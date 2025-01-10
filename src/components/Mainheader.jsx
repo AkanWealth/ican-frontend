@@ -175,6 +175,7 @@ function Mainheader() {
       >
         <div className="p-4 flex flex-col gap-2">
           <Link
+            onClick={() => setOpenMenu(!openMenu)}
             className={`${
               pathname === "/membership" ? "text-primary" : ""
             } text-sm font-semibold   leading-none`}
@@ -186,22 +187,43 @@ function Mainheader() {
             <AccordionItem value="item-1">
               <AccordionTrigger>Membership </AccordionTrigger>
               <AccordionContent className=" flex flex-col gap-2">
-                <Link href="/membership">Membership Information</Link>
-                <Link href="/sign-up">Membership Registration</Link>
-                <Link href="/login">Member Login</Link>
-                <Link href="/student">Student</Link>
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/membership">
+                  Membership Information
+                </Link>
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/sign-up">
+                  Membership Registration
+                </Link>
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/login">
+                  Member Login
+                </Link>
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/student">
+                  Student
+                </Link>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
               <AccordionTrigger>About us</AccordionTrigger>
               <AccordionContent className=" flex flex-col gap-2">
-                <Link href="/about-us/how-it-works">How It Works</Link>
-                <Link href="/about-us">About ICAN SDS</Link>
-                <Link href="/about-us/our-excos">Our Excos</Link>
+                <Link
+                  onClick={() => setOpenMenu(!openMenu)}
+                  href="/about-us/how-it-works"
+                >
+                  How It Works
+                </Link>
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/about-us">
+                  About ICAN SDS
+                </Link>
+                <Link
+                  onClick={() => setOpenMenu(!openMenu)}
+                  href="/about-us/our-excos"
+                >
+                  Our Excos
+                </Link>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
           <Link
+            onClick={() => setOpenMenu(!openMenu)}
             className={`${
               pathname === "/contact-us" ? "text-primary" : ""
             } text-sm font-semibold  py-4 leading-none`}
@@ -211,6 +233,7 @@ function Mainheader() {
           </Link>
           <br />
           <Link
+            onClick={() => setOpenMenu(!openMenu)}
             className={`${
               pathname === "/donate" ? "text-primary" : ""
             } text-sm font-semibold py-4  leading-none`}

@@ -1,4 +1,6 @@
-import React from "react";
+"use client"
+
+import React,{useState} from "react";
 import Heroimg from "@/components/Heroimg";
 import Getin from "@/components/Getin";
 import Cinfo from "@/components/Cinfo";

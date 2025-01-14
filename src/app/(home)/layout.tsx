@@ -1,9 +1,13 @@
+
+
 import type { Metadata } from "next";
 import "../globals.css";
 import { inter, league_spartan } from "../fonts";
 import Mainheader from "../../components/Mainheader";
 import Mainfooter from "../../components/Mainfooter";
 import { Toaster } from "@/components/ui/toaster";
+
+
 
 export const metadata: Metadata = {
   title: "ICAN Surulere",
@@ -15,6 +19,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+
   return (
     <html lang="en" className={`${inter.variable}  ${league_spartan.variable}`}>
       <head>

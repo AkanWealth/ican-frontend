@@ -5,8 +5,11 @@ function Backdrop({children, onClick}) {
   return (
 
     <motion.div
-    className=' absolute top-0 left-0 h-full w-full'
+    className=' absolute top-0 left-0 h-full w-full bg-black opacity-20 flex items-center justify-center'
     onClick={onclick}
+    initial={{opacity:0}}
+    animate={{opacity:0.5}}
+    exit={{opacity:0}}
     >
 
 

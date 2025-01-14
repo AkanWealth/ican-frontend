@@ -1,9 +1,14 @@
 "use client"
 
 import React, { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+// import ModalBasket from "./modal/ModalBasket";
 
 // get in touch form used on the contact us page of the design
 function Getin({ heading, phoneNumber = true, className }) {
+//   const [modalOpen, setModalOpen] = useState(false)
+// const close=()=>setModalOpen(false)
+// const open=()=>setModalOpen(true)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -158,10 +163,16 @@ function Getin({ heading, phoneNumber = true, className }) {
         <button
           type="submit"
           className=" rounded-full text-white bg-primary py-4 px-8 "
+          // onClick={()=>(modalOpen ? close():open())}
         >
           Send message
         </button>
       </form>
+      {/* <button onClick={()=>(modalOpen ? close():open())} >modal</button>
+      <AnimatePresence initial={false} mode="wait">
+
+      {modalOpen && <ModalBasket modalOpen={modalOpen} handleClose={close} >Testing</ModalBasket> }
+      </AnimatePresence> */}
     </div>
   );
 }

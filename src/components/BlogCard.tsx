@@ -60,7 +60,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onReadMore }) => {
           loading="lazy"
           src={post.imageUrl}
           alt={`Image for ${post.title}`}
-          className="h-full w-full sm:w-fit object-cover sm:rounded-l-lg rounded-3xl"
+          className="h-full w-full sm:w-fit object-cover sm:rounded-3xl rounded-3xl"
         />
       </div>
 

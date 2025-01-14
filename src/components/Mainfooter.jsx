@@ -22,10 +22,7 @@ function Mainfooter() {
                 />
               </Link>
             </div>
-            <p className=" text-white text-base font-normal ">
-              Tertiary institution as accredited by the Institute of Chartered
-              Accountants of Nigeria
-            </p>
+          
           </div>
           <div className="flex-col justify-start items-start gap-4 flex">
             <p className="text-white flex flex-row gap-3 items-center text-sm font-normal   leading-tight">

@@ -11,7 +11,7 @@ import {
   FaEyeSlash,
   FaRegCheckCircle,
 } from "react-icons/fa";
-import { MdOutlineMarkEmailUnread} from"react-icons/md";
+import { MdOutlineMarkEmailUnread } from "react-icons/md";
 import Toast from "@/components/genui/Toast";
 
 function Signup() {
@@ -224,33 +224,35 @@ function Signup() {
       email: email,
       password: password,
     });
+
     const config = {
-      method: 'post',
+      method: "post",
       maxBodyLength: Infinity,
-      url: 'https://ican-sds-api.onrender.com/api/v1/auth/register',
-      headers: { 
-        'Content-Type': 'application/json'
+      headers: {
+        "Content-Type": "application/json",
       },
-      data: data
     };
-
-
 
     if (Object.values(errors).every((error) => error === "")) {
       // Submit form
       try {
-        const response = await axios.request(config);
+        const response = await axios.post(
+          "https://ican-sds-api.onrender.com/api/v1/auth/register",
+          data,
+          config
+        );
+
         setPopupMessage(response.data.message);
         setShowPopup(true);
         setPopError(false);
       } catch (error) {
+        console.error("error: ", error);
         setPopupMessage("An error occurred during registration.");
         setPopError(true);
         setShowPopup(true);
       } finally {
         setLoading(false);
       }
-
     } else {
       setLoading(false);
     }
@@ -477,22 +479,30 @@ function Signup() {
             <Image src="/Logo_big.png" alt="Logo" width={143} height={60} />
 
             {popError ? (
-<>
-<h3 className="text-primary font-semibold text-3xl">Registration Failed</h3>
-            <p>{popupMessage}</p>
-</>            ) : (
+              <>
+                <h3 className="text-primary font-semibold text-3xl">
+                  Registration Failed
+                </h3>
+                <p>{popupMessage}</p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-primary font-semibold text-3xl">
+                  Verify your Email
+                </h3>
 
-<>
-<h3 className="text-primary font-semibold text-3xl">Verify your Email</h3>
-            
-            <MdOutlineMarkEmailUnread className="w-16 h-16 fill-primary" />
-            
-            <p className="text-center w-3/4 font-sans">A verification link has been sent to your email. Please check your email and select the link provided to continue</p>
+                <MdOutlineMarkEmailUnread className="w-16 h-16 fill-primary" />
 
-            <p className="font-medium">
-              Didn&apos;t receive an email? Check your spam folder.
-            </p>
-            </>            )}
+                <p className="text-center w-3/4 font-sans">
+                  A verification link has been sent to your email. Please check
+                  your email and select the link provided to continue
+                </p>
+
+                <p className="font-medium">
+                  Didn&apos;t receive an email? Check your spam folder.
+                </p>
+              </>
+            )}
 
             <button
               className="mt-4 px-4 py-2 bg-primary text-white rounded"

@@ -1,14 +1,49 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import axios from "axios";
 
 interface Propsval {
   onNext: () => void;
 }
 
 function Base({ onNext }: Propsval) {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const data = JSON.stringify({
+      email: email,
+    });
+
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "https://ican-sds-api.onrender.com/api/v1/auth/password/reset",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+
+    try {
+      const response = await axios.request(config);
+      setMessage(response.data.message);
+      setError("");
+      onNext(); // Call onNext if the request is successful
+    } catch (error) {
+      setMessage("");
+      setError("An error occurred. Please try again.");
+    }
+  };
+
   return (
-    <div className="flex flex-col w-full sm:w-[440px] items-center  gap-6 ">
+    <div className="flex flex-col w-full  items-center  gap-6 ">
       <Image src="/Logo_big.png" alt="Logo" width={143} height={60} />
       <div className=" w-fit">
         <h4 className=" text-primary text-center text-3xl font-bold font-mono   ">
@@ -18,7 +53,7 @@ function Base({ onNext }: Propsval) {
           Enter your email address to reset your password.{" "}
         </p>
       </div>
-      <form className="w-full flex flex-col gap-4 " action="">
+      <form className="w-full flex flex-col gap-4 " onSubmit={handleSubmit}>
         <div className="  w-full flex flex-col">
           <label
             className=" text-base font-sans font-semibold  "
@@ -32,6 +67,7 @@ function Base({ onNext }: Propsval) {
             name="email"
             required
             type="email"
+            onChange={(e) => setEmail(e.target.value)}
           />
           <p></p>
         </div>

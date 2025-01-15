@@ -30,7 +30,7 @@ function ForgotPassword() {
   };
   return (
     <div className=" m-auto ">
-      <div className="flex flex-col w-96 sm:w-[440px] items-center rounded-2xl  bg-white p-8  ">
+      <div className="flex flex-col w-fit sm:w-[440px] items-center rounded-2xl  bg-white p-8 gap-6 ">
         {step === 1 && <Base onNext={handleNext} />}
         {step === 2 && <Sent onNext={handleNext} />}
       </div>

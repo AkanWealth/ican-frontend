@@ -1,5 +1,12 @@
 import React from "react";
-import { FaPeopleRoof } from "react-icons/fa6";
+import {
+  MdOutlineContacts,
+  MdOutlineSpeaker,
+  MdOutlineLightbulb,
+  MdOutlineEmojiSymbols,
+  MdOutlineEscalatorWarning,
+  MdOutlineLinkedCamera,
+} from "react-icons/md";
 import PropTypes from "prop-types";
 import Itemcard from "@/components/genui/Itemcard";
 
@@ -23,27 +30,53 @@ function Infocard({
       </div>
       <div className="flex flex-col sm:flex-row flex-wrap gap-12 items-center justify-center">
         <Itemcard
-          name={"Monthly Meeting"}
+          name={"Insight into contemporary and significant national issues"}
           info={
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            "Gain in-depth understanding of relevant topics, equipping members to confidently contribute to industry discussions and policy debates."
           }
-          icon={<FaPeopleRoof className="w-9 h-9 fill-primary" />}
+          icon={<MdOutlineContacts className="w-9 h-9 fill-[#916103]" />}
           type="col"
         />
         <Itemcard
-          name={"Monthly Meeting"}
+          name={"Access to expert speaker"}
           info={
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            "Engage with industry leaders, carefully selected to share their vast knowledge and experience, enriching members &apos; perspectives."
           }
-          icon={<FaPeopleRoof className="w-9 h-9 fill-primary" />}
+          icon={<MdOutlineSpeaker className="w-9 h-9 fill-[#916103]" />}
           type="col"
         />
         <Itemcard
-          name={"Monthly Meeting"}
+          name={"Enhanced Professional Knowledge"}
           info={
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            "Sharpen your expertise as a chartered accountant. Sessions equip members to analyze and discuss critical topics with clients, colleagues, and stakeholders."
           }
-          icon={<FaPeopleRoof className="w-9 h-9 fill-primary" />}
+          icon={<MdOutlineLightbulb className="w-9 h-9 fill-[#916103]" />}
+          type="col"
+        />
+        <Itemcard
+          name={"Interactive Learning Experience"}
+          info={
+            "Participate in live Q&A, discussions, and real-time clarifications for a deeper understanding compared to virtual sessions."
+          }
+          icon={<MdOutlineEmojiSymbols className="w-9 h-9 fill-[#916103]" />}
+          type="col"
+        />
+        <Itemcard
+          name={"Networking Opportunities"}
+          info={
+            "Meet speakers, exchange contacts, and connect with fellow members, fostering a vibrant professional network."
+          }
+          icon={
+            <MdOutlineEscalatorWarning className="w-9 h-9 fill-[#916103]" />
+          }
+          type="col"
+        />
+        <Itemcard
+          name={"Exclusive Experience"}
+          info={
+            "Create lasting memories by capturing moments, enriching your professional journey with unique experiences."
+          }
+          icon={<MdOutlineLinkedCamera className="w-9 h-9 fill-[#916103]" />}
           type="col"
         />
       </div>

@@ -19,7 +19,7 @@ function Howiw() {
         subtitle={"ICAN SURULERE DISTRICT"}
         title="Benefits of Being a Member"
         addtxt={
-          "As a valued member of our ICAN District Society, you gain access to:"
+          "As a valued member of our ICAN District Society, your attendance at our Physical Technical Sessions and Meetings provides you with access to:"
         }
       />
 

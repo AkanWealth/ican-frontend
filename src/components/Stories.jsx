@@ -4,6 +4,7 @@ import React from "react";
 import BlogCard from "@/components/BlogCard";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { handleReadMore } from "@/lib/utils";
 import { blogPosts } from "@/lib/data";
 
 function Stories() {

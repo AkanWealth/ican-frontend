@@ -1,5 +1,8 @@
+"use client";
+
 import * as React from "react";
 import { BlogCardProps } from "@/types";
+// import { useRouter } from "next/router";
 
 /**
  * BlogCard Component
@@ -10,6 +13,7 @@ import { BlogCardProps } from "@/types";
  * @returns {JSX.Element} The rendered BlogCard component.
  */
 const BlogCard: React.FC<BlogCardProps> = ({ post, onReadMore }) => {
+  // const router = useRouter();
   /**
    * Handles keyboard navigation for the "Read more" button.
    * Triggers the `onReadMore` callback when the "Enter" or "Space" key is pressed.
@@ -19,6 +23,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onReadMore }) => {
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === "Enter" || event.key === " ") {
       onReadMore(post.id);
+      // router..h(`/blog/${post.id}`);
     }
   };
 
@@ -79,6 +84,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onReadMore }) => {
         </time>
 
         {/* Read more button */}
+
         <button
           onClick={() => onReadMore(post.id)}
           onKeyPress={handleKeyPress}

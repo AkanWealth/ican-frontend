@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react";
+import { useToast } from "./ui/toaster";
 
 
 // get in touch form used on the contact us page of the design
@@ -54,7 +55,7 @@ function Getin({ heading, phoneNumber = true, className }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const nameError = validateName(formData.name);
@@ -64,19 +65,46 @@ function Getin({ heading, phoneNumber = true, className }) {
       name: nameError,
       email: emailError,
     });
-    const templateParams = {
-      from_name: formData.name + " (" + formData.email + ")",
-      to_name: "icansuruleredistrictsociety@gmail.com",
-      feedback: this.state.feedback
-    };
+    // const templateParams = {
+    //   from_name: formData.name + " (" + formData.email + ")",
+    //   to_name: "icansuruleredistrictsociety@gmail.com",
+    //   feedback: this.state.feedback
+    // };
 
 
     if (!nameError && !emailError) {
-      
-
-      // Submit form
-      console.log("Form submitted", formData);
-
+      try {
+        // Submit form
+        console.log("Form submitted", formData);
+        // Make the API call
+        const response = await fetch('https://ican-sds-api.onrender.com/api/v1/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to send message');
+        }
+          
+        const result = await response.json();
+  
+        // console.log('API Response:', result);
+        alert('Contact form has been submitted successfully');
+  
+        // Reset the form after successful submission
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          message: '',
+        });
+      } catch (error) {
+        console.error('Error sending message:', error);
+        alert('There was an error sending your message. Please try again.');
+      }
 
       setFormData({
         name: "",
@@ -100,7 +128,7 @@ function Getin({ heading, phoneNumber = true, className }) {
           inquiries. We are here to assist you every step of the way.
         </p>
       </div>
-      <form className="flex flex-col gap-8 justify-start items-end" action="">
+      <form className="flex flex-col gap-8 justify-start items-end" method="POST">
         <div className="flex flex-col w-full gap-3">
           <label className=" text-base text-black  " htmlFor="name">
             Name*
@@ -174,6 +202,7 @@ function Getin({ heading, phoneNumber = true, className }) {
         </div>
         <button
           type="submit"
+          onClick={(e) => handleSubmit(e)}
           className=" rounded-full text-white bg-primary py-4 px-8 "
         >
           Send message

@@ -11,6 +11,8 @@ import { MdOutlineMarkEmailUnread } from "react-icons/md";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/utils/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/utils/firebase";
 
 import Toast from "@/components/genui/Toast";
 
@@ -218,11 +220,23 @@ function Signup() {
       data: data,
     };
 
+    const docRef = await addDoc(collection(db, "members"), {
+      firstName: firstName,
+      surname: surname,
+      email: email,
+      password: password,
+    });
+    console.log("Member written with ID: ", docRef.id);
+
     await createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
+
         const user = userCredential.user;
+
         console.log(user);
+        setShowPopup(true);
+        setPopError(false);
         router.push("/login");
         return <Toast type="success" message="Login Successful" />;
       })
@@ -230,26 +244,11 @@ function Signup() {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorCode, errorMessage);
+        setPopupMessage("An error occurred during registration.");
+        setPopError(true);
+        setShowPopup(true);
         return <Toast type="error" message={error} />;
       });
-
-    // if (Object.values(errors).every((error) => error === "")) {
-    //   // Submit form
-    //   try {
-    //     const response = await axios.request(config);
-    //     setPopupMessage(response.data.message);
-    //     setShowPopup(true);
-    //     setPopError(false);
-    //   } catch (error) {
-    //     setPopupMessage("An error occurred during registration.");
-    //     setPopError(true);
-    //     setShowPopup(true);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // } else {
-    //   setLoading(false);
-    // }
   };
 
   return (

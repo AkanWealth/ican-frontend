@@ -4,10 +4,15 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import InputEle from "@/components/genui/InputEle";
+import { useRouter } from "next/navigation";
+
 import Toast from "@/components/genui/Toast";
 import axios from "axios";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/utils/firebase";
 
 function Login() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -51,7 +56,7 @@ function Login() {
     }
     if (!/[@$!%*?&]/.test(password)) {
       setPnumber(false);
-      return("no special charcter")
+      return "no special charcter";
     } else {
       setPvalid(true);
     }
@@ -131,14 +136,27 @@ function Login() {
 
     if (Object.values(errors).every((error) => error === "")) {
       // Submit form
-      try {
-        const response = await axios.request(config);
-        return <Toast type="success" message={response.data.message} />;
-      } catch (error) {
-        return <Toast type="error" message="An error occurred during login." />;
-      } finally {
-        setLoading(false);
-      }
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          router.push("/login");
+          console.log(user);
+          return <Toast type="success" message="Login Successful" />;
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+          return <Toast type="error" message={error} />;
+        });
+
+      // try {
+      //   const response = await axios.request(config);
+      // } catch (error) {
+      // } finally {
+      //   setLoading(false);
+      // }
     } else {
       setLoading(false);
     }
@@ -187,7 +205,7 @@ function Login() {
             </Link>
           </div>
           <button
-            disabled={ !loading}
+            disabled={!loading}
             className=" px-8 py-4 bg-primary rounded-full text-white text-base disabled:bg-gray-600 font-semibold "
             type="submit"
           >

@@ -4,14 +4,18 @@ import React, { useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  FaLock,
-  FaEye,
-  FaEyeSlash,
-} from "react-icons/fa";
+import { useRouter } from "next/navigation";
+
+import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlineMarkEmailUnread } from "react-icons/md";
 
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/utils/firebase";
+
+import Toast from "@/components/genui/Toast";
+
 function Signup() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [complete, setComplete] = useState(false);
@@ -45,8 +49,6 @@ function Signup() {
   const [pnumber, setPnumber] = useState(false);
   const [plower, setPlower] = useState(false);
   const [consent, setConsent] = useState(false);
-
-
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -216,23 +218,38 @@ function Signup() {
       data: data,
     };
 
-    if (Object.values(errors).every((error) => error === "")) {
-      // Submit form
-      try {
-        const response = await axios.request(config);
-        setPopupMessage(response.data.message);
-        setShowPopup(true);
-        setPopError(false);
-      } catch (error) {
-        setPopupMessage("An error occurred during registration.");
-        setPopError(true);
-        setShowPopup(true);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      setLoading(false);
-    }
+    await createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(user);
+        router.push("/login");
+        return <Toast type="success" message="Login Successful" />;
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        return <Toast type="error" message={error} />;
+      });
+
+    // if (Object.values(errors).every((error) => error === "")) {
+    //   // Submit form
+    //   try {
+    //     const response = await axios.request(config);
+    //     setPopupMessage(response.data.message);
+    //     setShowPopup(true);
+    //     setPopError(false);
+    //   } catch (error) {
+    //     setPopupMessage("An error occurred during registration.");
+    //     setPopError(true);
+    //     setShowPopup(true);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // } else {
+    //   setLoading(false);
+    // }
   };
 
   return (

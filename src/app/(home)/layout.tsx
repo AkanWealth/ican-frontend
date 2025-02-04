@@ -1,5 +1,5 @@
 import "../globals.css";
-import { inter, league_spartan } from "../fonts";
+// import { inter, league_spartan } from "../fonts";
 import Mainheader from "../../components/Mainheader";
 import Mainfooter from "../../components/Mainfooter";
 
@@ -15,9 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable}  ${league_spartan.variable}`}>
+    <html lang="en" className={`{inter.variable}  {league_spartan.variable}`}>
       <head>
-      
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </head>
       <body>

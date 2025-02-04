@@ -220,19 +220,19 @@ function Signup() {
       data: data,
     };
 
-    const docRef = await addDoc(collection(db, "members"), {
-      firstName: firstName,
-      surname: surname,
-      email: email,
-      password: password,
-    });
-    console.log("Member written with ID: ", docRef.id);
-
     await createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
 
         const user = userCredential.user;
+        const docRef = addDoc(collection(db, "members"), {
+          userid: user.uid,
+          firstName: firstName,
+          surname: surname,
+          email: email,
+          password: password,
+        });
+        console.log("Member written with ID: ", docRef);
 
         console.log(user);
         setShowPopup(true);

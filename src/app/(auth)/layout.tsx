@@ -1,4 +1,10 @@
 import "../globals.css";
+import { Toaster } from "@/components/ui/toaster";
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "ICAN Surulere",
+  description: "Empowering Professionals, Building Futures",
+};
 
 export default function AuthLayout({
   children,
@@ -7,16 +13,15 @@ export default function AuthLayout({
 }) {
   return (
     <html lang="en">
-
       <body
-        className="flex h-screen items-center flex-col justify-center "
+        className="flex h-screen bg-fixed items-center flex-col justify-center "
         style={{
           backgroundImage: "url(/bgauth.png)",
           backgroundSize: "cover",
         }}
       >
-        <div>{children}</div>
-
+        <div className="pt-20">{children}</div>
+        <Toaster />
       </body>
     </html>
   );

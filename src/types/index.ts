@@ -6,7 +6,7 @@ export interface BlogPost {
   id: string;
 
   /** The category of the blog post */
-  category: "Articles" | "News" | "Videos";
+  category: "Articles" | "News" | "Videos" ;
 
   /** Title of the blog post */
   title: string;

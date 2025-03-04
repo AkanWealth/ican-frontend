@@ -22,21 +22,31 @@ function Mainfooter() {
                 />
               </Link>
             </div>
-            <p className=" text-white text-base font-normal ">
-              Tertiary institution as accredited by the Institute of Chartered
-              Accountants of Nigeria
-            </p>
           </div>
           <div className="flex-col justify-start items-start gap-4 flex">
             <p className="text-white flex flex-row gap-3 items-center text-sm font-normal   leading-tight">
               <HiOutlineLocationMarker className=" stroke-white w-8 h-8 relative" />
-              Office Address
+              Secretariat Address
             </p>
 
             <p className="text-white text-sm font-medium ">
               30B, Oke-Onijo Street, Off Ogunlana Street,
               <br />
               Ijeshatedo, Surulere, Lagos
+            </p>
+          </div>
+
+          <div className="flex-col justify-start items-start gap-4 flex">
+            <p className="text-white flex flex-row gap-3 items-center text-sm font-normal   leading-tight">
+              <HiOutlineLocationMarker className=" stroke-white w-8 h-8 relative" />
+              Physical Meeting Address
+            </p>
+
+            <p className="text-white text-sm font-medium ">
+              Surulere Local Government Secretariat, <br /> Senator Oluremi
+              Tinubu Hall, <br />
+              24, Hakeem Olaogun Dickson Close <br /> Off Alhaji Masha,
+              Onilegogoro Bus Stop, <br/> Lagos State
             </p>
           </div>
         </div>
@@ -98,9 +108,17 @@ function Mainfooter() {
                   Follow us on
                 </h5>
                 <div className="inline-flex flex-row  justify-start items-center gap-6">
-                  <FaInstagram className="stroke-white fill-white w-8 h-8 relative" />
-                  <FaTwitter className="stroke-white fill-white w-8 h-8 relative" />
-                  <FaFacebookF className=" stroke-white fill-white w-8 h-8 relative" />
+                  <Link
+                    href={
+                      "https://www.instagram.com/ican_suruleredistrict?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                    }
+                  >
+                    <FaInstagram className="stroke-white fill-white w-8 h-8 relative" />
+                  </Link>
+                  {/* <FaTwitter className="stroke-white fill-white w-8 h-8 relative" /> */}
+                  <Link href={"https://www.facebook.com/share/1XiDvJ63h8/"}>
+                    <FaFacebookF className=" stroke-white fill-white w-8 h-8 relative" />
+                  </Link>
                 </div>
               </div>
             </div>

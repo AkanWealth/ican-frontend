@@ -3,7 +3,7 @@ import React from "react";
 function Findus() {
   return (
     <div className="flex flex-col gap-8 w-full justify-between items-center p-4 md:p-20 lg:px-40 ">
-      <h2 className="font-bold text-4xl text-primary  font-mono ">
+      <h2 className="font-bold text-3xl sm:text-4xl text-primary  font-mono ">
         Find us on Google Map
       </h2>
       <div className="w-full">

@@ -80,7 +80,7 @@ function Dontoday() {
   return (
     <div className="p-4 sm:p-20 lg:px-40 flex flex-col w-full gap-16">
       <div className="items-center text-center flex flex-col gap-4">
-        <h2 className="w-fit max-w-[700px] font-bold text-4xl text-primary font-mono">
+        <h2 className="w-fit max-w-[700px] font-bold text-3xl sm:text-4xl text-primary font-mono">
           Donate securely today and support our mission
         </h2>
         <p className="text-gray-800 text-base font-normal font-sans">

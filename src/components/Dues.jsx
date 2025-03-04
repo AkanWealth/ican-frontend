@@ -7,7 +7,7 @@ function Dues() {
     <div className="py-20 px-40 flex flex-row justify-between items-center w-full ">
       <Image width={270} height={635} src="/chess.png" alt="Dues img" />
       <div className=" flex flex-col justify-start gap-12 items-start ">
-        <h2 className=" font-bold text-4xl text-primary  font-mono  ">
+        <h2 className=" font-bold text-3xl sm:text-4xl text-primary  font-mono  ">
           Membership Dues
         </h2>
         <div className=" flex rounded-2xl flex-col bg-primary p-6 h-fit w-fit gap-6 ">

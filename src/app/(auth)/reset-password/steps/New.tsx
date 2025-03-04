@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -6,10 +6,9 @@ interface Propsval {
   onNext: () => void;
 }
 
-
 function New({ onNext }: Propsval) {
   return (
-    <div className="flex flex-col w-[440px] items-center rounded-2xl  bg-white p-8 gap-6 ">
+    <div className="flex flex-col w-full items-center  gap-6 ">
       <Image src="/Logo_big.png" alt="Logo" width={143} height={60} />
       <div className=" w-fit">
         <h4 className=" text-primary text-center text-3xl font-bold font-mono   ">
@@ -53,9 +52,9 @@ function New({ onNext }: Propsval) {
           <p></p>
         </div>
         <button
-        onClick={()=>{
-          onNext()
-        }}
+          onClick={() => {
+            onNext();
+          }}
           className=" px-8 py-4 bg-primary rounded-full text-white text-base font-semibold "
           type="submit"
         >
@@ -72,4 +71,4 @@ function New({ onNext }: Propsval) {
   );
 }
 
-export default New
+export default New;

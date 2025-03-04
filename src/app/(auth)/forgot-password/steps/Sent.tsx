@@ -10,7 +10,7 @@ function Sent({ onNext }: Propsval) {
   return (
     <div className=" flex flex-col items-center gap-10  ">
       <Image src={"/Check.png"} width={52} height={35} alt="success" />
-      <h4 className=" text-black text-4xl font-semibold font-mono ">
+      <h4 className=" text-black text-3xl sm:text-4xl font-semibold font-mono ">
         Password Reset Link Sent
       </h4>
       <p className="text-xl font-normal font-mono">

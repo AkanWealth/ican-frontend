@@ -39,7 +39,7 @@ function Mainheader() {
         <div className="justify-start items-center gap-1  w-fit  flex">
           <HiOutlineMail className=" stroke-white " />
           <p className="text-white text-sm font-semibold   leading-none">
-            info@suruleredistrictsociety.org.ng
+            icansuruleredistrictsociety@gmail.com
           </p>
         </div>
         <div className="w-fit justify-start items-center gap-1 flex">
@@ -58,49 +58,20 @@ function Mainheader() {
 
       <div className=" w-full sm:w-full mt-4 p-2  justify-between sm:justify-around items-center sm:gap-10 flex flex-row">
         <Link href="/">
-          <Image alt="Logo" width={143} height={60} src="/Logo_big.png" />
+          <Image alt="Logo" width={184} height={60} src="/sdslogo.png" />
         </Link>
         <div className="hidden justify-start items-center gap-4 sm:flex">
           <NavigationMenu>
             <NavigationMenuList className=" gap-3">
               <NavigationMenuItem>
-                <Link
+                <NavigationMenuLink
+                  href="/"
                   className={`${
                     pathname === "/" ? "text-primary" : ""
                   } text-sm font-semibold   leading-none`}
-                  href="/"
                 >
-                  <NavigationMenuLink>Home</NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger
-                  className={`${
-                    pathname === "/membership" ? "text-primary" : ""
-                  } text-sm font-semibold   leading-none`}
-                >
-                  Membership
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="flex flex-col gap-5 p-4 md:w-[400px] lg:w-[500px] py-4 px-2  ">
-                    <Link href="/membership" legacyBehavior passHref>
-                      <NavigationMenuLink>
-                        Membership Information
-                      </NavigationMenuLink>
-                    </Link>
-                    <Link href="/sign-up" legacyBehavior passHref>
-                      <NavigationMenuLink>
-                        Membership Registration
-                      </NavigationMenuLink>
-                    </Link>
-                    <Link href="/login" legacyBehavior passHref>
-                      <NavigationMenuLink>Member Login</NavigationMenuLink>
-                    </Link>
-                    <Link href="/student" legacyBehavior passHref>
-                      <NavigationMenuLink>Student</NavigationMenuLink>
-                    </Link>
-                  </div>
-                </NavigationMenuContent>
+                  Home
+                </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger
@@ -112,9 +83,9 @@ function Mainheader() {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="flex flex-col mx-auto gap-5 p-4 md:w-[400px] lg:w-[500px] py-4 px-2  ">
-                    <Link href="/about-us/how-it-works" legacyBehavior passHref>
+                    {/* <Link href="/about-us/how-it-works" legacyBehavior passHref>
                       <NavigationMenuLink>How It Works</NavigationMenuLink>
-                    </Link>
+                    </Link> */}
                     <Link href="/about-us" legacyBehavior passHref>
                       <NavigationMenuLink>About SDS</NavigationMenuLink>
                     </Link>
@@ -124,6 +95,74 @@ function Mainheader() {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuTrigger
+                  className={`${
+                    pathname === "/membership" ? "text-primary" : ""
+                  } text-sm font-semibold   leading-none`}
+                >
+                  Membership
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="flex flex-col gap-5 p-4 md:w-[400px] lg:w-[500px] py-4 px-2  ">
+                    <Link href="/membership" legacyBehavior passHref>
+                      <NavigationMenuLink>Member Benefits</NavigationMenuLink>
+                    </Link>
+                    <Link href="/student" legacyBehavior passHref>
+                      <NavigationMenuLink>Student</NavigationMenuLink>
+                    </Link>
+                    <Link href="/sign-up" legacyBehavior passHref>
+                      <NavigationMenuLink>
+                        Membership Registration
+                      </NavigationMenuLink>
+                    </Link>
+                    <Link href="/login" legacyBehavior passHref>
+                      <NavigationMenuLink>Member Login</NavigationMenuLink>
+                    </Link>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuTrigger
+                  className={`${
+                    pathname === "/gallery" ? "text-primary" : ""
+                  } text-sm font-semibold   leading-none`}
+                >
+                  Media & Resources
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="flex flex-col gap-5 p-4 md:w-[400px] lg:w-[500px] py-4 px-2  ">
+                    {/* <Link href="/blog" legacyBehavior passHref>
+                      <NavigationMenuLink>Blog </NavigationMenuLink>
+                    </Link> */}
+                    <Link href="/gallery" legacyBehavior passHref>
+                      <NavigationMenuLink>Gallery</NavigationMenuLink>
+                    </Link>
+                    <Link href="/technical" legacyBehavior passHref>
+                      <NavigationMenuLink>
+                        Technical Session{" "}
+                      </NavigationMenuLink>
+                    </Link>
+                    {/* 
+                     <Link href="/publications" legacyBehavior passHref>
+                      <NavigationMenuLink>Publication</NavigationMenuLink>
+                    </Link> */}
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link
+                  href="/faq"
+                  className={`${
+                    pathname === "/faq" ? "text-primary" : ""
+                  } text-sm font-semibold`}
+                >
+                  FAQ
+                </Link>
+              </NavigationMenuItem>
+
               <NavigationMenuItem>
                 <Link
                   href="/contact-us"
@@ -134,16 +173,7 @@ function Mainheader() {
                   Contact Us
                 </Link>
               </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link
-                  href="/donate"
-                  className={`${
-                    pathname === "/donate" ? "text-primary" : ""
-                  } text-sm font-semibold`}
-                >
-                  Donations
-                </Link>
-              </NavigationMenuItem>
+
               <NavigationMenuIndicator />
             </NavigationMenuList>
             <NavigationMenuViewport className=" justify-self-center  " />
@@ -185,31 +215,14 @@ function Mainheader() {
           </Link>
           <Accordion type="single" collapsible>
             <AccordionItem value="item-1">
-              <AccordionTrigger>Membership </AccordionTrigger>
-              <AccordionContent className=" flex flex-col gap-2">
-                <Link onClick={() => setOpenMenu(!openMenu)} href="/membership">
-                  Membership Information
-                </Link>
-                <Link onClick={() => setOpenMenu(!openMenu)} href="/sign-up">
-                  Membership Registration
-                </Link>
-                <Link onClick={() => setOpenMenu(!openMenu)} href="/login">
-                  Member Login
-                </Link>
-                <Link onClick={() => setOpenMenu(!openMenu)} href="/student">
-                  Student
-                </Link>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2">
               <AccordionTrigger>About us</AccordionTrigger>
               <AccordionContent className=" flex flex-col gap-2">
-                <Link
+                {/* <Link
                   onClick={() => setOpenMenu(!openMenu)}
                   href="/about-us/how-it-works"
                 >
                   How It Works
-                </Link>
+                </Link> */}
                 <Link onClick={() => setOpenMenu(!openMenu)} href="/about-us">
                   About ICAN SDS
                 </Link>
@@ -221,25 +234,61 @@ function Mainheader() {
                 </Link>
               </AccordionContent>
             </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>Membership </AccordionTrigger>
+              <AccordionContent className=" flex flex-col gap-2">
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/membership">
+                  Member Benefits
+                </Link>{" "}
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/student">
+                  Student
+                </Link>
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/sign-up">
+                  Membership Registration
+                </Link>
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/login">
+                  Member Login
+                </Link>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>Media & Resources </AccordionTrigger>
+              <AccordionContent className=" flex flex-col gap-2">
+                {/* <Link onClick={() => setOpenMenu(!openMenu)} href="/blog">
+                  Blog{" "}
+                </Link>{" "} */}
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/gallery">
+                  Gallery
+                </Link>
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/technical">
+                  Technical Session{" "}
+                </Link>{" "}
+                {/*
+                 <Link onClick={() => setOpenMenu(!openMenu)} href="/publications">
+                  Publications
+                </Link>
+                */}
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
           <Link
             onClick={() => setOpenMenu(!openMenu)}
             className={`${
-              pathname === "/contact-us" ? "text-primary" : ""
-            } text-sm font-semibold  py-4 leading-none`}
-            href="/contact-us"
+              pathname === "/faq" ? "text-primary" : ""
+            } text-sm font-semibold py-2  leading-none`}
+            href="/faq"
           >
-            Contact Us
+            FAQ
           </Link>
           <br />
           <Link
             onClick={() => setOpenMenu(!openMenu)}
             className={`${
-              pathname === "/donate" ? "text-primary" : ""
-            } text-sm font-semibold py-4  leading-none`}
-            href="/donate"
+              pathname === "/contact-us" ? "text-primary" : ""
+            } text-sm font-semibold  py-2 leading-none`}
+            href="/contact-us"
           >
-            Donations
+            Contact Us
           </Link>
         </div>
         <Link className=" w-full " href="/login">

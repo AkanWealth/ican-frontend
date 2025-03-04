@@ -2,6 +2,7 @@
 
 import React from "react";
 import Studenttile from "./genui/Studenttile";
+import { studentMaterials } from "@/lib/studentdata";  
 // import { Pagination } from "../components/Pagination";
 
 function StudentStudy() {
@@ -27,20 +28,26 @@ function StudentStudy() {
   //     (currentPage - 1) * postsPerPage,
   //     currentPage * postsPerPage
   //   );
+  var raw = studentMaterials.slice(0, 9);
 
   return (
     <div className=" p-4  sm:p-20 lg:px-40 w-full flex flex-col gap-12 justify-start items-start ">
-      <h3 className="text-primary text-4xl font-bold font-mono ">
+      <h3 className="text-primary text-3xl sm:text-4xl font-bold font-mono ">
         Student Study Pack
       </h3>
       <section
-        className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         aria-label="Downloadable Contents"
       >
-        <Studenttile />
-        <Studenttile />
-        <Studenttile />
-        <Studenttile />
+         {raw.map((post) => (
+          <Studenttile
+            key={post.id}
+            imageUrl={post.imageUrl}
+            title={post.title}
+            fileType="PDF"
+            downloadLink={post.downloadLink}
+          />
+        ))}
       </section>
     </div>
   );

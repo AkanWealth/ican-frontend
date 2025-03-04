@@ -29,7 +29,7 @@ function ResetPassword() {
 
   return (
     <div className=" m-auto ">
-      <div className="flex flex-col w-[440px] items-center rounded-2xl  bg-white p-8 gap-6 ">
+      <div className="flex flex-col w-96 sm:w-[440px] items-center rounded-2xl  bg-white p-8 gap-6 ">
         {step === 1 && <New onNext={handleNext} />}
         {step === 2 && <Success onNext={handleNext} />}
       </div>

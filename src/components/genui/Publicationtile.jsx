@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 function Publicationtile({
   imgurl = "/image.png",
-  title = "2024- Annual Report & Minutes of AGM",
+  title = "2024 Annual Report & Minutes of AGM",
   date = "22, October 2024",
   previewurl,
   downloadurl,

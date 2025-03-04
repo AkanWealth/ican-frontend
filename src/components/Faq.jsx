@@ -32,7 +32,8 @@ function Faq() {
             </AccordionItem>
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg">
-                How can I become a member of the ICAN Surulere District?
+                How can I become a member of the Surulere & District Society
+                (SDS)?
               </AccordionTrigger>
               <AccordionContent className=" flex flex-col gap-2">
                 <p className=" text-base">
@@ -85,7 +86,7 @@ function Faq() {
               My question is not here.
             </p>
             <Link href="/contact-us">
-              <button className="w-fit rounded-full whitespace-nowrap py-2 px-4 text-sm sm:py-4 sm:px-8 sm:text-base bg-primary sm:bg-white text-white sm:text-primary font-sans">
+              <button className="w-fit rounded-lg whitespace-nowrap py-2 px-5 text-sm sm:py-4 sm:px-8 sm:text-base bg-primary sm:bg-white text-white sm:text-primary font-sans">
                 Connect with us
               </button>
             </Link>

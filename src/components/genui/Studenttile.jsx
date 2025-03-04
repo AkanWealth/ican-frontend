@@ -5,22 +5,24 @@ function Studenttile({
   imageUrl = "/image.png",
   title = "5 Critical Foundations for Mastering Financial Reporting",
   fileType = "PDF",
+  downloadLink = "/student/A3_ICAN_MI.pdf",
 }) {
   return (
     <div className="min-w-[350px]  gap-8 sm:gap-6 h-auto min-h-56 p-0 sm:pr-4 rounded-3xl border border-gray-300 justify-start items-center flex flex-col sm:flex-row">
-      {/* Download post image */}
-      <div className="sm:w-[253px] h-full w-full">
-        <Image
-          loading="lazy"
-          src={imageUrl}
-          width={100}
-          height={100}
-          alt={`Image for ${title}`}
-          className="h-full w-full  sm:w-fit object-cover sm:rounded-l-lg rounded-3xl"
-        />
-      </div>
-
-      {/* Download post content */}
+      {imageUrl ? (
+        <div className="sm:w-[253px] h-full w-full">
+          <Image
+            loading="lazy"
+            src={imageUrl}
+            width={100}
+            height={100}
+            alt={`Image for ${title}`}
+            className="h-full w-full sm:w-fit object-cover sm:rounded-l-lg rounded-3xl"
+          />
+        </div>
+      ) : (
+        ""
+      )}
       <div className="flex-col flex-1 justify-start items-start gap-4 inline-flex sm:p-6 py-8 px-4 ">
         {/* Download post category */}
         <span
@@ -35,7 +37,7 @@ function Studenttile({
         </h2>
 
         {/* Download button */}
-        <a href="/studenthero.png" download={title}>
+        <a href={downloadLink} download={title}>
           <button className=" px-4 py-1 rounded-full text-sm text-white  font-semibold bg-blue-900 hover:bg-white hover:border hover:border-primary hover:text-primary  ">
             Download
           </button>

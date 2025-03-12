@@ -284,9 +284,10 @@ function Base({ onNext }: PropsVal) {
 
   return (
     <>
-      <Image src="/Logo_big.png" alt="Logo" width={143} height={60} className="mt-40"/>
+    
+      <Image src="/Logo_big.png" alt="Logo" width={100} height={40} className=""/>
       <div className="w-fit">
-        <h4 className="text-primary text-center text-3xl font-bold font-mono">
+        <h4 className="text-primary text-center text-xl font-bold font-mono">
           Create Account
         </h4>
         <p className="text-base font-normal font-sans">

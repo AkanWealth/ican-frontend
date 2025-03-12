@@ -172,16 +172,16 @@ const MCPDRecords = () => {
     <div className="min-h-screen bg-gray-50">
 
 
-      <div className="p-8">
+      <div className="p-2">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold mb-2">My MCPD Points</h1>
-              <p className="text-gray-600 font-semibold">Track your professional development progress and stay on top of your goals.</p>
+              <h1 className="lg:text-2xl md:text-lg font-bold mb-2">My MCPD Points</h1>
+              <p className="text-gray-600 font-semibold  lg:text-base md:text-xs">Track your professional development progress and stay on top of your goals.</p>
             </div>
             <button
               onClick={handleExportPDF}
-              className="px-4 py-2 text-xs bg-primary text-white rounded-xl flex items-center gap-2 hover:bg-blue-700"
+              className="px-4 py-2 lg:text-base md:text-xs bg-primary text-white rounded-xl flex items-center gap-2 hover:bg-blue-700"
             >
               Export as PDF
             </button>
@@ -263,6 +263,7 @@ const MCPDRecords = () => {
                 </button>
               </div>
             ) : (
+              <div className='relative overflow-x-auto'>
               <table className="w-full justify-center item-center border-b border-gray-200 px-4">
                 <thead className="border-b border-t-none border-gray-300">
                   <tr>
@@ -291,6 +292,7 @@ const MCPDRecords = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </div>

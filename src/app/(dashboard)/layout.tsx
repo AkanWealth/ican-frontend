@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   description: "Empowering Professionals, Building Futures",
 };
 
-
 export default function AuthLayout({
   children,
 }: {
@@ -18,21 +17,20 @@ export default function AuthLayout({
 }) {
   return (
     <NotificationProvider>
-    <html lang="en">
-      <body>
-        
-        <div className="min-h-screen flex bg-gray-50">
-          <Sidebar />
-          <div className="flex-1 pt-12 bg-gray-50">
-            <Header />
-            <main className="pt-16 p-6">
-              {children}
-              <Toaster />
-            </main>
+      <html lang="en" className="h-full">
+        <body className="h-full bg-gray-50">
+          <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
+            <Sidebar />
+            <div className="flex-1 w-full lg:ml-60 md:ml-0">
+              <Header />
+              <main className="w-full pt-16 p-6 md:p-6 mt-20 ">
+                {children}
+                <Toaster />
+              </main>
+            </div>
           </div>
-        </div>
-      </body>
-    </html>
+        </body>
+      </html>
     </NotificationProvider>
   );
 }

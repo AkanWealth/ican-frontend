@@ -10,13 +10,13 @@ interface QualificationsProps {
 
 function Qualifications({ formData, updateFormData }: QualificationsProps) {
   return (
-    <div className="pt-4 flex flex-col justify-between gap-4 ">
-      <h3 className="font-bold font-mono text-2xl text-black ">
+    <div className="pt-4 flex flex-col justify-between gap-4 mt-4">
+      <h3 className="font-bold font-mono text-xl text-black ">
         EDUCATION AND PROFESSIONAL QUALIFICATION
         <hr />
       </h3>
 
-      <div className="grid grid-cols-2  gap-10 ">
+      <div className="grid lg:grid-cols-2 md:grid-col-1  lg:gap-10 md:gap-5">
         <InputEle
           id="insitution"
           placeholder="Enter your Insitution"
@@ -32,16 +32,16 @@ function Qualifications({ formData, updateFormData }: QualificationsProps) {
         <InputEle
           id="qualification"
           placeholder="Enter your qualification"
-          type="text"
+          type="status"
           label="Qualification"
         />
         <InputEle id="graduation" type="number" label="Year of Graduation" />
         <InputEle
-          id="firstQualName"
-          type="text"
-          label="First professional Qualification"
+          id="Status"
+          type="status"
+          label="Status"
         />
-        <InputEle
+        {/* <InputEle
           id="firstQualDate"
           type="number"
           label="Year of First Qualification"
@@ -55,7 +55,7 @@ function Qualifications({ formData, updateFormData }: QualificationsProps) {
           id="secQualDate"
           type="number"
           label="Year of Second Qualification"
-        />
+        /> */}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useState } from "react";
 import { BiodataFormData } from "../Biodata";
 import InputEle from "../genui/InputEle";
 
@@ -9,30 +10,55 @@ interface ExperienceProps {
 }
 
 function Experience({ formData, updateFormData }: ExperienceProps) {
+  const [isCurrentJob, setIsCurrentJob] = useState(false);
+
+  const handleCheckboxChange = () => {
+    setIsCurrentJob(!isCurrentJob);
+  };
+  
   return (
-    <div className="pt-4 flex flex-col justify-between gap-4 ">
-      <h3 className="font-bold font-mono text-2xl text-black ">
+    <div className="pt-4 flex flex-col justify-between gap-4 mt-4">
+      <h3 className="font-bold font-mono text-xl text-black ">
         WORK EXPERIENCE
         <hr />
       </h3>
-      <InputEle id="currentJob" type="text" label="Current Job " />
-      <InputEle id="companyName" type="text" label="Company Name" />
+      {/* <InputEle id="currentJob" type="text" label="Current Job " />
+      <InputEle id="companyName" type="text" label="Company Name" /> */}
 
       <div className="grid grid-cols-2  gap-10 ">
         <InputEle
-          id="department"
-          placeholder="Enter your department"
+          id="companyName"
+          placeholder=""
           type="text"
-          label="Department"
+          label="Company Name"
         />
         <InputEle
-          id="currentPosition"
-          placeholder="Enter your Current Position"
+          id="OfficeAddress"
+          placeholder="Enter your Address"
           type="text"
-          label="Current Position"
+          label="Office Address"
         />
-        <InputEle id="startDate" type="date" label="Start Date" />
+        </div>
+        
+        <InputEle id="Position/Role" type="text" label="Position/Role " />
+        <div className="flex items-center gap-2">
+        <input
+          id="checkbox"
+          type="checkbox"
+          checked={isCurrentJob}
+          onChange={handleCheckboxChange}
+          className="w-4 h-4 accent-blue-500 cursor-pointer"
+        />
+        <label htmlFor="checkbox">This is my current position</label>
       </div>
+
+      {!isCurrentJob &&
+      <div className="grid grid-cols-2 gap-10">
+        <InputEle id="startDate" type="date" label="Start Date" />
+       <InputEle id="endDate" type="date" label="End Date" />
+      </div>
+}
+      
     </div>
   );
 }

@@ -10,6 +10,7 @@ import Typography from "@mui/material/Typography";
 import { FaArrowLeft } from "react-icons/fa";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { Check } from "lucide-react";
 import Toast from "./genui/Toast";
 
 import Contact from "./biosteps/Contact";
@@ -20,18 +21,14 @@ import Qualifications from "./biosteps/Qualifications";
 import Reference from "./biosteps/Reference";
 import Uploadimg from "./biosteps/Uploadimg";
 
-// import MobileStepper from "@mui/material/MobileStepper";
-// import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
-// import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-
 const steps = [
-  { number: 0, title: "Upload Image" },
-  { number: 1, title: "BioData" },
-  { number: 2, title: "Contact Details" },
-  { number: 3, title: "Qualification" },
-  { number: 4, title: "Experience" },
-  { number: 5, title: "Reference" },
-  { number: 6, title: "Payment" },
+  { number: 0, title: "BioData" },
+  { number: 1, title: "Contact Details" },
+  { number: 2, title: "Qualification" },
+  { number: 3, title: "Experience" },
+  { number: 4, title: "Payment" },
+  // { number: 5, title: "Reference" },
+  // { number: 6, title: "Payment" },
 ];
 
 export type BiodataFormData = {
@@ -211,67 +208,6 @@ function Biodata() {
     saveFormProgress(dataToSave);
   }, [formData]);
 
-  // const validateStep = (currentStep: number): boolean => {
-  //   switch (currentStep) {
-  //     case 1:
-  //       if (!formData.title.trim()) {
-  //         setToast({ type: "error", message: "Please enter an event title" });
-  //         return false;
-  //       }
-  //       if (!formData.description.trim()) {
-  //         setToast({
-  //           type: "error",
-  //           message: "Please enter an event description",
-  //         });
-  //         return false;
-  //       }
-  //       if (!formData.image) {
-  //         setToast({ type: "error", message: "Please upload an event image" });
-  //         return false;
-  //       }
-  //       if (!formData.date || !formData.time) {
-  //         setToast({
-  //           type: "error",
-  //           message: "Please set event date and time",
-  //         });
-  //         return false;
-  //       }
-  //       if (!formData.venue || !formData.location) {
-  //         setToast({
-  //           type: "error",
-  //           message: "Please enter event venue and location",
-  //         });
-  //         return false;
-  //       }
-  //       return true;
-
-  //     case 2:
-  //       if (formData.ticketType.length === 0) {
-  //         setToast({
-  //           type: "error",
-  //           message: "Please add at least one ticket type",
-  //         });
-  //         return false;
-  //       }
-  //       for (const ticket of formData.ticketType) {
-  //         if (!ticket.name || !ticket.price || !ticket.quantity) {
-  //           setToast({
-  //             type: "error",
-  //             message: "Please fill in all ticket details",
-  //           });
-  //           return false;
-  //         }
-  //       }
-  //       return true;
-
-  //     case 3:
-  //       return true;
-
-  //     default:
-  //       return true;
-  //   }
-  // };
-
   const handleNext = () => {
     let newSkipped = skipped;
     if (isStepSkipped(activeStep)) {
@@ -289,8 +225,6 @@ function Biodata() {
 
   const handleSkip = () => {
     if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
       throw new Error("You can't skip a step that isn't optional.");
     }
 
@@ -306,138 +240,151 @@ function Biodata() {
     setActiveStep(0);
   };
 
+  // Check if we're on the end page
+  const isEndPage = activeStep === steps.length;
+
   return (
-    <div className=" p-10 bg-white rounded-2xl ">
-      <Box sx={{ width: "100%" }}>
-        <Stepper activeStep={activeStep} alternativeLabel>
-          {steps.map((step, index) => {
-            const stepProps: { completed?: boolean } = {};
-            const labelProps: { optional?: ReactNode } = {};
-            if (isStepOptional(index)) {
-              labelProps.optional = (
-                <Typography variant="caption">Optional</Typography>
-              );
-            }
-            if (isStepSkipped(index)) {
-              stepProps.completed = false;
-            }
-            return (
-              <Step key={step.number} {...stepProps}>
-                <StepLabel {...labelProps}>{step.title}</StepLabel>
-              </Step>
-            );
-          })}
-        </Stepper>
-        <div>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="w-full"
+    <div className="p-10 bg-white rounded-2xl">
+      {isEndPage ? (
+        // Only show the end page fragment when activeStep equals steps.length
+        <Fragment>
+          <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-lg max-w-md mx-auto space-y-2 my-8">
+            <div className="flex justify-center items-center w-20 h-20 bg-[#28A745] p-4 rounded-full shadow-md mb-6">
+              <Check className="w-12 h-12 text-white"/>
+            </div>
+            
+            <Typography
+              className="max-w-96 text-center text-black text-sm font-normal font-sans mx-auto"
+              sx={{ mt: 2, mb: 1 }}
             >
-              {activeStep === steps.length && (
-                // end page
-                <Fragment>
-                  <Typography
-                    className="max-w-96 text-center text-black text-sm font-normal font-sans mx-auto "
-                    sx={{ mt: 2, mb: 1 }}
-                  >
-                    Thank you for registering with us! Your account is being
-                    reviewed. We will send an email to you once review is
-                    complete. Please keep an eye on your email.
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      pt: 2,
-                    }}
-                  >
-                    {/* <Box sx={{ flex: "1 1 auto" }} /> */}
-                    <Link href="/">
-                      <Button
-                        className="py-3 px-4 bg-primary text-sm text-white font-semibold rounded font-sans "
-                        onClick={handleReset}
-                      >
-                        Back to website
-                      </Button>
-                    </Link>
-                  </Box>
-                </Fragment>
-              )}{" "}
-              {activeStep === 0 && (
-                <Uploadimg
-                  setToast={setToast}
-                  formData={formData}
-                  updateFormData={updateFormData}
-                />
+              Thank you for registering with us! Your account is being
+              reviewed. We will send an email to you once review is
+              complete. Please keep an eye on your email.
+            </Typography>
+            
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+                pt: 2,
+              }}
+            >
+              <Link href="/">
+                <Button
+                  className="py-3 px-4 bg-primary text-sm text-white font-semibold rounded-full font-sans"
+                  onClick={handleReset}
+                >
+                  Back to website
+                </Button>
+              </Link>
+            </Box>
+          </div>
+        </Fragment>
+      ) : (
+        // Show the normal stepper UI for all other steps
+        <>
+          <div className="flex flex-col item-center justify-center mb-8">
+            <h3 className="text-primary text-xl font-semibold text-center">Welcome Chinazom</h3>
+            <p className="text-sm text-center">Complete your registration. It won't take long.</p>
+          </div>
+          
+          <Box sx={{ width: "100%" }}>
+            <Stepper activeStep={activeStep} alternativeLabel>
+              {steps.map((step, index) => {
+                const stepProps: { completed?: boolean } = {};
+                const labelProps: { optional?: ReactNode } = {};
+                if (isStepOptional(index)) {
+                  labelProps.optional = (
+                    <Typography variant="caption">Optional</Typography>
+                  );
+                }
+                if (isStepSkipped(index)) {
+                  stepProps.completed = false;
+                }
+                return (
+                  <Step key={step.number} {...stepProps}>
+                    <StepLabel {...labelProps}>{step.title}</StepLabel>
+                  </Step>
+                );
+              })}
+            </Stepper>
+            
+            <div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStep}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="w-full"
+                >
+                  {activeStep === 0 && (
+                    <Personal formData={formData} updateFormData={updateFormData} />
+                  )}
+                  {activeStep === 1 && (
+                    <Contact formData={formData} updateFormData={updateFormData} />
+                  )}
+                  {activeStep === 2 && (
+                    <Qualifications
+                      formData={formData}
+                      updateFormData={updateFormData}
+                    />
+                  )}
+                  {activeStep === 3 && (
+                    <Experience
+                      formData={formData}
+                      updateFormData={updateFormData}
+                    />
+                  )}
+                  {activeStep === 4 && (
+                    <Payment formData={formData} updateFormData={updateFormData} />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            
+            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+              <Button
+                color="inherit"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                sx={{
+                  mr: 1,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+                hidden={activeStep === 0}
+              >
+                <FaArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              <Box sx={{ flex: "1 1 auto" }} />
+              {isStepOptional(activeStep) && (
+                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
+                  Skip
+                </Button>
               )}
-              {activeStep === 1 && (
-                <Personal formData={formData} updateFormData={updateFormData} />
-              )}
-              {activeStep === 2 && (
-                <Contact formData={formData} updateFormData={updateFormData} />
-              )}
-              {activeStep === 3 && (
-                <Qualifications
-                  formData={formData}
-                  updateFormData={updateFormData}
-                />
-              )}
-              {activeStep === 4 && (
-                <Experience
-                  formData={formData}
-                  updateFormData={updateFormData}
-                />
-              )}
-              {activeStep === 5 && (
-                <Reference
-                  formData={formData}
-                  updateFormData={updateFormData}
-                />
-              )}
-              {activeStep === 6 && (
-                <Payment formData={formData} updateFormData={updateFormData} />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-        <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-          <Button
-            color="inherit"
-            disabled={activeStep === 0}
-            onClick={handleBack}
-            sx={{
-              mr: 1,
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-            hidden={activeStep === 0}
-          >
-            <FaArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          <Box sx={{ flex: "1 1 auto" }} />
-          {isStepOptional(activeStep) && (
-            <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-              Skip
-            </Button>
-          )}
-          <Button
-            className="bg-primary p-2 rounded-full text-base text-white w-fit"
-            onClick={handleNext}
-            disabled={activeStep === 7}
-            hidden={activeStep === 7}
-          >
-            {activeStep === steps.length - 1 ? "Finish" : "Continue"}
-          </Button>
-        </Box>
-      </Box>
+              <Button
+                className="bg-primary p-4 rounded-full text-sm text-white w-fit"
+                onClick={handleNext}
+              >
+                {activeStep === steps.length - 1 ? "Finish" : "Continue"}
+              </Button>
+            </Box>
+          </Box>
+        </>
+      )}
+      
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

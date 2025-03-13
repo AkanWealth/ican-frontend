@@ -14,23 +14,23 @@ interface ContactProps {
 
 function Contact({ formData, updateFormData }: ContactProps) {
   return (
-    <div className="pt-4 flex flex-col justify-between gap-4 ">
-      <h3 className="font-bold font-mono text-2xl text-black ">
+    <div className="pt-4 flex flex-col justify-between gap-4 mt-4">
+      <h3 className="font-bold font-mono text-xl text-black ">
         CONTACT DETAILS
         <hr />
       </h3>
 
       <div className="flex flex-col w-full gap-10 ">
-        <InputEle
+        {/* <InputEle
           id="contactAddress"
           placeholder="Enter your contact address"
           type="text"
           label="Contact Address"
           addStyle="col-span-2"
-        />
+        /> */}
 
         <div className="grid grid-cols-2 gap-4 ">
-          <InputEle
+          {/* <InputEle
             id="contactCountry"
             type="country"
             label=" Contact Country"
@@ -52,18 +52,24 @@ function Contact({ formData, updateFormData }: ContactProps) {
             placeholder="Enter your email address"
             type="email"
             label="Email Address"
-          />
-          <InputEle id="mobileNumber" type="phone" label="Mobile Number" />
-          <InputEle
+          /> */}
+           <InputEle
             id="residentialAddress"
             placeholder="Enter your residential address"
             type="text"
             label="Residential Address"
           />
+          <InputEle id="mobileNumber" type="phone" label="Contact Phone Number" />
+         
           <InputEle
             id="residentialCountry"
             type="country"
             label=" Residential Country"
+          />
+          <InputEle
+            id="residentialCity"
+            type="country"
+            label=" Residential City"
           />
           <InputEle
             id="residentialState"
@@ -77,7 +83,7 @@ function Contact({ formData, updateFormData }: ContactProps) {
             type="text"
             label="Residential LGA"
           />
-          <InputEle
+          {/* <InputEle
             id="residentialTelephone"
             type="phone"
             label="Residential Telephone"
@@ -111,7 +117,7 @@ function Contact({ formData, updateFormData }: ContactProps) {
             id="officeTelephone"
             type="phone"
             label="Office Telephone"
-          />
+          /> */}
         </div>
       </div>
     </div>

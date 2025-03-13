@@ -11,6 +11,7 @@ function InputEle({
   placeholder = "",
   addStyle = "",
   errorMsg = "",
+  amount = "", 
 }) {
   if (type === "text") {
     return (
@@ -72,6 +73,72 @@ function InputEle({
       </div>
     );
   }
+  if (type === "radio") {
+    return (
+      <div className={` w-full h-fit flex flex-row gap-3 ${addStyle} `}>
+        <input
+          className=" p-3 rounded border border-blue-500  "
+          placeholder={placeholder}
+          name={id}
+          id={id}
+          required={required}
+          type={type}
+        />
+        <label className=" text-base font-sans font-semibold  " htmlFor={id}>
+          {label} {required ? <span className="text-red-600">*</span> : ""}
+        </label>
+        
+
+        <p>{errorMsg}</p>
+      </div>
+    );
+  }
+  if (type === "checkbox") {
+    return (
+      <div className={` w-full h-fit flex flex-row gap-3 ${addStyle} `}>
+        <input
+          className=" p-3 rounded border border-blue-500  "
+          placeholder={placeholder}
+          name={id}
+          id={id}
+          required={required}
+          type={type}
+        />
+        <label className=" text-sm font-sans " htmlFor={id}>
+          {label}
+        </label>
+        
+
+        <p>{errorMsg}</p>
+      </div>
+    );
+  }
+  if (type === "amount") {
+    return (
+      <div className={` w-full h-fit flex flex-col gap-3 ${addStyle} `}>
+        <label className=" text-base font-sans font-semibold  " htmlFor={id}>
+          {label} {required ? <span className="text-red-600">*</span> : ""}
+        </label>
+        <input
+          className=" p-3 rounded border border-gray-400 text-black font-medium placeholder:text-black"
+          name={id}
+          id={id}
+          placeholder={placeholder}
+          required={required}
+          type="text"
+          value={amount}
+          readOnly
+          style={{ 
+            pointerEvents: "none",
+            color: "black"
+          }}
+        />
+
+        <p>{errorMsg}</p>
+      </div>
+    );
+  }
+
   if (type === "date") {
     return (
       <div className={` w-full h-fit flex flex-col gap-3 ${addStyle} `}>
@@ -127,6 +194,28 @@ function InputEle({
           <option value="married">Married </option>
           <option value="divorced">Divorced </option>
           <option value="widowed">Widowed </option>
+        </select>
+        <p></p>
+      </div>
+    );
+  }
+  if (type === "status") {
+    return (
+      <div className={` w-full h-fit flex flex-col gap-3 ${addStyle} `}>
+        <label className=" text-base font-sans font-semibold  " htmlFor={id}>
+          
+        {label}
+        </label>
+        <select
+          className=" p-3 rounded border bg-white border-gray-400  "
+          name={id}
+          id={id}
+          required={required}
+        >
+          <option value="single">FCA </option>
+          <option value="married">ACA</option>
+          <option value="divorced">Student</option>
+        
         </select>
         <p></p>
       </div>

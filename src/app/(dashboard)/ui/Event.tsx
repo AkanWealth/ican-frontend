@@ -361,7 +361,7 @@ function EventPage() {
             </div>
     
             {feedbackHistory.length > 0 ? (
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6">
                     {feedbackHistory.map((feedback) => (
                         <div 
                             key={feedback.id} 
@@ -472,7 +472,7 @@ function EventPage() {
 
             {hasregistered ? (
                 
-                <><div className="grid grid-cols-2 gap-6 mt-8">
+                <><div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6 mt-8">
                     {filterEvents(registered).map((registered) => (
                         <div key={registered.id} className="rounded-lg relative border-l-4 border-green-600 p-4 bg-white">
                             <div className="">
@@ -614,7 +614,7 @@ function EventPage() {
 
             {hasEvents ? (
                 // Events Grid
-                <div className="grid grid-cols-2 gap-6 mt-8">
+                <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6 mt-8">
                     {events.map((event) => (
                         <div key={event.id} className="border rounded-lg relative">
                             <div className="relative h-52 mb-4 rounded-lg overflow-hidden">

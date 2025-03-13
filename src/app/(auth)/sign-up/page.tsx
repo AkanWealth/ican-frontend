@@ -527,8 +527,8 @@ function SignUp() {
   };
 
   return (
-    <div className="mt-40 mb-10">
-      <div className="flex flex-col lg:w-96 md:w-60  items-center rounded-2xl bg-white pt-20 p-8  sshadow-lg">
+    <div className="mx-auto">
+      <div className="flex flex-col lg:w-96 md:w-60  items-center rounded-2xl bg-white p-8  sshadow-lg">
         {step === 1 && <Base onNext={handleNext} />}
         {step === 2 && <VerifyEmail onNext={handleResend} email={email} />}
       </div>

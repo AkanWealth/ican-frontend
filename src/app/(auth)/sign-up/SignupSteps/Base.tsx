@@ -285,7 +285,7 @@ function Base({ onNext }: PropsVal) {
   return (
     <>
     
-      <Image src="/Logo_big.png" alt="Logo" width={100} height={40} className=""/>
+      <Image src="/Logo_big.png" alt="Logo" width={140} height={40} className=""/>
       <div className="w-fit">
         <h4 className="text-primary text-center text-xl font-bold font-mono">
           Create Account

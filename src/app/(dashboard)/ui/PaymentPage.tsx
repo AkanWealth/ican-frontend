@@ -50,11 +50,16 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 };
 
 
+
+
+
+
+
 const PaymentPage = () => {
   const [activeTab, setActiveTab] = useState('Outstanding');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);isCalendarOpen
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();

@@ -13,7 +13,7 @@ const topMenuItems = [
   { icon: LayoutGridIcon, label: 'Overview', href: '/Overview' },
   { icon: Banknote, label: 'Payment', href: '/Payment' },
   { icon: FaRegCalendarCheck, label: 'Events', href: '/Event' },
-  { icon: FileText, label: 'Resources', href: '/resources' },
+  { icon: FileText, label: 'Resources', href: '/Resource' },
   { icon: ListOrderedIcon, label: 'MCPD Records', href: '/MCPDRecords' },
 ];
 

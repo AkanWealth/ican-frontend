@@ -138,16 +138,24 @@ export const Sidebar = () => {
 
             {/* Bottom Menu Items */}
             <div className="space-y-4 mt-10">
-              {bottomMenuItems.map((item, index) => (
-                <div
+              {bottomMenuItems.map((item, index) => {
+                const active = isActiveLink(item.href);
+                return (
+                  <div
                   key={index}
                   onClick={() => handleNavigation(item.href)}
-                  className="flex items-center px-6 py-2 rounded-lg transition-colors cursor-pointer hover:bg-blue-800"
+                  className={cn(
+                    "flex items-center px-6 py-2 rounded-lg transition-colors cursor-pointer",
+                    active 
+                      ? "bg-white text-blue-900" 
+                      : "hover:bg-blue-800 text-white"
+                  )}
                 >
-                  <item.icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="ml-3 whitespace-nowrap">{item.label}</span>
+                  <item.icon className={cn("w-5 h-5 flex-shrink-0", active ? "text-blue-900" : "text-white")} />
+                  <span className="ml-3 whitespace-nowrap hover:text-green-500">{item.label}</span>
                 </div>
-              ))}
+                )
+             } )}
             </div>
 
             {/* Logout - Always Visible at Bottom of Scrollable Area */}

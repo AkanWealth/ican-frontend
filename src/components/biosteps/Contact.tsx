@@ -68,7 +68,8 @@ function Contact({ formData, updateFormData }: ContactProps) {
           />
           <InputEle
             id="residentialCity"
-            type="country"
+            placeholder="Enter your residential city"
+            type="text"
             label=" Residential City"
           />
           <InputEle

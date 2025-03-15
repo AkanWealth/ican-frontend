@@ -10,13 +10,13 @@ interface QualificationsProps {
 
 function Qualifications({ formData, updateFormData }: QualificationsProps) {
   return (
-    <div className="pt-4 flex flex-col justify-between gap-4 mt-4">
-      <h3 className="font-bold font-mono text-xl text-black ">
+    <div className="w-full pt-4 flex flex-col justify-between gap-4 mt-4">
+      <h3 className="w-full font-bold font-mono text-xl text-black ">
         EDUCATION AND PROFESSIONAL QUALIFICATION
         <hr />
       </h3>
 
-      <div className="grid lg:grid-cols-2 md:grid-col-1  lg:gap-10 md:gap-5">
+      <div className="w-full grid lg:grid-cols-2 md:grid-col-1  lg:gap-10 md:gap-5">
         <InputEle
           id="insitution"
           placeholder="Enter your Insitution"

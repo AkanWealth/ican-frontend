@@ -90,6 +90,7 @@ export type BiodataFormData = {
     refereeEmail: string;
   };
   payment?: {
+    image?: File | null;
     receipt?: File | null;
     waiver?: File | null;
   };
@@ -285,8 +286,8 @@ function Biodata() {
         // Show the normal stepper UI for all other steps
         <>
           <div className="flex flex-col item-center justify-center mb-8">
-            <h3 className="text-primary text-xl font-semibold text-center">Welcome Chinazom</h3>
-            <p className="text-sm text-center">Complete your registration. It won't take long.</p>
+            <h3 className="text-primary lg:text-3xl md:text-xl font-semibold text-center">Welcome Chinazom</h3>
+            <p className="text-base text-center">Complete your registration. It won't take long.</p>
           </div>
           
           <Box sx={{ width: "100%" }}>

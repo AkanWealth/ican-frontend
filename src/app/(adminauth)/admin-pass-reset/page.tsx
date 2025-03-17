@@ -67,6 +67,7 @@ function AdminPasswordRequest() {
             type="text"
             placeholder="Enter email address"
             label="Email Address"
+            value={formData.email}
             onChange={handleChange}
           />{" "}
           <button

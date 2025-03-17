@@ -125,13 +125,7 @@ function NewEvent({
             value={formData.eventFee}
             onChange={handleChange}
           />
-          <InputEle
-            type="text"
-            id="mcpdCredit"
-            label="MCPD Credit (Optional)"
-            value={formData.mcpdCredit}
-            onChange={handleChange}
-          />
+          
         </div>
         <InputEle
           type="file"

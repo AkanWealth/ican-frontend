@@ -1,8 +1,23 @@
 import React, { useState } from "react";
 import InputEle from "@/components/genui/InputEle";
 
+type Advert = {
+  name: string;
+  image: string;
+  textBody: string;
+  startDate: Date;
+  endDate: Date;
+};
+
 function AdvertEdit() {
-  const [advert, setAdvert] = useState("");
+  const [advert, setAdvert] = useState<Advert>({
+    name: "",
+    image: "",
+    textBody: "",
+    startDate: new Date(),
+    endDate: new Date(),
+  });
+
 
   return (
     <div>
@@ -11,13 +26,36 @@ function AdvertEdit() {
           label="Advert Title"
           type="text"
           id="title"
-          onChange={() => {}}
+          value={advert.name}
+          onChange={(e) => setAdvert({ ...advert, name: e.target.value })}
         />
         <InputEle
           label="Advertisement Image"
-          type="images"
+          type="text"
           id="advert_image"
-          onChange={() => {}}
+          value={advert.image}
+          onChange={(e) => setAdvert({ ...advert, image: e.target.value })}
+        />
+        <InputEle
+          label="Text Body"
+          type="text"
+          id="text_body"
+          value={advert.textBody}
+          onChange={(e) => setAdvert({ ...advert, textBody: e.target.value })}
+        />
+        <InputEle
+          label="Start Date"
+          type="date"
+          id="start_date"
+          value={advert.startDate.toISOString().split('T')[0]}
+          onChange={(e) => setAdvert({ ...advert, startDate: new Date(e.target.value) })}
+        />
+        <InputEle
+          label="End Date"
+          type="date"
+          id="end_date"
+          value={advert.endDate.toISOString().split('T')[0]}
+          onChange={(e) => setAdvert({ ...advert, endDate: new Date(e.target.value) })}
         />
       </div>
       <div className="flex flex-col gap-2">

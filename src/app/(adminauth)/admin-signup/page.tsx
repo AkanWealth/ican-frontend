@@ -18,6 +18,7 @@ function AdminSignup() {
     email: "",
     password: "",
     cpassword: "",
+    membershipId: "",
   });
   const [formErrors, setFormErrors] = useState({
     firstName: "",
@@ -25,6 +26,7 @@ function AdminSignup() {
     email: "",
     password: "",
     cpassword: "",
+    membershipId: "",
   });
 
   const [fname, setFname] = useState(false);
@@ -179,6 +181,7 @@ function AdminSignup() {
       email: validateEmail(email),
       password: validatePassword(password),
       cpassword: validateConfirmPassword(password, cpassword),
+      membershipId: "",
     };
 
     setFormErrors(errors);
@@ -243,6 +246,7 @@ function AdminSignup() {
               type="text"
               placeholder="Enter your First Name"
               label="First Name"
+              value={formData.firstName}
               onChange={handleChange}
               errorMsg={formErrors.firstName}
             />
@@ -251,6 +255,7 @@ function AdminSignup() {
               type="text"
               placeholder="Enter your Last Name"
               label="Last Name"
+              value={formData.lastName}
               onChange={handleChange}
               errorMsg={formErrors.lastName}
             />
@@ -261,6 +266,7 @@ function AdminSignup() {
             type="email"
             placeholder="Enter your email"
             label="Email address"
+            value={formData.email}
             onChange={handleChange}
             errorMsg={formErrors.email}
           />
@@ -269,6 +275,7 @@ function AdminSignup() {
             id="password"
             type="password"
             placeholder="Enter your password"
+            value={formData.password}
             required
             onChange={handleChange}
           />
@@ -303,6 +310,7 @@ function AdminSignup() {
             id="cpassword"
             type="password"
             placeholder="Confirm your new password"
+            value={formData.cpassword}
             required
             onChange={handleChange}
           />
@@ -311,6 +319,7 @@ function AdminSignup() {
             id="membershipId"
             type="text"
             placeholder="Enter your membership ID"
+            value={formData.membershipId}
             required
             onChange={handleChange}
           />

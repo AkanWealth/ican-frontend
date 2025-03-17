@@ -2,25 +2,41 @@ import React, { useState } from "react";
 import InputEle from "@/components/genui/InputEle";
 import { RichTextEditor } from "@/registry/new-york/rich-text-editor/rich-text-editor";
 
-interface BlogEditProps {}
+interface BlogEditProps {
+  title: string;
+  author: string;
+  post: string;
+}
 
 function BlogEdit({}: BlogEditProps) {
-  const [blog, setBlog] = useState("");
+  const [blog, setBlog] = useState<BlogEditProps>({
+    title: "",
+    author: "",
+    post: "",
+  });
+  const [post, setPost] = useState("");
 
   return (
     <div>
       <div>
-        <InputEle label="Title" type="text" id="title" onChange={() => {}} />
+        <InputEle
+          label="Title"
+          type="text"
+          id="title"
+          value={blog.title}
+          onChange={() => {}}
+        />
         <InputEle
           label="Author Name"
           type="text"
           id="author"
+          value={blog.author}
           onChange={() => {}}
         />
         <div>
           <h5>Content Body</h5>
 
-          <RichTextEditor value={blog} onChange={setBlog} />
+          <RichTextEditor value={post} onChange={setPost} />
         </div>
       </div>
       <div className="flex flex-col gap-2">

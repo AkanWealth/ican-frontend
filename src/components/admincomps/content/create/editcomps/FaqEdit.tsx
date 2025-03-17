@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import InputEle from "@/components/genui/InputEle";
 
+type Faq = {
+  question: string;
+  answer: string;
+};
+
 function FaqEdit() {
-  const [faq, setFaq] = useState("");
+  const [faq, setFaq] = useState<Faq>({ question: "", answer: "" });
   return (
     <div>
       <div>
@@ -11,14 +16,16 @@ function FaqEdit() {
           type="text"
           id="title"
           placeholder="Enter Question"
-          onChange={() => {}}
+          value={faq.question}
+          onChange={(e) => setFaq({ ...faq, question: e.target.value })}
         />
         <InputEle
           label="Answer"
           type="text"
           id="answer"
           placeholder="Enter Answer"
-          onChange={() => {}}
+          value={faq.answer}
+          onChange={(e) => setFaq({ ...faq, answer: e.target.value })}
         />
       </div>
       <div className="flex flex-col gap-2">

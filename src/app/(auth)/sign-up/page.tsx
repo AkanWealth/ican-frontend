@@ -17,7 +17,7 @@ function Signup() {
     lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    cpassword: "",
     consent: false,
     membershipId: "",
   });
@@ -339,7 +339,7 @@ function Signup() {
             placeholder="Confirm your password"
             required
             onChange={handleChange}
-            value={formData.confirmPassword}
+            value={formData.cpassword}
             errorMsg={formErrors.cpassword}
           />
 

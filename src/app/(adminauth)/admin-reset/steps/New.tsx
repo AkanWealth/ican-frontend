@@ -115,12 +115,14 @@ function New({ onNext }: Propsval) {
           id="password"
           type="password"
           placeholder="Enter your new password"
+          value={formData.password}
           required
           onChange={handleChange}
         />
         <InputEle
           label="Confirm Password"
           id="cpassword"
+          value={formData.cpassword}
           type="password"
           placeholder="Confirm your new password"
           required

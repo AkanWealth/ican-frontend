@@ -41,6 +41,7 @@ function General() {
             id="old_password"
             label="Old Password"
             type="password"
+            value=""
             placeholder="*********"
             onChange={() => {}}
           />

@@ -180,6 +180,7 @@ function Login() {
             type="email"
             placeholder="Enter your email address"
             onChange={handleChange}
+            value={formData.email}
             errorMsg={formErrors.email}
           />
           <InputEle
@@ -188,6 +189,7 @@ function Login() {
             type="password"
             placeholder="Enter your password"
             onChange={handleChange}
+            value={formData.password}
             errorMsg={formErrors.password}
           />
 

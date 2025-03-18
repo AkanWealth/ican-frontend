@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-// import axios from "axios";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -15,10 +15,12 @@ function Base({ onNext }: PropsVal) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const [fname, setFname] = useState(false);
   const [sname, setSname] = useState(false);
   const [evalid, setEvalid] = useState(false);
+  const [midValid, setMidValid] = useState(true); // Set this to true by default since no validation is needed
   const [plength, setPlength] = useState(false);
   const [pupper, setPupper] = useState(false);
   const [plower, setPlower] = useState(false);
@@ -32,6 +34,7 @@ function Base({ onNext }: PropsVal) {
     firstName: "",
     surname: "",
     email: "",
+    membershipId: "",
     password: "",
     confirmPassword: "",
     consent: false,
@@ -41,6 +44,7 @@ function Base({ onNext }: PropsVal) {
     firstName: "",
     surname: "",
     email: "",
+    membershipId: "",
     password: "",
     cpassword: "",
     consent: "",
@@ -88,6 +92,11 @@ function Base({ onNext }: PropsVal) {
     return "";
   };
 
+  // No validation for membership ID
+  const validateMembershipId = (id: string): string => {
+    return "";
+  };
+
   const validatePassword = (password: string): string => {
     // Reset all password validation states
     setPlength(false);
@@ -130,6 +139,11 @@ function Base({ onNext }: PropsVal) {
       setPspecial(true);
     }
 
+    // Return error message only if all criteria are not met
+    if (!(plength && pupper && plower && pnumber && pspecial)) {
+      return "Password does not meet all requirements.";
+    }
+    
     return "";
   };
 
@@ -169,122 +183,147 @@ function Base({ onNext }: PropsVal) {
       case "email":
         error = validateEmail(value);
         break;
+      case "membershipId":
+        // No validation needed, just clear any previous errors
+        error = "";
+        break;
       case "password":
-        validatePassword(value);
+        error = validatePassword(value);
+        // Also update confirm password validation when password changes
+        if (formData.confirmPassword) {
+          const confirmError = validateConfirmPassword(value, formData.confirmPassword);
+          setFormErrors({
+            ...formErrors,
+            cpassword: confirmError
+          });
+        }
         break;
       case "confirmPassword":
         error = validateConfirmPassword(formData.password, value);
         break;
       case "consent":
         setConsent(checked);
+        if (!checked) {
+          error = "You must agree to the terms and conditions.";
+        }
         break;
     }
 
-    // Update form errors
+    // Update form errors but don't show them until form is submitted
     setFormErrors({
       ...formErrors,
       [name]: error,
     });
-    
-    console.log('Validation States:', {
-      fname, 
-      sname, 
-      evalid, 
-      plength, 
-      pupper, 
-      plower, 
-      pnumber, 
-      pspecial, 
-      cvalid, 
-      consent
-    });
-  
 
-    // Check if all validations are met
+    // Check form completeness after state update
+    checkFormCompleteness();
+  };
+  
+  // Use useEffect to ensure state updates are complete before checking form completeness
+  useEffect(() => {
+    checkFormCompleteness();
+  }, [
+    fname, 
+    sname, 
+    evalid, 
+    midValid,
+    plength, 
+    pupper, 
+    plower, 
+    pnumber, 
+    pspecial, 
+    cvalid, 
+    formData.consent
+  ]);
+  
+  const checkFormCompleteness = () => {
     const isComplete = 
-      fname && sname && evalid && 
-      plength && pupper && plower && 
-      pnumber && pspecial && 
-      cvalid && consent;
+      fname && 
+      sname && 
+      evalid && 
+      midValid &&
+      plength && 
+      pupper && 
+      plower && 
+      pnumber && 
+      pspecial && 
+      cvalid && 
+      formData.consent;
     
     setComplete(isComplete);
   };
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-
-    // Perform validation on all fields
+    setFormSubmitted(true);
+    
+    // Run all validations to ensure we have current errors
     const errors = {
       firstName: validateFirstName(formData.firstName),
       surname: validateSurname(formData.surname),
       email: validateEmail(formData.email),
+      membershipId: "",
       password: validatePassword(formData.password),
       cpassword: validateConfirmPassword(formData.password, formData.confirmPassword),
       consent: formData.consent ? "" : "You must agree to the terms and conditions.",
     };
-
+  
     setFormErrors(errors);
-
+  
     const hasErrors = Object.values(errors).some(error => error !== "");
-
+  
     if (hasErrors) {
-      setLoading(false);
-      return;
+      return; // Don't proceed with submission
     }
-
-    // const data = JSON.stringify({
-    //   firstName: formData.firstName,
-    //   lastName: formData.surname,
-    //   email: formData.email,
-    //   password: formData.password,
-    // });
-
-    // const config = {
-    //   method: "post",
-    //   maxBodyLength: Infinity,
-    //   url: "https://ican-sds-api.onrender.com/api/v1/auth/register",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   data: data,
-    // };
-
-    // try {
-    //   const response = await axios.request(config);
-    //   onNext(formData.email);
-    //   toast({
-    //     title: "Registration Successful",
-    //     description: "Please verify your email",
-    //     variant: "default"
-    //   });
-    // } catch (error) {
-    //   toast({
-    //     title: "Registration Failed",
-    //     description: "An error occurred during registration.",
-    //     variant: "destructive"
-    //   });
-    // } finally {
-    //   setLoading(false);
-    // }
-    setTimeout(() => {
-      // Simulate successful registration
+  
+    setLoading(true);
+  
+    const data = JSON.stringify({
+      firstname: formData.firstName,
+      surname: formData.surname,
+      email: formData.email,
+      membershipId: formData.membershipId,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword
+    });
+    
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/register", // Removed the trailing '?'
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+    
+    try {
+      const response = await axios.request(config);
+      const { message, user, access_token } = response.data;
+      console.log("User registered successfully:", user);
+      console.log("Access token:", access_token);
+  
+      onNext(formData.email); // This was commented out in your original code
       toast({
         title: "Registration Successful",
-        description: "Please verify your email",
+        description: message,
         variant: "default"
       });
-  
-      // Move to verification page
-      onNext(formData.email);
-  
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast({
+        title: "Registration Failed",
+        description: "An error occurred during registration.",
+        variant: "destructive"
+      });
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
     <>
-    
       <Image src="/Logo_big.png" alt="Logo" width={140} height={40} className=""/>
       <div className="w-fit">
         <h4 className="text-primary text-center text-xl font-bold font-mono">
@@ -305,7 +344,7 @@ function Base({ onNext }: PropsVal) {
           </label>
           <input
             className={`p-3 rounded border ${
-              formErrors.firstName ? 'border-red-500' : 'border-gray-400'
+              formSubmitted && formErrors.firstName ? 'border-red-500' : 'border-gray-400'
             }`}
             placeholder="Enter your first name"
             name="firstName"
@@ -315,7 +354,7 @@ function Base({ onNext }: PropsVal) {
             value={formData.firstName}
             onChange={handleChange}
           />
-          {formErrors.firstName && (
+          {formSubmitted && formErrors.firstName && (
             <p className="text-red-600 text-sm">{formErrors.firstName}</p>
           )}
         </div>
@@ -330,7 +369,7 @@ function Base({ onNext }: PropsVal) {
           </label>
           <input
             className={`p-3 rounded border ${
-              formErrors.surname ? 'border-red-500' : 'border-gray-400'
+              formSubmitted && formErrors.surname ? 'border-red-500' : 'border-gray-400'
             }`}
             placeholder="Enter your surname"
             name="surname"
@@ -340,7 +379,7 @@ function Base({ onNext }: PropsVal) {
             value={formData.surname}
             onChange={handleChange}
           />
-          {formErrors.surname && (
+          {formSubmitted && formErrors.surname && (
             <p className="text-red-600 text-sm">{formErrors.surname}</p>
           )}
         </div>
@@ -355,7 +394,7 @@ function Base({ onNext }: PropsVal) {
           </label>
           <input
             className={`p-3 rounded border ${
-              formErrors.email ? 'border-red-500' : 'border-gray-400'
+              formSubmitted && formErrors.email ? 'border-red-500' : 'border-gray-400'
             }`}
             placeholder="Enter your email address"
             name="email"
@@ -365,9 +404,29 @@ function Base({ onNext }: PropsVal) {
             value={formData.email}
             onChange={handleChange}
           />
-          {formErrors.email && (
+          {formSubmitted && formErrors.email && (
             <p className="text-red-600 text-sm">{formErrors.email}</p>
           )}
+        </div>
+
+        {/* Membership ID - No validation */}
+        <div className="w-full flex flex-col">
+          <label
+            className="text-base font-sans font-semibold"
+            htmlFor="membershipId"
+          >
+            Membership ID <span className="text-red-600">*</span>
+          </label>
+          <input
+            className="p-3 rounded border border-gray-400"
+            placeholder="Enter your membership ID"
+            name="membershipId"
+            id="membershipId"
+            required
+            type="text"
+            value={formData.membershipId}
+            onChange={handleChange}
+          />
         </div>
 
         {/* Password */}
@@ -386,8 +445,9 @@ function Base({ onNext }: PropsVal) {
               name="password"
               placeholder="Create a password"
               className={`w-full pl-10 pr-10 py-2 border rounded focus:outline-none focus:ring-2 ${
-                formErrors.password ? 'border-red-500 focus:ring-red-400' : 'border-gray-400 focus:ring-blue-400'
+                formSubmitted && formErrors.password ? 'border-red-500 focus:ring-red-400' : 'border-gray-400 focus:ring-blue-400'
               }`}
+              value={formData.password}
               onChange={handleChange}
               required
             />
@@ -430,13 +490,16 @@ function Base({ onNext }: PropsVal) {
               </span>
             </p>
           </div>
+          {formSubmitted && formErrors.password && (
+            <p className="text-red-600 text-sm">{formErrors.password}</p>
+          )}
         </div>
 
         {/* Confirm Password */}
         <div className="w-full flex flex-col">
         <label
           className="text-base font-sans font-semibold"
-          htmlFor="cpassword"
+          htmlFor="confirmPassword"
         >
           Confirm Password <span className="text-red-600">*</span>
         </label>
@@ -448,7 +511,7 @@ function Base({ onNext }: PropsVal) {
             id="confirmPassword"
             placeholder="Confirm password"
             className={`w-full pl-10 pr-10 py-3 border rounded focus:outline-none focus:ring-2 ${
-              formErrors.cpassword ? 'border-red-500 focus:ring-red-400' : 'border-gray-400 focus:ring-blue-400'
+              formSubmitted && formErrors.cpassword ? 'border-red-500 focus:ring-red-400' : 'border-gray-400 focus:ring-blue-400'
             }`}
             value={formData.confirmPassword}
             onChange={handleChange}
@@ -462,7 +525,7 @@ function Base({ onNext }: PropsVal) {
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </button>
         </div>
-        {formErrors.cpassword && (
+        {formSubmitted && formErrors.cpassword && (
           <p className="text-red-600 text-sm">{formErrors.cpassword}</p>
         )}
       </div>
@@ -482,13 +545,15 @@ function Base({ onNext }: PropsVal) {
             and acknowledged the Privacy Policy along with the Terms and Conditions therein.
           </p>
         </div>
-        {formErrors.consent && (
+        {formSubmitted && formErrors.consent && (
           <p className="text-red-600 text-sm">{formErrors.consent}</p>
         )}
 
         <button
-          disabled={complete || loading}
-          className="px-8 py-4 bg-primary disabled:bg-slate-500 rounded-full text-white text-base font-semibold"
+          disabled={!complete || loading}
+          className={`px-8 py-4 rounded-full text-white text-base font-semibold ${
+            !complete || loading ? 'bg-slate-500' : 'bg-primary'
+          }`}
           type="submit"
         >
           {loading ? "Submitting..." : "Create Account"}

@@ -49,13 +49,13 @@ export const Header = () => {
   }, [isNotificationOpen, isMobile]);
 
   return (
-    <header className={` w-full h-[6rem] fixed top-0 right-0 ${
+    <header className={` h-[6rem] fixed top-0 right-0 ${
       isMobile || isTablet ? 'left-0 w-full' : 'left-10 lg:left-60'
     } z-30 p-2 transition-all duration-300`}>
-      <div className="w-full h-full bg-white border-b border-gray-400 shadow-sm px-4 md:px-12 flex items-center justify-between">
+      <div className="h-full bg-white border-b border-gray-400 shadow-sm px-4 md:px-12 flex items-center justify-between">
         {/* Search Bar - with better positioning for mobile */}
         <div className={`flex items-center ${isMobile ? 'ml-10' : isTablet ? 'ml-6' : 'ml-0'}`}>
-          <div className="relative group w-full md:w-auto">
+          <div className="relative group md:w-auto">
             <div className="absolute left-3 top-1/2 -translate-y-1/2">
               <Search className="w-5 h-5 text-black" />
             </div>

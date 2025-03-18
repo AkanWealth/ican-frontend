@@ -4,8 +4,6 @@ import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { adminscolumns } from "@/components/admincomps/user/datatable/columns";
 import { User, users } from "@/components/admincomps/user/datatable/colsdata";
 
-import Admins from "./tabs/Admins";
-
 export async function getData(): Promise<User[]> {
   return users;
 }

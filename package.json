@@ -49,6 +49,7 @@
     "gsap": "^3.12.5",
     "iconify": "^1.4.0",
     "input-otp": "^1.4.2",
+    "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.0",
     "jspdf-autotable": "^3.0.4",
     "lexical": "^0.24.0",

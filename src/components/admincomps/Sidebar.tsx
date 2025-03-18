@@ -23,7 +23,11 @@ const topMenuItems = [
     href: "/admin/admins",
   },
 
-  { icon: MdOutlinePeopleAlt, label: "User Management", href: "/admin/users" },
+  {
+    icon: MdOutlinePeopleAlt,
+    label: "Members Management",
+    href: "/admin/members",
+  },
   {
     icon: MdCollectionsBookmark,
     label: "Content Management",

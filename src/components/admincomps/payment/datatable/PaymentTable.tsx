@@ -35,7 +35,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function BillingTable<TData, TValue>({
+export function PaymentTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -119,7 +119,7 @@ export function BillingTable<TData, TValue>({
                 >
                   <Image
                     className="mx-auto"
-                    src="/EmptyBillingTable.png"
+                    src="/EmptyUserTable.png"
                     alt="Empty"
                     width={400}
                     height={400}

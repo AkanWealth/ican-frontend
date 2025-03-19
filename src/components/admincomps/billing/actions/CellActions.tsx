@@ -38,9 +38,9 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           <DropdownMenuItem>Edit</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={() => router.push(`payment/${row.original.id}`)}
+            onClick={() => router.push(`billing/${row.original.id}`)}
           >
-            View Payment Details
+            View Billing Details
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

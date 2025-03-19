@@ -31,7 +31,34 @@ function BillingDetailsPage() {
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
         <h2 className="text-xl font-semibold text-left">Billing Details</h2>
         <hr />
-        <div>ppp</div>
+        <div className="grid grid-cols-2 gap-6">
+          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+            Bill Name
+            <span className="text-base text-black font-medium">Bill Name</span>
+          </p>
+          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+            Bill Type
+            <span className="text-base text-black font-medium">Dues</span>
+          </p>
+          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+            Bill Description
+            <span className="text-base text-black font-medium">
+              Bill description
+            </span>
+          </p>
+          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+            Bill Amount{" "}
+            <span className="text-base text-black font-medium">5,000</span>
+          </p>{" "}
+          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+            Due Date{" "}
+            <span className="text-base text-black font-medium">12/5/2005</span>
+          </p>{" "}
+          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+            Reciepients{" "}
+            <span className="text-base text-black font-medium">all</span>
+          </p>{" "}
+        </div>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
         <h2 className="text-xl font-semibold text-left">Payment Details</h2>

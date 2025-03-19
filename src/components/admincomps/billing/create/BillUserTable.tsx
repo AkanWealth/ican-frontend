@@ -33,16 +33,19 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  setter: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export function PaymentTable<TData, TValue>({
+export function BillUserTable<TData, TValue>({
   columns,
   data,
+  setter,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const [rowSelection, setRowSelection] = React.useState({});
   const table = useReactTable({
     data,
     columns,
@@ -52,22 +55,26 @@ export function PaymentTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
+      rowSelection,
     },
   });
+
+  function onAccept(selectedRows: TData[]) {
+    setter(selectedRows.map((row) => String((row as any).id))); // Extract and convert the 'id' field to string
+  }
 
   return (
     <div>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter by Name..."
-          value={
-            (table.getColumn("member_name")?.getFilterValue() as string) ?? ""
-          }
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("member_name")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -121,7 +128,7 @@ export function PaymentTable<TData, TValue>({
                 >
                   <Image
                     className="mx-auto"
-                    src="/EmptyUserTable.png"
+                    src="/EmptyBillingTable.png"
                     alt="Empty"
                     width={400}
                     height={400}
@@ -131,6 +138,10 @@ export function PaymentTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex-1 text-sm text-muted-foreground">
+        {table.getFilteredSelectedRowModel().rows.length} of{" "}
+        {table.getFilteredRowModel().rows.length} member(s) selected.
       </div>
       <div className="flex flex-row items-center justify-center">
         <div className="flex items-center justify-end space-x-2 py-4">
@@ -178,6 +189,20 @@ export function PaymentTable<TData, TValue>({
             Next
           </Button>
         </div>
+      </div>
+      <div className="flex justify-end py-4">
+        <Button
+          variant="default"
+          size="sm"
+          onClick={() => {
+            const selectedRows = table
+              .getSelectedRowModel()
+              .rows.map((row) => row.original);
+            onAccept(selectedRows); // Pass the selected rows to the parent component via the callback
+          }}
+        >
+          Accept
+        </Button>
       </div>
     </div>
   );

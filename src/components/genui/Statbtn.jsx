@@ -7,55 +7,104 @@ import {
 
 function Statbtn({ status }) {
   //   "published" | "draft" | "hidden" | "expired" | "pending";
-  if (status === "published") {
-    return (
-      <button className="flex flex-row items-center gap-2 bg-green-100 text-green-600 fill-green-600 py-1 px-2 rounded">
-        <MdCheckCircleOutline className="w-4 h-4" /> Published
-      </button>
-    );
-  } else if (status === "draft") {
-    return (
-      <button className="flex flex-row items-center gap-2 bg-neutral-200 text-neutral-950 fill-neutral-900 py-1 px-2 rounded">
-        <MdAccessTime className="w-4 h-4" /> Draft
-      </button>
-    );
-  } else if (status === "pending") {
-    return (
-      <button className="flex flex-row items-center gap-2 bg-neutral-200 text-neutral-950 fill-neutral-900 py-1 px-2 rounded">
-        <MdAccessTime className="w-4 h-4" /> Pending
-      </button>
-    );
-  } else if (status === "hidden") {
-    return (
-      <button className="flex flex-row items-center gap-2 bg-red-200 text-red-500 fill-red-500 py-1 px-2 rounded">
-        <MdOutlineCancel className="w-4 h-4" /> Hidden
-      </button>
-    );
-  } else if (status === "expired") {
-    return (
-      <button className="flex flex-row items-center gap-2 bg-red-200 text-red-500 fill-red-500 py-1 px-2 rounded">
-        <MdOutlineCancel className="w-4 h-4" /> Expired
-      </button>
-    );
-  } else if (status === "active") {
-    return (
-      <button className="flex flex-row items-center gap-2 bg-green-100 text-green-600 fill-green-600 py-1 px-2 rounded">
-        <MdCheckCircleOutline className="w-4 h-4" /> Active
-      </button>
-    );
-  } else if (status === "suspended") {
-    return (
-      <button className="flex flex-row items-center gap-2 bg-neutral-200 text-neutral-950 fill-neutral-900 py-1 px-2 rounded">
-        <MdAccessTime className="w-4 h-4" /> Suspended
-      </button>
-    );
-  } else if (status === "inactive") {
-    return (
-      <button className="flex flex-row items-center gap-2 bg-red-200 text-red-500 fill-red-500 py-1 px-2 rounded">
-        <MdOutlineCancel className="w-4 h-4" /> Inactive
-      </button>
-    );
-  }
+  const statusStyles = {
+    published: {
+      bg: "bg-green-100",
+      text: "text-green-600",
+      fill: "fill-green-600",
+      icon: <MdCheckCircleOutline className="w-4 h-4" />,
+      label: "Published",
+    },
+    active: {
+      bg: "bg-green-100",
+      text: "text-green-600",
+      fill: "fill-green-600",
+      icon: <MdCheckCircleOutline className="w-4 h-4" />,
+      label: "Active",
+    },
+    completed: {
+      bg: "bg-green-100",
+      text: "text-green-600",
+      fill: "fill-green-600",
+      icon: <MdCheckCircleOutline className="w-4 h-4" />,
+      label: "Completed",
+    },
+    draft: {
+      bg: "bg-neutral-200",
+      text: "text-neutral-950",
+      fill: "fill-neutral-900",
+      icon: <MdAccessTime className="w-4 h-4" />,
+      label: "Draft",
+    },
+    pending: {
+      bg: "bg-neutral-200",
+      text: "text-neutral-950",
+      fill: "fill-neutral-900",
+      icon: <MdAccessTime className="w-4 h-4" />,
+      label: "Pending",
+    },
+    upcoming: {
+      bg: "bg-neutral-200",
+      text: "text-neutral-950",
+      fill: "fill-neutral-900",
+      icon: <MdAccessTime className="w-4 h-4" />,
+      label: "Upcoming",
+    },
+    suspended: {
+      bg: "bg-neutral-200",
+      text: "text-neutral-950",
+      fill: "fill-neutral-900",
+      icon: <MdAccessTime className="w-4 h-4" />,
+      label: "Suspended",
+    },
+    hidden: {
+      bg: "bg-red-200",
+      text: "text-red-500",
+      fill: "fill-red-500",
+      icon: <MdOutlineCancel className="w-4 h-4" />,
+      label: "Hidden",
+    },
+    expired: {
+      bg: "bg-red-200",
+      text: "text-red-500",
+      fill: "fill-red-500",
+      icon: <MdOutlineCancel className="w-4 h-4" />,
+      label: "Expired",
+    },
+    cancelled: {
+      bg: "bg-red-200",
+      text: "text-red-500",
+      fill: "fill-red-500",
+      icon: <MdOutlineCancel className="w-4 h-4" />,
+      label: "Cancelled",
+    },
+    overdue: {
+      bg: "bg-red-200",
+      text: "text-red-500",
+      fill: "fill-red-500",
+      icon: <MdOutlineCancel className="w-4 h-4" />,
+      label: "Overdue",
+    },
+    inactive: {
+      bg: "bg-red-200",
+      text: "text-red-500",
+      fill: "fill-red-500",
+      icon: <MdOutlineCancel className="w-4 h-4" />,
+      label: "Inactive",
+    },
+  };
+
+  const style = statusStyles[status];
+
+  if (!style) return null;
+
+  return (
+    <button
+      className={`flex flex-row items-center gap-2 ${style.bg} ${style.text} ${style.fill} py-1 px-2 rounded`}
+    >
+      {style.icon} {style.label}
+    </button>
+  );
 }
 
 export default Statbtn;

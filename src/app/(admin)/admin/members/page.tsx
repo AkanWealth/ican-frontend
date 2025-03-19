@@ -5,16 +5,12 @@ import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { memberscolumns } from "@/components/admincomps/user/datatable/columns";
 import { User, users } from "@/components/admincomps/user/datatable/colsdata";
 
-export async function getData(): Promise<User[]> {
-  return users;
-}
-
 function MembersPage() {
   const [data, setData] = useState<User[]>([]);
 
   useEffect(() => {
     async function fetchData() {
-      const result = await getData();
+      const result = users;
       const filteredData = result.filter((user) => user.role === "member");
       setData(filteredData);
     }

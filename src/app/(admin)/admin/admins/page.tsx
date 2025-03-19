@@ -1,19 +1,16 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { adminscolumns } from "@/components/admincomps/user/datatable/columns";
 import { User, users } from "@/components/admincomps/user/datatable/colsdata";
 
-export async function getData(): Promise<User[]> {
-  return users;
-}
-
 function AdminManagementPage() {
-  const [data, setData] = useState<User[]>([]);
+  const [data, setData] = useState<User[] | never[]>([]);
 
   useEffect(() => {
     async function fetchData() {
-      const result = await getData();
+      const result = users;
       const filteredData = result.filter(
         (user) => user.role === "admin" || user.role === "super admin"
       );

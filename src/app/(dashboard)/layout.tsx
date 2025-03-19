@@ -23,7 +23,7 @@ export default function AuthLayout({
             <Sidebar />
             <div className="flex-1 w-full lg:ml-60 md:ml-0">
               <Header />
-              <main className="w-full pt-16 p-6 md:p-6 mt-20 ">
+              <main className="w-full lg:pt-10 md:pt-8 lg:p-6 md:p-2 mt-20 ">
                 {children}
                 <Toaster />
               </main>

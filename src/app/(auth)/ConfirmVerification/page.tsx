@@ -4,9 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import axios from "axios"; 
+import axios from "axios"; // Make sure to import axios
 
-function Login() {
+function Verification() {
   const { toast } = useToast();
   const router = useRouter();
   
@@ -97,13 +97,13 @@ function Login() {
       
       toast({
         title: "Login Successful",
-        description: message || "Welcome back!",
+        description: "Continue your registration process. It won't take long",
         variant: "default",
         duration: 2000,
       });
 
       setTimeout(() => {
-        router.push("/Overview");
+        router.push("/registration");
       }, 2000);
     } catch (error) {
       console.error("Login error:", error);
@@ -129,11 +129,11 @@ function Login() {
       <div className="flex flex-col lg:w-96 md:w-80 items-center rounded-2xl bg-white p-8 gap-6">
         <Image src="/Logo_big.png" alt="Logo" width={100} height={50} />
         <div className="w-fit">
-          <h4 className="text-primary text-center text-2xl font-bold font-mono">
-            Member Login
+          <h4 className="text-primary text-center text-3xl font-bold font-mono">
+            Continue Registration
           </h4>
-          <p className="text-base font-normal font-sans">
-            Please, enter your details below
+          <p className="text-sm font-sans text-center text-gray-600">
+          Email verification was successful. Please enter your details to continue your registration
           </p>
         </div>
         <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
@@ -179,14 +179,14 @@ function Login() {
           </div>
           <div className="flex flex-row justify-between">
             <div className="flex flex-row gap-2">
-              <input type="checkbox" name="remember" id="remember" />
-              <p className="text-base font-medium">Remember me</p>
+              {/* <input type="checkbox" name="remember" id="remember" />
+              <p className="text-base font-medium">Remember me</p> */}
             </div>
             <Link
               className="text-primary text-base font-medium"
               href={"/forgot-password"}
             >
-              Forgot Password
+              Forgot Password?
             </Link>
           </div>
           <button
@@ -194,18 +194,18 @@ function Login() {
             type="submit"
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Log In"}
+            {loading ? "Submitting..." : "Continue"}
           </button>
         </form>
-        <p className="text-base font-medium">
-          Don&apos;t have an account? {"       "}
-          <Link className="text-primary" href={"/sign-up"}>
-            Sign Up
+        {/* <p className="text-base font-medium">
+       
+          <Link className="text-primary" href={"/forgot-password"}>
+            Forgot Password?
           </Link>
-        </p>
+        </p> */}
       </div>
     </div>
   );
 }
 
-export default Login;
+export default Verification;

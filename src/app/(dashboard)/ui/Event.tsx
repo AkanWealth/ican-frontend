@@ -561,15 +561,15 @@ function EventPage() {
             </div>
 
             <div className="flex items-center">
-                <div className="w-[400px] mr-40">
-                    <div className="relative group flex-1">
+                <div className="w-[400px] lg:mr-40 md:mr-10 ">
+                    <div className="relative group flex-1 p-2">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2">
                             <Search className="w-5 h-5 text-black" />
                         </div>
                         <input
                             type="text"
                             placeholder="Search Events"
-                            className="w-full h-8 pl-12 pr-4 rounded-xl text-sm border border-gray-700
+                            className="w-full h-8 pl-12 pr-4 p-6 rounded-xl text-sm border border-gray-700
                        focus:outline-none  focus:ring-1 focus:ring-blue-500
                        text-base transition-colors text-black
                        placeholder:text-black"
@@ -682,12 +682,12 @@ function EventPage() {
 
 
     return (
-        <div className="p-2">
+        <div className="py-6 px-4">
             <div className="w-full mb-4">
-                <div className='w-[460px] bg-gray-200 rounded-xl p-2'>
+            <div className='flex w-full max-w-[700px] bg-gray-200 rounded-xl p-2'>
                     <button
                         onClick={() => handleTabChange('password')}
-                        className={`sm:w-auto text-xs px-8 py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'password'
+                        className={`flex-1 text-sm px-2 md:px-2 lg:px-4 lg:py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'password'
                             ? 'bg-primary text-white'
                             : 'text-gray-800 hover:bg-gray-300'
                             }`}>
@@ -695,7 +695,7 @@ function EventPage() {
                     </button>
                     <button
                         onClick={() => handleTabChange('notification')}
-                        className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'notification'
+                        className={`flex-1 text-sm px-2 md:px-4 lg:px-8 py-2 rounded-lg ${activeTab === 'notification'
                             ? 'bg-primary text-white'
                             : 'text-gray-800 hover:bg-gray-300'
                             }`}
@@ -704,7 +704,7 @@ function EventPage() {
                     </button>
                     <button
                         onClick={() => handleTabChange('delete')}
-                        className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'delete'
+                        className={`flex-1 text-sm px-2 md:px-4 lg:px-8 py-2 rounded-lg ${activeTab === 'delete'
                             ? 'bg-primary text-white'
                             : 'text-gray-800 hover:bg-gray-300'
                             }`}

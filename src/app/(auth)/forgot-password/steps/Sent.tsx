@@ -22,9 +22,9 @@ function Sent({ onNext }: Propsval) {
         
         Follow the directions to reset your password
       </p>
-      <Link className="w-full flex items-center " href={"/login"}>
+      <Link className="w-full flex items-center " href={"/reset-password"}>
         <button className="w-1/2 p-3 mx-auto rounded-full bg-primary text-white text-base font-semibold">
-          LOGIN
+          Reset Password
         </button>
       </Link>
     </div>

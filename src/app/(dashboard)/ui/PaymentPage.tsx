@@ -36,7 +36,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-12 w-full max-w-2xl relative">
+      <div className="bg-white rounded-xl lg:p-12 md:p-8 w-full lg:max-w-2xl md:w-2xl relative">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
@@ -1010,14 +1010,14 @@ const PaymentPage = () => {
 
           <div className="grid grid-cols-1 gap-6 mb-8">
 
-            <div className="w-1/2 h-30 bg-white p-6 rounded-xl border border-gray-200">
+            <div className="lg:w-1/2  md:w-full h-30 bg-white p-6 rounded-xl border border-gray-200">
               <h3 className="text-gray-600 mb-2">Total Outstanding</h3>
               <div className="flex items-center justify-between">
-                <span className="text-xl font-medium">₦45,000</span>
+                <span className="lg:text-xl md:text-sm font-medium">₦45,000</span>
                 <div className="rounded-full flex items-center justify-center px-4 py-2 bg-primary  hover:bg-blue-700 hover:text-lg">
                   <button
                     onClick={handleSelectPaymentAll}
-                    className='className="text-base  text-white rounded-xl flex items-center gap-2'>Settle All Payment</button>
+                    className='text-sm text-white rounded-xl flex items-center '>Settle All Payment</button>
                 </div>
               </div>
             </div>
@@ -1026,19 +1026,19 @@ const PaymentPage = () => {
           </div>
 
           <div className="bg-white max-w-[1100px] flex flex-col item-center rounded-xl border border-gray-300 p-6 mb-10">
-            <h1 className='font-medium text-lg mb-6'>Outstanding Dues Breakdown</h1>
-            <div className="flex justify-between items-center w-full">
-              {/* <h3 className="font-semibold text-lg">Points Earned by Activity</h3> */}
+            <h1 className='font-semibold lg:text-lg md:text-base mb-6'>Outstanding Dues Breakdown</h1>
+            <div className="flex lg:flex-row md:flex-col justify-between items-center w-full">
+              
               <div className='w-1/2'>
                 <button
-                  // onClick={handleExportPDF}
-                  className="px-4 py-2 text-base bg-primary text-white rounded-xl flex items-center gap-2 hover:bg-blue-700 hover:text-lg"
+                  
+                  className="px-4 py-2 lg:text-base md:text-sm bg-primary text-white rounded-xl flex items-center gap-2 hover:bg-blue-700 hover:text-lg"
                 >
                   Settle payment
                 </button>
               </div>
-              <div className='flex flex-row gap-10 w-3/4'>
-                <div className="relative group w-3/4">
+              <div className='flex flex-row gap-5 w-full'>
+                <div className="relative group w-full">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2">
                     <Search className="w-5 h-5 text-gray-500" />
                   </div>
@@ -1154,7 +1154,7 @@ const PaymentPage = () => {
 
 
   return (
-    <div className="">
+    <div className="py-6 px-4">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold mb-2">Payment</h1>
@@ -1172,10 +1172,10 @@ const PaymentPage = () => {
 
       {/* Personal Details Section */}
       <div className="w-full mb-6">
-        <div className='w-[500px] bg-gray-200 rounded-xl p-2'>
+        <div className='flex w-full max-w-[460px] bg-gray-200 rounded-xl p-2'>
           <button
             onClick={() => handleTabChange('Outstanding')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'Outstanding'
+            className={`flex-1 text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'Outstanding'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}>
@@ -1183,7 +1183,7 @@ const PaymentPage = () => {
           </button>
           <button
             onClick={() => handleTabChange('Subcription')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'Subcription'
+            className={`flex-1 text-xs px-2 md:px-4 lg:px-8 py-2 rounded-lg ${activeTab === 'Subcription'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}
@@ -1192,7 +1192,7 @@ const PaymentPage = () => {
           </button>
           <button
             onClick={() => handleTabChange('PaymentHistory')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'PaymentHistory'
+            className={`flex-1 text-xs px-2 md:px-4 lg:px-8 py-2 rounded-lg  ${activeTab === 'PaymentHistory'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}

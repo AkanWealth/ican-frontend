@@ -3,6 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
+import {
+  payments,
+  PaymentDets,
+} from "@/components/admincomps/payment/datatable/colsdata";
+import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
+import { paymentdetailscoloumns } from "@/components/admincomps/payment/datatable/columns";
 
 function BillingDetailsPage() {
   const router = useRouter();
@@ -18,9 +24,8 @@ function BillingDetailsPage() {
             <MdArrowBack className="w-6 h-6" /> Back
           </button>
           <h2 className="font-semibold text-2xl text-black">Billing Details</h2>
-          <p>View and Manage all user billings here</p>
+          <p>View billings and payments here</p>
         </div>
-       
       </div>
       {/* Tab sections */}
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
@@ -31,7 +36,7 @@ function BillingDetailsPage() {
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
         <h2 className="text-xl font-semibold text-left">Payment Details</h2>
         <hr />
-        <div>ppp</div>
+        <PaymentTable data={payments} columns={paymentdetailscoloumns} />
       </div>
     </div>
   );

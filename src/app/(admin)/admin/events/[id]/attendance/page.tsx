@@ -35,7 +35,7 @@ function EventAttendancePage() {
       </div>
       {/* Tab sections */}
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl font-semibold text-left">Event Registration</h2>
+        <h2 className="text-xl font-semibold text-left">Event Name</h2>
         <div>
           <UserAttendanceTable
             setter={setSelected}

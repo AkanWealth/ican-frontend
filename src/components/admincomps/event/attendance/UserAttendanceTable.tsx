@@ -69,7 +69,7 @@ export function UserAttendanceTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex flex-row justify-between w-full  items-center py-4">
         <Input
           placeholder="Filter by attendee name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -78,6 +78,9 @@ export function UserAttendanceTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+        <button className=" bg-primary text-white rounded-full py-2 px-3 border border-white whitespace-nowrap ">
+          Mark as Present
+        </button>
       </div>
       <div className="">
         <Table>

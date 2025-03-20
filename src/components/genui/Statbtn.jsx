@@ -29,6 +29,13 @@ function Statbtn({ status }) {
       icon: <MdCheckCircleOutline className="w-4 h-4" />,
       label: "Completed",
     },
+    present: {
+      bg: "bg-green-100",
+      text: "text-green-600",
+      fill: "fill-green-600",
+      icon: <MdCheckCircleOutline className="w-4 h-4" />,
+      label: "Present",
+    },
     draft: {
       bg: "bg-neutral-200",
       text: "text-neutral-950",
@@ -42,6 +49,12 @@ function Statbtn({ status }) {
       fill: "fill-neutral-900",
       icon: <MdAccessTime className="w-4 h-4" />,
       label: "Pending",
+    }, registered: {
+      bg: "bg-neutral-200",
+      text: "text-neutral-950",
+      fill: "fill-neutral-900",
+      icon: <MdAccessTime className="w-4 h-4" />,
+      label: "Registered",
     },
     upcoming: {
       bg: "bg-neutral-200",
@@ -84,6 +97,13 @@ function Statbtn({ status }) {
       fill: "fill-red-500",
       icon: <MdOutlineCancel className="w-4 h-4" />,
       label: "Overdue",
+    },
+    absent: {
+      bg: "bg-red-200",
+      text: "text-red-500",
+      fill: "fill-red-500",
+      icon: <MdOutlineCancel className="w-4 h-4" />,
+      label: "Absent",
     },
     inactive: {
       bg: "bg-red-200",

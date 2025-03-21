@@ -139,22 +139,28 @@ function Login() {
 
     if (Object.values(errors).every((error) => error === "")) {
       // Submit form
-      try {
-        const response = await axios.request(config);
-        const { user, access_token } = response.data;
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("access_token", access_token);
+        try {
+          const response = await axios.request(config);
+          const { user, access_token } = response.data;
 
-        if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
-          router.push("/admin/");
-        } else {
-          router.push("/dashboard/");
+          // Set secure cookies instead of localStorage
+          document.cookie = `user=${JSON.stringify(
+            user
+          )}; path=/; secure; samesite=strict`;
+          document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
+
+          if (user.role === "USER") {
+            router.push("/dashboard");
+          } else if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
+            router.push("/admin");
+          }
+        } catch (error) {
+          return (
+            <Toast type="error" message="An error occurred during login." />
+          );
+        } finally {
+          setValidreq(false);
         }
-      } catch (error) {
-        return <Toast type="error" message="An error occurred during login." />;
-      } finally {
-        setValidreq(false);
-      }
     } else {
       setValidreq(false);
     }

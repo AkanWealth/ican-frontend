@@ -116,13 +116,18 @@ function AdminLogin() {
       try {
         const response = await axios.request(config);
         const { user, access_token } = response.data;
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("access_token", access_token);
+
+        // Set secure cookies instead of localStorage
+        document.cookie = `user=${JSON.stringify(
+          user
+        )}; path=/; secure; samesite=strict`;
+        document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
 
         if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
-          router.push("/admin/");
+          router.push("/admin");
         } else {
-          router.push("/dashboard/");
+          // Handle unauthorized access attempt
+          router.push("/login");
         }
       } catch (error) {
         console.error(error);

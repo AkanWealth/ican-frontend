@@ -4,17 +4,19 @@ import { Sidebar } from "./ui/Sidebar";
 import { NotificationProvider } from "./Context/NotificationContext";
 import { Toaster } from "@/components/ui/toaster";
 
+
 import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "ICAN Surulere",
   description: "Empowering Professionals, Building Futures",
 };
 
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <NotificationProvider>
       <html lang="en">

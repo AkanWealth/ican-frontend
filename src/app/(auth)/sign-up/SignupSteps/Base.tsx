@@ -4,8 +4,9 @@ import React, { useState } from "react";
 // import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import InputEle from "@/components/genui/InputEle";
 import { useToast } from "@/hooks/use-toast";
+import Toast from "@/components/genui/Toast";
 
 interface PropsVal {
   onNext: (email: string) => void;
@@ -34,6 +35,7 @@ function Base({ onNext }: PropsVal) {
     email: "",
     password: "",
     confirmPassword: "",
+    membershipId: "",
     consent: false,
   });
 
@@ -42,7 +44,8 @@ function Base({ onNext }: PropsVal) {
     surname: "",
     email: "",
     password: "",
-    cpassword: "",
+    confirmPassword: "",
+    membershipId: "",
     consent: "",
   });
 
@@ -185,28 +188,33 @@ function Base({ onNext }: PropsVal) {
       ...formErrors,
       [name]: error,
     });
-    
-    console.log('Validation States:', {
-      fname, 
-      sname, 
-      evalid, 
-      plength, 
-      pupper, 
-      plower, 
-      pnumber, 
-      pspecial, 
-      cvalid, 
-      consent
+
+    console.log("Validation States:", {
+      fname,
+      sname,
+      evalid,
+      plength,
+      pupper,
+      plower,
+      pnumber,
+      pspecial,
+      cvalid,
+      consent,
     });
-  
 
     // Check if all validations are met
-    const isComplete = 
-      fname && sname && evalid && 
-      plength && pupper && plower && 
-      pnumber && pspecial && 
-      cvalid && consent;
-    
+    const isComplete =
+      fname &&
+      sname &&
+      evalid &&
+      plength &&
+      pupper &&
+      plower &&
+      pnumber &&
+      pspecial &&
+      cvalid &&
+      consent;
+
     setComplete(isComplete);
   };
 
@@ -220,13 +228,21 @@ function Base({ onNext }: PropsVal) {
       surname: validateSurname(formData.surname),
       email: validateEmail(formData.email),
       password: validatePassword(formData.password),
-      cpassword: validateConfirmPassword(formData.password, formData.confirmPassword),
-      consent: formData.consent ? "" : "You must agree to the terms and conditions.",
+      confirmPassword: validateConfirmPassword(
+        formData.password,
+        formData.confirmPassword
+      ),
+      membershipId: formData.membershipId
+        ? ""
+        : "Membership ID is required.",
+      consent: formData.consent
+        ? ""
+        : "You must agree to the terms and conditions.",
     };
 
     setFormErrors(errors);
 
-    const hasErrors = Object.values(errors).some(error => error !== "");
+    const hasErrors = Object.values(errors).some((error) => error !== "");
 
     if (hasErrors) {
       setLoading(false);
@@ -269,22 +285,24 @@ function Base({ onNext }: PropsVal) {
     // }
     setTimeout(() => {
       // Simulate successful registration
-      toast({
-        title: "Registration Successful",
-        description: "Please verify your email",
-        variant: "default"
-      });
-  
+      //       return <Toast type="success" message={response.data.message} />;
+
       // Move to verification page
       onNext(formData.email);
-  
+
       setLoading(false);
     }, 1500);
   };
 
   return (
     <>
-      <Image src="/Logo_big.png" alt="Logo" width={143} height={60} className="mt-40"/>
+      <Image
+        src="/Logo_big.png"
+        alt="Logo"
+        width={143}
+        height={60}
+        className="mt-40"
+      />
       <div className="w-fit">
         <h4 className="text-primary text-center text-3xl font-bold font-mono">
           Create Account
@@ -295,176 +313,75 @@ function Base({ onNext }: PropsVal) {
       </div>
       <form className="w-full flex flex-col gap-4" onSubmit={handleSignup}>
         {/* First Name */}
-        <div className="w-full flex flex-col">
-          <label
-            className="text-base font-sans font-semibold"
-            htmlFor="firstName"
-          >
-            First Name <span className="text-red-600">*</span>
-          </label>
-          <input
-            className={`p-3 rounded border ${
-              formErrors.firstName ? 'border-red-500' : 'border-gray-400'
-            }`}
-            placeholder="Enter your first name"
-            name="firstName"
-            id="firstName"
-            required
-            type="text"
-            value={formData.firstName}
-            onChange={handleChange}
-          />
-          {formErrors.firstName && (
-            <p className="text-red-600 text-sm">{formErrors.firstName}</p>
-          )}
-        </div>
 
+        <InputEle
+          label="First Name"
+          id="firstName"
+          type="text"
+          required
+          placeholder="Enter your first name"
+          value={formData.firstName}
+          onChange={handleChange}
+          errorMsg={formErrors.firstName}
+        />
         {/* Surname */}
-        <div className="w-full flex flex-col">
-          <label
-            className="text-base font-sans font-semibold"
-            htmlFor="surname"
-          >
-            Surname <span className="text-red-600">*</span>
-          </label>
-          <input
-            className={`p-3 rounded border ${
-              formErrors.surname ? 'border-red-500' : 'border-gray-400'
-            }`}
-            placeholder="Enter your surname"
-            name="surname"
-            id="surname"
-            required
-            type="text"
-            value={formData.surname}
-            onChange={handleChange}
-          />
-          {formErrors.surname && (
-            <p className="text-red-600 text-sm">{formErrors.surname}</p>
-          )}
-        </div>
+        <InputEle
+          label="Surname"
+          id="surname"
+          type="text"
+          required
+          placeholder="Enter your Surname"
+          value={formData.surname}
+          onChange={handleChange}
+          errorMsg={formErrors.surname}
+        />
 
         {/* Email */}
-        <div className="w-full flex flex-col">
-          <label
-            className="text-base font-sans font-semibold"
-            htmlFor="email"
-          >
-            Email <span className="text-red-600">*</span>
-          </label>
-          <input
-            className={`p-3 rounded border ${
-              formErrors.email ? 'border-red-500' : 'border-gray-400'
-            }`}
-            placeholder="Enter your email address"
-            name="email"
-            id="email"
-            required
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          {formErrors.email && (
-            <p className="text-red-600 text-sm">{formErrors.email}</p>
-          )}
-        </div>
+        <InputEle
+          label="Email"
+          id="email"
+          type="email"
+          required
+          placeholder="Enter your Email"
+          value={formData.email}
+          onChange={handleChange}
+          errorMsg={formErrors.email}
+        />
+        {/* Membership ID */}
+        <InputEle
+          label="Membership ID"
+          id="membershipId"
+          type="text"
+          required
+          placeholder="Enter your Membership ID"
+          value={formData.membershipId}
+          onChange={handleChange}
+          errorMsg={formErrors.membershipId}
+        />
 
         {/* Password */}
-        <div className="w-full flex flex-col">
-          <label
-            className="text-base font-sans font-semibold"
-            htmlFor="password"
-          >
-            Password <span className="text-red-600">*</span>
-          </label>
-          <div className="relative">
-            <FaLock className="absolute left-3 top-[.8rem] text-gray-400 text-md" />
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              name="password"
-              placeholder="Create a password"
-              className={`w-full pl-10 pr-10 py-2 border rounded focus:outline-none focus:ring-2 ${
-                formErrors.password ? 'border-red-500 focus:ring-red-400' : 'border-gray-400 focus:ring-blue-400'
-              }`}
-              onChange={handleChange}
-              required
-            />
-            <button
-              type="button"
-              onClick={togglePasswordVisibility}
-              className="absolute right-3 top-3 text-gray-400 text-md focus:outline-none"
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
-          <div className="pt-4">
-            <p className="text-xs text-gray-500">
-              Must be at least{" "}
-              <span
-                className={plength ? "text-green-500" : "text-gray-500"}
-              >
-                8 characters long,{" "}
-              </span>
-              including{" "}
-              <span
-                className={pupper ? "text-green-500" : "text-gray-500"}
-              >
-                upper case,{" "}
-              </span>
-              <span
-                className={plower ? "text-green-500" : "text-gray-500"}
-              >
-                lower case,{" "}
-              </span>
-              <span
-                className={pnumber ? "text-green-500" : "text-gray-500"}
-              >
-                one number,{" "}
-              </span>
-              <span
-                className={pspecial ? "text-green-500" : "text-gray-500"}
-              >
-                one symbol.
-              </span>
-            </p>
-          </div>
-        </div>
+        <InputEle
+          label="Password"
+          id="password"
+          type="password"
+          required
+          placeholder="Enter your password"
+          value={formData.password}
+          onChange={handleChange}
+          errorMsg={formErrors.password}
+        />
 
         {/* Confirm Password */}
-        <div className="w-full flex flex-col">
-        <label
-          className="text-base font-sans font-semibold"
-          htmlFor="cpassword"
-        >
-          Confirm Password <span className="text-red-600">*</span>
-        </label>
-        <div className="relative">
-          <FaLock className="absolute left-3 top-[.8rem] text-gray-400 text-md" />
-          <input
-            type={showPassword ? "text" : "password"}
-            name="confirmPassword"
-            id="confirmPassword"
-            placeholder="Confirm password"
-            className={`w-full pl-10 pr-10 py-3 border rounded focus:outline-none focus:ring-2 ${
-              formErrors.cpassword ? 'border-red-500 focus:ring-red-400' : 'border-gray-400 focus:ring-blue-400'
-            }`}
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-          <button
-            type="button"
-            onClick={togglePasswordVisibility}
-            className="absolute right-3 top-3 text-gray-400 text-md focus:outline-none"
-          >
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </button>
-        </div>
-        {formErrors.cpassword && (
-          <p className="text-red-600 text-sm">{formErrors.cpassword}</p>
-        )}
-      </div>
+        <InputEle
+          label="Confirm Password"
+          id="confirmPassword"
+          type="password"
+          required
+          placeholder="Re-enter your password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          errorMsg={formErrors.confirmPassword}
+        />
 
         {/* Consent Checkbox */}
         <div className="flex flex-row justify-between gap-2 items-center">
@@ -476,9 +393,10 @@ function Base({ onNext }: PropsVal) {
             onChange={handleChange}
           />
           <p className="text-xs">
-            By creating an account, I agree and consent to receive communications 
-            and updates about ICAN Institute products and services. I have reviewed 
-            and acknowledged the Privacy Policy along with the Terms and Conditions therein.
+            By creating an account, I agree and consent to receive
+            communications and updates about ICAN Institute products and
+            services. I have reviewed and acknowledged the Privacy Policy along
+            with the Terms and Conditions therein.
           </p>
         </div>
         {formErrors.consent && (

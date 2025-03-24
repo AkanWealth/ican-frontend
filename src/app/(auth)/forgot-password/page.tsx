@@ -8,10 +8,7 @@ import Sent from "./steps/Sent";
 function ForgotPassword() {
   const [step, setStep] = useState(1);
 
-  const steps = [
-    { number: 1, title: "Forgot Password" },
-    { number: 2, title: "Link Sent" },
-  ];
+
 
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {

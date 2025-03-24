@@ -3,16 +3,17 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Toast from "@/components/genui/Toast";
+
 import InputEle from "@/components/genui/InputEle";
 import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
 interface Propsval {
   onNext: () => void;
 }
 
 function Base({ onNext }: Propsval) {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -32,7 +33,7 @@ function Base({ onNext }: Propsval) {
     let config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/forgot-password",
+      url: `${BASE_API_URL}/auth/forgot-password"`,
       headers: {
         "Content-Type": "application/json",
       },
@@ -41,12 +42,10 @@ function Base({ onNext }: Propsval) {
 
     try {
       const response = await axios.request(config);
-      setMessage(response.data.message);
-      setError("");
       onNext(); // Call onNext if the request is successful
+      return <Toast type="success" message={response.data.message} />;
     } catch (error) {
-      setMessage("");
-      setError("An error occurred. Please try again.");
+      return <Toast type="error" message="An error occurred during login." />;
     }
   };
 

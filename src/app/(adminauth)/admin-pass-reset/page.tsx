@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import InputEle from "@/components/genui/InputEle";
 import Link from "next/link";
 import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+import Toast from "@/components/genui/Toast";
 
 function AdminPasswordRequest() {
   const [evalid, setEvalid] = useState(false);
@@ -39,7 +41,7 @@ function AdminPasswordRequest() {
     let config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/forgot-password",
+      url: `${BASE_API_URL}/auth/forgot-password`,
       headers: {
         "Content-Type": "application/json",
       },
@@ -49,8 +51,10 @@ function AdminPasswordRequest() {
     try {
       const response = await axios.request(config);
       console.log(JSON.stringify(response.data));
+      return <Toast type="success" message="Request successful" />;
     } catch (error) {
       console.log(error);
+      return <Toast type="error" message="An error occurred during request." />;
     }
   };
 

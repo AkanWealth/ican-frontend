@@ -7,6 +7,7 @@ import InputEle from "@/components/genui/InputEle";
 import { useRouter } from "next/navigation";
 import Toast from "@/components/genui/Toast";
 import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
 
 function Login() {
   const router = useRouter();
@@ -129,7 +130,7 @@ function Login() {
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/login",
+      url: `${BASE_API_URL}/auth/login`,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -139,28 +140,27 @@ function Login() {
 
     if (Object.values(errors).every((error) => error === "")) {
       // Submit form
-        try {
-          const response = await axios.request(config);
-          const { user, access_token } = response.data;
+      try {
+        const response = await axios.request(config);
+        const { user, access_token } = response.data;
 
-          // Set secure cookies instead of localStorage
-          document.cookie = `user=${JSON.stringify(
-            user
-          )}; path=/; secure; samesite=strict`;
-          document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
+        // Set secure cookies instead of localStorage
+        document.cookie = `user=${JSON.stringify(
+          user
+        )}; path=/; secure; samesite=strict`;
+        document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
 
-          if (user.role === "USER") {
-            router.push("/dashboard");
-          } else if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
-            router.push("/admin");
-          }
-        } catch (error) {
-          return (
-            <Toast type="error" message="An error occurred during login." />
-          );
-        } finally {
-          setValidreq(false);
+        if (user.role === "USER") {
+          router.push("/dashboard");
+        } else if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
+          router.push("/admin");
         }
+        return <Toast type="success" message="Login successful" />;
+      } catch (error) {
+        return <Toast type="error" message="An error occurred during login." />;
+      } finally {
+        setValidreq(false);
+      }
     } else {
       setValidreq(false);
     }

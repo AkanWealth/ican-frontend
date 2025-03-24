@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import Toast from "@/components/genui/Toast";
+
 import InputEle from "@/components/genui/InputEle";
 import {
   InputOTP,
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/input-otp";
 
 import { useRouter } from "next/navigation";
+import { BASE_API_URL } from "@/utils/setter";
 
 function AdminLogin() {
   const router = useRouter();
@@ -104,7 +107,7 @@ function AdminLogin() {
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/login",
+      url: `${BASE_API_URL}/auth/login"`,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -129,8 +132,9 @@ function AdminLogin() {
           // Handle unauthorized access attempt
           router.push("/login");
         }
+        return <Toast type="success" message="Login successful" />;
       } catch (error) {
-        console.error(error);
+        return <Toast type="error" message="An error occurred during login." />;
       } finally {
         setLoading(false);
       }

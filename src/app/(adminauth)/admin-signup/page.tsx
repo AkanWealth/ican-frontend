@@ -6,6 +6,7 @@ import Link from "next/link";
 import Toast from "@/components/genui/Toast";
 import InputEle from "@/components/genui/InputEle";
 import { useRouter } from "next/navigation";
+import { BASE_API_URL } from "@/utils/setter";
 
 function AdminSignup() {
   const router = useRouter();
@@ -187,16 +188,17 @@ function AdminSignup() {
     setFormErrors(errors);
 
     const data = JSON.stringify({
-      firstName: firstName,
-      lastName: lastName,
+      membershipId: membershipId,
+      firstname: firstName,
+      surname: lastName,
       email: email,
       password: password,
-      membershipId: membershipId,
+      confirmPassword: password,
     });
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/register?", // Change to admin login
+      url: `${BASE_API_URL}/auth/register`, // Change to admin login
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

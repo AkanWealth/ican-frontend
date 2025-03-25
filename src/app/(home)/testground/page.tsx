@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 
-import { RichTextEditor } from "@/registry/new-york/rich-text-editor/rich-text-editor";
-
+import FlutterModal from "@/components/genui/FlutterModal";
 function TestingPage() {
   const [value, setValue] = useState(``);
 
@@ -11,8 +10,12 @@ function TestingPage() {
     <div className="mt-20">
       TestingPage
       <div className="m-10 w-96">
-        <RichTextEditor value={value} onChange={setValue} />
-        <button onClick={() => console.log(value)}>Submit</button>
+        <FlutterModal
+          amount={50000}
+          email="woodsedema001@gmail.com"
+          phone_number="08127576854"
+          name="Francis Woods"
+        />
       </div>
     </div>
   );

@@ -17,7 +17,7 @@ function BlogEdit({}: BlogEditProps) {
   const [post, setPost] = useState("");
 
   return (
-    <div>
+    <form>
       <div>
         <InputEle
           label="Title"
@@ -29,7 +29,7 @@ function BlogEdit({}: BlogEditProps) {
         <InputEle
           label="Author Name"
           type="text"
-          id="author"
+          id="authorName"
           value={blog.author}
           onChange={() => {}}
         />
@@ -53,7 +53,7 @@ function BlogEdit({}: BlogEditProps) {
           Preview
         </button>
       </div>
-    </div>
+    </form>
   );
 }
 

@@ -4,6 +4,7 @@ import { FaRegDotCircle } from 'react-icons/fa';
 import { Eye, EyeOff, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Modal } from '@mui/material';
+import DeleteAccountModal from '@/components/Modal/Delete';
 
 
 type NotificationType = 'generalNotifications' | 'eventRegistrations' | 'payments' | 'mcpdUpdates';
@@ -37,15 +38,33 @@ function SettingsPage() {
   };
 
   const confirmDelete = () => {
+    // Handle the confirmation logic
     console.log('Account deleted');
     setIsModalOpen(false);
+    
+    // Show success toast
+    toast({
+      title: "Account Deleted",
+      description: "Your account has been successfully deleted.",
+      variant: "default",
+      duration: 150,
+    });
   };
 
 
   const getTabDescription = () => {
     switch (activeTab) {
       case 'password':
-        return 'Update your password here';
+        return (
+          <div className='flex justify-end'>
+              <button
+                type="button"
+                onClick={handleDeleteClick}
+                className="px-8 py-2 rounded-full bg-red-600 text-white"
+              >
+                Delete account
+              </button>
+          </div>);
       case 'notification':
         return (
           <div>
@@ -59,8 +78,8 @@ function SettingsPage() {
     }
   };
   const [notifications, setNotifications] = useState<NotificationState>({
-    generalNotifications: true,  // Set to true by default
-    eventRegistrations: true,    // Set to true by default
+    generalNotifications: true,  
+    eventRegistrations: true,   
     payments: false,
     mcpdUpdates: false
   });
@@ -512,15 +531,16 @@ function SettingsPage() {
 
 
   return (
-    <div className="p-4 md:p-8 bg-white rounded-lg border-2 border-gray-400">
-      <h1 className="text-2xl md:text-2xl font-bold mb-4">Settings</h1>
+    <div className='py-4 px-4'>
+    <div className="p-4 md:p-8 bg-white rounded-lg border border-gray-300">
+      <h1 className="lg:text-2xl md:text-xl font-semibold mb-4">Settings</h1>
 
       {/* Personal Details Section */}
       <div className="w-full mb-4">
-        <div className='w-[450px] bg-gray-200 rounded-xl p-2'>
+        <div className='grid grid-cols-3 w-full max-w-[550px] bg-gray-200 rounded-xl p-2'>
           <button
             onClick={() => handleTabChange('password')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'password'
+            className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'password'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}>
@@ -528,7 +548,7 @@ function SettingsPage() {
           </button>
           <button
             onClick={() => handleTabChange('notification')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'notification'
+            className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg  ${activeTab === 'notification'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}
@@ -537,7 +557,7 @@ function SettingsPage() {
           </button>
           <button
             onClick={() => handleTabChange('delete')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'delete'
+            className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg ${activeTab === 'delete'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}
@@ -553,9 +573,13 @@ function SettingsPage() {
       {activeTab === 'notification' && renderNotificationTab()}
       {activeTab === 'delete' && renderDeleteTab()}
 
+      <DeleteAccountModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          onConfirm={confirmDelete} 
+        />
 
-
-
+    </div>
     </div>
   );
 }

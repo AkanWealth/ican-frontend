@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { nigerianStates } from '@/lib/States';
 import { nigerianStatesLGAs } from '@/lib/nigerianStatesLGAs';
 import { nigerianStatesCity } from '@/lib/NigeriaCity';
+import Image from 'next/image';
 
 interface StateCityMap {
   [state: string]: string[];
@@ -119,22 +120,24 @@ function Profile() {
     setActiveTab(tab);
   };
   const renderBiodata = () => (
-    <><div className="w-full mb-8 md:mb-16 flex flex-col md:flex-row md:gap-32">
+    <><div className="w-full mb-8 md:mb-16 flex flex-col md:flex-row md:gap-32 py-6 px-4">
       <h2 className="text-base font-medium mb-4">Profile Photo</h2>
       <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
         <div className="relative">
           {profilePhoto ? (
             <div className="relative">
-              <img
+              <Image
                 src={URL.createObjectURL(profilePhoto)}
                 alt="Profile"
+                fill={true} 
                 className="w-24 h-24 rounded-full object-cover" />
             </div>
           ) : (
             <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-              <img
+              <Image
                 src="/avatar.png"
                 alt="Profile"
+                fill={true} 
                 className="w-24 h-24 rounded-full object-cover" />
             </div>
           )}
@@ -585,7 +588,8 @@ function Profile() {
   </>);
 
   return (
-    <div className="p-4 md:p-8 bg-white rounded-lg border border-gray-400">
+    <div className='py-4 px-2'>
+    <div className="p-4 bg-white rounded-lg border border-gray-300 ">
       <h1 className="text-2xl md:text-3xl font-bold mb-6">Profile Management</h1>
 
       {/* Personal Details Section */}
@@ -595,10 +599,10 @@ function Profile() {
       </div>
 
       <div className="w-full mb-4">
-        <div className='w-[780px] bg-gray-200 rounded-xl p-2'>
+        <div className='flex w-full max-w-[800px] bg-gray-200 rounded-xl p-1'>
           <button
             onClick={() => handleTabChange('biodata')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'biodata'
+            className={`flex-1 text-xs px-2  py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'biodata'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}>
@@ -606,7 +610,7 @@ function Profile() {
           </button>
           <button
             onClick={() => handleTabChange('contact')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'contact'
+            className={`flex-1 text-xs px-2 md:px-4 lg:px-8 py-2 rounded-lg ${activeTab === 'contact'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}
@@ -615,7 +619,7 @@ function Profile() {
           </button>
           <button
             onClick={() => handleTabChange('qualification')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'qualification'
+            className={`flex-1 text-xs px-2 md:px-4 lg:px-8 py-2 rounded-lg ${activeTab === 'qualification'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}
@@ -624,7 +628,7 @@ function Profile() {
           </button>
           <button
             onClick={() => handleTabChange('experience')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'experience'
+            className={`flex-1 text-xs px-2 md:px-4 lg:px-8 py-2 rounded-lg ${activeTab === 'experience'
               ? 'bg-primary text-white'
               : 'text-gray-800 hover:bg-gray-300'
               }`}
@@ -642,6 +646,7 @@ function Profile() {
       {activeTab === 'contact' && renderContactDetails()}
       {activeTab === 'qualification' && renderEducationDetail()}
       {activeTab === 'experience' && renderWorkExperience()}
+    </div>
     </div>
   );
 }

@@ -14,7 +14,7 @@ const topMenuItems = [
   { icon: Banknote, label: 'Payment', href: '/Payment' },
   { icon: FaRegCalendarCheck, label: 'Events', href: '/Event' },
   { icon: FileText, label: 'Resources', href: '/Resource' },
-  { icon: ListOrderedIcon, label: 'MCPD Records', href: '/MCPDRecords' },
+  // { icon: ListOrderedIcon, label: 'MCPD Records', href: '/MCPDRecords' },
 ];
 
 const bottomMenuItems = [
@@ -29,24 +29,22 @@ export const Sidebar = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Check if mobile or tablet on client side to avoid hydration issues
+
   useEffect(() => {
     const checkIfMobile = () => {
-      // Changed this to also account for tablet sizes
+
       setIsMobileView(window.innerWidth < 1024);
     };
     
-    // Initial check
+
     checkIfMobile();
-    
-    // Add event listener
+
     window.addEventListener('resize', checkIfMobile);
-    
-    // Cleanup
+   
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
 
-  // Handle clicks outside the sidebar to close it
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (isOpen && sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
@@ -58,7 +56,7 @@ export const Sidebar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  // Custom navigation handler
+
   const handleNavigation = (href: string) => {
     if (isMobileView) {
       setIsOpen(false);
@@ -137,7 +135,7 @@ export const Sidebar = () => {
             </nav>
 
             {/* Bottom Menu Items */}
-            <div className="space-y-4 mt-10">
+            <div className="space-y-4 mt-20">
               {bottomMenuItems.map((item, index) => {
                 const active = isActiveLink(item.href);
                 return (
@@ -161,7 +159,7 @@ export const Sidebar = () => {
             {/* Logout - Always Visible at Bottom of Scrollable Area */}
             <div
               onClick={() => handleNavigation('/login')}
-              className="flex items-center px-6 py-2 mt-12 mb-4 cursor-pointer hover:bg-blue-800 rounded-lg"
+              className="flex items-center px-6 py-2 mt-40 mb-4 cursor-pointer hover:bg-blue-800 rounded-lg"
             >
               <LogOut className="w-5 h-5 transform scale-x-[-1] flex-shrink-0" />
               <span className="ml-3 whitespace-nowrap">Logout</span>

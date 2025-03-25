@@ -438,6 +438,7 @@ function ResourcePage() {
 
             {/* Search and Filter - Improved for mobile */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="relative w-full sm:w-1/2"></div>    
                 <div className="relative w-full sm:w-1/2">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2">
                         <Search className="w-5 h-5 text-gray-500" />

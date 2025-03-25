@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
-import axios from "axios"; 
+import { useAuth } from "@/app/(dashboard)/LoginAuthentication/AuthContext";
+import { AuthProvider } from "@/app/(dashboard)/LoginAuthentication/AuthContext";
 
 function Login() {
   const { toast } = useToast();
-  const router = useRouter();
+  const { login } = useAuth();
   
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -67,49 +67,21 @@ function Login() {
 
     setLoading(true);
 
-    // Prepare data for API request
-    const data = JSON.stringify({
-      email: formData.email,
-      password: formData.password,
-    });
-
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/login", // Update with the correct login endpoint
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      data: data,
-    };
-
     try {
-      const response = await axios.request(config);
-      const { message, user, access_token } = response.data;
-      
-      console.log("User logged in successfully:", user);
-      console.log("Access token:", access_token);
-      
-      // Store the token in localStorage or cookies for future authenticated requests
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem('token', access_token);
+      // Use the login method from AuthContext
+      await login(formData.email, formData.password);
       
       toast({
         title: "Login Successful",
-        description: message || "Welcome back!",
+        description: "Welcome back!",
         variant: "default",
         duration: 2000,
       });
-
-      setTimeout(() => {
-        router.push("/Overview");
-      }, 2000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
       
       let errorMessage = "An error occurred during login.";
-      if (axios.isAxiosError(error) && error.response) {
+      if (error.response) {
         errorMessage = error.response.data.message || errorMessage;
       }
       
@@ -208,4 +180,10 @@ function Login() {
   );
 }
 
-export default Login;
+export default function LoginPage() {
+  return (
+    <AuthProvider>
+      <Login />
+    </AuthProvider>
+  );
+}

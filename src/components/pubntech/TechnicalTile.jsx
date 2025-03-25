@@ -1,14 +1,17 @@
-import React from 'react'
+import React from 'react';
+import Image from 'next/image';
 
 function TechnicalTile({post}) {
   return (
 <div className="min-w-[350px]  gap-8 sm:gap-6 h-auto p-0 sm:pr-4 rounded-3xl border border-gray-300 justify-start items-center flex flex-col sm:flex-row">
         {/* Blog post image */}
         <div className="sm:w-[253px] h-full w-full">
-          <img
+          <Image
             loading="lazy"
             src={post.imageUrl}
             alt={`Image for ${post.title}`}
+            width={200}
+            height={200}
             className="h-full w-full sm:w-fit object-cover sm:rounded-l-lg rounded-3xl"
           />
         </div>

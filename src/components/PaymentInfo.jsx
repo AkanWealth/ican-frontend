@@ -29,7 +29,7 @@ function PaymentInfo() {
         </div>
         <div className="w-1/2 flex flex-col gap-3">
             <h4 className="font-semibold">ACCOUNT DETAILS </h4>
-            <Image width={137} height={37} src={"/first.png"} />
+            <Image width={137} height={37} src={"/first.png"} alt="firstBAnkLogo" />
             <p className="text-base font-normal text-neutral-700 font-sans">Account Number</p>
             <p className="text-base font-normal font-sans flex flex-row gap-4 items-center"><span className="font-semibold text-2xl">2045417438</span> <MdContentCopy className="w-5 h-5 " />  </p>
             <p className="text-base font-normal text-neutral-700 font-sans">Account Name</p>

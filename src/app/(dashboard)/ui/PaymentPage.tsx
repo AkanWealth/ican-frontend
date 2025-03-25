@@ -1172,7 +1172,7 @@ const PaymentPage = () => {
 
       {/* Personal Details Section */}
       <div className="w-full mb-6">
-        <div className='flex w-full max-w-[460px] bg-gray-200 rounded-xl p-2'>
+        <div className='flex w-full max-w-[600px] bg-gray-200 rounded-xl p-2'>
           <button
             onClick={() => handleTabChange('Outstanding')}
             className={`flex-1 text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'Outstanding'

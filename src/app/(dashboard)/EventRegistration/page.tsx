@@ -1,7 +1,10 @@
 import EventRegistration from "../ui/EventRegisration";
+import { Suspense } from 'react';
 
 const EventRegistrationPage = () => {
-    return <EventRegistration />;
-  };
-  
-  export default EventRegistrationPage; 
+  return (<Suspense>
+    <EventRegistration />;
+  </Suspense>)
+};
+
+export default EventRegistrationPage; 

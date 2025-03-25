@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, BellIcon, ChevronDown } from 'lucide-react';
+import Image from 'next/image';
 import Notification from '@/components/Notification';
 import {
   DropdownMenu,
@@ -97,9 +98,11 @@ export const Header = () => {
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center space-x-2 outline-none">
               <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
-                <img
+                <Image
                   src="/Ellipse 1732.png"
                   alt="Profile"
+                  width={200}
+                  height={200}
                   className="w-full h-full object-cover"
                 />
               </div>

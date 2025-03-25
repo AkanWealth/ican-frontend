@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,6 +29,7 @@ function Base({ onNext }: PropsVal) {
   const [cvalid, setCvalid] = useState(false);
   const [consent, setConsent] = useState(false);
   const [complete, setComplete] = useState(false);
+  
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -219,24 +220,11 @@ function Base({ onNext }: PropsVal) {
     checkFormCompleteness();
   };
   
-  // Use useEffect to ensure state updates are complete before checking form completeness
-  useEffect(() => {
-    checkFormCompleteness();
-  }, [
-    fname, 
-    sname, 
-    evalid, 
-    midValid,
-    plength, 
-    pupper, 
-    plower, 
-    pnumber, 
-    pspecial, 
-    cvalid, 
-    formData.consent
-  ]);
+
+
   
-  const checkFormCompleteness = () => {
+  
+  const checkFormCompleteness = useCallback(() => {
     const isComplete = 
       fname && 
       sname && 
@@ -251,7 +239,24 @@ function Base({ onNext }: PropsVal) {
       formData.consent;
     
     setComplete(isComplete);
-  };
+  }, [
+    fname, 
+    sname, 
+    evalid, 
+    midValid,
+    plength, 
+    pupper, 
+    plower, 
+    pnumber, 
+    pspecial, 
+    cvalid, 
+    formData.consent
+  ]);
+
+// Use useEffect to ensure state updates are complete before checking form completeness
+useEffect(() => {
+  checkFormCompleteness();
+}, [checkFormCompleteness]);
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -290,7 +295,7 @@ function Base({ onNext }: PropsVal) {
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/register", // Removed the trailing '?'
+      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/register", 
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

@@ -35,7 +35,7 @@ function Signup() {
     email: "",
     membershipId: "",
     password: "",
-    cpassword: "",
+    confirmPassword: "",
     consent: false,
   });
   const [formErrors, setFormErrors] = useState({
@@ -554,7 +554,6 @@ function Signup() {
             {formSubmitted && formErrors.consent && (
               <p className="text-red-600 text-sm">{formErrors.consent}</p>
             )}
-
 
             <button
               disabled={!complete || loading}

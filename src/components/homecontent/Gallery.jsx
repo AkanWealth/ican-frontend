@@ -28,10 +28,7 @@ const ImageOverlay = ({
         <div className="relative">
           {/* Image */}
           <Image
-<<<<<<< HEAD:src/components/Gallery.jsx
-=======
             fill={true}
->>>>>>> admin-side:src/components/homecontent/Gallery.jsx
             src={currentImage.imgurl}
             alt={currentImage.title}
             className="max-h-[85vh] w-auto"
@@ -191,13 +188,10 @@ function Gallery() {
                       >
                         <div className="aspect-[4/3] w-full">
                           <Image
-<<<<<<< HEAD:src/components/Gallery.jsx
-=======
                             fill={true}
->>>>>>> admin-side:src/components/homecontent/Gallery.jsx
                             src={item.imgurl}
                             alt={item.title}
-                            fill
+
                             className="w-full h-full object-cover"
                           />
                         </div>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRef } from "react";
-import { BiodataFormData } from "../Biodata";
+import { BiodataFormData } from "../homecomps/Biodata";
 import InputEle from "@/components/genui/InputEle";
 import Image from "next/image";
 import { UserPenIcon } from "lucide-react";
@@ -68,7 +68,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
       <div className="grid lg:grid-cols-2 md:grid-cols-1  lg:gap-10 md:gap-5 ">
         <InputEle
           value={formData.personalData.surname}
-          onChange={handleChange}
+          onChange={() => {}}
           id="surname"
           placeholder="Enter your surname"
           type="text"
@@ -76,7 +76,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
         />
         <InputEle
           value={formData.personalData.firstName}
-          onChange={handleChange}
+          onChange={() => {}}
           id="firstName"
           placeholder="Enter your first name"
           type="text"
@@ -84,24 +84,69 @@ function Personal({ formData, updateFormData }: PersonalProps) {
         />
         <InputEle
           value={formData.personalData?.middleName}
-          onChange={handleChange}
+          onChange={() => {}}
           id="middleName"
           placeholder="Enter your middle name"
           type="text"
           label="Middle Name"
         />
-        <InputEle id="gender" type="gender" label="Gender" />
-        <InputEle id="dob" type="date" label="Date of birth" />
-        <InputEle id="maritalStatus" type="marriage" label="Marital Status" />
+        <InputEle
+          id="gender"
+          type="gender"
+          label="Gender"
+          onChange={(e) =>
+            updateFormData({
+              personalData: {
+                ...formData.personalData,
+                gender: e.target.value,
+              },
+            })
+          }
+        />
+        <InputEle
+          id="dob"
+          type="date"
+          label="Date of birth"
+          onChange={(e) =>
+            updateFormData({
+              personalData: { ...formData.personalData, dob: e.target.value },
+            })
+          }
+        />
+        <InputEle
+          id="maritalStatus"
+          type="marriage"
+          label="Marital Status"
+          onChange={(e) =>
+            updateFormData({
+              personalData: {
+                ...formData.personalData,
+                maritalStatus: e.target.value,
+              },
+            })
+          }
+        />
         <InputEle
           value={formData.personalData?.state}
-          onChange={handleChange}
+          onChange={() => {}}
           id="state"
           type="text"
           label="State of origin"
           placeholder="Enter your state of origin"
         />
-        <InputEle id="nationality" type="country" label="Nationality" />
+        <InputEle
+          id="nationality"
+          type="country"
+          label="Nationality"
+          onChange={(e) =>
+            updateFormData({
+              personalData: {
+                ...formData.personalData,
+                nationality: e.target.value,
+              },
+            })
+          }
+        />
 
         {/* <InputEle
           id="lga"

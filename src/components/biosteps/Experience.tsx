@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import { BiodataFormData } from "../Biodata";
+import { BiodataFormData } from "../homecomps/Biodata";
 import InputEle from "../genui/InputEle";
 
 interface ExperienceProps {
@@ -33,31 +33,49 @@ function Experience({ formData, updateFormData }: ExperienceProps) {
           placeholder=""
           type="text"
           label="Company Name"
+          onChange={() => {}}
         />
         <InputEle
           id="OfficeAddress"
           placeholder="Enter your Address"
           type="text"
           label="Office Address"
+          onChange={() => {}}
+        />
+        <InputEle
+          id="Position/Role"
+          type="text"
+          label="Position/Role "
+          onChange={() => {}}
         />
       </div>
 
-      <InputEle id="Position/Role" type="text" label="Position/Role " />
       <div className="flex items-center gap-2">
         <input
           id="checkbox"
           type="checkbox"
           checked={isCurrentJob}
           onChange={handleCheckboxChange}
-          className="w-4 h-4 accent-blue-500 cursor-pointer"
+        />
+        <InputEle
+          id="startDate"
+          type="date"
+          label="Start Date"
+          onChange={() => {}}
+        />
+        <InputEle
+          id="endDate"
+          type="date"
+          label="End Date"
+          onChange={() => {}}
         />
         <label htmlFor="checkbox">This is my current position</label>
       </div>
 
       {!isCurrentJob && (
         <div className="grid grid-cols-2 gap-10">
-          <InputEle id="startDate" type="date" label="Start Date" />
-          <InputEle id="endDate" type="date" label="End Date" />
+          {/* <InputEle id="startDate" type="date" label="Start Date" />
+          <InputEle id="endDate" type="date" label="End Date" /> */}
         </div>
       )}
     </div>

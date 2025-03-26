@@ -91,18 +91,24 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             id="mobileNumber"
             type="phone"
             label="Contact Phone Number"
+            onChange={handleChange}
+            value={formData.contactDetails?.mobileNumber}
           />
 
           <InputEle
             id="residentialCountry"
             type="country"
             label=" Residential Country"
+            onChange={handleChange}
+            value={formData.contactDetails?.residentialCountry}
           />
           <InputEle
             id="residentialCity"
             placeholder="Enter your residential city"
             type="text"
             label=" Residential City"
+            onChange={handleChange}
+            value={formData.contactDetails?.residentialAddress}
           />
           <InputEle
             id="residentialState"

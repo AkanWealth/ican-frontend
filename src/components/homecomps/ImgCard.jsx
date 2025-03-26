@@ -1,10 +1,5 @@
-<<<<<<< HEAD:src/components/ImgCard.jsx
-import React from 'react';
-import Image from 'next/image';
-=======
 import React from "react";
 import Image from "next/image";
->>>>>>> admin-side:src/components/homecomps/ImgCard.jsx
 
 const Imgcard = ({ title, imgurl }) => {
   return (
@@ -12,11 +7,6 @@ const Imgcard = ({ title, imgurl }) => {
       {/* Image container */}
       <div className="relative aspect-[16/9] w-full min-w-[300px] sm:min-w-[400px]">
         <Image
-<<<<<<< HEAD:src/components/ImgCard.jsx
-=======
-          width={10}
-          height={10}
->>>>>>> admin-side:src/components/homecomps/ImgCard.jsx
           src={imgurl}
           alt={title}
           height={200}

@@ -1,5 +1,6 @@
 import "../globals.css";
 import type { Metadata } from "next";
+import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: "ICAN Surulere",
   description: "Empowering Professionals, Building Futures",

@@ -79,7 +79,14 @@ function Qualifications({
           required={false}
           value={formData?.education?.graduation}
         />
-        <InputEle id="Status" type="status" label="Status" />
+        {/* <InputEle
+          id="status"
+          type="status"
+          label="Status"
+          onChange={handleChange}
+          required={false}
+          value={formData?.education?.status}
+        /> */}
         {/* <InputEle
           id="firstQualDate"
           type="number"

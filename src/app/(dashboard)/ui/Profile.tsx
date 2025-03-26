@@ -97,25 +97,6 @@ function Profile() {
     }
   };
 
-  const handleInputChanges = (e: { target: { id: any; value: any } }) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-
-    if (id === "stateOfOrigin" && value) {
-      const stateCities = nigerianStateCities[value] || [];
-      setCities(stateCities);
-    } else if (id === "residentialState" && value) {
-      const stateCities = nigerianStateCities[value] || [];
-      setResidentialCities(stateCities);
-    } else if (id === "residentialCity" && value) {
-      const stateCities = nigerianStateCity[value] || [];
-      setResidentialCities(stateCities);
-    }
-  };
-
   const handlePhotoUpload = (event: any) => {
     const file = event.target.files[0];
     if (file && file.size <= 100 * 1024) {

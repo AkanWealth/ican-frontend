@@ -39,10 +39,10 @@ function Profile() {
         <hr className="w-full" />
         <div>
           <div className="mx-auto flex flex-col items-center gap-2">
-            <Image />
-            <h5 className="flex flex-col items-center text-center text-black text-2xl font-medium">
+            {/* <Image src="./img.png" width={50} height={50}  alt="Profile img" /> */}
+            <h5 className="flex flex-col items-center text-center text-black text-xl font-medium">
               Admin Name
-              <span>admin role</span>
+              <span className="text-xs text-neutral-400">admin role</span>
             </h5>
           </div>
           <div className="flex flex-col gap-4 mt-4">

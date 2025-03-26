@@ -40,7 +40,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           <DropdownMenuItem
             onClick={() => router.push(`billing/${row.original.id}`)}
           >
-            View Billings Details
+            View Billing Details
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

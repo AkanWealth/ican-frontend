@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import Toast from "@/components/genui/Toast";
+
 import InputEle from "@/components/genui/InputEle";
 import {
   InputOTP,
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/input-otp";
 
 import { useRouter } from "next/navigation";
+import { BASE_API_URL } from "@/utils/setter";
 
 function AdminLogin() {
   const router = useRouter();
@@ -104,7 +107,7 @@ function AdminLogin() {
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/login",
+      url: `${BASE_API_URL}/auth/login"`,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -116,16 +119,22 @@ function AdminLogin() {
       try {
         const response = await axios.request(config);
         const { user, access_token } = response.data;
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("access_token", access_token);
+
+        // Set secure cookies instead of localStorage
+        document.cookie = `user=${JSON.stringify(
+          user
+        )}; path=/; secure; samesite=strict`;
+        document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
 
         if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
-          router.push("/admin/");
+          router.push("/admin");
         } else {
-          router.push("/dashboard/");
+          // Handle unauthorized access attempt
+          router.push("/login");
         }
+        return <Toast type="success" message="Login successful" />;
       } catch (error) {
-        console.error(error);
+        return <Toast type="error" message="An error occurred during login." />;
       } finally {
         setLoading(false);
       }

@@ -2,22 +2,27 @@
 
 import React, { useEffect, useState } from "react";
 
-import { EventTable } from "@/components/admincomps/event/datatable/EventTable";
-import { registeredcolumns } from "@/components/admincomps/event/datatable/columns";
-import { getData } from "@/utils/dataFetcher";
-import { Event } from "@/components/admincomps/event/datatable/colsdata";
+import { UserAttendanceTable } from "@/components/admincomps/event/attendance/UserAttendanceTable";
+import { userattendancecolumns } from "@/components/admincomps/event/attendance/columns";
+import {
+  UserAttendance,
+  userattendances,
+} from "@/components/admincomps/event/attendance/colsdata";
 
 function EventAttendancePage() {
-  const [data, setData] = useState<Event[]>([]);
-  const [showNewEvent, setShowNewEvent] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [data, setData] = useState<UserAttendance[]>([]);
 
   useEffect(() => {
     async function fetchData() {
-      const result = await getData();
+      const result = userattendances;
       setData(result);
     }
     fetchData();
   }, []);
+  useEffect(() => {
+    console.log("Selected recipients:", selected);
+  }, [selected]);
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
@@ -30,9 +35,13 @@ function EventAttendancePage() {
       </div>
       {/* Tab sections */}
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl font-semibold text-left">Event Registration</h2>
+        <h2 className="text-xl font-semibold text-left">Event Name</h2>
         <div>
-          <EventTable columns={registeredcolumns} data={data} />
+          <UserAttendanceTable
+            setter={setSelected}
+            columns={userattendancecolumns}
+            data={data}
+          />
         </div>
       </div>
     </div>

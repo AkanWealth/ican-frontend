@@ -13,9 +13,9 @@ function BillingPage() {
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
         <h2 className="flex flex-col gap-2 text-left items-start font-semibol text-2xl text-black">
-          Billing{" "}
+          Billing Management
           <span className="text-base text-gray-600">
-            Bill members and track their invoices here
+            Create member bills and track their invoices here
           </span>
         </h2>
         <button

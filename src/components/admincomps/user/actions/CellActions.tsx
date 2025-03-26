@@ -11,6 +11,7 @@ import {
 
 import {
   MdEdit,
+  MdRemoveRedEye,
   MdOutlineToggleOn,
   MdOutlineDelete,
   MdOutlineToggleOff,
@@ -21,12 +22,14 @@ import { MoreHorizontal } from "lucide-react";
 import DisableAdmin from "./DisableAdmin";
 import DeleteAdmin from "./DeleteAdmin";
 import EnableAdmin from "./EnableAdmin";
+import { useRouter } from "next/navigation";
 
 interface CellProps {
   row: any; // Replace 'any' with the actual type of 'row'
 }
 
 const ActionsCell: React.FC<CellProps> = ({ row }) => {
+  const router = useRouter();
   const [showDisableModal, setShowDisableModal] = useState(false);
   const [showEnableModal, setShowEnableModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -48,13 +51,20 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           <DropdownMenuContent align="end">
             {row.original.status === "active" ? (
               <DropdownMenuItem className="flex flex-row items-center">
-                <FaUserXmark className="w-4 h-4" /> Suspend User
+                <FaUserXmark className="w-4 h-4" /> Suspend Member
               </DropdownMenuItem>
             ) : (
               <DropdownMenuItem className="flex flex-row items-center">
-                <FaUserCheck className="w-4 h-4" /> Reactivate User
+                <FaUserCheck className="w-4 h-4" /> Reactivate Member
               </DropdownMenuItem>
-            )}
+            )}{" "}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => router.push(`members/${row.original.id}`)}
+              className="flex flex-row items-center"
+            >
+              <MdRemoveRedEye className="w-4 h-4" /> View Member Details
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </>
@@ -71,8 +81,11 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem className="flex flex-row items-center">
-              <MdEdit className="w-4 h-4" /> Edit Admin Details
+            <DropdownMenuItem
+              onClick={() => router.push(`admins/${row.original.id}`)}
+              className="flex flex-row items-center"
+            >
+              <MdRemoveRedEye className="w-4 h-4" /> View Admin Details
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {row.original.status === "active" ? (

@@ -1,221 +1,181 @@
 "use client";
-
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import InputEle from "@/components/genui/InputEle";
-import { useRouter } from "next/navigation";
-import Toast from "@/components/genui/Toast";
-import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/app/(dashboard)/LoginAuthentication/AuthContext";
+import { AuthProvider } from "@/app/(dashboard)/LoginAuthentication/AuthContext";
 
 function Login() {
-  const router = useRouter();
-  const [validreq, setValidreq] = useState(true);
+  const { toast } = useToast();
+  const { login } = useAuth();
+
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [formErrors, setFormErrors] = useState({
-    email: "",
-    password: "",
-  });
 
-  const [complete, setComplete] = useState(false);
-  const [evalid, setEvalid] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
-  const [pvalid, setPvalid] = useState(false);
-  const [plength, setPlength] = useState(false);
-  const [pupper, setPupper] = useState(false);
-  const [pnumber, setPnumber] = useState(false);
-  const [plower, setPlower] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const validatePassword = (password: string): string => {
-    if (password.length < 8) {
-      setPlength(false);
-      return "No Password too short ";
-    } else {
-      setPlength(true);
-    }
-    if (!/[A-Z]/.test(password)) {
-      setPupper(false);
-      return "No Uppercase letters";
-    } else {
-      setPupper(true);
-    }
-    if (!/[a-z]/.test(password)) {
-      setPlower(false);
-      return "No Lowercase letters";
-    } else {
-      setPlower(true);
-    }
-    if (!/\d/.test(password)) {
-      setPnumber(false);
-      return "No Number Charcter";
-    } else {
-      setPnumber(true);
-    }
-    if (!/[@$!%*?&]/.test(password)) {
-      setPnumber(false);
-      return "No Special Charcter";
-    } else {
-      setPvalid(true);
-    }
-    return "";
-  };
-  const validateEmail = (email: string): string => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return "Invalid email address.";
-    }
-    return "";
-  };
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
+  const handleChange = (e: { target: { name: any; value: any } }) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     });
-    let error = "";
-
-    if (name === "email") {
-      error = validateEmail(value);
-      setEvalid(!error);
-    }
-    if (name === "password") {
-      error = validatePassword(value);
-    }
-
-    setFormErrors({
-      ...formErrors,
-      [name]: error,
-    });
-
-    if (pvalid && evalid) {
-      setComplete(true);
-    } else {
-      setComplete(false);
-    }
   };
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+
+  const validateForm = () => {
+    let isValid = true;
+
+    // Reset errors
+    setEmailError("");
+    setPasswordError("");
+
+    // Validate email
+    if (!formData.email) {
+      setEmailError("Email is required");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      setEmailError("Please enter a valid email address");
+      isValid = false;
+    }
+
+    // Validate password
+    if (!formData.password) {
+      setPasswordError("Password is required");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    const email = (
-      document.getElementById("email") as HTMLInputElement
-    ).value.trim();
-    const password = (
-      document.getElementById("password") as HTMLInputElement
-    ).value.trim();
-    console.log(email, password);
+    if (!validateForm()) {
+      toast({
+        title: "Login Failed",
+        description: "Please correct the errors in the form",
+        variant: "destructive",
+        duration: 2000,
+      });
+      return;
+    }
 
-    const errors = {
-      password: validatePassword(password),
-      email: validateEmail(email),
-    };
+    setLoading(true);
 
-    setFormErrors(errors);
+    try {
+      // Use the login method from AuthContext
+      await login(formData.email, formData.password);
 
-    const data = JSON.stringify({
-      email: email,
-      password: password,
-    });
+      toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+        variant: "default",
+        duration: 2000,
+      });
+    } catch (error: any) {
+      console.error("Login error:", error);
 
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/login",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      data: data,
-    };
-
-    if (Object.values(errors).every((error) => error === "")) {
-      // Submit form
-      try {
-        const response = await axios.request(config);
-        const { user, access_token } = response.data;
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("access_token", access_token);
-
-        if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
-          router.push("/admin/");
-        } else {
-          router.push("/dashboard/");
-        }
-      } catch (error) {
-        return <Toast type="error" message="An error occurred during login." />;
-      } finally {
-        setValidreq(false);
+      let errorMessage = "An error occurred during login.";
+      if (error.response) {
+        errorMessage = error.response.data.message || errorMessage;
       }
-    } else {
-      setValidreq(false);
+
+      toast({
+        title: "Login Failed",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 2000,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className=" m-auto ">
-      <div className="flex flex-col w-96 sm:w-[440px] items-center rounded-2xl  bg-white p-8 gap-6 ">
-        <Image src="/Logo_big.png" alt="Logo" width={143} height={60} />
-        <div className=" w-fit">
-          <h4 className=" text-primary text-center text-3xl font-bold font-mono   ">
+    <div className="m-auto">
+      <div className="flex flex-col lg:w-96 md:w-80 items-center rounded-2xl bg-white p-8 gap-6">
+        <Image src="/Logo_big.png" alt="Logo" width={100} height={50} />
+        <div className="w-fit">
+          <h4 className="text-primary text-center text-2xl font-bold font-mono">
             Member Login
           </h4>
-          <p className=" text-base font-normal font-sans  ">
+          <p className="text-base font-normal font-sans">
             Please, enter your details below
           </p>
         </div>
-
-        <form className="w-full flex flex-col gap-4 " onSubmit={handleLogin}>
-          <InputEle
-            id="email"
-            label="Email Address"
-            type="email"
-            placeholder="Enter your email address"
-            onChange={handleChange}
-            value={formData.email}
-            errorMsg={formErrors.email}
-          />
-          <InputEle
-            id="password"
-            label="Password"
-            type="password"
-            placeholder="Enter your password"
-            onChange={handleChange}
-            value={formData.password}
-            errorMsg={formErrors.password}
-          />
-
-          <div className=" flex flex-row justify-between  ">
-            <div className=" flex flex-row gap-2 ">
+        <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="w-full flex flex-col">
+            <label
+              className="text-base font-sans font-semibold"
+              htmlFor="email"
+            >
+              Email Address <span className="text-red-600">*</span>
+            </label>
+            <input
+              className={`p-3 rounded border ${
+                emailError ? "border-red-500" : "border-gray-400"
+              }`}
+              placeholder="Enter your email address"
+              name="email"
+              value={formData.email}
+              required
+              type="email"
+              onChange={handleChange}
+            />
+            {emailError && (
+              <p className="text-red-500 text-sm mt-1">{emailError}</p>
+            )}
+          </div>
+          <div className="w-full flex flex-col">
+            <label
+              className="text-base font-sans font-semibold"
+              htmlFor="password"
+            >
+              Password <span className="text-red-600">*</span>
+            </label>
+            <input
+              className={`p-3 rounded border ${
+                passwordError ? "border-red-500" : "border-gray-400"
+              }`}
+              placeholder="Enter password"
+              name="password"
+              value={formData.password}
+              required
+              type="password"
+              onChange={handleChange}
+            />
+            {passwordError && (
+              <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+            )}
+          </div>
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-row gap-2">
               <input type="checkbox" name="remember" id="remember" />
-              <p className=" text-base font-medium   ">Remember me</p>
+              <p className="text-base font-medium">Remember me</p>
             </div>
             <Link
-              className=" text-primary text-base font-medium  "
+              className="text-primary text-base font-medium"
               href={"/forgot-password"}
             >
               Forgot Password
             </Link>
           </div>
           <button
-            disabled={!validreq}
-            className=" px-8 py-4 bg-primary rounded-full text-white text-base disabled:bg-gray-600 font-semibold "
+            className="px-8 py-4 bg-primary rounded-full text-white text-base font-semibold"
             type="submit"
+            disabled={loading}
           >
-            Log In
+            {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
-        <p className=" text-base font-medium   ">
+        <p className="text-base font-medium">
           Don&apos;t have an account? {"       "}
-          <Link className=" text-primary " href={"/sign-up"}>
+          <Link className="text-primary" href={"/sign-up"}>
             Sign Up
           </Link>
         </p>
@@ -224,4 +184,10 @@ function Login() {
   );
 }
 
-export default Login;
+export default function LoginPage() {
+  return (
+    <AuthProvider>
+      <Login />
+    </AuthProvider>
+  );
+}

@@ -15,6 +15,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { logout } from "@/lib/auth";
+
 const topMenuItems = [
   { icon: MdHome, label: "Dashboard", href: "/admin" },
   {
@@ -23,7 +25,11 @@ const topMenuItems = [
     href: "/admin/admins",
   },
 
-  { icon: MdOutlinePeopleAlt, label: "User Management", href: "/admin/users" },
+  {
+    icon: MdOutlinePeopleAlt,
+    label: "Members Management",
+    href: "/admin/members",
+  },
   {
     icon: MdCollectionsBookmark,
     label: "Content Management",
@@ -99,13 +105,14 @@ function Sidebar() {
         </div>
 
         <div>
-          <Link
-            href="/"
+          <button
+            
+            onClick={logout}
             className="flex text-red-500 fill-red-500 items-center space-x-3 px-6 py-2 rounded-lg mt-32 mb-20"
           >
             <LogOut className="w-5 h-5 transform scale-x-[-1]" />
             <span className=" test-xs">Logout</span>
-          </Link>
+          </button>
         </div>
       </nav>
     </aside>

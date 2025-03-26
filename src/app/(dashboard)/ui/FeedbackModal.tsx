@@ -1,21 +1,87 @@
 "use client";
 import { X, Star } from "lucide-react";
 import { useState } from "react";
+import axios from "axios";
+import { useToast } from '@/hooks/use-toast';
 
 // Define the type for the modal props
 interface FeedbackModalProps {
-    isOpen: boolean; // This must be a boolean
-    onClose: () => void; // This must be a function
+    isOpen: boolean;
+    onClose: () => void;
+    eventId?: string | null; // Allow both undefined and null
 }
 
-const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
-    const [feedbackData, setFeedbackData] = useState({ comment: "", rating: 0 });
+const FeedbackModal: React.FC<FeedbackModalProps> = ({ 
+    isOpen, 
+    onClose, 
+    eventId 
+}) => {
+    const [feedbackData, setFeedbackData] = useState({ 
+        comment: "", 
+        rating: 0 
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const { toast } = useToast();
+    
 
-    // Prevent page reload on form submission
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    // Submit feedback to API
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log("Feedback submitted:", feedbackData);
-        onClose(); // Close modal after submission
+        
+        // Validate input
+        if (!eventId) {
+            setError("No event selected for feedback");
+            return;
+        }
+
+        // Validate feedback
+        if (feedbackData.comment.trim() === "") {
+            setError("Please provide a feedback comment");
+            return;
+        }
+
+        if (feedbackData.rating === 0) {
+            setError("Please provide a rating");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Prepare feedback payload
+            const payload = {
+                comment: feedbackData.comment,
+                rating: feedbackData.rating
+            };
+
+            // Submit feedback to API
+            const response = await axios.post(
+                `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/feedback`,
+                payload
+            );
+            console.log("response",response);
+            // setTimeout(() => {
+            if(response.status === 201){
+            toast({
+                title: "Feedback submitted successfully!",
+                description: " ",
+                variant: "default",
+                duration: 2000,
+              }); 
+            }
+            // }, 3000);
+
+            setFeedbackData({ comment: "", rating: 0 });
+            onClose();
+        } catch (err) {
+            // Handle API submission error
+            console.error("Feedback submission error:", err);
+            setError(err instanceof Error ? err.message : "Failed to submit feedback");
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Prevent modal from closing when clicking inside it
@@ -23,13 +89,13 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
         event.stopPropagation();
     };
 
-    if (!isOpen) return null; // Don't render modal if it's not open
+    if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30" onClick={onClose}>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50" onClick={onClose}>
             <div 
                 className="relative bg-white rounded-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto"
-                onClick={handleModalClick} // Prevents modal from closing when clicking inside
+                onClick={handleModalClick}
             >
                 {/* Close Button */}
                 <button
@@ -41,6 +107,13 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
 
                 {/* Modal Header */}
                 <h3 className="text-2xl font-semibold mb-4">Event Feedback</h3>
+
+                {/* Error Message */}
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        {error}
+                    </div>
+                )}
 
                 {/* Feedback Input */}
                 <form onSubmit={handleSubmit}>
@@ -96,9 +169,10 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
                     <div className="flex justify-end gap-3">
                         <button
                             type="submit"
+                            disabled={loading}
                             className="w-full px-4 py-2 text-sm bg-blue-800 text-white rounded-full hover:bg-blue-900 disabled:bg-gray-300 disabled:cursor-not-allowed"
                         >
-                            Submit Feedback
+                            {loading ? "Submitting..." : "Submit Feedback"}
                         </button>
                     </div>
                 </form>

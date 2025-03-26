@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useState } from "react";
 import { BiodataFormData } from "../homecomps/Biodata";
 import InputEle from "../genui/InputEle";
 
@@ -10,79 +11,73 @@ interface ExperienceProps {
   updateFormData: (data: Partial<BiodataFormData>) => void;
 }
 
-function Experience({ isShown, formData, updateFormData }: ExperienceProps) {
-  var bucket = "";
-  if (isShown) {
-    bucket = "flex";
-  } else {
-    bucket = "hidden";
-  }
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { id, value } = e.target;
-    updateFormData({
-      experience: {
-        ...formData.experience,
-        [id]: value,
-      },
-    });
-    console.log(e);
-    console.log(formData);
+function Experience({ formData, updateFormData }: ExperienceProps) {
+  const [isCurrentJob, setIsCurrentJob] = useState(false);
+
+  const handleCheckboxChange = () => {
+    setIsCurrentJob(!isCurrentJob);
   };
+
   return (
-    <div className={` ${bucket} pt-4 flex flex-col justify-between gap-4 `}>
-      <h3 className="font-bold font-mono text-2xl text-black ">
+    <div className="pt-4 flex flex-col justify-between gap-4 mt-4">
+      <h3 className="font-bold font-mono text-xl text-black ">
         WORK EXPERIENCE
         <hr />
       </h3>
-      <InputEle
-        onChange={handleChange}
-        required={false}
-        id="currentJob"
-        type="text"
-        label="Current Job "
-        value={formData?.experience?.currentJob}
-      />
-      <InputEle
-        onChange={handleChange}
-        required={false}
-        id="companyName"
-        type="text"
-        label="Company Name"
-        value={formData?.experience?.companyName}
-      />
+      {/* <InputEle id="currentJob" type="text" label="Current Job " />
+      <InputEle id="companyName" type="text" label="Company Name" /> */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2  gap-10 ">
         <InputEle
-          onChange={handleChange}
-          required={false}
-          id="department"
-          placeholder="Enter your department"
+          id="companyName"
+          placeholder=""
           type="text"
-          label="Department"
-          value={formData?.experience?.department}
+          label="Company Name"
+          onChange={() => {}}
         />
         <InputEle
-          onChange={handleChange}
-          required={false}
-          id="currentPosition"
-          placeholder="Enter your Current Position"
+          id="OfficeAddress"
+          placeholder="Enter your Address"
           type="text"
-          label="Current Position"
-          value={formData?.experience?.currentPosition}
+          label="Office Address"
+          onChange={() => {}}
         />
         <InputEle
-          onChange={handleChange}
-          required={false}
+          id="Position/Role"
+          type="text"
+          label="Position/Role "
+          onChange={() => {}}
+        />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          id="checkbox"
+          type="checkbox"
+          checked={isCurrentJob}
+          onChange={handleCheckboxChange}
+        />
+        <InputEle
           id="startDate"
           type="date"
           label="Start Date"
-          value={formData?.experience?.startDate}
+          onChange={() => {}}
         />
+        <InputEle
+          id="endDate"
+          type="date"
+          label="End Date"
+          onChange={() => {}}
+        />
+        <label htmlFor="checkbox">This is my current position</label>
       </div>
+
+      {!isCurrentJob && (
+        <div className="grid grid-cols-2 gap-10">
+          {/* <InputEle id="startDate" type="date" label="Start Date" />
+          <InputEle id="endDate" type="date" label="End Date" /> */}
+        </div>
+      )}
     </div>
   );
 }

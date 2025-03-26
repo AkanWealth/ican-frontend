@@ -37,13 +37,13 @@ function Qualifications({
     console.log(formData);
   };
   return (
-    <div className={`${bucket}  pt-4 flex flex-col justify-between gap-4 `}>
-      <h3 className="font-bold font-mono text-2xl text-black ">
+    <div className="w-full pt-4 flex flex-col justify-between gap-4 mt-4">
+      <h3 className="w-full font-bold font-mono text-xl text-black ">
         EDUCATION AND PROFESSIONAL QUALIFICATION
         <hr />
       </h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2  gap-10 ">
+      <div className="w-full grid lg:grid-cols-2 md:grid-col-1  lg:gap-10 md:gap-5">
         <InputEle
           id="insitution"
           placeholder="Enter your Insitution"
@@ -65,7 +65,7 @@ function Qualifications({
         <InputEle
           id="qualification"
           placeholder="Enter your qualification"
-          type="text"
+          type="status"
           label="Qualification"
           onChange={handleChange}
           required={false}
@@ -79,19 +79,15 @@ function Qualifications({
           required={false}
           value={formData?.education?.graduation}
         />
-        <InputEle
+        {/* <InputEle
+          id="status"
+          type="status"
+          label="Status"
           onChange={handleChange}
           required={false}
-          id="firstQualName"
-          type="text"
-          label="First professional Qualification"
-          value={
-            formData?.education?.professionalQualification?.[0]?.firstQualName
-          }
-        />
-        <InputEle
-          onChange={handleChange}
-          required={false}
+          value={formData?.education?.status}
+        /> */}
+        {/* <InputEle
           id="firstQualDate"
           type="number"
           label="Year of First Qualification"
@@ -115,10 +111,7 @@ function Qualifications({
           id="secQualDate"
           type="number"
           label="Year of Second Qualification"
-          value={
-            formData?.education?.professionalQualification?.[1]?.secQualDate
-          }
-        />
+        /> */}
       </div>
     </div>
   );

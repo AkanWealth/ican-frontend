@@ -3,10 +3,48 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MdArrowBack, MdDelete } from "react-icons/md";
-import { BellIcon } from "lucide-react";
+import InputEle from "@/components/genui/InputEle";
+import { BillUserTable } from "@/components/admincomps/billing/create/BillUserTable";
+import { userbillingcolumns } from "@/components/admincomps/billing/create/columns";
+import {
+  BillUser,
+  billings,
+} from "@/components/admincomps/billing/create/colsdata";
+
+interface IBilling {
+  billing_name: string;
+  billing_type: string;
+  billing_description: string;
+  billing_amount: string;
+  billing_date: string;
+  reciepients: "all" | string[];
+}
 
 function CreateBillingPage() {
+  //const selected = React.useMemo(() => [], []);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [recipientType, setRecipientType] = useState<string>("all");
+
   const router = useRouter();
+  const [newBill, setNewBill] = useState<IBilling>({
+    billing_name: "",
+    billing_type: "",
+    billing_description: "",
+    billing_amount: "0",
+    billing_date: "",
+    reciepients: "all",
+  });
+  useEffect(() => {
+    console.log("Selected recipients:", selected);
+  }, [selected]);
+
+  const onInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    setNewBill((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+  };
 
   return (
     <div className="rounded-3xl p-6">
@@ -23,10 +61,74 @@ function CreateBillingPage() {
       {/* Tab sections */}
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
         <h2 className="text-xl w-full font-semibold text-left border-b border-gray-500 ">
-          Invoice Summary
+          Bill Creation
         </h2>
-        <div></div>
+        <div className="grid grid-cols-2 gap-6">
+          <InputEle
+            label="Billing Name"
+            id="billing_name"
+            type="text"
+            value={newBill.billing_name}
+            onChange={onInputChange}
+            placeholder="Enter bill name"
+          />{" "}
+          <InputEle
+            label="Bill type"
+            id="billing_type"
+            type="text"
+            value={newBill.billing_type}
+            onChange={onInputChange}
+            placeholder="Enter bill type"
+          />
+          <InputEle
+            label="Billing Description"
+            id="billing_description"
+            type="text"
+            value={newBill.billing_description}
+            onChange={onInputChange}
+            placeholder="Enter bill description"
+          />
+          <InputEle
+            label="Bill Amount"
+            id="billing_amount"
+            type="text"
+            value={newBill.billing_amount}
+            onChange={onInputChange}
+            placeholder="Enter bill amount"
+          />
+          <InputEle
+            label="Due Date"
+            id="billing_date"
+            type="date"
+            value={newBill.billing_date}
+            onChange={onInputChange}
+            placeholder="Enter bill due date"
+          />
+          <InputEle
+            label="Reciepients"
+            id="reciepients"
+            type="select"
+            options={[
+              { value: "all", label: "All members" },
+              { value: "select", label: "Select members" },
+            ]}
+            value={recipientType}
+            onChange={(e) => setRecipientType(e.target.value)}
+          />
+        </div>
       </div>
+      {recipientType === "select" && (
+        <div className="rounded-3xl mt-10 px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
+          <h2 className="text-xl w-full font-semibold text-left border-b border-gray-500 ">
+            Select members{" "}
+          </h2>
+          <BillUserTable
+            columns={userbillingcolumns}
+            data={billings}
+            setter={setSelected}
+          />
+        </div>
+      )}
     </div>
   );
 }

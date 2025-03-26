@@ -12,7 +12,9 @@ export default function Dashboard() {
   return (
     <AuthProvider>
       <ProtectedRoute>
+        
         <DashboardContent />
+        
       </ProtectedRoute>
     </AuthProvider>
   );

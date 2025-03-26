@@ -6,6 +6,7 @@ import { FaBookmark } from 'react-icons/fa6';
 import { useToast } from '@/hooks/use-toast';
 import { Modal } from '@mui/material';
 import Image from 'next/image';
+import ResourceDetailsModal from '../ModalPage/ResourceModalPage';
 
 interface Resource {
     id: number;
@@ -15,6 +16,9 @@ interface Resource {
     isPremium: boolean;
     isBookmarked: boolean;
     icon: 'REC' | 'PDF' | 'VIDEO' | 'AUDIO';
+    description?: string;
+    duration?: string;
+    // fullDescription?: string;
 }
 
 function ResourcePage() {
@@ -27,83 +31,97 @@ function ResourcePage() {
     const [filterBy, setShowFilterBy] = useState<boolean>(false);
     const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
 
+    const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+
     const [resources, setResources] = useState<Resource[]>([
         { 
             id: 1,
-            type: 'webinar',
+            type: 'Webinar',
             title: 'Mastering Communication Skills in the Digital Age',
             date: '22, October 2024',
             isPremium: true,
             isBookmarked: false,
-            icon: 'REC'
+            icon: 'REC',
+            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
+            duration: '56:10',
+            
         },
         { 
             id: 2,
-            type: 'article',
+            type: 'PDF',
             title: '5 Strategies for Time Management in the Workplace',
             date: '22, October 2024',
             isPremium: false,
             isBookmarked: false,
-            icon: 'PDF'
+            icon: 'PDF',
+            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
         },
         { 
             id: 3,
-            type: 'video',
+            type: 'Video',
             title: 'The Future of Leadership: Insights for 2025',
             date: '22, October 2024',
             isPremium: true,
             isBookmarked: true,
-            icon: 'VIDEO'
+            icon: 'VIDEO',
+            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
         },
         { 
             id: 4,
-            type: 'audio',
+            type: 'Audio',
             title: 'The Future of Leadership: Insights for 2025',
             date: '22, October 2024',
             isPremium: false,
             isBookmarked: false,
-            icon: 'AUDIO'
+            icon: 'AUDIO',
+            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
         },
     ]);
 
 
 
     const [recommended, setRecommened] = useState<Resource[]>([
-        { 
+       { 
             id: 1,
-            type: 'webinar',
+            type: 'Webinar',
             title: 'Mastering Communication Skills in the Digital Age',
             date: '22, October 2024',
             isPremium: false,
             isBookmarked: false,
-            icon: 'REC'
+            icon: 'REC',
+            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
+            duration: '56:10',
+            
         },
         { 
             id: 2,
-            type: 'article',
+            type: 'PDF',
             title: '5 Strategies for Time Management in the Workplace',
             date: '22, October 2024',
             isPremium: false,
             isBookmarked: false,
-            icon: 'PDF'
+            icon: 'PDF',
+            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
         },
         { 
             id: 3,
-            type: 'video',
+            type: 'Video',
             title: 'The Future of Leadership: Insights for 2025',
             date: '22, October 2024',
             isPremium: false,
-            isBookmarked: false,
-            icon: 'VIDEO'
+            isBookmarked: true,
+            icon: 'VIDEO',
+            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
         },
         { 
             id: 4,
-            type: 'audio',
+            type: 'Audio',
             title: 'The Future of Leadership: Insights for 2025',
             date: '22, October 2024',
             isPremium: false,
             isBookmarked: false,
-            icon: 'AUDIO'
+            icon: 'AUDIO',
+            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
         },
     ]);
 
@@ -165,6 +183,15 @@ function ResourcePage() {
         
         return true;
     });
+
+    const openResourceModal = (resource: Resource) => {
+        setSelectedResource(resource);
+    };
+
+    // Function to close resource details modal
+    const closeResourceModal = () => {
+        setSelectedResource(null);
+    };
 
     const handleCancel = () => {
         setActiveTab('resource');
@@ -255,7 +282,9 @@ function ResourcePage() {
           <div className="flex items-center text-xs text-gray-700 mb-3">
             <span>{resource.date}</span>
           </div>
-          <button className="bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-800 transition-colors">
+          <button 
+          className="bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-800 transition-colors"
+          onClick={() => openResourceModal(resource)}>
             View Details
           </button>
         </div>
@@ -346,7 +375,9 @@ function ResourcePage() {
           <div className="flex items-center text-xs text-gray-700 mb-3">
             <span>{recommended.date}</span>
           </div>
-          <button className="bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-800 transition-colors">
+          <button 
+          className="bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-800 transition-colors"
+          onClick={() => openResourceModal(recommended)}>
             View Details
           </button>
         </div>
@@ -507,6 +538,15 @@ function ResourcePage() {
             {activeTab === 'resource' && renderResouceTab()}
             {activeTab === 'recommended' && renderRecommendedTab()}
             {activeTab === 'bookmark' && renderBookmarkTab()}
+
+
+
+            {selectedResource && (
+                <ResourceDetailsModal 
+                    resource={selectedResource} 
+                    onClose={closeResourceModal} 
+                />
+            )}
         </div>
     );
 }

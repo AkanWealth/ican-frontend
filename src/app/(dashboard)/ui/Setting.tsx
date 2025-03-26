@@ -4,6 +4,7 @@ import { FaRegDotCircle } from 'react-icons/fa';
 import { Eye, EyeOff, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Modal } from '@mui/material';
+import axios from 'axios';
 import DeleteAccountModal from '@/components/Modal/Delete';
 
 
@@ -178,23 +179,72 @@ function SettingsPage() {
     setIsFormValid(allFieldsFilled && allCriteriaMet && passwordsMatch);
   }, [formData, criteria]);
 
-  const handlePasswordSubmit = async (e: { preventDefault: () => void; }) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid) {
-      try {
+    
+    // Validate form before submission
+    if (!isFormValid) {
+      toast({
+        title: "Validation Error",
+        description: "Please ensure all password requirements are met.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      // Get the authentication token from localStorage or your auth context
+      const token = localStorage.getItem('token');
+      console.log("token",token);
+
+      // API call to change password
+      const response = await axios.patch('https://ican-api-6000e8d06d3a.herokuapp.com/api/users/password', 
+        {
+          oldPassword: formData.currentPassword,
+          newPassword: formData.newPassword
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`, 
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      // Success handling
+      if (response.status === 200) {
         showToastOnPasswordChange();
+        
+        // Reset form fields
         setFormData({
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
         });
+        
+        // Reset password criteria
         setCriteria({
           hasUpperCase: false,
           hasLowerCase: false,
           hasMinLength: false,
           hasSpecialChar: false
         });
-      } catch (error) {
+      }
+    } catch (error) {
+      
+      if (axios.isAxiosError(error)) {
+        
+        const errorMessage = error.response?.data?.message || 'Failed to update password';
+        
+        toast({
+          title: "Password Change Error",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 3000,
+        });
+      } else {
+        // Generic error handling
         showToastOnPasswordChangeError();
       }
     }

@@ -1,5 +1,6 @@
 import "../globals.css";
 import type { Metadata } from "next";
+import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: "ICAN Surulere",
   description: "Empowering Professionals, Building Futures",
@@ -19,7 +20,8 @@ export default function AuthLayout({
           backgroundSize: "cover",
         }}
       >
-        <div className="pt-20">{children}</div>
+        <div className="my-20">{children}</div>
+        <Toaster />
       </body>
     </html>
   );

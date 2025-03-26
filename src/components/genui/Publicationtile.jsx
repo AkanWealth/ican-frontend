@@ -4,6 +4,8 @@ import Image from "next/image";
 
 import PropTypes from "prop-types";
 
+
+
 function Publicationtile({
   imgurl = "/image.png",
   title = "2024 Annual Report & Minutes of AGM",
@@ -42,13 +44,7 @@ function Publicationtile({
 
   return (
     <div className="h-48 pr-4 rounded-lg border border-[#bbbbbb] justify-start items-center gap-8 inline-flex">
-      <Image
-        width={10}
-        height={10}
-        className="w-36 h-48 relative"
-        src={imgurl}
-        alt="Publication Image"
-      />
+      <Image className="w-36 h-48 relative" src={imgurl} alt="ImageRender" width={200} height={200} />
       <div className="py-8 flex-col justify-start items-start gap-4 inline-flex">
         <h4 className="w-80 text-[#272727] text-xl font-semibold font-['Inter'] leading-normal">
           {title}

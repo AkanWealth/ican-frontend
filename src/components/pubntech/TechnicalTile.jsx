@@ -7,8 +7,7 @@ function TechnicalTile({ post }) {
       {/* Blog post image */}
       <div className="sm:w-[253px] h-full w-full">
         <Image
-          width={253}
-          height={253}
+          fill={true}
           loading="lazy"
           src={post.imageUrl}
           alt={`Image for ${post.title}`}

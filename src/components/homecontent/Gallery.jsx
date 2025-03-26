@@ -191,6 +191,7 @@ function Gallery() {
                             fill={true}
                             src={item.imgurl}
                             alt={item.title}
+
                             className="w-full h-full object-cover"
                           />
                         </div>

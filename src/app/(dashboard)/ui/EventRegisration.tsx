@@ -1,10 +1,11 @@
-'use client';
+"use client";
 import React, { useState, useEffect } from 'react';
-import { Users, CalendarRange, MapPin, CalendarCheck, Copy, FilePlus, CircleAlert } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { Users, CalendarRange, MapPin, CalendarCheck, Copy, FilePlus, CircleAlert, ArrowLeft } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import SuccessModal from './SuccessMessage';
 import { useToast } from '@/hooks/use-toast';
+import axios from 'axios';
 
 
 const EventRegistration = () => {
@@ -14,13 +15,15 @@ const EventRegistration = () => {
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
   const [isToastVisible, setIsToastVisible] = useState(false);
   const [emailError, setEmailError] = useState('');
+  const router = useRouter();
 
 
   const [eventDetails, setEventDetails] = useState({
     id: '',
     topic: '',
     date: '',
-    location: '',
+    time: '',
+    venue: '',
     eventFee: '',
     eventPayment: '',
     image: '',
@@ -29,12 +32,25 @@ const EventRegistration = () => {
     isFull: ''
   });
   useEffect(() => {
+
+    const originalDate = new Date(searchParams.get('date') || '');
+
+    // Format date
+    const formattedDate = originalDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
+
     // Get event details from URL parameters
     setEventDetails({
       id: searchParams.get('id') || '',
+      time: searchParams.get('time') || '',
       topic: searchParams.get('topic') || '',
-      date: searchParams.get('date') || '',
-      location: searchParams.get('location') || '',
+      date: formattedDate,
+      venue: searchParams.get('venue') || '',
       eventFee: searchParams.get('eventFee') || '',
       eventPayment: searchParams.get('eventPayment') || '',
       image: searchParams.get('image') || "",
@@ -43,6 +59,10 @@ const EventRegistration = () => {
       isFull: searchParams.get('isFull') || '',
     });
   }, [searchParams]);
+
+  const handleGoBack = () => {
+    router.back();
+  }
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -53,7 +73,7 @@ const EventRegistration = () => {
 
   const handleCardPayment = () => {
 
-   
+
     setIsToastVisible(true);
     setIsPaymentSuccessful(true);
     toast({
@@ -111,14 +131,25 @@ const EventRegistration = () => {
     }
   };
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+
+
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
 
-   
-    console.log('Registration submitted', formData);
-    setIsModalOpen(true);
+    // Validate form before submission
+    if (!isFormValid() && Number(eventDetails.eventFee) > 0) {
+      return;
+    }
 
+    if (!isNoFeeFormValid() && Number(eventDetails.eventFee) === 0) {
+      return;
+    }
 
+    try {
+      await registerForEvent();
+    } catch (error) {
+      console.error('Submission error:', error);
+    }
   };
 
   const isFormValid = () => {
@@ -144,56 +175,116 @@ const EventRegistration = () => {
     }
   };
 
+  const registerForEvent = async () => {
+    try {
+
+      const membership = 'MEMBER';
+      const eventId = eventDetails.id;
+      console.log("eventId", eventId);
+
+      const registrationPayload = {
+        fullName: formData.fullName,
+        email: formData.email,
+        membership: membership,
+        proofOfPayment: formData.paymentMethod === 'bankTransfer' ? 'PAID' : 'PENDING'
+      };
+
+      console.log(registrationPayload);
+      const response = await axios.post(`https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/registrations/register`, registrationPayload, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+
+      if (response.status === 200 || response.status === 201) {
+        setIsModalOpen(true);
+
+      }
+    } catch (error) {
+
+      console.error('Registration failed:', error);
+
+
+      toast({
+        title: "Registration Failed",
+        description: "Unable to complete registration. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
+
+
   return (
-    <div className="flex min-h-screen">
+  <div className='py-2 px-4'>
+    <button
+        onClick={handleGoBack}
+        className="z-10 flex items-center justify-center 
+        w-10 h-10 bg-white rounded-full shadow-md hover:bg-gray-100 
+        transition-colors duration-300 group"
+        aria-label="Go back"
+      >
+        <ArrowLeft
+          className="w-6 h-6 text-gray-700 group-hover:text-gray-900 
+          transition-colors duration-300"
+        />
+      </button>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-screen mt-2">
+
+
+      
       {/* Left Column */}
-      <div className="w-1/2 mr-20">
-      <div className={`rounded-lg shadow-md p-6 ${Number(eventDetails.eventFee) > 0 ? 'bg-white' : 'bg-gray-100'}`}>
+      <div className="order-1 lg:order-1">
+      
+        <div className={`rounded-lg shadow-md p-6 ${Number(eventDetails.eventFee) > 0 ? 'bg-white' : 'bg-gray-100'}`}>
           <div className="flex items-center mb-4">
             <div className={`flex ${Number(eventDetails.eventFee) > 0 ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-600'} px-3 py-1 rounded-full text-sm mr-2`}>
               <CalendarCheck className={`w-5 h-5 mr-1 ${Number(eventDetails.eventFee) > 0 ? 'text-green-600' : 'text-gray-600'}`} />
               {Number(eventDetails.eventFee) > 0 ? 'Paid Event' : 'Free Event'}
             </div>
           </div>
-  
+
           <h1 className="font-Spartan text-3xl font-bold mb-4">
             {eventDetails.topic} - Understanding Accounting
           </h1>
-          
+
           {eventDetails.image && (
-  <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
-    <Image
-      src={eventDetails.image}
-      alt={eventDetails.topic}
-      layout="fill"
-      objectFit="cover"
-    />
-  </div>
-)}
+            <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
+              <Image
+                src={eventDetails.image}
+                alt={eventDetails.topic}
+                fill
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
           <div className="mb-4">
             <div className="flex items-center mb-2 text-sm text-gray-500">
               <CalendarRange className="h-5 w-5 mr-2 text-gray-500" />
-              <span>{eventDetails.date}</span>
+              <span>{eventDetails.date} at  {eventDetails.time}</span>
+
             </div>
             <div className="flex items-center text-sm text-gray-500">
               <MapPin className="h-5 w-5 mr-2 text-gray-500" />
-              <span>{eventDetails.location}</span>
+              <span>{eventDetails.venue}</span>
             </div>
           </div>
-  
+
           <p className="text-gray-600 text-base mb-4">
             Join us for an insightful evening focused on managing life's challenges and prioritizing mental well-being. Network, learn, and unwind in a supportive environment.
           </p>
-  
+
           <div className="flex items-center text-sm mb-2 text-gray-500">
             <Users className="h-5 w-5 mr-2 text-gray-500" />
             <span>{eventDetails.registeredNo}/{eventDetails.totalSpot} registered people</span>
           </div>
         </div>
       </div>
-  
+
       {/* Right Column */}
-      <div className="w-1/2 p-8">
+      <div className="order-2 lg:order-2">
         <p className="flex flex-row text-sm font-medium">
           Event fee - <span className='flex text-base text-primary'>₦{eventDetails.eventFee}</span>
         </p>
@@ -201,7 +292,7 @@ const EventRegistration = () => {
         <p className="text-gray-700 mb-6">Secure your spot by filling out the form below.</p>
         <p className="text-gray-800 text-sm mb-2 font-semibold">Personal Details</p>
         <hr className='mb-4 border-gray-500' />
-        
+
         {Number(eventDetails.eventFee) > 0 ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Personal Details Section */}
@@ -220,9 +311,9 @@ const EventRegistration = () => {
                 className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-  
+
             <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
                 Email Address<span className='text-red-600'>*</span>
               </label>
               <input
@@ -233,23 +324,21 @@ const EventRegistration = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="Enter your email address"
-                className={`w-full px-3 py-2 border ${
-                  emailError  ? 'border-red-500' : 'border-gray-300'
-                } text-sm rounded-md focus:outline-none focus:ring-2 ${
-                  emailError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
-                }`}
-  
+                className={`w-full px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'
+                  } text-sm rounded-md focus:outline-none focus:ring-2 ${emailError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
+                  }`}
+
               />
             </div>
-            {emailError &&  (
+            {emailError && (
               <div className="flex items-center mt-1">
                 <CircleAlert
                   className="w-4 h-4 text-red-500 mr-1"
-                  
+
                 />
                 <span className="text-red-500 text-sm">{emailError}</span>
               </div>)}
-  
+
             {/* Payment Section */}
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2">
@@ -257,11 +346,11 @@ const EventRegistration = () => {
               </label>
               <hr className='mb-4 border-gray-500' />
               <p className="text-sm text-gray-600 mb-4">This event is paid, payment is required to register</p>
-  
+
               <label htmlFor="select" className="block text-sm font-medium text-gray-600 mb-6">
                 Select Payment Method<span className='text-red-600'>*</span>
               </label>
-  
+
               <div className="flex gap-12 mb-4">
                 <div className="flex items-center gap-2">
                   <input
@@ -275,7 +364,7 @@ const EventRegistration = () => {
                   />
                   <label htmlFor="card" className="text-sm text-gray-700">Card Payment</label>
                 </div>
-  
+
                 <div className="flex items-center gap-2">
                   <input
                     type="radio"
@@ -289,22 +378,21 @@ const EventRegistration = () => {
                   <label htmlFor="bankTransfer" className="text-sm text-gray-700">Bank Transfer</label>
                 </div>
               </div>
-  
+
               {formData.paymentMethod === 'card' && (
                 <button
                   type="button"
                   onClick={handleCardPayment}
                   disabled={isPaymentSuccessful}
-                  className={`w-full py-2 px-4 rounded-full ${
-                    isPaymentSuccessful
+                  className={`w-full py-2 px-4 rounded-full ${isPaymentSuccessful
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700'
-                  } text-white transition duration-300 mb-4`}
+                    } text-white transition duration-300 mb-4`}
                 >
                   Pay ₦{eventDetails.eventFee}
                 </button>
               )}
-  
+
               {formData.paymentMethod === 'bankTransfer' && (
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="text-sm font-semibold mb-4">Account Details</h3>
@@ -338,12 +426,12 @@ const EventRegistration = () => {
                         </div>
                       </div>
                     </div>
-  
+
                     <div className="flex flex-col">
                       <span className="text-sm text-gray-600">Account Name</span>
                       <span className="text-sm text-gray-600 font-semibold">{bankDetails.accountName}</span>
                     </div>
-  
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-800 mb-2">
                         Upload your Receipt<span className='text-red-500'>*</span>
@@ -367,22 +455,21 @@ const EventRegistration = () => {
                         </label>
                       </div>
                     </div>
-  
-                    
+
+
                   </div>
                 </div>
               )}
               <button
-                      type="submit"
-                      className={`w-full py-2 rounded-full transition duration-300 ${
-                        isFormValidAndToastVisible()
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                          : 'bg-blue-200 text-white cursor-not-allowed'
-                      }`}
-                      disabled={!isFormValidAndToastVisible()}
-                    >
-                      Submit Registration
-                    </button>
+                type="submit"
+                className={`w-full py-2 rounded-full transition duration-300 ${isFormValidAndToastVisible()
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-blue-200 text-white cursor-not-allowed'
+                  }`}
+                disabled={!isFormValidAndToastVisible()}
+              >
+                Submit Registration
+              </button>
             </div>
           </form>
         ) : (
@@ -403,7 +490,7 @@ const EventRegistration = () => {
                 className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-  
+
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
                 Email Address<span className='text-red-600'>*</span>
@@ -416,37 +503,34 @@ const EventRegistration = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="Enter your email address"
-                className={`w-full px-3 py-2 border ${
-                  emailError  ? 'border-red-500' : 'border-gray-300'
-                } text-sm rounded-md focus:outline-none focus:ring-2 ${
-                  emailError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
-                }`}
-  
+                className={`w-full px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'
+                  } text-sm rounded-md focus:outline-none focus:ring-2 ${emailError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
+                  }`}
+
               />
             </div>
-            {emailError &&  (
+            {emailError && (
               <div className="flex items-center mt-1">
                 <CircleAlert
                   className="w-4 h-4 text-red-500 mr-1"
-                  
+
                 />
                 <span className="text-red-500 text-sm">{emailError}</span>
               </div>
             )}
             <button
               type="submit"
-              className={`w-full py-2 rounded-full transition duration-300 ${
-                isNoFeeFormValid()
+              className={`w-full py-2 rounded-full transition duration-300 ${isNoFeeFormValid()
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
                   : 'bg-blue-200 text-white cursor-not-allowed'
-              }`}
+                }`}
               disabled={!isNoFeeFormValid()}
             >
               Submit Registration
             </button>
           </form>
         )}
-  
+
         <SuccessModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -454,5 +538,7 @@ const EventRegistration = () => {
         />
       </div>
     </div>
-  );}
- export default EventRegistration;
+    </div>
+  );
+}
+export default EventRegistration;

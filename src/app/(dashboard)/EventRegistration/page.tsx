@@ -5,8 +5,8 @@ import EventRegistration from "../ui/EventRegisration";
 
 const EventRegistrationPage = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <EventRegistration />
+    <Suspense>
+      <EventRegistration />;
     </Suspense>
   );
 };

@@ -33,25 +33,23 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
     console.log(formData);
   };
   return (
-    <div className={` ${bucket} pt-4 flex flex-col justify-between gap-4 `}>
-      <h3 className="font-bold font-mono text-2xl text-black ">
+    <div className="pt-4 flex flex-col justify-between gap-4 mt-4">
+      <h3 className="font-bold font-mono text-xl text-black ">
         CONTACT DETAILS
         <hr />
       </h3>
 
       <div className="flex flex-col w-full gap-10 ">
-        <InputEle
+        {/* <InputEle
           id="contactAddress"
           placeholder="Enter your contact address"
           type="text"
           label="Contact Address"
           addStyle="col-span-2"
-          onChange={handleChange}
-          value={formData.contactDetails.contactAddress}
-        />
+        /> */}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
-          <InputEle
+        <div className="grid grid-cols-2 gap-4 ">
+          {/* <InputEle
             id="contactCountry"
             type="country"
             label=" Contact Country"
@@ -79,16 +77,7 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             placeholder="Enter your email address"
             type="email"
             label="Email Address"
-            onChange={handleChange}
-            value={formData.contactDetails.email}
-          />
-          <InputEle
-            id="mobileNumber"
-            type="phone"
-            label="Mobile Number"
-            onChange={handleChange}
-            value={formData.contactDetails.mobileNumber}
-          />
+          /> */}
           <InputEle
             id="residentialAddress"
             placeholder="Enter your residential address"
@@ -99,12 +88,27 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             value={formData.contactDetails?.residentialAddress}
           />
           <InputEle
+            id="mobileNumber"
+            type="phone"
+            label="Contact Phone Number"
+            onChange={handleChange}
+            value={formData.contactDetails?.mobileNumber}
+          />
+
+          <InputEle
             id="residentialCountry"
             type="country"
             label=" Residential Country"
             onChange={handleChange}
-            required={false}
             value={formData.contactDetails?.residentialCountry}
+          />
+          <InputEle
+            id="residentialCity"
+            placeholder="Enter your residential city"
+            type="text"
+            label=" Residential City"
+            onChange={handleChange}
+            value={formData.contactDetails?.residentialAddress}
           />
           <InputEle
             id="residentialState"
@@ -124,7 +128,7 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             required={false}
             value={formData.contactDetails?.residentialLga}
           />
-          <InputEle
+          {/* <InputEle
             id="residentialTelephone"
             type="phone"
             label="Residential Telephone"
@@ -180,10 +184,7 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             id="officeTelephone"
             type="phone"
             label="Office Telephone"
-            onChange={handleChange}
-            required={false}
-            value={formData.contactDetails?.officeTelephone}
-          />
+          /> */}
         </div>
       </div>
     </div>

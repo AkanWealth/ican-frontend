@@ -4,6 +4,8 @@ import { FaRegDotCircle } from "react-icons/fa";
 import { Eye, EyeOff, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Modal } from "@mui/material";
+import axios from "axios";
+import DeleteAccountModal from "@/components/Modal/Delete";
 
 type NotificationType =
   | "generalNotifications"
@@ -38,14 +40,33 @@ function SettingsPage() {
   };
 
   const confirmDelete = () => {
+    // Handle the confirmation logic
     console.log("Account deleted");
     setIsModalOpen(false);
+
+    // Show success toast
+    toast({
+      title: "Account Deleted",
+      description: "Your account has been successfully deleted.",
+      variant: "default",
+      duration: 150,
+    });
   };
 
   const getTabDescription = () => {
     switch (activeTab) {
       case "password":
-        return "Update your password here";
+        return (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleDeleteClick}
+              className="px-8 py-2 rounded-full bg-red-600 text-white"
+            >
+              Delete account
+            </button>
+          </div>
+        );
       case "notification":
         return (
           <div>
@@ -64,8 +85,8 @@ function SettingsPage() {
     }
   };
   const [notifications, setNotifications] = useState<NotificationState>({
-    generalNotifications: true, // Set to true by default
-    eventRegistrations: true, // Set to true by default
+    generalNotifications: true,
+    eventRegistrations: true,
     payments: false,
     mcpdUpdates: false,
   });
@@ -168,23 +189,72 @@ function SettingsPage() {
     setIsFormValid(allFieldsFilled && allCriteriaMet && passwordsMatch);
   }, [formData, criteria]);
 
-  const handlePasswordSubmit = async (e: { preventDefault: () => void }) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid) {
-      try {
+
+    // Validate form before submission
+    if (!isFormValid) {
+      toast({
+        title: "Validation Error",
+        description: "Please ensure all password requirements are met.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      // Get the authentication token from localStorage or your auth context
+      const token = localStorage.getItem("token");
+      console.log("token", token);
+
+      // API call to change password
+      const response = await axios.patch(
+        "https://ican-api-6000e8d06d3a.herokuapp.com/api/users/password",
+        {
+          oldPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Success handling
+      if (response.status === 200) {
         showToastOnPasswordChange();
+
+        // Reset form fields
         setFormData({
           currentPassword: "",
           newPassword: "",
           confirmPassword: "",
         });
+
+        // Reset password criteria
         setCriteria({
           hasUpperCase: false,
           hasLowerCase: false,
           hasMinLength: false,
           hasSpecialChar: false,
         });
-      } catch (error) {
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to update password";
+
+        toast({
+          title: "Password Change Error",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 3000,
+        });
+      } else {
+        // Generic error handling
         showToastOnPasswordChangeError();
       }
     }
@@ -573,50 +643,60 @@ function SettingsPage() {
   );
 
   return (
-    <div className="p-4 md:p-8 bg-white rounded-lg border-2 border-gray-400">
-      <h1 className="text-2xl md:text-2xl font-bold mb-4">Settings</h1>
+    <div className="py-4 px-4">
+      <div className="p-4 md:p-8 bg-white rounded-lg border border-gray-300">
+        <h1 className="lg:text-2xl md:text-xl font-semibold mb-4">Settings</h1>
 
-      {/* Personal Details Section */}
-      <div className="w-full mb-4">
-        <div className="w-[450px] bg-gray-200 rounded-xl p-2">
-          <button
-            onClick={() => handleTabChange("password")}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg hover:bg-blue-700 ${
-              activeTab === "password"
-                ? "bg-primary text-white"
-                : "text-gray-800 hover:bg-gray-300"
-            }`}
-          >
-            Change Password
-          </button>
-          <button
-            onClick={() => handleTabChange("notification")}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${
-              activeTab === "notification"
-                ? "bg-primary text-white"
-                : "text-gray-800 hover:bg-gray-300"
-            }`}
-          >
-            Notification
-          </button>
-          <button
-            onClick={() => handleTabChange("delete")}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${
-              activeTab === "delete"
-                ? "bg-primary text-white"
-                : "text-gray-800 hover:bg-gray-300"
-            }`}
-          >
-            Delete Account
-          </button>
+        {/* Personal Details Section */}
+        <div className="w-full mb-4">
+          <div className="grid grid-cols-3 w-full max-w-[550px] bg-gray-200 rounded-xl p-2">
+            <button
+              onClick={() => handleTabChange("password")}
+              className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg hover:bg-blue-700 ${
+                activeTab === "password"
+                  ? "bg-primary text-white"
+                  : "text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              Change Password
+            </button>
+            <button
+              onClick={() => handleTabChange("notification")}
+              className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg  ${
+                activeTab === "notification"
+                  ? "bg-primary text-white"
+                  : "text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              Notification
+            </button>
+            <button
+              onClick={() => handleTabChange("delete")}
+              className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg ${
+                activeTab === "delete"
+                  ? "bg-primary text-white"
+                  : "text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              Delete Account
+            </button>
+          </div>
+          <div className="text-sm text-gray-500 mt-6">
+            {getTabDescription()}
+          </div>
         </div>
-        <div className="text-sm text-gray-500 mt-6">{getTabDescription()}</div>
-      </div>
 
-      <hr className="mb-8 border-gray-400" />
-      {activeTab === "password" && renderPasswordTab()}
-      {activeTab === "notification" && renderNotificationTab()}
-      {activeTab === "delete" && renderDeleteTab()}
+        <hr className="mb-8 border-gray-400" />
+        {activeTab === "password" && renderPasswordTab()}
+        {activeTab === "notification" && renderNotificationTab()}
+        {activeTab === "delete" && renderDeleteTab()}
+
+        <DeleteAccountModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={confirmDelete}
+        />
+      </div>
     </div>
   );
 }

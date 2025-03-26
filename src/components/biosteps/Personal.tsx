@@ -8,6 +8,8 @@ import Image from "next/image";
 import { UserPenIcon } from "lucide-react";
 
 interface PersonalProps {
+  isShown: boolean;
+
   formData: BiodataFormData;
   updateFormData: (data: Partial<BiodataFormData>) => void;
 }
@@ -32,24 +34,23 @@ function Personal({ formData, updateFormData }: PersonalProps) {
         <hr />
       </h3>
       <div className="flex flex-col items-center justify-center mb-6">
-        <div 
+        <div
           className="w-32 h-32 rounded-full bg-[#F7F7F7] flex items-center justify-center mb-4 cursor-pointer"
           onClick={handleUploadClick}
         >
           {formData.image ? (
-            <Image 
-              src={URL.createObjectURL(formData.image)} 
-              alt="Profile" 
-              width={128} 
-              height={128} 
+            <Image
+              src={URL.createObjectURL(formData.image)}
+              alt="Profile"
+              width={128}
+              height={128}
               className="w-full h-full rounded-full object-cover"
             />
           ) : (
-            <UserPenIcon className="w-6 h-6 text-gray-700"/>
-              
+            <UserPenIcon className="w-6 h-6 text-gray-700" />
           )}
         </div>
-        <button 
+        <button
           type="button"
           onClick={handleUploadClick}
           className="py-2 px-4 bg-primary text-white rounded-full text-sm font-medium"
@@ -66,18 +67,24 @@ function Personal({ formData, updateFormData }: PersonalProps) {
       </div>
       <div className="grid lg:grid-cols-2 md:grid-cols-1  lg:gap-10 md:gap-5 ">
         <InputEle
+          value={formData.personalData.surname}
+          onChange={handleChange}
           id="surname"
           placeholder="Enter your surname"
           type="text"
           label="Surname"
         />
         <InputEle
+          value={formData.personalData.firstName}
+          onChange={handleChange}
           id="firstName"
           placeholder="Enter your first name"
           type="text"
           label="First Name"
         />
         <InputEle
+          value={formData.personalData?.middleName}
+          onChange={handleChange}
           id="middleName"
           placeholder="Enter your middle name"
           type="text"
@@ -85,15 +92,17 @@ function Personal({ formData, updateFormData }: PersonalProps) {
         />
         <InputEle id="gender" type="gender" label="Gender" />
         <InputEle id="dob" type="date" label="Date of birth" />
-        <InputEle id="maritalStatus" type="marriage" label="Marital Status" /> 
+        <InputEle id="maritalStatus" type="marriage" label="Marital Status" />
         <InputEle
+          value={formData.personalData?.state}
+          onChange={handleChange}
           id="state"
           type="text"
           label="State of origin"
           placeholder="Enter your state of origin"
         />
         <InputEle id="nationality" type="country" label="Nationality" />
-       
+
         {/* <InputEle
           id="lga"
           type="text"

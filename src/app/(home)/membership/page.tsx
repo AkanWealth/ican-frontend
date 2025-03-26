@@ -1,9 +1,9 @@
 import React from "react";
-import Heroimg from "@/components/Heroimg";
-import Meminfo from "@/components/Meminfo";
+import Heroimg from "@/components/homecomps/Heroimg";
+import Meminfo from "@/components/homecomps/Meminfo";
 import Infocard from "@/components/genui/Infocard";
 import Link from "next/link";
-import PaymentInfo from "@/components/PaymentInfo";
+import PaymentInfo from "@/components/homecomps/PaymentInfo";
 // import Cta from "@/components/Cta";
 // import Dues from "@/components/Dues";
 

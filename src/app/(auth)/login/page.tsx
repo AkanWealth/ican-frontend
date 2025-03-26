@@ -9,31 +9,31 @@ import { AuthProvider } from "@/app/(dashboard)/LoginAuthentication/AuthContext"
 function Login() {
   const { toast } = useToast();
   const { login } = useAuth();
-  
+
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
-  
+
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
   const validateForm = () => {
     let isValid = true;
-    
+
     // Reset errors
     setEmailError("");
     setPasswordError("");
-    
+
     // Validate email
     if (!formData.email) {
       setEmailError("Email is required");
@@ -42,19 +42,19 @@ function Login() {
       setEmailError("Please enter a valid email address");
       isValid = false;
     }
-    
+
     // Validate password
     if (!formData.password) {
       setPasswordError("Password is required");
       isValid = false;
     }
-    
+
     return isValid;
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-   
+
     if (!validateForm()) {
       toast({
         title: "Login Failed",
@@ -70,7 +70,7 @@ function Login() {
     try {
       // Use the login method from AuthContext
       await login(formData.email, formData.password);
-      
+
       toast({
         title: "Login Successful",
         description: "Welcome back!",
@@ -79,12 +79,12 @@ function Login() {
       });
     } catch (error: any) {
       console.error("Login error:", error);
-      
+
       let errorMessage = "An error occurred during login.";
       if (error.response) {
         errorMessage = error.response.data.message || errorMessage;
       }
-      
+
       toast({
         title: "Login Failed",
         description: errorMessage,
@@ -127,7 +127,9 @@ function Login() {
               type="email"
               onChange={handleChange}
             />
-            {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+            {emailError && (
+              <p className="text-red-500 text-sm mt-1">{emailError}</p>
+            )}
           </div>
           <div className="w-full flex flex-col">
             <label
@@ -147,7 +149,9 @@ function Login() {
               type="password"
               onChange={handleChange}
             />
-            {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
+            {passwordError && (
+              <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+            )}
           </div>
           <div className="flex flex-row justify-between">
             <div className="flex flex-row gap-2">

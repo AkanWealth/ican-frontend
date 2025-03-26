@@ -1,11 +1,11 @@
 "use client";
 
-import Heroimg from "../../components/Heroimg";
-import Cta from "../../components/Cta";
-import Stories from "../../components/Stories";
-import Gallery from "../../components/Gallery";
-import Adverts from "../../components/Adverts";
-import Speech from "../../components/Speech";
+import Heroimg from "../../components/homecomps/Heroimg";
+import Cta from "../../components/homecomps/Cta";
+import Stories from "../../components/homecontent/Stories";
+import Gallery from "../../components/homecontent/Gallery";
+import Adverts from "../../components/homecomps/Adverts";
+import Speech from "../../components/homecomps/Speech";
 
 import Link from "next/link";
 
@@ -14,7 +14,7 @@ export default function Home() {
     <div className="">
       <main className="flex flex-col items-center ">
         <Heroimg
-        toggle={true}
+          toggle={true}
           maintxt={"Empowering Professionals, Building Futures"}
           subtxt={
             "Join Surulere & District Society (SDS) and unlock the benefits of a thriving professional community."

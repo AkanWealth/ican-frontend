@@ -39,7 +39,7 @@ export const galleryItems: GalleryItem[] = [
   {
     id: "2",
     category: "Meetings",
-    title: "Monthly Meeting",
+    title: "September Monthly Meeting",
     date: "",
     imageUrl: "/month/mm (1).jpg",
     galleryContent: {

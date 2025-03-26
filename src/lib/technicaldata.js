@@ -19,7 +19,7 @@ export const technicalPosts = [
   },
   {
     id: "3",
-    title: "Transforming the Audit Process : The Role of AI",
+    title: "Nigeria Tax Reform",
     date: "22, October 2024",
     imageUrl: "/technical/NIgeria_Tax_Reform.jpg",
     downloadLink:
@@ -27,7 +27,7 @@ export const technicalPosts = [
   },
   {
     id: "4",
-    title: "The Essence of Bank Recapitalization",
+    title: "Transforming the Audit Process",
     date: "22, October 2024",
     imageUrl: "/technical/Transforming_the_Audit_Process.jpg",
     downloadLink:

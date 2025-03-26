@@ -1,8 +1,8 @@
-'use client';
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, BellIcon, ChevronDown } from 'lucide-react';
-import Image from 'next/image';
-import Notification from '@/components/Notification';
+"use client";
+import React, { useState, useRef, useEffect } from "react";
+import { Search, BellIcon, ChevronDown } from "lucide-react";
+import Image from "next/image";
+import Notification from "@/components/Notification";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,38 +24,47 @@ export const Header = () => {
       setIsMobile(width < 768);
       setIsTablet(width >= 768 && width < 1024);
     };
-    
+
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    
+    window.addEventListener("resize", checkScreenSize);
+
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
         setIsNotificationOpen(false);
       }
     };
 
     if (isNotificationOpen && !isMobile) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isNotificationOpen, isMobile]);
 
   return (
-    <header className={` h-[6rem] fixed top-0 right-0 ${
-      isMobile || isTablet ? 'left-0 w-full' : 'left-10 lg:left-60'
-    } z-30 p-2 transition-all duration-300`}>
+    <header
+      className={` h-[6rem] fixed top-0 right-0 ${
+        isMobile || isTablet ? "left-0 w-full" : "left-10 lg:left-60"
+      } z-30 p-2 transition-all duration-300`}
+    >
       <div className="h-full bg-white border-b border-gray-400 shadow-sm px-4 md:px-12 flex items-center justify-between">
         {/* Search Bar - with better positioning for mobile */}
-        <div className={`flex items-center ${isMobile ? 'ml-10' : isTablet ? 'ml-6' : 'ml-0'}`}>
+        <div
+          className={`flex items-center ${
+            isMobile ? "ml-10" : isTablet ? "ml-6" : "ml-0"
+          }`}
+        >
           <div className="relative group md:w-auto">
             <div className="absolute left-3 top-1/2 -translate-y-1/2">
               <Search className="w-5 h-5 text-black" />
@@ -64,7 +73,7 @@ export const Header = () => {
               type="text"
               placeholder="Search"
               className={`h-10 pl-10 pr-4 rounded-full text-base focus:outline-none focus:ring-1 focus:ring-blue-500 text-black placeholder:text-black ${
-                isMobile ? 'w-48' : 'w-full'
+                isMobile ? "w-48" : "w-full"
               }`}
             />
           </div>
@@ -72,7 +81,6 @@ export const Header = () => {
 
         {/* Profile Section */}
         <div className="flex items-center space-x-4 md:space-x-8">
-
           {!isMobile && (
             <div className="relative">
               <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -94,7 +102,7 @@ export const Header = () => {
               )}
             </div>
           )}
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center space-x-2 outline-none">
               <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
@@ -124,7 +132,9 @@ export const Header = () => {
                 <>
                   <DropdownMenuItem className="flex justify-between items-center">
                     Notifications
-                    <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">5</span>
+                    <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      5
+                    </span>
                   </DropdownMenuItem>
                   <div className="max-h-60 overflow-y-auto">
                     <Notification />
@@ -134,7 +144,9 @@ export const Header = () => {
               )}
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600">
+                Logout
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

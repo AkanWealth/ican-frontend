@@ -1,14 +1,12 @@
 "use client";
 
-import Heroimg from "@/components/Heroimg";
+import Heroimg from "@/components/homecomps/Heroimg";
 import React from "react";
-import TechnicalSect from"@/components/pubntech/TechnicalSect"
-import Faq from "@/components/Faq";
-import StudentStudy from "@/components/StudentStudy";
+import TechnicalSect from "@/components/pubntech/TechnicalSect";
 
 
 function Technical() {
-  return (  
+  return (
     <div className="flex flex-col items-center ">
       <Heroimg
         subtxt={""}
@@ -17,9 +15,8 @@ function Technical() {
         imageUrl="/techhero.png"
       />
       <TechnicalSect />
-
     </div>
-  )
+  );
 }
 
-export default Technical
+export default Technical;

@@ -117,8 +117,8 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         {showDisableModal && (
           <DisableAdmin
             id={row.original.id}
-            fullName={row.original.fullName}
-            role={capitalizeWords(row.original.role ?? "")}
+            fullName={row.original.firstName + " " + row.original.lastName}
+            role={capitalizeWords(row.original.role.name ?? "")}
             onClose={() => setShowDisableModal(false)}
           />
         )}

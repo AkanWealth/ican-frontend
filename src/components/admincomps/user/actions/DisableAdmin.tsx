@@ -5,6 +5,9 @@ import {
   MdOutlineDateRange,
 } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
+import { BASE_API_URL } from "@/utils/setter";
+import axios from "axios";
+import Toast from "@/components/genui/Toast";
 
 interface DisableAdminProps {
   id: string;
@@ -16,6 +19,28 @@ interface DisableAdminProps {
 function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
   const handleConfirm = () => {
     console.log({ id, fullName, role });
+    async function fetchData() {
+      const data = JSON.stringify({
+        userId: "",
+        suspend: true,
+      });
+      const config = {
+        method: "patch",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/users/${id}/suspend`,
+        headers: {
+          Accept: "application/json",
+          ContentType: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+        data: data,
+      };
+      const results = await axios.request(config);
+      console.log(results.data);
+      onClose();
+      return <Toast type="success" message={results.data.message} />;
+    }
+    fetchData();
   };
 
   return (

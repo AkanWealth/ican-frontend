@@ -125,7 +125,7 @@ function Verification() {
   };
 
   return (
-    <div className="m-auto">
+    <div className="m-auto flex flex-col items-center justify-center">
       <div className="flex flex-col lg:w-96 md:w-80 items-center rounded-2xl bg-white p-8 gap-6">
         <Image src="/Logo_big.png" alt="Logo" width={100} height={50} />
         <div className="w-fit">

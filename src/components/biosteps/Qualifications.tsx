@@ -64,8 +64,7 @@ function Qualifications({
         />
         <InputEle
           id="qualification"
-          placeholder="Enter your qualification"
-          type="status"
+          type="qualification"
           label="Qualification"
           onChange={handleChange}
           required={false}

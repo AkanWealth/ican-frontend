@@ -63,8 +63,8 @@ function DashboardContent() {
         return (
           <div className="flex flex-row gap-2 sm:gap-5 mt-4 sm:mt-8">
             <Info className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />
-            <p className="text-gray-500 text-base sm:text-sm">
-              Your account is being reviewed. We will send an email to you once <br />
+            <p className="text-gray-500 lg:text-base text-xs">
+              Your account is being reviewed. We will send an email to you once <br className="lg:block hidden" />
               review is complete. Please keep an eye on your email.
             </p>
           </div>

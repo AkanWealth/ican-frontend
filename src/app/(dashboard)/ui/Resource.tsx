@@ -1,6 +1,6 @@
-'use client';
+"use client";
 import React, { useState, useEffect } from 'react';
-
+import axios from 'axios';
 import { Search, ChevronDown, ListFilter, ChevronUp, Bookmark, CircleDollarSign, SquareLibrary } from 'lucide-react';
 import { FaBookmark } from 'react-icons/fa6';
 import { useToast } from '@/hooks/use-toast';
@@ -32,52 +32,41 @@ function ResourcePage() {
     const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
 
     const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+    const [resources, setResources] = useState<Resource[]>([]); 
+    const [loading, setLoading] = useState<boolean>(true); 
 
-    const [resources, setResources] = useState<Resource[]>([
-        { 
-            id: 1,
-            type: 'Webinar',
-            title: 'Mastering Communication Skills in the Digital Age',
-            date: '22, October 2024',
-            isPremium: true,
-            isBookmarked: false,
-            icon: 'REC',
-            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
-            duration: '56:10',
-            
-        },
-        { 
-            id: 2,
-            type: 'PDF',
-            title: '5 Strategies for Time Management in the Workplace',
-            date: '22, October 2024',
-            isPremium: false,
-            isBookmarked: false,
-            icon: 'PDF',
-            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
-        },
-        { 
-            id: 3,
-            type: 'Video',
-            title: 'The Future of Leadership: Insights for 2025',
-            date: '22, October 2024',
-            isPremium: true,
-            isBookmarked: true,
-            icon: 'VIDEO',
-            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
-        },
-        { 
-            id: 4,
-            type: 'Audio',
-            title: 'The Future of Leadership: Insights for 2025',
-            date: '22, October 2024',
-            isPremium: false,
-            isBookmarked: false,
-            icon: 'AUDIO',
-            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
-        },
-    ]);
+    useEffect(() => {
+        const fetchResources = async () => {
+          try {
+            setLoading(true); 
+            const token = localStorage.getItem("token");
 
+    console.log('Token:', token);
+    
+      const response = await axios.get(
+        "https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/contents",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+      );
+            setResources(response.data); 
+            console.log('Resources:', response.data);
+          } catch (error) {
+            console.error('Error fetching resources:', error);
+            toast({
+              title: 'Error',
+              description: 'Failed to fetch resources. Please try again later.',
+              variant: 'destructive',
+            });
+          } finally {
+            setLoading(false); 
+          }
+        };
+    
+        fetchResources();
+      }, [toast]);
 
 
     const [recommended, setRecommened] = useState<Resource[]>([

@@ -16,6 +16,17 @@ function Experience({ formData, updateFormData }: ExperienceProps) {
 
   const handleCheckboxChange = () => {
     setIsCurrentJob(!isCurrentJob);
+
+    if (!isCurrentJob) {
+      // Clear startDate and endDate when it's the current job
+      updateFormData({
+        experience: {
+          ...formData.experience,
+          startDate: "",
+          endDate: "",
+        },
+      });
+    }
   };
 
   return (
@@ -30,52 +41,96 @@ function Experience({ formData, updateFormData }: ExperienceProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2  gap-10 ">
         <InputEle
           id="companyName"
-          placeholder=""
+          placeholder="Enter company name"
           type="text"
           label="Company Name"
-          onChange={() => {}}
+          value={formData.experience?.companyName || ""}
+          onChange={(e) =>
+            updateFormData({
+              experience: {
+                ...formData.experience,
+                companyName: e.target.value,
+              },
+            })
+          }
         />
         <InputEle
           id="OfficeAddress"
           placeholder="Enter your Address"
           type="text"
           label="Office Address"
-          onChange={() => {}}
+          value={formData.experience?.officeAddress || ""}
+          onChange={(e) =>
+            updateFormData({
+              experience: {
+                ...formData.experience,
+                officeAddress: e.target.value,
+              },
+            })
+          }
         />
-        <InputEle
+        
+      </div>
+      <InputEle
           id="Position/Role"
           type="text"
           label="Position/Role "
-          onChange={() => {}}
+          placeholder="Enter your Position/Role"
+          value={formData.experience?.currentPosition || ""}
+          onChange={(e) =>
+            updateFormData({
+              experience: {
+                ...formData.experience,
+                currentPosition: e.target.value,
+              },
+            })
+          }
         />
+        <label htmlFor="checkbox">
+          <input
+            id="checkbox"
+            type="checkbox"
+            checked={isCurrentJob}
+            onChange={handleCheckboxChange}
+          />
+          This is my current position
+        </label>
+      <div className="flex items-center gap-2">
+        
+        
+        
       </div>
 
-      <div className="flex items-center gap-2">
-        <input
-          id="checkbox"
-          type="checkbox"
-          checked={isCurrentJob}
-          onChange={handleCheckboxChange}
-        />
-        <InputEle
+      {!isCurrentJob && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+          <InputEle
           id="startDate"
           type="date"
           label="Start Date"
-          onChange={() => {}}
+            value={formData.experience?.startDate || ""}
+            onChange={(e) =>
+              updateFormData({
+                experience: {
+                  ...formData.experience,
+                  startDate: e.target.value,
+                },
+              })
+            }
         />
         <InputEle
           id="endDate"
           type="date"
           label="End Date"
-          onChange={() => {}}
+            value={formData.experience?.startDate || ""}
+            onChange={(e) =>
+              updateFormData({
+                experience: {
+                  ...formData.experience,
+                  startDate: e.target.value,
+                },
+              })
+            }
         />
-        <label htmlFor="checkbox">This is my current position</label>
-      </div>
-
-      {!isCurrentJob && (
-        <div className="grid grid-cols-2 gap-10">
-          {/* <InputEle id="startDate" type="date" label="Start Date" />
-          <InputEle id="endDate" type="date" label="End Date" /> */}
         </div>
       )}
     </div>

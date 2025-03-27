@@ -312,8 +312,8 @@ function Signup() {
   };
 
   return (
-    <div className="mx-auto">
-      <div className="flex flex-col lg:w-96 md:w-60  items-center rounded-2xl bg-white p-8  sshadow-lg">
+    <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center rounded-2xl bg-white p-8 gap-6 w-full max-w-md sm:max-w-lg md:max-w-xl">
         <>
           <Image
             src="/Logo_big.png"
@@ -323,7 +323,7 @@ function Signup() {
             className=""
           />
           <div className="w-fit">
-            <h4 className="text-primary text-center text-xl font-bold font-mono">
+            <h4 className="text-primary text-center text-2xl font-bold font-mono">
               Create Account
             </h4>
             <p className="text-base font-normal font-sans">
@@ -565,7 +565,7 @@ function Signup() {
               {loading ? "Submitting..." : "Create Account"}
             </button>
           </form>
-          <p className="text-base font-medium">
+          <p className="text-xs lg:text-base font-medium">
             Already have an account?{" "}
             <Link className="text-primary" href="/login">
               Login Here

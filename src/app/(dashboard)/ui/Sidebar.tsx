@@ -113,7 +113,7 @@ export const Sidebar = () => {
 
           {/* Logo - Fixed at Top */}
           <div className="h-16 flex items-center py-12 border-b border-gray-200 px-6 flex-shrink-0">
-            <Image alt="Logo" width={170} height={90} src="/ICANlogo1.png" />
+            <Image src="/Icanlogo.png" alt="Logo" width={170} height={90}  />
           </div>
 
           {/* Scrollable Navigation Section */}

@@ -8,6 +8,7 @@ import Toast from "@/components/genui/Toast";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
+import { BASE_API_URL } from "@/utils/setter";
 
 function Signup() {
   const router = useRouter();
@@ -280,7 +281,7 @@ function Signup() {
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/register",
+      url: `${BASE_API_URL}/auth/register`,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -332,6 +333,7 @@ function Signup() {
           </div>
           <form className="w-full flex flex-col gap-4" onSubmit={handleSignup}>
             {/* First Name */}
+
             <div className="w-full flex flex-col">
               <label
                 className="text-base font-sans font-semibold"
@@ -556,10 +558,7 @@ function Signup() {
             )}
 
             <button
-              disabled={!complete || loading}
-              className={`px-8 py-4 rounded-full text-white text-base font-semibold ${
-                !complete || loading ? "bg-slate-500" : "bg-primary"
-              }`}
+              className={`px-8 py-4 rounded-full text-white text-base font-semibold bg-primary`}
               type="submit"
             >
               {loading ? "Submitting..." : "Create Account"}

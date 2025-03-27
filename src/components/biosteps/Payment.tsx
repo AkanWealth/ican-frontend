@@ -135,10 +135,13 @@ function Payment({ formData, updateFormData }: PaymentProps) {
 
       {/* Payment options */}
       <FlutterModal
+        title="Member registration"
         amount={25000}
-        email="woodsedema001@gmail.com"
-        phone_number="08127576854"
-        name="Francis Woods"
+        email={formData.contactDetails.email}
+        phone_number={formData.contactDetails.mobileNumber}
+        name={
+          formData.personalData.firstName + " " + formData.personalData.surname
+        }
       />
       {/* Weiver */}
 

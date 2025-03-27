@@ -89,7 +89,7 @@ function InputEle({
             onChange={onChange}
           />
 
-          <p className="text-red-500 text-base font-medium">{errorMsg}</p>
+          <p className="text-red-600 text-sm font-light">{errorMsg}</p>
         </div>
       );
     case "gender":
@@ -499,7 +499,7 @@ function InputEle({
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
-          <p className="text-red-500 text-base font-medium">{errorMsg}</p>
+          <p className="text-red-600 text-sm font-light">{errorMsg}</p>
         </div>
       );
     case "select":
@@ -568,7 +568,7 @@ function InputEle({
               </div>
             ))}
           </div>
-          <p className="text-red-500 text-base font-medium">{errorMsg}</p>
+          <p className="text-red-600 text-sm font-light">{errorMsg}</p>
         </div>
       );
 
@@ -617,7 +617,7 @@ function InputEle({
               </div>
             ))}
           </div>
-          <p className="text-red-500 text-base font-medium">{errorMsg}</p>
+          <p className="text-red-600 text-sm font-light">{errorMsg}</p>
         </div>
       );
 
@@ -639,7 +639,7 @@ function InputEle({
             onChange={onChange}
           />
 
-          <p className="text-red-500 text-base font-medium">{errorMsg}</p>
+          <p className="text-red-600 text-sm font-light">{errorMsg}</p>
         </div>
       );
   }

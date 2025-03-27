@@ -9,7 +9,7 @@ interface Propsval {
   onNext: () => void;
 }
 
-function New({ onNext }: Propsval) {
+function   New({ onNext }: Propsval) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");

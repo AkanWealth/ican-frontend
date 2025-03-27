@@ -19,20 +19,7 @@ function AdminDashboard() {
           </h2>
           <p>View and Manage all user reports here</p>
         </div>
-        {/* <div className="flex flex-row items-center gap-4 justify-end">
-          <button
-            className="py-2 px-3 text-white bg-primary text-base rounded-full w-fit"
-            onClick={() => setShowNewEvent(true)}
-          >
-            Create New Event
-          </button>
-          {showNewEvent && (
-            <NewEvent
-              showNewEvent={showNewEvent}
-              setShowNewEvent={setShowNewEvent}
-            />
-          )}
-        </div> */}
+      
       </div>
       {/* Tab sections */}
       <Tabs defaultValue="user" className="flex flex-col gap-4">

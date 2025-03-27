@@ -1,17 +1,28 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { memberscolumns } from "@/components/admincomps/user/datatable/columns";
-import { User, users } from "@/components/admincomps/user/datatable/colsdata";
+import { User } from "@/components/admincomps/user/datatable/colsdata";
+import { BASE_API_URL } from "@/utils/setter";
 
 function MembersPage() {
   const [data, setData] = useState<User[]>([]);
 
   useEffect(() => {
     async function fetchData() {
-      const result = users;
-      const filteredData = result.filter((user) => user.role === "member");
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/users/users`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      };
+      const result = await axios.request(config);
+      const filteredData = result.data.filter((user: User) => user.role.name === "MEMBER");
       setData(filteredData);
     }
     fetchData();

@@ -124,6 +124,7 @@ function AdminLogin() {
         document.cookie = `user=${JSON.stringify(
           user
         )}; path=/; secure; samesite=strict`;
+        localStorage.setItem("access_token", access_token);
         document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
 
         if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {

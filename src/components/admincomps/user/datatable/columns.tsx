@@ -77,7 +77,7 @@ export const allcolumns: ColumnDef<User>[] = [
 
 export const adminscolumns: ColumnDef<User>[] = [
   {
-    accessorKey: "fullName",
+    accessorKey: "firstname",
     header: ({ column }) => {
       return (
         <Button
@@ -85,7 +85,22 @@ export const adminscolumns: ColumnDef<User>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Full Name
+          First Name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "surname",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Surname
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -96,7 +111,7 @@ export const adminscolumns: ColumnDef<User>[] = [
     header: "Email Address",
   },
   {
-    accessorKey: "role",
+    accessorKey: "role.name",
     header: ({ column }) => {
       return (
         <Button

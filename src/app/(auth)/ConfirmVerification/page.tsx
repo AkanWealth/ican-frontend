@@ -86,14 +86,21 @@ function Verification() {
 
     try {
       const response = await axios.request(config);
-      const { message, user, access_token } = response.data;
+      const { user, access_token } = response.data;
       
       console.log("User logged in successfully:", user);
       console.log("Access token:", access_token);
       
       // Store the token in localStorage or cookies for future authenticated requests
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem('token', access_token);
+      localStorage.setItem("token", access_token);
+      localStorage.setItem("user", user);
+      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("memberId", user.membershipId);
+
+      console.log("User logged in successfully:", user);
+      console.log("memberID:", user.membershipId);
+
+      
       
       toast({
         title: "Login Successful",

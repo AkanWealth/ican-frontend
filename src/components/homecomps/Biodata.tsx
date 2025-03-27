@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, Fragment, ReactNode } from "react";
@@ -65,22 +66,26 @@ export type BiodataFormData = {
     endDate?: string;
     officeAddress?: string;
   };
-  reference: {
-    refereeName: string;
-    refereeIcanNo: string;
-    refereePhone: string;
-    refereeEmail: string;
-  };
+  // reference: {
+  //   refereeName: string;
+  //   refereeIcanNo: string;
+  //   refereePhone: string;
+  //   refereeEmail: string;
+  // };
   payment?: {
     image?: File | null;
     receipt?: File | null;
     waiver?: string;
+  };
+  userData?: {
+    email: string;
   };
 };
 
 function Biodata() {
   const [activeStep, setActiveStep] = useState(0);
   const [skipped, setSkipped] = useState(new Set());
+  const userData = localStorage.getItem("user");
 
   const [formData, setFormData] = useState<BiodataFormData>({
     image: null,
@@ -117,12 +122,12 @@ function Biodata() {
       endDate: "",
     
     },
-    reference: {
-      refereeName: "",
-      refereeIcanNo: "",
-      refereePhone: "",
-      refereeEmail: "",
-    },
+    // reference: {
+    //   refereeName: "",
+    //   refereeIcanNo: "",
+    //   refereePhone: "",
+    //   refereeEmail: "",
+    // },
   });
 
   const getFormProgress = (): Partial<BiodataFormData> | null => {
@@ -165,47 +170,53 @@ function Biodata() {
 
 
   const handleSubmit = async () => {
+  
+
     try {
-      // Prepare the data to match the API structure
-      const payload = {
-        email: formData.reference.refereeEmail,
-        membershipId: formData.reference.refereeIcanNo,
-        surname: formData.personalData.surname,
-        firstname: formData.personalData.firstName,
-        middlename: formData.personalData.middleName,
-        gender: formData.personalData.gender,
-        dateOfBirth: formData.personalData.dob,
-        maritalStatus: formData.personalData.maritalStatus,
-        stateOfOrigin: formData.personalData.state,
-        nationality: formData.personalData.nationality,
-        residentialAddress: formData.contactDetails.residentialAddress,
-        residentialCountry: formData.contactDetails.residentialCountry,
-        residentialCity: formData.contactDetails.residentialCity,
-        residentialState: formData.contactDetails.residentialState,
-        residentialLGA: formData.personalData.lga,
-        contactPhoneNumber: formData.contactDetails.mobileNumber,
-        institution: formData.education?.insitution,
-        discipline: formData.education?.discipline ?? "",
-        qualifications: formData.education?.qualification,
-        yearOfGraduation: formData.education?.graduation,
-        companyName: formData.experience?.companyName,
-        officeAddress: formData.experience?.officeAddress,
-        position: formData.experience?.currentPosition,
-        startDate: formData.experience?.startDate,
-        endDate: formData.experience?.endDate,
-      };
+      const userEmail = localStorage.getItem("userEmail") || "";
+    const memberId = localStorage.getItem("memberId") || "";
+    const payload = {
+      email: userEmail,
+      membershipId: memberId,
+      surname: formData.personalData.surname,
+      firstname: formData.personalData.firstName,
+      middlename: formData.personalData.middleName,
+      gender: formData.personalData.gender,
+      dateOfBirth: formData.personalData.dob,
+      maritalStatus: formData.personalData.maritalStatus,
+      stateOfOrigin: formData.personalData.state,
+      nationality: formData.personalData.nationality,
+      residentialAddress: formData.contactDetails.residentialAddress,
+      residentialCountry: formData.contactDetails.residentialCountry,
+      residentialCity: formData.contactDetails.residentialCity,
+      residentialState: formData.contactDetails.residentialState,
+      residentialLGA: formData.personalData.lga,
+      contactPhoneNumber: formData.contactDetails.mobileNumber,
+      institution: formData.education?.insitution,
+      discipline: formData.education?.discipline ?? "",
+      qualifications: formData.education?.qualification,
+      yearOfGraduation: formData.education?.graduation,
+      companyName: formData.experience?.companyName,
+      officeAddress: formData.experience?.officeAddress,
+      position: formData.experience?.currentPosition,
+      startDate: formData.experience?.startDate,
+      endDate: formData.experience?.endDate,
+    };
+    console.log("Payload:", payload);
+    const Token = localStorage.getItem("token")?.trim();
+    console.log("Token:", Token);
 
       // Send the data to the API
-      const response = await axios.put(
-        "https://ican-api-6000e8d06d3a.herokuapp.com/api/users/update-user",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Pass the token for authorization
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axios({
+        method: 'put',
+        url: 'https://ican-api-6000e8d06d3a.herokuapp.com/api/users/update-user',
+        data: payload,
+        headers: {
+          'Authorization': `Bearer ${Token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+      });
 
       console.log("Biodata submitted successfully:", response.data);
       alert("Biodata submitted successfully!");

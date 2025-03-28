@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import axios from "axios";
 
 import { BillingTable } from "@/components/admincomps/billing/datatable/BillingTable";
 import { billingcolumns } from "@/components/admincomps/billing/datatable/columns";
 import { Billing } from "@/components/admincomps/billing/datatable/colsdata";
 
+import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
 function BillingPage() {

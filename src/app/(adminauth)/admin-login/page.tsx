@@ -121,9 +121,7 @@ function AdminLogin() {
         const { user, access_token } = response.data;
 
         // Set secure cookies instead of localStorage
-        document.cookie = `user=${JSON.stringify(
-          user
-        )}; path=/; secure; samesite=strict`;
+        localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("access_token", access_token);
         document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
 

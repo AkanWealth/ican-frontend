@@ -25,7 +25,7 @@ export const billingcolumns: ColumnDef<Billing>[] = [
     },
   },
   {
-    accessorKey: "date",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -38,6 +38,14 @@ export const billingcolumns: ColumnDef<Billing>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return `${date.getDate().toString().padStart(2, "0")}/${(
+        date.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, "0")}/${date.getFullYear()}`;
+    },
   },
 
   {
@@ -47,6 +55,14 @@ export const billingcolumns: ColumnDef<Billing>[] = [
   {
     accessorKey: "amount",
     header: "Amount",
+    cell: ({ row }) => {
+      return (
+        <div className="flex flex-row items-center gap-2">
+          <span className="text-primary font-semibold">₦</span>
+          <span>{row.original.amount}</span>
+        </div>
+      );
+    },
   },
 
   {
@@ -64,7 +80,7 @@ export const billingcolumns: ColumnDef<Billing>[] = [
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      return <Statbtn status={row.original.status.toLowerCase} />;
     },
   },
   {

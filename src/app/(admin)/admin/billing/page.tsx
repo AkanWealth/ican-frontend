@@ -1,14 +1,37 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+import axios from "axios";
 
 import { BillingTable } from "@/components/admincomps/billing/datatable/BillingTable";
 import { billingcolumns } from "@/components/admincomps/billing/datatable/columns";
-import { billings } from "@/components/admincomps/billing/datatable/colsdata";
+import { Billing } from "@/components/admincomps/billing/datatable/colsdata";
+
+import { BASE_API_URL } from "@/utils/setter";
 
 function BillingPage() {
+  const [data, setData] = useState<Billing[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    async function fetchData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/billing`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      };
+      const result = await axios.request(config);
+
+      setData(result.data);
+    }
+    fetchData();
+  }, []);
+
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
@@ -31,7 +54,7 @@ function BillingPage() {
           Invoices & Billings
         </h2>
         <div>
-          <BillingTable columns={billingcolumns} data={billings} />
+          <BillingTable columns={billingcolumns} data={data} />
         </div>
       </div>
     </div>

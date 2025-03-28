@@ -35,10 +35,20 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
         },
         data: data,
       };
-      const results = await axios.request(config);
-      console.log(results.data);
-      onClose();
-      return <Toast type="success" message={results.data.message} />;
+      try {
+        const results = await axios.request(config);
+        console.log(results.data);
+        onClose();
+        return <Toast type="success" message={results.data.message} />;
+      } catch (error: any) {
+        console.error(error);
+        return (
+          <Toast
+            type="error"
+            message={error.response?.data?.message || "An error occurred"}
+          />
+        );
+      }
     }
     fetchData();
   };

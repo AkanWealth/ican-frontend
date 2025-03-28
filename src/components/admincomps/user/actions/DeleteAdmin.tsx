@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  MdSubtitles,
-  MdDeleteOutline,
-} from "react-icons/md";
+import { MdSubtitles, MdDeleteOutline } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
 import axios from "axios";
@@ -18,29 +15,28 @@ interface DeleteAdminProps {
 function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
   const handleDelete = () => {
     console.log({ id, fullName, role });
-       async function fetchData() {
-         const data = JSON.stringify({
-           userId: "",
-           suspend: false,
-         });
-         const config = {
-           method: "patch",
-           maxBodyLength: Infinity,
-           url: `${BASE_API_URL}/users/${id}/suspend`,
-           headers: {
-             Accept: "application/json",
-             ContentType: "application/json",
-             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-           },
-           data: data,
-         };
-         const results = await axios.request(config);
-         console.log(results.data);
-         onClose();
-         return <Toast type="success" message={results.data.message} />;
-       }
-       fetchData();
-
+    async function fetchData() {
+      const config = {
+        method: "delete",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/users/${id}`,
+        headers: {
+          Accept: "application/json",
+          ContentType: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      };
+      try {
+        const results = await axios.request(config);
+        console.log(results.data);
+        onClose();
+        return <Toast type="success" message={results.data.message} />;
+      } catch (error: any) {
+        console.error(error);
+        return <Toast type="error" message={error.response?.data?.message || "An error occurred"} />;
+      }
+    }
+    fetchData();
   };
 
   return (

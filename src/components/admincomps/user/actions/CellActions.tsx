@@ -38,7 +38,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
     return str.replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
-  if (row.original.role === "member") {
+  if (row.original.role.name === "MEMBER") {
     return (
       <>
         <DropdownMenu>
@@ -50,11 +50,17 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {row.original.status === "active" ? (
-              <DropdownMenuItem className="flex flex-row items-center">
+              <DropdownMenuItem
+                onClick={() => setShowDisableModal(true)}
+                className="flex flex-row items-center"
+              >
                 <FaUserXmark className="w-4 h-4" /> Suspend Member
               </DropdownMenuItem>
             ) : (
-              <DropdownMenuItem className="flex flex-row items-center">
+              <DropdownMenuItem
+                onClick={() => setShowEnableModal(true)}
+                className="flex flex-row items-center"
+              >
                 <FaUserCheck className="w-4 h-4" /> Reactivate Member
               </DropdownMenuItem>
             )}{" "}
@@ -69,8 +75,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         </DropdownMenu>
       </>
     );
-  }
-  if (row.original.role === "admin" || row.original.role === "super admin") {
+  } else {
     return (
       <>
         <DropdownMenu>

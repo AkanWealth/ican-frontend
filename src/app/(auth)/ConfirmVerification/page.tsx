@@ -108,10 +108,8 @@ function Verification() {
         variant: "default",
         duration: 2000,
       });
-
-      setTimeout(() => {
-        router.push("/registration");
-      }, 2000);
+      router.push("/registration");
+      
     } catch (error) {
       console.error("Login error:", error);
       

@@ -43,6 +43,7 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
     useState("Select Date Range");
 
   useEffect(() => {
+    const Token = localStorage.getItem("token");
     const fetchEvents = async () => {
       try {
         const response = await fetch(
@@ -50,6 +51,7 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
           {
             method: "GET",
             headers: {
+              Authorization: `Bearer ${Token}`,
               "Content-Type": "application/json",
               // Add any additional headers like authorization if required
             },

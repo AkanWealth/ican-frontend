@@ -114,6 +114,29 @@ function InputEle({
           <p></p>
         </div>
       );
+      case "status":
+      return (
+        <div className={` w-full h-fit flex flex-col gap-3 ${addStyle} `}>
+          <label className=" text-base font-sans font-semibold  " htmlFor={id}>
+            {label} {required ? <span className="text-red-600">*</span> : ""}
+          </label>
+          <select
+            className=" p-3 rounded border bg-white border-gray-400  "
+            name={id}
+            id={id}
+            value={value}
+            required={required}
+            disabled={disabled}
+            onChange={onChange}
+          >
+            <option value="">Select status</option>
+              <option value="FCA">FCA </option>
+              <option value="ACA">ACA</option>
+              <option value="Student">Student</option>
+          </select>
+          <p></p>
+        </div>
+      );
     case "marriage":
       return (
         <div className={` w-full h-fit flex flex-col gap-3 ${addStyle} `}>

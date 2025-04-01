@@ -69,6 +69,13 @@ export const Sidebar = () => {
     }
     router.push(href);
   };
+  const handleLogout = () => {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  
+    router.push("/login");
+  };
   const isActiveLink = (href: string) => {
     return pathname === href;
   };
@@ -178,7 +185,7 @@ export const Sidebar = () => {
 
             {/* Logout - Always Visible at Bottom of Scrollable Area */}
             <div
-              onClick={() => handleNavigation("/login")}
+              onClick={handleLogout}
               className="flex items-center px-6 py-2 mt-40 mb-4 cursor-pointer hover:bg-blue-800 rounded-lg"
             >
               <LogOut className="w-5 h-5 transform scale-x-[-1] flex-shrink-0" />

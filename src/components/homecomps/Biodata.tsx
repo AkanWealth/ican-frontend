@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, Fragment, ReactNode } from "react";
@@ -13,7 +12,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 import Toast from "@/components/genui/Toast";
-
+import { useToast } from "@/hooks/use-toast";
 import Contact from "../biosteps/Contact";
 import Experience from "../biosteps/Experience";
 import Payment from "../biosteps/Payment";
@@ -58,6 +57,7 @@ export type BiodataFormData = {
     discipline?: string;
     qualification?: string;
     graduation?: string;
+    status?: string;
   };
   experience?: {
     companyName?: string;
@@ -66,26 +66,20 @@ export type BiodataFormData = {
     endDate?: string;
     officeAddress?: string;
   };
-  // reference: {
-  //   refereeName: string;
-  //   refereeIcanNo: string;
-  //   refereePhone: string;
-  //   refereeEmail: string;
-  // };
   payment?: {
-    image?: File | null;
-    receipt?: File | null;
-    waiver?: string;
+    amount?: number;
   };
   userData?: {
     email: string;
   };
+  isPaymentSuccessful?: boolean;
 };
 
 function Biodata() {
   const [activeStep, setActiveStep] = useState(0);
   const [skipped, setSkipped] = useState(new Set());
   const userData = localStorage.getItem("user");
+  const toast = useToast();
 
   const [formData, setFormData] = useState<BiodataFormData>({
     image: null,
@@ -113,6 +107,7 @@ function Biodata() {
       discipline: "",
       qualification: "",
       graduation: "",
+      status: "",
     },
     experience: {
       companyName: "",
@@ -120,14 +115,11 @@ function Biodata() {
       currentPosition: "",
       startDate: "",
       endDate: "",
-    
     },
-    // reference: {
-    //   refereeName: "",
-    //   refereeIcanNo: "",
-    //   refereePhone: "",
-    //   refereeEmail: "",
-    // },
+    payment: {
+      amount: 25000,
+    },
+    isPaymentSuccessful: false,
   });
 
   const getFormProgress = (): Partial<BiodataFormData> | null => {
@@ -168,43 +160,57 @@ function Biodata() {
     setFormData((prev) => ({ ...prev, ...data }));
   };
 
-
   const handleSubmit = async () => {
-  
-
     try {
       const userEmail = localStorage.getItem("userEmail") || "";
-    const memberId = localStorage.getItem("memberId") || "";
-    const payload = {
-      email: userEmail,
-      membershipId: memberId,
-      surname: formData.personalData.surname,
-      firstname: formData.personalData.firstName,
-      middlename: formData.personalData.middleName,
-      gender: formData.personalData.gender,
-      dateOfBirth: formData.personalData.dob,
-      maritalStatus: formData.personalData.maritalStatus,
-      stateOfOrigin: formData.personalData.state,
-      nationality: formData.personalData.nationality,
-      residentialAddress: formData.contactDetails.residentialAddress,
-      residentialCountry: formData.contactDetails.residentialCountry,
-      residentialCity: formData.contactDetails.residentialCity,
-      residentialState: formData.contactDetails.residentialState,
-      residentialLGA: formData.personalData.lga,
-      contactPhoneNumber: formData.contactDetails.mobileNumber,
-      institution: formData.education?.insitution,
-      discipline: formData.education?.discipline ?? "",
-      qualifications: formData.education?.qualification,
-      yearOfGraduation: formData.education?.graduation,
-      companyName: formData.experience?.companyName,
-      officeAddress: formData.experience?.officeAddress,
-      position: formData.experience?.currentPosition,
-      startDate: formData.experience?.startDate,
-      endDate: formData.experience?.endDate,
-    };
-    console.log("Payload:", payload);
-    const Token = localStorage.getItem("token")?.trim();
-    console.log("Token:", Token);
+      const memberId = localStorage.getItem("memberId") || "";
+      const payload = {
+        email: userEmail,
+        membershipId: memberId,
+        
+        // Personal Data
+        surname: formData.personalData.surname || "",
+        firstname: formData.personalData.firstName || "",
+        middlename: formData.personalData.middleName || "",
+        gender: formData.personalData.gender || "",
+        dateOfBirth: formData.personalData.dob 
+          ? new Date(formData.personalData.dob).toISOString() 
+          : null,
+        maritalStatus: formData.personalData.maritalStatus || "",
+        stateOfOrigin: formData.personalData.state || "",
+        nationality: formData.personalData.nationality || "",
+        
+        // Contact Details
+        residentialAddress: formData.contactDetails.residentialAddress || "",
+        residentialCountry: formData.contactDetails.residentialCountry || "",
+        residentialCity: formData.contactDetails.residentialCity || "",
+        residentialState: formData.contactDetails.residentialState || "",
+        residentialLGA: formData.contactDetails.residentialLga || "",
+        contactPhoneNumber: formData.contactDetails.mobileNumber || "",
+        
+        // Education
+        institution: formData.education?.insitution || "",
+        discipline: formData.education?.discipline || "",
+        qualifications: formData.education?.qualification || "",
+        yearOfGraduation: formData.education?.graduation 
+          ? Number(formData.education.graduation) 
+          : "",
+        status: formData.education?.status || "",
+        
+        // Experience
+        companyName: formData.experience?.companyName || "",
+        officeAddress: formData.experience?.officeAddress || "",
+        position: formData.experience?.currentPosition || "",
+        startDate: formData.experience?.startDate 
+          ? new Date(formData.experience.startDate).toISOString() 
+          : null,
+        endDate: formData.experience?.endDate 
+          ? new Date(formData.experience.endDate).toISOString() 
+          : null,
+      };
+      console.log("Payload:", payload);
+      const Token = localStorage.getItem("token");
+      console.log("Token:", Token);
 
       // Send the data to the API
       const response = await axios({
@@ -212,17 +218,31 @@ function Biodata() {
         url: 'https://ican-api-6000e8d06d3a.herokuapp.com/api/users/update-user',
         data: payload,
         headers: {
-          'Authorization': `Bearer ${Token}`,
+          Authorization: `Bearer ${Token}`,
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          Accept: 'application/json'
         },
       });
 
       console.log("Biodata submitted successfully:", response.data);
-      alert("Biodata submitted successfully!");
+      // alert("Biodata submitted successfully!");
+      toast.toast({
+        title: "Biodata submitted successfully!",
+        description: "Registration is complete.",
+        variant: "default",
+        duration: 3000,
+      });
+      // Move to end page after successful submission
+      setActiveStep(steps.length);
     } catch (error) {
       console.error("Error submitting biodata:", error);
-      alert("Failed to submit biodata. Please try again.");
+      // alert("Failed to submit biodata. Please try again.");
+      toast.toast({
+        title: "Failed to submit biodata",
+        description: "Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
     }
   };
 
@@ -266,23 +286,26 @@ function Biodata() {
     saveFormProgress(dataToSave);
   }, [formData]);
 
-  // const handleNext = () => {
-  //   let newSkipped = skipped;
-  //   if (isStepSkipped(activeStep)) {
-  //     newSkipped = new Set(newSkipped.values());
-  //     newSkipped.delete(activeStep);
-  //   }
-
-  //   setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  //   setSkipped(newSkipped);
-  // };
-
-
   const handleNext = () => {
+    // For the last step (payment page), check if payment is completed
     if (activeStep === steps.length - 1) {
-      handleSubmit(); // Submit the form on the last step
+      // Only proceed if payment is successful
+      if (formData.isPaymentSuccessful) {
+        handleSubmit(); // Submit the form on the last step
+      } else {
+        // If trying to finish without payment, show a message or alert
+        alert("Please complete your payment before finishing the registration.");
+        return;
+      }
     } else {
+      // For other steps, just proceed normally
+      let newSkipped = skipped;
+      if (isStepSkipped(activeStep)) {
+        newSkipped = new Set(newSkipped.values());
+        newSkipped.delete(activeStep);
+      }
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      setSkipped(newSkipped);
     }
   };
 
@@ -309,6 +332,9 @@ function Biodata() {
 
   // Check if we're on the end page
   const isEndPage = activeStep === steps.length;
+
+  // Check if we're on payment page (last step) and payment is not complete
+  const isPaymentIncomplete = activeStep === steps.length - 1 && !formData.isPaymentSuccessful;
 
   return (
     <div className="p-4 sm:p-6 md:p-10 bg-white rounded-2xl">
@@ -479,23 +505,26 @@ function Biodata() {
                 Skip
               </Button>
             )}
+            
+            {/* Payment message when on payment page but payment not complete */}
+            {isPaymentIncomplete && (
+              <div className="text-red-500 text-sm mr-3 self-center">
+                Complete payment to finish
+              </div>
+            )}
+            
             <Button
-              className="bg-primary p-3 sm:p-4 rounded-full text-sm sm:text-base text-white w-fit"
+              className={`bg-primary p-3 sm:p-4 rounded-full text-sm sm:text-base text-white w-fit ${
+                isPaymentIncomplete ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               onClick={handleNext}
+              disabled={isPaymentIncomplete}
             >
               {activeStep === steps.length - 1 ? "Finish" : "Continue"}
             </Button>
           </Box>
         </>
       )}
-
-      {/* {toast && (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
-      )} */}
     </div>
   );
 }

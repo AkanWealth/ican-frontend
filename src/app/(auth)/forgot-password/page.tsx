@@ -25,7 +25,7 @@ function ForgotPassword() {
     }
   };
   return (
-    <div className="m-auto flex flex-col items-center justify-center h-screen">
+    <div className="m-auto flex flex-col items-center justify-center">
 
       <div className="flex flex-col items-center rounded-2xl bg-white p-8 gap-6 w-full max-w-md sm:max-w-lg md:max-w-xl">
         {step === 1 && <Base onNext={handleNext} />}

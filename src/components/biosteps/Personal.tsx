@@ -128,11 +128,18 @@ function Personal({ formData, updateFormData }: PersonalProps) {
         <InputEle
           id="dob"
           type="date"
-          label="Date of birth"
-          value={formData.personalData.dob}
+          label="Date of Birth"
+          value={
+            formData.personalData.dob
+              ? new Date(formData.personalData.dob).toISOString().split("T")[0]
+              : ""
+          }
           onChange={(e) =>
             updateFormData({
-              personalData: { ...formData.personalData, dob: e.target.value },
+              personalData: {
+                ...formData.personalData,
+                dob: new Date(e.target.value).toISOString(), // Convert to ISO format
+              },
             })
           }
         />

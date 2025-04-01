@@ -96,7 +96,7 @@ function Experience({ formData, updateFormData }: ExperienceProps) {
         }
       />
 
-      <label htmlFor="checkbox">
+      {/* <label htmlFor="checkbox">
         <input
           id="checkbox"
           type="checkbox"
@@ -104,9 +104,9 @@ function Experience({ formData, updateFormData }: ExperienceProps) {
           onChange={handleCheckboxChange}
         />
         This is my current position
-      </label>
+      </label> */}
 
-      {!isCurrentJob && (
+      {/* {!isCurrentJob && ( */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
           <InputEle
             id="startDate"
@@ -131,7 +131,7 @@ function Experience({ formData, updateFormData }: ExperienceProps) {
             onChange={(e) => handleDateChange("endDate", e.target.value)}
           />
         </div>
-      )}
+      {/* )} */}
     </div>
   );
 }

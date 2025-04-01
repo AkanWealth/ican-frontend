@@ -78,7 +78,6 @@ export type BiodataFormData = {
 function Biodata() {
   const [activeStep, setActiveStep] = useState(0);
   const [skipped, setSkipped] = useState(new Set());
-  const userData = localStorage.getItem("user");
   const toast = useToast();
 
   const [formData, setFormData] = useState<BiodataFormData>({
@@ -122,7 +121,17 @@ function Biodata() {
     isPaymentSuccessful: false,
   });
 
+  const [userData, setUserData] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setUserData(localStorage.getItem("user"));
+    }
+  }, []);
+
   const getFormProgress = (): Partial<BiodataFormData> | null => {
+    if (typeof window === "undefined") return null; // Prevent SSR issues
+
     try {
       const saved = localStorage.getItem("biodataFormProgress");
       if (saved) {
@@ -161,6 +170,8 @@ function Biodata() {
   };
 
   const handleSubmit = async () => {
+    if (typeof window === "undefined") return; 
+    
     try {
       const userEmail = localStorage.getItem("userEmail") || "";
       const memberId = localStorage.getItem("memberId") || "";
@@ -256,6 +267,8 @@ function Biodata() {
 
   // Load saved progress on mount
   useEffect(() => {
+    if (typeof window === "undefined") return; // Prevent SSR issues
+
     const savedData = getFormProgress();
     if (savedData) {
       const savedImageMeta = localStorage.getItem("biodataFormImageMeta");

@@ -76,9 +76,9 @@ function NewContent({ showModal, setShowModal }: NewContentProps) {
             {contentType}
           </h3>
           <div>
-            {contentType === "adverts" && <AdvertEdit />}
-            {contentType === "blog" && <BlogEdit title="" author="" post="" />}
-            {contentType === "gallery" && <GalleryEdit />}
+            {contentType === "adverts" && <AdvertEdit mode="create" />}
+            {contentType === "blog" && <BlogEdit mode="create" />}
+            {contentType === "gallery" && <GalleryEdit mode="create" />}
             {contentType === "publication" && <PublicationEdit />}
             {contentType === "technical" && <TechnicalEdit />}
             {contentType === "student" && <StudentEdit />}

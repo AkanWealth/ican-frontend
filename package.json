@@ -68,7 +68,8 @@
     "recharts": "^2.15.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "tiptap": "^1.32.2"
+    "tiptap": "^1.32.2",
+    "universal-cookie": "^8.0.1"
   },
   "devDependencies": {
     "@shadcn/ui": "^0.0.4",

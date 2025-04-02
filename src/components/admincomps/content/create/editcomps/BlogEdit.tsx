@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
@@ -60,16 +60,16 @@ function BlogEdit({ mode, id }: CreateContentProps) {
         ) {
           setEditDataFetched(true);
           console.error(
-            "Advert not found (404). Stopping further fetch attempts."
+            "Blog not found (404). Stopping further fetch attempts."
           );
         } else {
-          console.error("Error fetching Transactions:", error);
+          console.error("Error fetching Blog:", error);
         }
       }
     };
 
     if (mode === "edit" && !editDataFetched) {
-      console.log("Fetching transaction details for edit mode");
+      console.log("Fetching Blog details for edit mode");
       fetchDetails();
     }
   }, []);

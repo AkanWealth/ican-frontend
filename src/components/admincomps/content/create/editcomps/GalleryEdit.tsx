@@ -21,40 +21,77 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
     images: [""],
     videos: [""],
   });
+  const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
 
- const handleSubmit = async (status: "published" | "draft") => {
-   const data = JSON.stringify({
-    name: gallery.name,
-     images: gallery.images,
-     videos: gallery.es,
-     contentBody: post,
-     contentType: "article",
-     coverImage: "",
-     status: status,
-   });
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const response = await axios.get(`${BASE_API_URL}/gallery/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          withCredentials: true,
+        });
+        console.log("Gallery details fetched:", response.data);
+        setGallery({
+          name: response.data.name,
+          images: response.data.images || [""],
+          videos: response.data.videos || [""],
+        });
+        setEditDataFetched(true);
+      } catch (error) {
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 404
+        ) {
+          setEditDataFetched(true);
+          console.error(
+            "Gallery not found (404). Stopping further fetch attempts."
+          );
+        } else {
+          console.error("Error fetching Gallery:", error);
+        }
+      }
+    };
 
-   const config = {
-     method: mode === "edit" ? "PATCH" : "POST",
-     maxBodyLength: Infinity,
-     url:
-       mode === "edit"
-         ? `${BASE_API_URL}/blogs/${id}`
-         : `${BASE_API_URL}/blogs`,
-     headers: {
-       "Content-Type": "application/json",
-       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-     },
-     data: data,
-   };
+    if (mode === "edit" && !editDataFetched) {
+      console.log("Fetching Gallery details for edit mode");
+      fetchDetails();
+    }
+  }, []);
 
-   try {
-     const response = await axios.request(config);
-     console.log("Blog submitted successfully:", response.data);
-     return <Toast type="success" message="Blog submitted successfully!" />;
-   } catch (error) {
-     console.error("Error submitting blog:", error);
-   }
- };
+  const handleSubmit = async (status: "published" | "draft") => {
+    const data = JSON.stringify({
+      name: gallery.name,
+      images: gallery.images,
+      videos: gallery.videos,
+      status: status,
+    });
+
+    const config = {
+      method: mode === "edit" ? "PATCH" : "POST",
+      maxBodyLength: Infinity,
+      url:
+        mode === "edit"
+          ? `${BASE_API_URL}/gallery/${id}`
+          : `${BASE_API_URL}/gallery`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      data: data,
+    };
+
+    try {
+      const response = await axios.request(config);
+      console.log("Gallery submitted successfully:", response.data);
+      return <Toast type="success" message="Gallery submitted successfully!" />;
+    } catch (error) {
+      console.error("Error submitting gallery:", error);
+    }
+  };
 
   return (
     <div>
@@ -73,11 +110,23 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <button className="rounded-full py-2 bg-primary text-white text-base w-full">
-          Publish Gallery
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            handleSubmit("published");
+          }}
+          className="rounded-full py-2 bg-primary text-white text-base w-full"
+        >
+          {mode === "edit" ? "Publish Edit" : "Publish Gallery"}
         </button>
-        <button className=" py-2 text-primary border border-primary text-base rounded-full w-full">
-          Save as Draft
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            handleSubmit("draft");
+          }}
+          className=" py-2 text-primary border border-primary text-base rounded-full w-full"
+        >
+          {mode === "edit" ? "Save Edit" : "Save as Draft"}
         </button>
         <button className=" py-1 text-primary text-base rounded-full w-full">
           Preview

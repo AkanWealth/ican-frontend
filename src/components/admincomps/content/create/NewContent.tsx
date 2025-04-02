@@ -79,10 +79,10 @@ function NewContent({ showModal, setShowModal }: NewContentProps) {
             {contentType === "adverts" && <AdvertEdit mode="create" />}
             {contentType === "blog" && <BlogEdit mode="create" />}
             {contentType === "gallery" && <GalleryEdit mode="create" />}
-            {contentType === "publication" && <PublicationEdit />}
-            {contentType === "technical" && <TechnicalEdit />}
-            {contentType === "student" && <StudentEdit />}
-            {contentType === "faq" && <FaqEdit />}
+            {contentType === "publication" && <PublicationEdit mode="create" />}
+            {contentType === "technical" && <TechnicalEdit mode="create" />}
+            {contentType === "student" && <StudentEdit mode="create" />}
+            {contentType === "faq" && <FaqEdit mode="create" />}
           </div>
         </div>
       </div>

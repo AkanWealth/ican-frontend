@@ -7,10 +7,16 @@ import {
 } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+import Toast from "@/components/genui/Toast";
+
 interface UnpublishContentProps {
   id: string;
   title: string;
   category: string;
+  contentCategory: string;
+
   date: string;
   onClose: () => void;
 }
@@ -19,11 +25,33 @@ function UnpublishContent({
   id,
   title,
   category,
+  contentCategory,
   date,
   onClose,
 }: UnpublishContentProps) {
-  const handleConfirm = () => {
-    console.log({ id, title, category, date });
+  const handleConfirm = async () => {
+    const data = JSON.stringify({
+      status: "draft",
+    });
+    const config = {
+      method: "PATCH",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/${contentCategory}/${id}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      data: data,
+    };
+    try {
+      const response = await axios.request(config);
+      console.log("Content unpubished successfully:", response.data);
+      return (
+        <Toast type="success" message="Content unpubished successfully!" />
+      );
+    } catch (error) {
+      console.error("Error Unpubishing:", error);
+    }
   };
 
   return (

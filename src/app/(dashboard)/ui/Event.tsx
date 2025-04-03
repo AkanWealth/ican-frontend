@@ -49,87 +49,13 @@ function EventPage() {
     "Zamfara",
   ];
 
-  const registered: any[] = [
-    {
-      id: 1,
-      date: "Friday, Jan 31,2023 6:00 PM - 11:30 PM",
-      location: "Grey Hall Conference, Lagos",
-      IsAttended: true,
-      topic: "Balancing Life and Mental Health",
-      subtitle:
-        "From networking opportunities to unforgettable entertainment, there's something for everyone",
-    },
-    {
-      id: 2,
-      date: "Friday, Jan 31 6:00 PM - 11:30 PM",
-      location: "Grey Hall Conference, Lagos",
-      IsAttended: false,
-      topic: "Essence of Bank Recapitalization",
-      subtitle:
-        "From networking opportunities to unforgettable entertainment, there's something for everyone",
-    },
-    {
-      id: 3,
-      date: "Friday, Jan 31 6:00 PM - 11:30 PM",
-      location: "Grey Hall Conference, Lagos",
-      IsAttended: false,
-      topic: "Balancing Life and Mental Health",
-      subtitle:
-        "From networking opportunities to unforgettable entertainment, there's something for everyone",
-    },
-    {
-      id: 4,
-      date: "Friday, Jan 31 6:00 PM - 11:30 PM",
-      location: "Grey Hall Conference, Lagos",
-      IsAttended: true,
-      topic: "Essence of Bank Recapitalization",
-      subtitle:
-        "From networking opportunities to unforgettable entertainment, there's something for everyone",
-    },
-  ];
+ 
 
   const handleTabChange = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
 
-  const feedbackHistory = [
-    {
-      id: 1,
-      topic: "Balancing Life and Mental Health",
-      date: "Friday, Jan 31 6:00 PM - 11:30 PM",
-      rating: 4,
-      comment:
-        "The event was overall great! The speakers were knowledgeable and engaging, and the topics covered were very relevant to current tech trends. I especially enjoyed the panel discussion on AI and its future ...read more",
-      timestamp: "January 16, 2025",
-    },
-    {
-      id: 2,
-      topic: "Balancing Life and Mental Health",
-      date: "Friday, Jan 31 6:00 PM - 11:30 PM",
-      rating: 4,
-      comment:
-        "The event was overall great! The speakers were knowledgeable and engaging, and the topics covered were very relevant to current tech trends. I especially enjoyed the panel discussion on AI and its future ...read more",
-      timestamp: "January 16, 2025",
-    },
-    {
-      id: 3,
-      topic: "Balancing Life and Mental Health",
-      date: "Friday, Jan 31 6:00 PM - 11:30 PM",
-      rating: 4,
-      comment:
-        "The event was overall great! The speakers were knowledgeable and engaging, and the topics covered were very relevant to current tech trends. I especially enjoyed the panel discussion on AI and its future ...read more",
-      timestamp: "January 16, 2025",
-    },
-    {
-      id: 4,
-      topic: "Balancing Life and Mental Health",
-      date: "Friday, Jan 31 6:00 PM - 11:30 PM",
-      rating: 4,
-      comment:
-        "The event was overall great! The speakers were knowledgeable and engaging, and the topics covered were very relevant to current tech trends. I especially enjoyed the panel discussion on AI and its future ...read more",
-      timestamp: "January 16, 2025",
-    },
-  ];
+ 
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {

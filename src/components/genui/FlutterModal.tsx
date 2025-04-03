@@ -28,7 +28,7 @@ function FlutterModal({
     payment_options: "card,mobilemoney,ussd",
     customer: {
       email: email,
-      phonenumber: phone_number,
+      phone_number: phone_number,
       name: name,
     },
     customizations: {

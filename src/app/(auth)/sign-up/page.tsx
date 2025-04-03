@@ -89,80 +89,57 @@ function Signup() {
   const validateFirstName = (firstName: string): string => {
     const nameRegex = /^[a-zA-Z0-9]+$/;
     if (firstName.length < 3) {
+      setFname(false);
       return "First name must be at least 3 characters long.";
     }
     if (!nameRegex.test(firstName)) {
+      setFname(false);
       return "First name must contain only alphanumeric characters.";
     }
+    setFname(true);
     return "";
   };
 
   const validateSurname = (lastName: string): string => {
     const nameRegex = /^[a-zA-Z0-9]+$/;
     if (lastName.length < 3) {
+      setSname(false);
       return "Surname must be at least 3 characters long.";
     }
     if (!nameRegex.test(lastName)) {
+      setSname(false);
       return "Surname must contain only alphanumeric characters.";
     }
+    setSname(true);
     return "";
   };
 
   const validateEmail = (email: string): string => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      setEvalid(false);
       return "Invalid email address.";
     }
+    setEvalid(true);
     return "";
   };
 
   const validatePassword = (password: string): string => {
-    // Reset all password validation states
-    setPlength(false);
-    setPupper(false);
-    setPlower(false);
-    setPnumber(false);
-    setPspecial(false);
+    const lengthValid = password.length >= 8;
+    const upperValid = /[A-Z]/.test(password);
+    const lowerValid = /[a-z]/.test(password);
+    const numberValid = /\d/.test(password);
+    const specialValid = /[@$!%*?&]/.test(password);
 
-    // Check length
-    if (password.length < 8) {
-      setPlength(false);
-    } else {
-      setPlength(true);
-    }
+    setPlength(lengthValid);
+    setPupper(upperValid);
+    setPlower(lowerValid);
+    setPnumber(numberValid);
+    setPspecial(specialValid);
 
-    if (!/[A-Z]/.test(password)) {
-      setPupper(false);
-    } else {
-      setPupper(true);
-    }
-
-    // Check lowercase
-    if (!/[a-z]/.test(password)) {
-      setPlower(false);
-    } else {
-      setPlower(true);
-    }
-
-    // Check number
-    if (!/\d/.test(password)) {
-      setPnumber(false);
-    } else {
-      setPnumber(true);
-    }
-
-    // Check special character
-    if (!/[@$!%*?&]/.test(password)) {
-      setPspecial(false);
-    } else {
-      setPspecial(true);
-    }
-
-    // Return error message only if all criteria are not met
-    if (!(plength && pupper && plower && pnumber && pspecial)) {
+    if (!(lengthValid && upperValid && lowerValid && numberValid && specialValid)) {
       return "Password does not meet all requirements.";
     }
-
     return "";
   };
 
@@ -171,6 +148,7 @@ function Signup() {
     cpassword: string
   ): string => {
     if (cpassword !== password) {
+      setCvalid(false);
       return "Passwords do not match.";
     }
     setCvalid(true);
@@ -206,7 +184,7 @@ function Signup() {
         break;
       case "password":
         error = validatePassword(value);
-        // Also update confirm password validation when password changes
+        
         if (formData.confirmPassword) {
           const confirmError = validateConfirmPassword(
             value,
@@ -300,6 +278,9 @@ function Signup() {
         description: message,
         variant: "default",
       });
+
+      // Redirect to the next page after successful registration
+      router.push(`/Verify-email?email=${encodeURIComponent(formData.email)}`);
     } catch (error) {
       console.error("Registration error:", error);
       toast({
@@ -313,8 +294,8 @@ function Signup() {
   };
 
   return (
-    <div className="mx-auto">
-      <div className="flex flex-col lg:w-96 md:w-60  items-center rounded-2xl bg-white p-8  sshadow-lg">
+    <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center rounded-2xl bg-white p-8 gap-6 w-full max-w-md sm:max-w-lg md:max-w-xl">
         <>
           <Image
             src="/Logo_big.png"
@@ -324,7 +305,7 @@ function Signup() {
             className=""
           />
           <div className="w-fit">
-            <h4 className="text-primary text-center text-xl font-bold font-mono">
+            <h4 className="text-primary text-center text-2xl font-bold font-mono">
               Create Account
             </h4>
             <p className="text-base font-normal font-sans">
@@ -564,7 +545,7 @@ function Signup() {
               {loading ? "Submitting..." : "Create Account"}
             </button>
           </form>
-          <p className="text-base font-medium">
+          <p className="text-xs lg:text-base font-medium">
             Already have an account?{" "}
             <Link className="text-primary" href="/login">
               Login Here

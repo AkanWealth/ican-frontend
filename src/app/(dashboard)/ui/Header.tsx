@@ -11,12 +11,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 export const Header = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const notificationRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -51,6 +53,13 @@ export const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isNotificationOpen, isMobile]);
+  const handleLogout = () => {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  
+    router.push("/login");
+  };
 
   return (
     <header
@@ -142,9 +151,9 @@ export const Header = () => {
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem onClick={() => router.push("/Profile")}>Profile</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/Setting")}>Settings</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

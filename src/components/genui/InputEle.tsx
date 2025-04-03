@@ -36,7 +36,7 @@ function InputEle({
   addStyle = "",
   errorMsg = "",
   value = "",
-  onChange = () => {},
+  onChange = () => { },
 }: InputEleProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [images, setImages] = useState<File[]>([]);
@@ -110,6 +110,29 @@ function InputEle({
             <option value="select">Select...</option>
             <option value="male">Male </option>
             <option value="female">Female</option>
+          </select>
+          <p></p>
+        </div>
+      );
+      case "status":
+      return (
+        <div className={` w-full h-fit flex flex-col gap-3 ${addStyle} `}>
+          <label className=" text-base font-sans font-semibold  " htmlFor={id}>
+            {label} {required ? <span className="text-red-600">*</span> : ""}
+          </label>
+          <select
+            className=" p-3 rounded border bg-white border-gray-400  "
+            name={id}
+            id={id}
+            value={value}
+            required={required}
+            disabled={disabled}
+            onChange={onChange}
+          >
+            <option value="">Select status</option>
+              <option value="FCA">FCA </option>
+              <option value="ACA">ACA</option>
+              <option value="Student">Student</option>
           </select>
           <p></p>
         </div>
@@ -471,6 +494,34 @@ function InputEle({
           <p></p>
         </div>
       );
+    case "qualification":
+      return (
+        <div className={`w-full h-fit flex flex-col gap-3 ${addStyle}`}>
+          <label className="text-base font-sans font-semibold" htmlFor={id}>
+            {label} {required ? <span className="text-red-600">*</span> : ""}
+          </label>
+          <select
+            className="p-3 rounded border bg-white border-gray-400"
+            name={id}
+            id={id}
+            value={value}
+            required={required}
+            disabled={disabled}
+            onChange={onChange}
+          >
+            <option value="">Select qualification</option>
+            <option value="HND">HND</option>
+            <option value="BBA">Bachelor of Business Administration (BBA)</option>
+            <option value="BSc">Bachelor of Science (BSc)</option>
+            <option value="BTech">Bachelor of Technology (BTech)</option>
+            <option value="BScEdu">Bachelor of Science Education (BSc Edu)</option>
+            <option value="MBA">Master of Business Administration (MBA)</option>
+            <option value="ME">Master of Engineering (ME)</option>
+            <option value="MSc">Master of Science (MSc)</option>
+          </select>
+          <p className="text-red-500 text-base font-medium">{errorMsg}</p>
+        </div>
+      );
 
     case "password":
       return (
@@ -663,6 +714,7 @@ InputEle.propTypes = {
     "password",
     "select",
     "images",
+    "qualification",
   ]),
 };
 export default InputEle;

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
 import FeedbackModal from '../ui/FeedbackModal';
-import axios from 'axios';
+import CertificateGenerator from '@/components/homecomps/CertificateGenerator';
 
 interface Event {
     id: string;
@@ -39,59 +39,57 @@ const RegisteredEventsTab: React.FC = () => {
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
-    const fetchUserRegisteredEvents = async () => {
-        try {
-            setLoading(true);
-            
-            // Fetch all events
-            const eventsResponse = await axios.get('https://ican-api-6000e8d06d3a.herokuapp.com/api/events');
-            const fetchedEvents = eventsResponse.data.data;
-
-            // Create a map to store registrations for each event
-            const registrationsMapTemp: Record<string, Registration[]> = {};
-
-            // Fetch registrations for each event
-            const registeredEventsWithDetails = await Promise.all(
-                fetchedEvents.map(async (event: Event) => {
-                    try {
-                        const registrationsResponse = await axios.get(
-                            `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${event.id}/registrations`
-                        );
-                        
-                      
-                        registrationsMapTemp[event.id] = registrationsResponse.data.data;
-
-                      
-                        console.log(`Registrations for event ${event.topic}:`, registrationsResponse.data.data);
-
-                        return registrationsResponse.data.data.length > 0 ? event : null;
-                    } catch (err) {
-                        console.error(`Error fetching registrations for event ${event.id}:`, err);
-                        return null;
-                    }
-                })
-            );
-
-            // Filter out null values (events with no registrations)
-            const userRegisteredEvents = registeredEventsWithDetails.filter(event => event !== null);
-
-            // Debug: Log all registered events
-            console.log('Registered Events:', userRegisteredEvents);
-            console.log('Registrations Map:', registrationsMapTemp);
-
-            setEvents(fetchedEvents);
-            setRegisteredEvents(userRegisteredEvents);
-            setRegistrationsMap(registrationsMapTemp);
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to fetch registered events');
-            setLoading(false);
-            console.error('Registered events fetch error:', err);
-        }
-    };
-
+    // Dummy data for testing
     useEffect(() => {
-        fetchUserRegisteredEvents();
+        const dummyEvents: Event[] = [
+            {
+                id: '1',
+                topic: 'Tech Innovations Conference',
+                subtitle: 'Exploring the future of technology',
+                date: '2025-04-15',
+                location: 'Lagos, Nigeria',
+                IsAttended: true,
+            },
+            {
+                id: '2',
+                topic: 'Financial Literacy Workshop',
+                subtitle: 'Mastering personal finance',
+                date: '2025-05-20',
+                location: 'Abuja, Nigeria',
+                IsAttended: false,
+            },
+        ];
+
+        const dummyRegistrationsMap: Record<string, Registration[]> = {
+            '1': [
+                {
+                    id: '101',
+                    fullName: 'John Doe',
+                    email: 'johndoe@example.com',
+                    membership: 'ICAN12345',
+                    eventId: '1',
+                    status: 'Confirmed',
+                    proofOfPayment: 'Paid',
+                    createdAt: '2025-04-01',
+                },
+            ],
+            '2': [
+                {
+                    id: '102',
+                    fullName: 'Jane Smith',
+                    email: 'janesmith@example.com',
+                    membership: 'ICAN67890',
+                    eventId: '2',
+                    status: 'Pending',
+                    proofOfPayment: 'Unpaid',
+                    createdAt: '2025-05-01',
+                },
+            ],
+        };
+
+        setEvents(dummyEvents);
+        setRegisteredEvents(dummyEvents);
+        setRegistrationsMap(dummyRegistrationsMap);
     }, []);
 
     const handleOpenFeedbackModal = (event: Event) => {
@@ -105,18 +103,19 @@ const RegisteredEventsTab: React.FC = () => {
         setSelectedEvent(null);
         setSelectedEventId(null); // Reset selected event ID
     };
+
     const filterEvents = (events: Event[]) => {
         switch (filterType) {
-          case 'Past events':
-            return events.filter(event => !event.IsAttended);
-          case 'Upcoming events':
-            return events.filter(event => !event.IsAttended); 
-          case 'Updated events':
-            return events; 
-          case 'Attended':
-            return events.filter(event => event.IsAttended);
-          default:
-            return events;
+            case 'Past events':
+                return events.filter(event => !event.IsAttended);
+            case 'Upcoming events':
+                return events.filter(event => !event.IsAttended);
+            case 'Updated events':
+                return events;
+            case 'Attended':
+                return events.filter(event => event.IsAttended);
+            default:
+                return events;
         }
     };
 
@@ -140,9 +139,9 @@ const RegisteredEventsTab: React.FC = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-38 bg-white z-50 text-xs border border-gray-300 rounded-lg text-gray-700 ">
                         {['Past events', 'Upcoming events', 'Updated events', 'Attended'].map((filter) => (
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                                 key={filter}
-                                className='transition-colors hover:bg-blue-100 p-2' 
+                                className="transition-colors hover:bg-blue-100 p-2"
                                 onClick={() => setFilterType(filter)}
                             >
                                 {filter}
@@ -158,15 +157,17 @@ const RegisteredEventsTab: React.FC = () => {
                         <div key={event.id} className="rounded-lg relative border-l-4 border-green-600 p-4 bg-white">
                             <div className="">
                                 <span
-                                    className={`rounded-full px-2 py-0.5 text-sm  ${event.IsAttended
+                                    className={`rounded-full px-2 py-0.5 text-sm  ${
+                                        event.IsAttended
                                             ? 'text-green-700 bg-green-100 font-medium'
-                                            : 'text-gray-700 bg-gray-100 font-medium'}`}
+                                            : 'text-gray-700 bg-gray-100 font-medium'
+                                    }`}
                                 >
-                                    {event.IsAttended}
+                                    {event.IsAttended ? 'Attended' : 'Not Attended'}
                                 </span>
                             </div>
 
-                            <div className=''>
+                            <div className="">
                                 <h3 className="font-bold text-lg mb-2">{event.topic}</h3>
                                 <p className="text-sm text-gray-600 mb-4">{event.subtitle}</p>
 
@@ -180,26 +181,24 @@ const RegisteredEventsTab: React.FC = () => {
                                         {event.location}
                                     </div>
                                 </div>
-                                
-                                {/* Debug: Show number of registrations for this event */}
+
                                 <div className="text-sm text-gray-500 mb-4">
                                     Registrations: {registrationsMap[event.id]?.length || 0}
                                 </div>
 
-                                <div className='flex items-center justify-end gap-2 ml-4'>
-                                    <button
-                                        onClick={() => {/* Add certificate download logic */}}
-                                        // hidden={!event.IsAttended}
-                                        className="px-6 py-2 rounded-full transition-colors border border-primary text-primary"
-                                    >
-                                        Download certificate
-                                    </button>
+                                <div className="flex items-center justify-end gap-2 ml-4">
+                                    
+                                        <CertificateGenerator
+                                            eventId={event.id}
+                                            eventTitle={event.topic}
+                                        />
                                     <button
                                         onClick={() => handleOpenFeedbackModal(event)}
-                                        // disabled={!event.IsAttended}
-                                        className={`px-6 py-2 rounded-full transition-colors ${!event.IsAttended
-                                            ? 'bg-blue-800 text-white'
-                                            : 'bg-blue-800 text-white'}`}
+                                        className={`px-6 py-2 rounded-full transition-colors ${
+                                            !event.IsAttended
+                                                ? 'bg-blue-800 text-white'
+                                                : 'bg-blue-800 text-white'
+                                        }`}
                                     >
                                         Write Feedback
                                     </button>
@@ -214,9 +213,7 @@ const RegisteredEventsTab: React.FC = () => {
                         <div className="flex justify-center">
                             <Image src="/calendar.png" width={150} height={50} alt="calendar-image" />
                         </div>
-                        <h2 className="mt-10 text-xl font-bold text-gray-800">
-                            No Registered Events
-                        </h2>
+                        <h2 className="mt-10 text-xl font-bold text-gray-800">No Registered Events</h2>
                         <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
                             Please check back later for updates or explore other sections for more opportunities.
                         </p>
@@ -224,11 +221,10 @@ const RegisteredEventsTab: React.FC = () => {
                 </div>
             )}
 
-            {/* Pass registrations to the feedback modal */}
-            <FeedbackModal 
-                isOpen={isFeedbackModalOpen} 
+            <FeedbackModal
+                isOpen={isFeedbackModalOpen}
                 onClose={handleCloseFeedbackModal}
-                eventId={selectedEventId} // Pass the event ID
+                eventId={selectedEventId}
             />
         </div>
     );

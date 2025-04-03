@@ -97,14 +97,14 @@ function Login() {
   };
 
   return (
-    <div className="m-auto">
-      <div className="flex flex-col lg:w-96 md:w-80 items-center rounded-2xl bg-white p-8 gap-6">
+    <div className="m-auto flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center rounded-2xl bg-white p-8 gap-6 w-full max-w-xl sm:max-w-lg md:max-w-xl">
         <Image src="/Logo_big.png" alt="Logo" width={100} height={50} />
         <div className="w-fit">
-          <h4 className="text-primary text-center text-2xl font-bold font-mono">
+          <h4 className="text-primary text-center text-2xl lg:text-3xl font-bold font-mono">
             Member Login
           </h4>
-          <p className="text-base font-normal font-sans">
+          <p className="lg:text-base text-xs text-center font-normal font-sans">
             Please, enter your details below
           </p>
         </div>
@@ -156,10 +156,10 @@ function Login() {
           <div className="flex flex-row justify-between">
             <div className="flex flex-row gap-2">
               <input type="checkbox" name="remember" id="remember" />
-              <p className="text-base font-medium">Remember me</p>
+              <p className="text-xs lg:text-base font-medium">Remember me</p>
             </div>
             <Link
-              className="text-primary text-base font-medium"
+              className="text-primary text-xs lg:text-base font-medium"
               href={"/forgot-password"}
             >
               Forgot Password
@@ -173,7 +173,7 @@ function Login() {
             {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
-        <p className="text-base font-medium">
+        <p className="text-xs lg:text-base font-medium">
           Don&apos;t have an account? {"       "}
           <Link className="text-primary" href={"/sign-up"}>
             Sign Up

@@ -71,13 +71,13 @@ function Base({ onNext }: Propsval) {
   };
 
   return (
-    <div className="flex flex-col w-full sm:w-[440px] items-center gap-6 p-4">
+    <div className="flex flex-col w-full items-center gap-6 p-2">
       <Image src="/Logo_big.png" alt="Logo" width={143} height={60} />
       <div className="w-fit">
-        <h4 className="text-primary text-center text-3xl font-bold font-mono">
+        <h4 className="text-primary text-center text-2xl lg:text-3xl font-bold font-mono">
           Forgot Password
         </h4>
-        <p className="text-base font-normal font-sans">
+        <p className="text:xs lg:text-base text-center font-normal font-sans">
           Enter your email address to reset your password.{" "}
         </p>
       </div>
@@ -108,7 +108,7 @@ function Base({ onNext }: Propsval) {
           {isLoading ? "Sending..." : "Send reset link"}
         </button>
       </form>
-      <p className="text-base font-medium">
+      <p className="text:xs lg:text-base font-medium">
         Remember Password? {""}
         <Link className="text-primary" href={"/login"}>
           Login Here

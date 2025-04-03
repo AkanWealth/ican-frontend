@@ -48,7 +48,7 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
           addStyle="col-span-2"
         /> */}
 
-        <div className="grid grid-cols-2 gap-4 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
           {/* <InputEle
             id="contactCountry"
             type="country"
@@ -108,7 +108,7 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             type="text"
             label=" Residential City"
             onChange={handleChange}
-            value={formData.contactDetails?.residentialAddress}
+            value={formData.contactDetails?.residentialCity}
           />
           <InputEle
             id="residentialState"

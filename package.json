@@ -58,6 +58,7 @@
     "lexical": "^0.24.0",
     "lucide-react": "^0.460.0",
     "next": "^15.0.3",
+    "next-s3-upload": "^0.3.4",
     "nodemailer": "^6.9.16",
     "radix-ui": "^1.1.3",
     "react": "^19.0.0",

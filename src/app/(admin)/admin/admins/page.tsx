@@ -3,21 +3,32 @@
 import React, { useEffect, useState } from "react";
 import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { adminscolumns } from "@/components/admincomps/user/datatable/columns";
-import { User, users } from "@/components/admincomps/user/datatable/colsdata";
+import { User } from "@/components/admincomps/user/datatable/colsdata";
+
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
 
 function AdminManagementPage() {
-  const [data, setData] = useState<User[] | never[]>([]);
+  const [data, setData] = useState<User[]>([]);
 
   useEffect(() => {
     async function fetchData() {
-      const result = users;
-      const filteredData = result.filter(
-        (user) => user.role === "admin" || user.role === "super admin"
-      );
-      setData(filteredData);
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/users/admins`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      };
+      const result = await axios.request(config);
+
+      setData(result.data);
     }
     fetchData();
   }, []);
+
+
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">

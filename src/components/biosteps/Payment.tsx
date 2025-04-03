@@ -266,6 +266,7 @@ function Payment({ formData, updateFormData }: PaymentProps) {
 
       <p>To complete your registration, you need to make payments</p>
 
+
       {/* Payment button */}
       <FlutterWaveButton
         {...handleFlutterwavePayment()}
@@ -305,6 +306,7 @@ function Payment({ formData, updateFormData }: PaymentProps) {
             : "bg-blue-600 hover:bg-blue-700"
         } text-white transition duration-300 mb-4`}
         disabled={formData.isPaymentSuccessful}
+
       />
 
       {/* Payment status message */}

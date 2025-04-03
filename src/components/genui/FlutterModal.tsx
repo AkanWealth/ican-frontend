@@ -8,6 +8,7 @@ interface TransactionDetails {
   email: string;
   phone_number: string;
   name: string;
+  title: string;
 }
 
 function FlutterModal({
@@ -15,6 +16,7 @@ function FlutterModal({
   email,
   phone_number,
   name,
+  title,
 }: TransactionDetails) {
   const config = {
     public_key:
@@ -30,7 +32,7 @@ function FlutterModal({
       name: name,
     },
     customizations: {
-      title: "What the payment is for",
+      title: title,
       description: "Pay to complete processes",
       logo: "",
     },

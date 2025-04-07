@@ -72,7 +72,7 @@ function BlogEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching Blog details for edit mode");
       fetchDetails();
     }
-  }, []);
+  }, [editDataFetched, id, mode]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({

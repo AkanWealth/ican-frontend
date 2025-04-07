@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useS3Upload } from "next-s3-upload";
+import Image from "next/image";
 
 function UploadS3() {
   const [fileUrl, setFIleUrl] = useState<string>("");
@@ -25,7 +26,7 @@ function UploadS3() {
 
       <button onClick={openFileDialog}>Upload file</button>
 
-      {fileUrl && <img src={fileUrl} />}
+      {fileUrl && <Image src={fileUrl} alt="Uploaded file" fill />}
     </div>
   );
 }

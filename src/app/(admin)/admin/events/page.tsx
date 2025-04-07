@@ -50,6 +50,7 @@ function EventsPage() {
           </button>
           {showNewEvent && (
             <NewEvent
+            
               showNewEvent={showNewEvent}
               setShowNewEvent={setShowNewEvent}
             />

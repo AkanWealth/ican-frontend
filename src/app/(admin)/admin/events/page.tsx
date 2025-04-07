@@ -5,7 +5,9 @@ import { EventTable } from "@/components/admincomps/event/datatable/EventTable";
 import { allcolumns } from "@/components/admincomps/event/datatable/columns";
 import { Event } from "@/components/admincomps/event/datatable/colsdata";
 import NewEvent from "@/components/admincomps/event/create/NewEvent";
-import { getData } from "@/utils/dataFetcher";
+
+import { BASE_API_URL } from "@/utils/setter";
+import axios from "axios";
 
 function EventsPage() {
   const [data, setData] = useState<Event[]>([]);
@@ -13,8 +15,19 @@ function EventsPage() {
 
   useEffect(() => {
     async function fetchData() {
-      const result = await getData();
-      setData(result);
+      try {
+        const config = {
+          method: 'get',
+          maxBodyLength: Infinity,
+          url: `${BASE_API_URL}/api/events`,
+          headers: {}
+        };
+
+        const response = await axios.request(config);
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching events data:", error);
+      }
     }
     fetchData();
   }, []);

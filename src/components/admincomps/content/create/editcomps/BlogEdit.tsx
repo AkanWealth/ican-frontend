@@ -81,7 +81,6 @@ function BlogEdit({ mode, id }: CreateContentProps) {
       contentBody: post,
       contentType: "article",
       coverImage: "",
-      status: status,
     });
 
     const config = {

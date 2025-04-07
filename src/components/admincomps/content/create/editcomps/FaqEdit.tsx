@@ -61,7 +61,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
     const data = JSON.stringify({
       name: faq.question,
       answer: faq.answer,
-      status: status,
+
     });
 
     const config = {

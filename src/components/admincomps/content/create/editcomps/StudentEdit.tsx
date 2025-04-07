@@ -54,7 +54,7 @@ function StudentEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching Study Pack details for edit mode");
       fetchDetails();
     }
-  }, []);
+  }, [editDataFetched, id, mode]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({

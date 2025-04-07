@@ -78,7 +78,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching transaction details for edit mode");
       fetchDetails();
     }
-  }, []);
+  }, [advert.advertiser, advert.endDate, advert.image, advert.name, advert.startDate, advert.textBody, editDataFetched, id, mode]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({

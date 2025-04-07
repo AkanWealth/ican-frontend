@@ -1,14 +1,12 @@
 export function getUser() {
   if (typeof window === "undefined") return null;
 
-  const userCookie = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("user="));
+  const userData = localStorage.getItem("user");
 
-  if (!userCookie) return null;
+  if (!userData) return null;
 
   try {
-    return JSON.parse(userCookie.split("=")[1]);
+    return JSON.parse(userData);
   } catch {
     return null;
   }

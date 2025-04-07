@@ -60,7 +60,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching Gallery details for edit mode");
       fetchDetails();
     }
-  }, []);
+  }, [editDataFetched, id, mode]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({

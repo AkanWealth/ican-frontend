@@ -68,7 +68,14 @@ function Personal({ formData, updateFormData }: PersonalProps) {
       <div className="grid lg:grid-cols-2 md:grid-cols-1  lg:gap-10 md:gap-5 ">
         <InputEle
           value={formData.personalData.surname}
-          onChange={() => {}}
+          onChange={(e) =>
+            updateFormData({
+              personalData: {
+                ...formData.personalData,
+                surname: e.target.value,
+              },
+            })
+          }
           id="surname"
           placeholder="Enter your surname"
           type="text"
@@ -76,7 +83,14 @@ function Personal({ formData, updateFormData }: PersonalProps) {
         />
         <InputEle
           value={formData.personalData.firstName}
-          onChange={() => {}}
+          onChange={(e) =>
+            updateFormData({
+              personalData: {
+                ...formData.personalData,
+                firstName: e.target.value,
+              },
+            })
+          }
           id="firstName"
           placeholder="Enter your first name"
           type="text"
@@ -84,7 +98,14 @@ function Personal({ formData, updateFormData }: PersonalProps) {
         />
         <InputEle
           value={formData.personalData?.middleName}
-          onChange={() => {}}
+          onChange={(e) =>
+            updateFormData({
+              personalData: {
+                ...formData.personalData,
+                middleName: e.target.value,
+              },
+            })
+          }
           id="middleName"
           placeholder="Enter your middle name"
           type="text"
@@ -94,6 +115,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           id="gender"
           type="gender"
           label="Gender"
+          value={formData.personalData.gender}
           onChange={(e) =>
             updateFormData({
               personalData: {
@@ -106,10 +128,18 @@ function Personal({ formData, updateFormData }: PersonalProps) {
         <InputEle
           id="dob"
           type="date"
-          label="Date of birth"
+          label="Date of Birth"
+          value={
+            formData.personalData.dob
+              ? new Date(formData.personalData.dob).toISOString().split("T")[0]
+              : ""
+          }
           onChange={(e) =>
             updateFormData({
-              personalData: { ...formData.personalData, dob: e.target.value },
+              personalData: {
+                ...formData.personalData,
+                dob: new Date(e.target.value).toISOString(), // Convert to ISO format
+              },
             })
           }
         />
@@ -117,6 +147,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           id="maritalStatus"
           type="marriage"
           label="Marital Status"
+          value={formData.personalData.maritalStatus}
           onChange={(e) =>
             updateFormData({
               personalData: {
@@ -128,7 +159,14 @@ function Personal({ formData, updateFormData }: PersonalProps) {
         />
         <InputEle
           value={formData.personalData?.state}
-          onChange={() => {}}
+          onChange={(e) =>
+            updateFormData({
+              personalData: {
+                ...formData.personalData,
+                state: e.target.value,
+              },
+            })
+          }
           id="state"
           type="text"
           label="State of origin"
@@ -138,6 +176,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           id="nationality"
           type="country"
           label="Nationality"
+          value={formData.personalData.nationality}
           onChange={(e) =>
             updateFormData({
               personalData: {

@@ -106,17 +106,28 @@ const FeedbackHistoryTab: React.FC = () => {
 
             try {
                 setIsLoading(true);
-                
-                // Fetch feedback for the selected event
-                const feedbackResponse = await axios.get<{data: Feedback[], meta: any}>(`https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${selectedEvent.id}/feedback`);
-                const fetchedFeedback = feedbackResponse.data.data || [];
 
+                // Retrieve the token from localStorage
+                const token = localStorage.getItem("token");
+
+                // Fetch feedback for the selected event
+                const feedbackResponse = await axios.get<{ data: Feedback[]; meta: any }>(
+                    `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${selectedEvent.id}/feedback`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`, 
+                            // "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                const fetchedFeedback = feedbackResponse.data.data || [];
                 setFeedbackHistory(fetchedFeedback);
 
                 setIsLoading(false);
             } catch (err) {
-                console.error('Error fetching feedback:', err);
-                setError('Failed to fetch feedback history');
+                console.error("Error fetching feedback:", err);
+                setError("Failed to fetch feedback history");
                 setFeedbackHistory([]);
                 setIsLoading(false);
             }

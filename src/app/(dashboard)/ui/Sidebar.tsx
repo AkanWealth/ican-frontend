@@ -69,6 +69,13 @@ export const Sidebar = () => {
     }
     router.push(href);
   };
+  const handleLogout = () => {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  
+    router.push("/login");
+  };
   const isActiveLink = (href: string) => {
     return pathname === href;
   };
@@ -113,7 +120,7 @@ export const Sidebar = () => {
 
           {/* Logo - Fixed at Top */}
           <div className="h-16 flex items-center py-12 border-b border-gray-200 px-6 flex-shrink-0">
-            <Image alt="Logo" width={170} height={90} src="/ICANlogo1.png" />
+            <Image src="/Icanlogo.png" alt="Logo" width={170} height={90}  />
           </div>
 
           {/* Scrollable Navigation Section */}
@@ -178,7 +185,7 @@ export const Sidebar = () => {
 
             {/* Logout - Always Visible at Bottom of Scrollable Area */}
             <div
-              onClick={() => handleNavigation("/login")}
+              onClick={handleLogout}
               className="flex items-center px-6 py-2 mt-40 mb-4 cursor-pointer hover:bg-blue-800 rounded-lg"
             >
               <LogOut className="w-5 h-5 transform scale-x-[-1] flex-shrink-0" />

@@ -6,7 +6,8 @@ import Image from 'next/image';
 import SuccessModal from './SuccessMessage';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
-
+import { FlutterWaveButton, closePaymentModal } from 'flutterwave-react-v3';
+import CertificateGenerator from '@/components/homecomps/CertificateGenerator';
 
 const EventRegistration = () => {
   const searchParams = useSearchParams();
@@ -111,8 +112,8 @@ const EventRegistration = () => {
 
   const isFormValidAndToastVisible = () => {
     return (
-      isFormValid() ||
-      (isPaymentSuccessful)  // Ensuring either payment success or toast popup
+      isFormValid() || 
+      (isPaymentSuccessful && Number(eventDetails.eventFee) > 0) // Ensure payment is successful for paid events
     );
   };
 
@@ -147,8 +148,16 @@ const EventRegistration = () => {
 
     try {
       await registerForEvent();
+      console.log("Registration successful, opening modal..."); // Debugging log
+      setIsModalOpen(true); // Show the success modal after successful registration
     } catch (error) {
       console.error('Submission error:', error);
+      toast({
+        title: "Submission Failed",
+        description: "Unable to complete registration. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
     }
   };
 
@@ -186,16 +195,17 @@ const EventRegistration = () => {
         fullName: formData.fullName,
         email: formData.email,
         membership: membership,
-        proofOfPayment: formData.paymentMethod === 'bankTransfer' ? 'PAID' : 'PENDING'
+        proofOfPayment: isPaymentSuccessful ? 'PAID' : (formData.paymentMethod === 'bankTransfer' ? 'PAID' : 'PENDING')
       };
 
       console.log(registrationPayload);
       const response = await axios.post(`https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/registrations/register`, registrationPayload, {
         headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         }
       });
-
+console.log("Registration response:", response.data);
 
       if (response.status === 200 || response.status === 201) {
         setIsModalOpen(true);
@@ -215,7 +225,27 @@ const EventRegistration = () => {
     }
   };
 
+  const handleFlutterwavePayment = () => {
+    const config = {
+      public_key: process.env.FLW_PUBLIC_KEY || "FLWPUBK_TEST-534b5997be3928deed468163ca379112-X", // Replace with your actual public key
+      tx_ref: Date.now().toString(),
+      amount: Number(eventDetails.eventFee),
+      currency: 'NGN',
+      payment_options: 'card, banktransfer',
+      customer: {
+        email: formData.email,
+        name: formData.fullName,
+        phone_number: '08012345678', // Replace with a valid phone number
+      },
+      customizations: {
+        title: eventDetails.topic,
+        description: 'Event Registration Payment',
+        logo: 'https://your-logo-url.com/logo.png', // Replace with your logo URL
+      },
+    };
 
+    return config;
+  };
 
   return (
   <div className='py-2 px-4'>
@@ -341,7 +371,7 @@ const EventRegistration = () => {
 
             {/* Payment Section */}
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">
+              {/* <label className="block text-sm font-semibold text-gray-800 mb-2">
                 Payment
               </label>
               <hr className='mb-4 border-gray-500' />
@@ -377,96 +407,130 @@ const EventRegistration = () => {
                   />
                   <label htmlFor="bankTransfer" className="text-sm text-gray-700">Bank Transfer</label>
                 </div>
-              </div>
+              </div> */}
 
-              {formData.paymentMethod === 'card' && (
-                <button
-                  type="button"
-                  onClick={handleCardPayment}
-                  disabled={isPaymentSuccessful}
-                  className={`w-full py-2 px-4 rounded-full ${isPaymentSuccessful
+              
+                {/* {formData.paymentMethod === 'card' && ( */}
+                  <FlutterWaveButton
+                    {...handleFlutterwavePayment()}
+                    callback={(response) => {
+                      if (response.status === 'successful') {
+                        setIsPaymentSuccessful(true); // Mark payment as successful
+                        toast({
+                          title: "Payment Successful",
+                          description: "You can proceed to submit your registration",
+                          variant: "default",
+                          duration: 3000, // Ensure duration is long enough to be visible
+                        });
+                      } else {
+                        toast({
+                          title: "Payment Failed",
+                          description: "Something went wrong. Please try again.",
+                          variant: "destructive",
+                          duration: 3000,
+                        });
+                      }
+                      closePaymentModal(); // Close the modal programmatically
+                    }}
+                    onClose={() => {
+                      console.log('Payment closed');
+                      toast({
+                        title: "Payment Cancelled",
+                        description: "You cancelled the payment process.",
+                        variant: "default",
+                        duration: 3000,
+                      });
+                    }}
+                    text={`Pay ₦${eventDetails.eventFee}`}
+                    className={`w-full py-2 px-4 rounded-full ${isPaymentSuccessful
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700'
                     } text-white transition duration-300 mb-4`}
-                >
-                  Pay ₦{eventDetails.eventFee}
-                </button>
-              )}
+                    disabled={isPaymentSuccessful}
+                  />
+                {/* )} */}
+            
 
-              {formData.paymentMethod === 'bankTransfer' && (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold mb-4">Account Details</h3>
-                  <div className="space-y-4">
-                    <div className='flex items-center space-x-6'>
-                      <div className="flex items-center">
-                        <Image
-                          src="/firstBankLogo.png"
-                          alt="FirstBank"
-                          width={90}
-                          height={70}
-                          className="object-contain"
-                        />
+              {/* {formData.paymentMethod === 'bankTransfer' && (
+                <div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="text-sm font-semibold mb-4">Account Details</h3>
+                    <div className="space-y-4">
+                      <div className='flex items-center space-x-6'>
+                        <div className="flex items-center">
+                          <Image
+                            src="/firstBankLogo.png"
+                            alt="FirstBank"
+                            width={90}
+                            height={70}
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm text-gray-600">Account Number</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-lg text-gray-600 font-semibold">
+                              {bankDetails.accountNumber}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(bankDetails.accountNumber)}
+                              className="p-1 hover:bg-gray-100 rounded-md transition-colors"
+                              title="Copy account number"
+                            >
+                              <Copy
+                                className={`w-4 h-4 ${copied ? 'text-green-500' : 'text-gray-400'}`}
+                              />
+                            </button>
+                          </div>
+                        </div>
                       </div>
+              
                       <div className="flex flex-col">
-                        <span className="text-sm text-gray-600">Account Number</span>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-lg text-gray-600 font-semibold">
-                            {bankDetails.accountNumber}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => copyToClipboard(bankDetails.accountNumber)}
-                            className="p-1 hover:bg-gray-100 rounded-md transition-colors"
-                            title="Copy account number"
+                        <span className="text-sm text-gray-600">Account Name</span>
+                        <span className="text-sm text-gray-600 font-semibold">{bankDetails.accountName}</span>
+                      </div>
+              
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-2">
+                          Upload your Receipt<span className='text-red-500'>*</span>
+                        </label>
+                        <div className="border-2 border-gray-400 rounded-lg p-10 text-center">
+                          <input
+                            type="file"
+                            id="receipt"
+                            accept="image/*,.pdf"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                          <label
+                            htmlFor="receipt"
+                            className="cursor-pointer flex flex-col items-center"
                           >
-                            <Copy
-                              className={`w-4 h-4 ${copied ? 'text-green-500' : 'text-gray-400'}`}
-                            />
-                          </button>
+                            <FilePlus className="w-12 h-12 text-gray-800 mb-2" />
+                            <span className="text-sm text-gray-800">
+                              {isReceiptUploaded ? 'Receipt uploaded' : 'Click to add file or drag any attachment here'}
+                            </span>
+                          </label>
                         </div>
                       </div>
                     </div>
-
-                    <div className="flex flex-col">
-                      <span className="text-sm text-gray-600">Account Name</span>
-                      <span className="text-sm text-gray-600 font-semibold">{bankDetails.accountName}</span>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-800 mb-2">
-                        Upload your Receipt<span className='text-red-500'>*</span>
-                      </label>
-                      <div className="border-2 border-gray-400 rounded-lg p-10 text-center">
-                        <input
-                          type="file"
-                          id="receipt"
-                          accept="image/*,.pdf"
-                          onChange={handleFileUpload}
-                          className="hidden"
-                        />
-                        <label
-                          htmlFor="receipt"
-                          className="cursor-pointer flex flex-col items-center"
-                        >
-                          <FilePlus className="w-12 h-12 text-gray-800 mb-2" />
-                          <span className="text-sm text-gray-800">
-                            {isReceiptUploaded ? 'Receipt uploaded' : 'Click to add file or drag any attachment here'}
-                          </span>
-                        </label>
-                      </div>
-                    </div>
-
-
                   </div>
                 </div>
-              )}
+              )} */}
               <button
                 type="submit"
                 className={`w-full py-2 rounded-full transition duration-300 ${isFormValidAndToastVisible()
                     ? 'bg-blue-600 hover:bg-blue-700 text-white'
                     : 'bg-blue-200 text-white cursor-not-allowed'
                   }`}
-                disabled={!isFormValidAndToastVisible()}
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent default form submission
+                  if (isFormValidAndToastVisible()) {
+                    setIsModalOpen(true); // Open the success modal
+                  }
+                }}
+                disabled={!isFormValidAndToastVisible()} // Disable button if form is invalid
               >
                 Submit Registration
               </button>
@@ -520,10 +584,7 @@ const EventRegistration = () => {
             )}
             <button
               type="submit"
-              className={`w-full py-2 rounded-full transition duration-300 ${isNoFeeFormValid()
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-blue-200 text-white cursor-not-allowed'
-                }`}
+              className={`w-full py-2 rounded-full transition duration-300 bg-blue-600 hover:bg-blue-700 text-white`}
               disabled={!isNoFeeFormValid()}
             >
               Submit Registration
@@ -533,7 +594,10 @@ const EventRegistration = () => {
 
         <SuccessModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            console.log("Closing modal..."); // Debugging log
+            setIsModalOpen(false);
+          }}
           email={formData.email}
         />
       </div>

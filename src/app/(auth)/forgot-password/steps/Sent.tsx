@@ -18,9 +18,9 @@ function Sent({ onNext }: Propsval) {
         Password Reset Link Sent
       </h4>
       <p className="text-center text-sm font-normal mx-auto max-w-lg">
-        Reset password link has been sent to xxxxxxx@gmail.com
+        Reset password link has been sent to your email. Please check your email and
+        follow the instructions to reset your password.
         
-        Follow the directions to reset your password
       </p>
       <Link className="w-full flex items-center " href={"/reset-password"}>
         <button className="w-1/2 p-3 mx-auto rounded-full bg-primary text-white text-base font-semibold">

@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-
 import FlutterModal from "@/components/genui/FlutterModal";
+import UploadS3 from "@/components/genui/UploadS3";
+
 function TestingPage() {
   const [value, setValue] = useState(``);
 
@@ -17,6 +18,8 @@ function TestingPage() {
           name="Francis Woods"
           title="Payment for services"
         />
+
+        <UploadS3 />
       </div>
     </div>
   );

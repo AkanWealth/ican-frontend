@@ -213,4 +213,10 @@ export type {
   TransactionsFormData,
   StatCardProps,
   CustomerFormData,
+  CreateContentProps,
+};
+
+type CreateContentProps = {
+  id?: string;
+  mode: "create" | "edit";
 };

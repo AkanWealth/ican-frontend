@@ -79,7 +79,7 @@ export const allcolumns: ColumnDef<Content>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellActions row={row} />;
+      return <CellActions contentCategory="" row={row} />;
     },
   },
 ];
@@ -166,7 +166,7 @@ export const advertscolumns: ColumnDef<Content>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellActions row={row} />;
+      return <CellActions contentCategory="adverts" row={row} />;
     },
   },
 ];
@@ -254,7 +254,7 @@ export const blogscolumns: ColumnDef<Content>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellActions row={row} />;
+      return <CellActions contentCategory="blogs" row={row} />;
     },
   },
 ];
@@ -342,7 +342,7 @@ export const publicationscolumns: ColumnDef<Content>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellActions row={row} />;
+      return <CellActions contentCategory="publications" row={row} />;
     },
   },
 ];
@@ -444,7 +444,7 @@ export const galleriescolumns: ColumnDef<Content>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellActions row={row} />;
+      return <CellActions contentCategory="gallery" row={row} />;
     },
   },
 ];
@@ -602,7 +602,7 @@ export const studentcolumns: ColumnDef<Content>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellActions row={row} />;
+      return <CellActions contentCategory="studypacks" row={row} />;
     },
   },
 ];
@@ -688,7 +688,7 @@ export const faqcolumns: ColumnDef<Content>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellActions row={row} />;
+      return <CellActions contentCategory="faqs" row={row} />;
     },
   },
 ];

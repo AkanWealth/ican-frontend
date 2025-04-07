@@ -8,19 +8,11 @@ import "../globals.css";
 import Sidebar from "@/components/admincomps/Sidebar";
 import Header from "@/components/admincomps/Header";
 
-
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!hasRole(["SUPER_ADMIN", "ADMIN"])) {
-      router.push("/dashboard");
-    }
-  }, [router]);
 
   return (
     <html lang="en">

@@ -125,13 +125,13 @@ function AdminLogin() {
         localStorage.setItem("access_token", access_token);
         document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
 
+        console.log("User data:", user);
+        console.log("Access token:", access_token);
 
-        if (user.role === "MEMBER" ) {
-          // Handle unauthorized access attempt
-          router.push("/login");
-        } else {
+        setTimeout(() => {
           router.push("/admin");
-        }
+        }, 5000);
+
         return <Toast type="success" message="Login successful" />;
       } catch (error) {
         return <Toast type="error" message="An error occurred during login." />;

@@ -64,11 +64,13 @@ export function UserTable<TData, TValue>({
         <Input
           placeholder="Filter by name..."
           value={
-            (table.getColumn("fullName")?.getFilterValue() as string) ?? ""
+        (table.getColumn("surname")?.getFilterValue() as string) ?? ""
           }
-          onChange={(event) =>
-            table.getColumn("fullName")?.setFilterValue(event.target.value)
-          }
+          onChange={(event) => {
+        const value = event.target.value;
+        table.getColumn("surname")?.setFilterValue(value);
+        table.getColumn("firstname")?.setFilterValue(value);
+          }}
           className="max-w-sm"
         />
       </div>
@@ -119,7 +121,8 @@ export function UserTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <Image className="mx-auto"
+                  <Image
+                    className="mx-auto"
                     src="/Emptyusertable.png"
                     alt="Empty"
                     width={400}

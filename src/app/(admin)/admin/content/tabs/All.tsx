@@ -18,37 +18,21 @@ function All() {
   const [data, setData] = useState<Content[]>([]);
 
   useEffect(() => {
-    async function fetchStudyData() {
+    async function fetchAllContentData() {
       const config = {
         method: "get",
         maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/studypacks`,
+        url: `${BASE_API_URL}/content`,
         headers: {},
       };
       try {
         const response = await axios.request(config);
-        setData((prevData) => [...prevData, ...response.data]);
+        setData(response.data);
       } catch (error) {
         console.error(error);
       }
     }
-    async function fetchGalleryData() {
-      const config = {
-        method: "get",
-        maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/gallery`,
-        headers: {},
-      };
-      try {
-        const response = await axios.request(config);
-        setData((prevData) => [...prevData, ...response.data]);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    fetchStudyData();
-    
+    fetchAllContentData();
   }, []);
 
   return (

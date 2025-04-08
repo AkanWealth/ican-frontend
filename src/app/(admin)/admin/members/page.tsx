@@ -5,7 +5,7 @@ import axios from "axios";
 
 import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { memberscolumns } from "@/components/admincomps/user/datatable/columns";
-import { User } from "@/components/admincomps/user/datatable/colsdata";
+import { User } from "@/libs/types";
 import { BASE_API_URL } from "@/utils/setter";
 
 function MembersPage() {

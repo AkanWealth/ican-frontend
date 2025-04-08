@@ -69,7 +69,7 @@ function NewEvent({
     if (mode === "edit" && id && !editDataFetched) {
       fetchDetails();
     }
-  }, []);
+  }, [editDataFetched, id, mode]);
 
   const handleChange = (
     e: React.ChangeEvent<

@@ -3,27 +3,29 @@
 import React, { useEffect, useState } from "react";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { faqcolumns } from "@/components/admincomps/content/datatable/columns";
-import {
-  Content,
-  contents,
-} from "@/components/admincomps/content/datatable/colsdata";
 
-async function getData(): Promise<Content[]> {
-  return contents;
-}
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+
 function Faq() {
-  const [data, setData] = useState<Content[]>([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
-      const result = await getData();
-      const filteredData = result.filter(
-        (content) => content.category === "faq"
-      );
-
-      setData(filteredData);
+    async function fetchFAQData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/faqs`,
+        headers: {},
+      };
+      try {
+        const response = await axios.request(config);
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
     }
-    fetchData();
+    fetchFAQData();
   }, []);
 
   return (

@@ -3,19 +3,14 @@
 import React, { useEffect, useState } from "react";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { allcolumns } from "@/components/admincomps/content/datatable/columns";
-import {
-  Content,
-  contents,
-} from "@/components/admincomps/content/datatable/colsdata";
+
 import { BASE_API_URL } from "@/utils/setter";
 import axios from "axios";
 
-export async function getData(): Promise<Content[]> {
-  return contents;
-}
+
 
 function All() {
-  const [data, setData] = useState<Content[]>([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     async function fetchAllContentData() {

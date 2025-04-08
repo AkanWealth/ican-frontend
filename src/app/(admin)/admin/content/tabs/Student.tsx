@@ -4,28 +4,29 @@ import React, { useEffect, useState } from "react";
 // import { Pagination } from "@/components/ui/pagination";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { studentcolumns } from "@/components/admincomps/content/datatable/columns";
-import {
-  Content,
-  contents,
-} from "@/components/admincomps/content/datatable/colsdata";
 
-async function getData(): Promise<Content[]> {
-  return contents;
-}
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
 
 function Student() {
-  const [data, setData] = useState<Content[]>([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
-      const result = await getData();
-      const filteredData = result.filter(
-        (content) => content.category === "student"
-      );
-
-      setData(filteredData);
+    async function fetchStudyData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/studypacks`,
+        headers: {},
+      };
+      try {
+        const response = await axios.request(config);
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
     }
-    fetchData();
+    fetchStudyData();
   }, []);
 
   return (

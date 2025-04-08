@@ -49,7 +49,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {row.original.status === "active" ? (
+            {row.original.isSuspended === false ? (
               <DropdownMenuItem
                 onClick={() => setShowDisableModal(true)}
                 className="flex flex-row items-center"

@@ -1,31 +1,30 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-// import { Pagination } from "@/components/ui/pagination";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { advertscolumns } from "@/components/admincomps/content/datatable/columns";
-import {
-  Content,
-  contents,
-} from "@/components/admincomps/content/datatable/colsdata";
-
-async function getData(): Promise<Content[]> {
-  return contents;
-}
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
 
 function Adverts() {
-  const [data, setData] = useState<Content[]>([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
-      const result = await getData();
-      const filteredData = result.filter(
-        (content) => content.category === "adverts"
-      );
-
-      setData(filteredData);
+    async function fetchAdvertsData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/adverts`,
+        headers: {},
+      };
+      try {
+        const response = await axios.request(config);
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
     }
-    fetchData();
+    fetchAdvertsData();
   }, []);
 
   return (

@@ -10,7 +10,7 @@ import CellActions from "@/components/admincomps/event/actions/CellActions";
 
 export const allcolumns: ColumnDef<Event>[] = [
   {
-    accessorKey: "eventName",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -37,6 +37,9 @@ export const allcolumns: ColumnDef<Event>[] = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      return <span>{new Date(row.original.date).toLocaleDateString()}</span>;
     },
   },
   {

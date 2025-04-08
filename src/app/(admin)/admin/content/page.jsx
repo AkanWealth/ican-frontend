@@ -21,7 +21,6 @@ function Content() {
   };
 
   useEffect(() => {
-    // Any code that accesses the document object should be placed here
   }, []);
 
   return (

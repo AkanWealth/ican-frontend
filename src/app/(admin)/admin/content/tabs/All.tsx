@@ -7,6 +7,8 @@ import {
   Content,
   contents,
 } from "@/components/admincomps/content/datatable/colsdata";
+import { BASE_API_URL } from "@/utils/setter";
+import axios from "axios";
 
 export async function getData(): Promise<Content[]> {
   return contents;
@@ -16,11 +18,37 @@ function All() {
   const [data, setData] = useState<Content[]>([]);
 
   useEffect(() => {
-    async function fetchData() {
-      const result = await getData();
-      setData(result);
+    async function fetchStudyData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/studypacks`,
+        headers: {},
+      };
+      try {
+        const response = await axios.request(config);
+        setData((prevData) => [...prevData, ...response.data]);
+      } catch (error) {
+        console.error(error);
+      }
     }
-    fetchData();
+    async function fetchGalleryData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/gallery`,
+        headers: {},
+      };
+      try {
+        const response = await axios.request(config);
+        setData((prevData) => [...prevData, ...response.data]);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchStudyData();
+    
   }, []);
 
   return (

@@ -123,6 +123,7 @@ function AdminLogin() {
         // Set secure cookies instead of localStorage
         localStorage.setItem("user", JSON.stringify(user));
         document.cookie = `user=${encodeURIComponent(JSON.stringify(user))}; path=/; secure; samesite=strict`;
+
         localStorage.setItem("access_token", access_token);
         document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
 

@@ -73,6 +73,7 @@ export type BiodataFormData = {
     email: string;
   };
   isPaymentSuccessful?: boolean;
+  profilePicture?: string;
 };
 
 function Biodata() {
@@ -119,13 +120,22 @@ function Biodata() {
       amount: 25000,
     },
     isPaymentSuccessful: false,
+    profilePicture: "",
   });
 
   const [userData, setUserData] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setUserData(localStorage.getItem("user"));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUsername = localStorage.getItem("userName");
+      setUsername(storedUsername);
     }
   }, []);
 
@@ -180,6 +190,7 @@ function Biodata() {
         membershipId: memberId,
         
         // Personal Data
+        profilePicture: formData.profilePicture || "",
         surname: formData.personalData.surname || "",
         firstname: formData.personalData.firstName || "",
         middlename: formData.personalData.middleName || "",
@@ -220,6 +231,7 @@ function Biodata() {
           : null,
       };
       console.log("Payload:", payload);
+      const username = localStorage.getItem("userName") || "";
       const Token = localStorage.getItem("token");
       console.log("Token:", Token);
 
@@ -375,7 +387,7 @@ function Biodata() {
                 pt: 2,
               }}
             >
-              <Link href="/">
+              <Link href="/login">
                 <Button
                   className="py-3 px-4 bg-primary text-sm sm:text-base text-white font-semibold rounded-full font-sans"
                   onClick={handleReset}
@@ -390,7 +402,7 @@ function Biodata() {
         <>
           <div className="flex flex-col items-center justify-center mb-6 sm:mb-8">
             <h3 className="text-primary text-xl sm:text-2xl lg:text-3xl font-semibold text-center">
-              Welcome Chinazom
+              Welcome {username || "Guest"}
             </h3>
             <p className="text-sm sm:text-base text-center">
               Complete your registration. It won't take long.

@@ -89,4 +89,10 @@ body {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+  
+  .auth-layout-body {
+    background-image: url('/bgauth.png');
+    background-size: cover;
+    background-attachment: fixed;
+  }
 }

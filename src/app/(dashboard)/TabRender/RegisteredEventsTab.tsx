@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
 import FeedbackModal from '../ui/FeedbackModal';
 import CertificateGenerator from '@/components/homecomps/CertificateGenerator';
+import axios from 'axios';
 
 interface Event {
     id: string;
@@ -39,57 +40,78 @@ const RegisteredEventsTab: React.FC = () => {
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
-    // Dummy data for testing
     useEffect(() => {
-        const dummyEvents: Event[] = [
-            {
-                id: '1',
-                topic: 'Tech Innovations Conference',
-                subtitle: 'Exploring the future of technology',
-                date: '2025-04-15',
-                location: 'Lagos, Nigeria',
-                IsAttended: true,
-            },
-            {
-                id: '2',
-                topic: 'Financial Literacy Workshop',
-                subtitle: 'Mastering personal finance',
-                date: '2025-05-20',
-                location: 'Abuja, Nigeria',
-                IsAttended: false,
-            },
-        ];
+        const fetchUserRegistrations = async () => {
+            setLoading(true);
+            try {
+                const token = localStorage.getItem('token');
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const email = user.email;
 
-        const dummyRegistrationsMap: Record<string, Registration[]> = {
-            '1': [
-                {
-                    id: '101',
-                    fullName: 'John Doe',
-                    email: 'johndoe@example.com',
-                    membership: 'ICAN12345',
-                    eventId: '1',
-                    status: 'Confirmed',
-                    proofOfPayment: 'Paid',
-                    createdAt: '2025-04-01',
-                },
-            ],
-            '2': [
-                {
-                    id: '102',
-                    fullName: 'Jane Smith',
-                    email: 'janesmith@example.com',
-                    membership: 'ICAN67890',
-                    eventId: '2',
-                    status: 'Pending',
-                    proofOfPayment: 'Unpaid',
-                    createdAt: '2025-05-01',
-                },
-            ],
+                if (!token || !email) {
+                    setError('User is not authenticated. Please log in again.');
+                    setLoading(false);
+                    return;
+                }
+
+                // Fetch user registrations
+                const registrationsResponse = await axios.get(
+                    'https://ican-api-6000e8d06d3a.herokuapp.com/api/events/registrations/user-events',
+                    {
+                        params: { email },
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+
+                // Ensure the response contains the expected data structure
+                const registrationsData: Registration[] = registrationsResponse.data?.data || [];
+
+                if (!Array.isArray(registrationsData) || registrationsData.length === 0) {
+                    setRegisteredEvents([]); // Set empty list for no registered events
+                    setLoading(false);
+                    return;
+                }
+
+                // Map to store registrations by event ID
+                const registrationsMap: Record<string, Registration[]> = {};
+                registrationsData.forEach((registration) => {
+                    if (!registrationsMap[registration.eventId]) {
+                        registrationsMap[registration.eventId] = [];
+                    }
+                    registrationsMap[registration.eventId].push(registration);
+                });
+
+                // Fetch event details for each registration
+                const eventPromises = registrationsData.map(async (registration) => {
+                    const eventResponse = await axios.get(
+                        `http://localhost:4000/api/events/${registration.eventId}`,
+                        {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }
+                    );
+                    return eventResponse.data;
+                });
+
+                const eventsData: Event[] = await Promise.all(eventPromises);
+
+                setEvents(eventsData);
+                setRegisteredEvents(eventsData);
+                setRegistrationsMap(registrationsMap);
+            } catch (err) {
+                if (axios.isAxiosError(err)) {
+                    console.error('Error details:', err.response ? err.response.data : err.message);
+                } else {
+                    console.error('Error details:', err);
+                }
+                setError('Failed to fetch registered events. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
         };
 
-        setEvents(dummyEvents);
-        setRegisteredEvents(dummyEvents);
-        setRegistrationsMap(dummyRegistrationsMap);
+        if (typeof window !== 'undefined') {
+            fetchUserRegistrations();
+        }
     }, []);
 
     const handleOpenFeedbackModal = (event: Event) => {
@@ -125,6 +147,22 @@ const RegisteredEventsTab: React.FC = () => {
 
     if (error) {
         return <div className="text-center text-red-500 mt-10">Error: {error}</div>;
+    }
+
+    if (registeredEvents.length === 0) {
+        return (
+            <div className="flex-grow flex items-center justify-center mt-40">
+                <div className="text-center p-16">
+                    <div className="flex justify-center">
+                        <Image src="/calendar.png" width={150} height={50} alt="calendar-image" />
+                    </div>
+                    <h2 className="mt-10 text-xl font-bold text-gray-800">No Registered Events</h2>
+                    <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
+                        Please check back later for updates or explore other sections for more opportunities.
+                    </p>
+                </div>
+            </div>
+        );
     }
 
     return (

@@ -3,21 +3,26 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { FaCloudUploadAlt, FaTrash } from "react-icons/fa";
 
-import { BiodataFormData } from "../Biodata";
+import { BiodataFormData } from "../homecomps/Biodata";
+import Toast from "../genui/Toast";
 
 interface UploadimgProps {
+  isShown: boolean;
   formData: BiodataFormData;
   updateFormData: (data: Partial<BiodataFormData>) => void;
-  setToast: (
-    toast: { type: "success" | "error"; message: string } | null
-  ) => void;
 }
 
-function Uploadimg({ formData, updateFormData, setToast }: UploadimgProps) {
+function Uploadimg({ isShown, formData, updateFormData }: UploadimgProps) {
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  var bucket = "";
+  if (isShown) {
+    bucket = "flex";
+  } else {
+    bucket = "hidden";
+  }
 
   useEffect(() => {
     if (formData.image) {
@@ -34,13 +39,11 @@ function Uploadimg({ formData, updateFormData, setToast }: UploadimgProps) {
 
   const handleImageChange = (file: File) => {
     if (!file.type.startsWith("image/")) {
-      setToast({ type: "error", message: "Please upload an image file" });
-      return;
+      return <Toast type="error" message="Please upload an image file" />;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setToast({ type: "error", message: "Image must be less than 5MB" });
-      return;
+      return <Toast type="error" message="Image must be less than 5MB" />;
     }
 
     if (imagePreview) {
@@ -61,7 +64,7 @@ function Uploadimg({ formData, updateFormData, setToast }: UploadimgProps) {
 
   const validateForm = () => {
     if (!formData.image) {
-      setToast({ type: "error", message: "Please upload an image" });
+      <Toast type="error" message="Please upload an image" />;
       return false;
     }
   };
@@ -71,7 +74,7 @@ function Uploadimg({ formData, updateFormData, setToast }: UploadimgProps) {
   //     }
   //  };
   return (
-    <div className="pt-4 flex flex-col justify-between gap-4 ">
+    <div className={`${bucket} pt-4 flex flex-col justify-between gap-4 `}>
       <h3 className="font-bold font-mono text-2xl text-black ">
         UPLOAD IMAGE
         <hr />
@@ -107,7 +110,7 @@ function Uploadimg({ formData, updateFormData, setToast }: UploadimgProps) {
             <div className="relative h-48 w-full">
               <Image
                 src={imagePreview}
-                alt="Event preview"
+                alt="Image preview"
                 fill
                 className="object-cover rounded-lg"
               />
@@ -124,26 +127,8 @@ function Uploadimg({ formData, updateFormData, setToast }: UploadimgProps) {
               >
                 <FaTrash size={12} />
               </button>
-              {/* <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setImagePreview(null);
-                  updateFormData({ image: null });
-                }}
-                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full
-                         hover:bg-red-600 transition-colors duration-200"
-              >
-                
-              </button> */}
             </div>
           ) : (
-            // <div className="space-y-4">
-            //   <FaCloudUploadAlt className="mx-auto h-12 w-12 text-blue-500" />
-            //   <div className="text-gray-600 dark:text-gray-300">
-            //     <p className="font-medium">Drag and drop your event image here</p>
-            //     <p className="text-sm">or click to browse</p>
-            //   </div>
-            // </div>
             <div
               onClick={() => fileInputRef.current?.click()}
               className="flex flex-col items-center justify-center h-full cursor-pointer"

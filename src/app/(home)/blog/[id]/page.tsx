@@ -6,9 +6,9 @@ import { blogPosts } from "@/lib/data";
 import { notFound } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
-import BlogCard from "@/components/BlogCard";
+import BlogCard from "@/components/homecontent/BlogCard";
 import { shuffleArray } from "@/lib/utils";
-import Getin from "@/components/Getin";
+import Getin from "@/components/homecomps/Getin";
 import { handleReadMore } from "@/lib/utils";
 
 export default function BlogPost({

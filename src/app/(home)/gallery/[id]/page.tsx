@@ -6,11 +6,11 @@ import { galleryItems } from "@/lib/gallerydata"; // Assuming you have a data fi
 import { notFound } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
-import GalleryCard from "@/components/GalleryCard"; // Assuming you have a GalleryCard component
+import GalleryCard from "@/components/homecontent/GalleryCard"; // Assuming you have a GalleryCard component
 // import { shuffleArray } from "@/lib/utils";
 // import Getin from "@/components/Getin";
 import { handleReadMore } from "@/lib/utils";
-import CommentSection from "@/components/CommentSection";
+import CommentSection from "@/components/homecontent/CommentSection";
 
 export default function GalleryPage({
   params,

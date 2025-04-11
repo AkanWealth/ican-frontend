@@ -1,8 +1,7 @@
 import "../globals.css";
 import { inter, league_spartan } from "../fonts";
-import Mainheader from "../../components/Mainheader";
-import Mainfooter from "../../components/Mainfooter";
-import { Toaster } from "@/components/ui/toaster";
+import Mainheader from "../../components/homecomps/Mainheader";
+import Mainfooter from "../../components/homecomps/Mainfooter";
 
 import type { Metadata } from "next";
 export const metadata: Metadata = {
@@ -25,7 +24,6 @@ export default function RootLayout({
         <Mainheader />
         {children}
         <Mainfooter />
-        <Toaster />
       </body>
     </html>
   );

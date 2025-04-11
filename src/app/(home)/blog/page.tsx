@@ -1,11 +1,9 @@
-
 "use client";
 
 import React from "react";
-import Heroimg from "@/components/Heroimg"; // Import Heroimg component for the page hero section
-import BlogList from "@/components/BlogListSection"; // Import BlogList component to display the list of blogs
+import Heroimg from "@/components/homecomps/Heroimg"; // Import Heroimg component for the page hero section
+import BlogList from "@/components/homecontent/BlogListSection"; // Import BlogList component to display the list of blogs
 import Link from "next/link";
-
 
 // Main Blog page component
 function Blog() {
@@ -31,11 +29,10 @@ function Blog() {
           </Link>
           {/** Button for additional information */}
           <Link href={"/membership"}>
-          <button className="outline-1 outline-white text-primary rounded-full bg-blue-100 hover:bg-blue-500 hover:text-white py-3 px-8 w-fit">
-            Learn more
-          </button>
+            <button className="outline-1 outline-white text-primary rounded-full bg-blue-100 hover:bg-blue-500 hover:text-white py-3 px-8 w-fit">
+              Learn more
+            </button>
           </Link>
-
         </div>
       </Heroimg>
 

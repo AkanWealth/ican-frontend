@@ -1,26 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import InputEle from "@/components/genui/InputEle";
 
 function Profile() {
   const [admin, setAdmin] = useState({
     firstName: "Admin",
-    lastName: "Admin",
+    surname: "Admin",
     email: "",
-    phoneNumber: "",
+    membershipId: "",
+    role: "",
   });
 
   const handleCancel = () => {
     // Reset admin state to initial values
     setAdmin({
       firstName: "Admin",
-      lastName: "Admin",
+      surname: "Admin",
       email: "",
-      phoneNumber: "",
+      membershipId: "",
+      role: "",
     });
   };
+
+  useEffect(() => {
+    const storedAdmin = localStorage.getItem("user");
+    console.log("storedAdmin", storedAdmin);
+    if (storedAdmin) {
+      setAdmin(JSON.parse(storedAdmin));
+    }
+  }, []);
 
   const handleSaveChanges = () => {
     // Implement save changes logic here
@@ -49,7 +59,7 @@ function Profile() {
             <h5 className="text-base w-full border-b border-gray-600 text-neutral-900">
               Admin Details
             </h5>
-            <div className="flex flex-row gap-4 flex-wrap">
+            <div className="grid grid-cols-2  gap-4 ">
               <InputEle
                 id="first_name"
                 label="First Name"
@@ -65,7 +75,7 @@ function Profile() {
                 label="Last Name"
                 type="text"
                 placeholder="Last Name"
-                value={admin.lastName}
+                value={admin.surname}
                 onChange={(e) =>
                   setAdmin({ ...admin, lastName: e.target.value })
                 }
@@ -79,14 +89,24 @@ function Profile() {
                 onChange={(e) => setAdmin({ ...admin, email: e.target.value })}
               />
               <InputEle
-                id="phone_number"
-                label="Phone Number"
+                id="membershipId"
+                label="Membership ID"
                 type="text"
-                placeholder="Phone Number"
-                value={admin.phoneNumber}
+                placeholder="Membership ID"
+                value={admin.membershipId}
+                disabled
                 onChange={(e) =>
-                  setAdmin({ ...admin, phoneNumber: e.target.value })
+                  setAdmin({ ...admin, membershipId: e.target.value })
                 }
+              />
+              <InputEle
+                id="role"
+                label="Role"
+                type="text"
+                placeholder="Role"
+                value={admin.role}
+                disabled
+                onChange={(e) => setAdmin({ ...admin, role: e.target.value })}
               />
             </div>
             <div className="flex w-full justify-center items-center flex-row gap-4">

@@ -107,7 +107,7 @@ function AdminLogin() {
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/auth/login"`,
+      url: `${BASE_API_URL}/auth/login`,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -121,9 +121,8 @@ function AdminLogin() {
         const { user, access_token } = response.data;
 
         // Set secure cookies instead of localStorage
-        document.cookie = `user=${JSON.stringify(
-          user
-        )}; path=/; secure; samesite=strict`;
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("access_token", access_token);
         document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
 
         if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {

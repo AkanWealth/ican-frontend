@@ -1,10 +1,15 @@
 "use client"
 
 import React, { useState } from "react";
+import axios from "axios";
+import Toast from "@/components/genui/Toast";
+import InputEle from "../genui/InputEle";
 
+import { BASE_API_URL } from "@/utils/setter";
 
 // get in touch form used on the contact us page of the design
 function Getin({ heading, phoneNumber = true, className }) {
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -54,30 +59,50 @@ function Getin({ heading, phoneNumber = true, className }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     const nameError = validateName(formData.name);
     const emailError = validateEmail(formData.email);
-
     setFormErrors({
       name: nameError,
       email: emailError,
     });
-    const templateParams = {
-      from_name: formData.name + " (" + formData.email + ")",
-      to_name: "icansuruleredistrictsociety@gmail.com",
-      feedback: this.state.feedback
-    };
-
 
     if (!nameError && !emailError) {
-      
-
       // Submit form
       console.log("Form submitted", formData);
 
+      const data = JSON.stringify({
+        "name": formData.name,
+        "email": formData.email,
+        "phone": formData.phone,
+        "message": formData.message
+      });
 
+
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/contact-us`,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        data: data
+      };
+
+    }
+
+    try {
+      const response = await axios.request(config);
+      console.log("Sending:", response)
+
+      return <Toast type="success" message="Message sent successfully" />;
+    } catch (error) {
+      console.error("Sending:", error);
+      return <Toast type="error" message="An error occurred during Sending." />;
+
+    } finally {
       setFormData({
         name: "",
         email: "",
@@ -100,59 +125,40 @@ function Getin({ heading, phoneNumber = true, className }) {
           inquiries. We are here to assist you every step of the way.
         </p>
       </div>
-      <form className="flex flex-col gap-8 justify-start items-end" action="">
-        <div className="flex flex-col w-full gap-3">
-          <label className=" text-base text-black  " htmlFor="name">
-            Name*
-          </label>
-          <input
-            className=" p-3 border rounded-xl border-gray-400 "
-            type="text"
-            required
-            name="name"
-            placeholder="Enter your first and last name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-          {formErrors.name && <p className="text-red-600">{formErrors.name}</p>}
-        </div>
-        <div className="flex flex-col w-full gap-3 ">
-          <label className=" text-base text-black " htmlFor="email">
-            Email address*
-          </label>
-          <input
-            className=" p-3 border rounded-xl border-gray-400 "
-            type="email"
-            required
-            name="email"
-            placeholder="Enter your email address"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          {formErrors.email && (
-            <p className="text-red-600">{formErrors.email}</p>
-          )}
-        </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-8 justify-start items-end" >
 
-        {phoneNumber && (
-          <div className="flex flex-col w-full gap-3 ">
-            <label className=" text-base text-black  " htmlFor="phone">
-              Phone number*
-            </label>
-            <input
-              className=" p-3 border rounded-xl border-gray-400 "
-              type="tel"
-              required
-              name="phone"
-              placeholder="Enter your phone number"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-            {formErrors.phone && (
-              <p className="text-red-600">{formErrors.phone}</p>
-            )}
-          </div>
-        )}
+        <InputEle
+          id="name"
+          type="text"
+          placeholder="Enter your first and last name"
+          label="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+          errorMsg={formErrors.name}
+        />
+
+        <InputEle
+          id="email"
+          type="text"
+          placeholder="Enter email address"
+          label="Email Address"
+          required
+          value={formData.email}
+          onChange={handleChange}
+          errorMsg={formErrors.email}
+        />
+        <InputEle
+          id="phone"
+          type="tel"
+          placeholder="Enter your phone number"
+          label="Phone Number"
+          required
+          value={formData.phone}
+          onChange={handleChange}
+          errorMsg={formErrors.phone}
+        />
+
+
 
         <div className="flex flex-col w-full gap-3 ">
           <label className=" text-base text-black  " htmlFor="message">

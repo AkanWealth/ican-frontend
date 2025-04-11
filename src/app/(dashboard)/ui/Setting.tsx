@@ -35,6 +35,9 @@ function SettingsPage() {
     confirmPassword: "",
   });
 
+
+  
+
   const handleDeleteClick = () => {
     setIsModalOpen(true);
   };
@@ -46,10 +49,10 @@ function SettingsPage() {
 
     // Show success toast
     toast({
-      title: "Account Deleted",
-      description: "Your account has been successfully deleted.",
+      title: "Confimation email sent",
+      description: "Please check your email for confirmation",
       variant: "default",
-      duration: 150,
+      duration: 3000,
     });
   };
 

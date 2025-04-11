@@ -9,7 +9,7 @@ import axios from "axios";
 
 function VerifyEmailPage() {
   const searchParams = useSearchParams();
-  const email = searchParams.get("email") || "your email";
+  const email = searchParams?.get("email") || "your email";
   const { toast } = useToast();
   const [resending, setResending] = useState(false);
 

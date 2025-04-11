@@ -17,6 +17,10 @@ import "jspdf-autotable";
 import { Checkbox } from "@mui/material";
 import TablePagination from "@/components/Pagenation";
 import { useToast } from "@/hooks/use-toast";
+import axios from 'axios';
+import PaymentHistory from "../TabRender/PaymentHistory";
+import Outstanding from "../TabRender/Outstanding";
+import Subscription from "../TabRender/Subscription";
 
 interface ModalProps {
   isOpen: boolean;
@@ -807,7 +811,7 @@ const PaymentPage = () => {
               </h2>
 
               <div className="mb-4 border border-gray-400 p-4 rounded-xl">
-                <p className="text-base text-gray-700">Customer Amount(₦)</p>
+                <p className="text-base text-gray-700">Amount(₦)</p>
                 <input
                   type="text"
                   placeholder="Enter Amount"
@@ -824,10 +828,7 @@ const PaymentPage = () => {
               </h3>
 
               <p className="font-semibold">Make this a recurring donation</p>
-              <p className="font-medium text-gray-600 mb-3">
-                Support us with a regular contribution
-              </p>
-
+              <p className="font-medium text-gray-600 mb-3"></p>
               <div className="flex space-x-6 mb-4">
                 <label className="flex items-center space-x-2 text-gray-700">
                   <input type="checkbox" className="h-4 w-4 text-gray-200" />
@@ -1411,6 +1412,47 @@ const PaymentPage = () => {
     </div>
   );
 
+  const [totalOutstanding, setTotalOutstanding] = useState(0);
+
+  useEffect(() => {
+    const fetchOutstandingData = async () => {
+        try {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                console.error('User is not authenticated. Please log in again.');
+                return;
+            }
+
+            // Fetch total outstanding payment
+            const totalOutstandingResponse = await axios.get(
+                'https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/total-outstanding',
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const totalOutstanding = totalOutstandingResponse.data?.totalOutstanding || 0;
+
+            // Fetch outstanding breakdown
+            const outstandingBreakdownResponse = await axios.get(
+                'https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/outstanding-breakdown',
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const outstandingBreakdown = outstandingBreakdownResponse.data?.breakdown || [];
+
+            // Update state with API data
+            setTotalOutstanding(totalOutstanding);
+            setActivities(outstandingBreakdown);
+        } catch (error) {
+            console.error('Failed to fetch outstanding data:', error);
+        }
+    };
+
+    fetchOutstandingData();
+}, []);
+
   const renderOutstanding = () => (
     <div className="min-h-screen bg-gray-50">
       <div className="">
@@ -1420,7 +1462,7 @@ const PaymentPage = () => {
               <h3 className="text-gray-600 mb-2">Total Outstanding</h3>
               <div className="flex items-center justify-between">
                 <span className="lg:text-xl md:text-sm font-medium">
-                  ₦45,000
+                  ₦{totalOutstanding.toLocaleString()}
                 </span>
                 <div className="rounded-full flex items-center justify-center px-4 py-2 bg-primary  hover:bg-blue-700 hover:text-lg">
                   <button
@@ -1481,7 +1523,7 @@ const PaymentPage = () => {
             {activities.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8">
                 <p className="text-center text-gray-500 py-4">
-                  No activities found for the selected date.
+                  No payment activities found for the selected date.
                 </p>
                 <button
                   onClick={resetActivities}
@@ -1628,9 +1670,9 @@ const PaymentPage = () => {
         {/* <div className="text-sm text-gray-500 mt-6">{getTabDescription()}</div> */}
       </div>
 
-      {activeTab === "Outstanding" && renderOutstanding()}
-      {activeTab === "Subcription" && renderSubscription()}
-      {activeTab === "PaymentHistory" && renderPaymentHistory()}
+      {activeTab === "Outstanding" && <Outstanding/>}
+      {activeTab === "Subcription" && <Subscription/>}
+      {activeTab === "PaymentHistory" && <PaymentHistory/>}
 
       {renderDonationModal()}
     </div>

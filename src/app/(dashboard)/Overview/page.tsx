@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-
 import { ProtectedRoute } from "../LoginAuthentication/ProtectedRoute";
 import { AuthProvider } from "../LoginAuthentication/AuthContext";
 import DashboardContent from "../ui/DashboardContent";

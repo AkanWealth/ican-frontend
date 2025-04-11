@@ -85,29 +85,30 @@ function Signup() {
   useEffect(() => {
     checkFormCompleteness();
   }, [checkFormCompleteness]);
+  
   const validateFirstName = (firstName: string): string => {
-    const nameRegex = /^[a-zA-Z0-9]+$/;
+    const nameRegex = /^[a-zA-Z0-9\-]+$/; // Updated to allow hyphens
     if (firstName.length < 3) {
       setFname(false);
       return "First name must be at least 3 characters long.";
     }
     if (!nameRegex.test(firstName)) {
       setFname(false);
-      return "First name must contain only alphanumeric characters.";
+      return "First name must contain only alphanumeric characters and hyphens.";
     }
     setFname(true);
     return "";
   };
 
   const validateSurname = (lastName: string): string => {
-    const nameRegex = /^[a-zA-Z0-9]+$/;
+    const nameRegex = /^[a-zA-Z0-9\-]+$/; // Updated to allow hyphens
     if (lastName.length < 3) {
       setSname(false);
       return "Surname must be at least 3 characters long.";
     }
     if (!nameRegex.test(lastName)) {
       setSname(false);
-      return "Surname must contain only alphanumeric characters.";
+      return "Surname must contain only alphanumeric characters and hyphens.";
     }
     setSname(true);
     return "";
@@ -230,7 +231,7 @@ function Signup() {
         formData.password,
         formData.confirmPassword
       ),
-      membershipId: formData.membershipId ? "" : "Membership ID is required.",
+      membershipId: validateMembershipId(formData.membershipId),
       consent: formData.consent
         ? ""
         : "You must agree to the terms and conditions.",
@@ -478,7 +479,7 @@ function Signup() {
             </div>
 
             {/* Confirm Password */}
-            <div className="w-full flex flex-col">
+            <div className="w-full flex flex-col mb-2 mt-2">
               <label
                 className="text-base font-sans font-semibold"
                 htmlFor="confirmPassword"
@@ -517,7 +518,7 @@ function Signup() {
             </div>
 
             {/* Consent Checkbox */}
-            <div className="flex flex-row justify-between gap-2 items-center">
+            <div className="flex flex-row justify-between gap-4 items-center mt-2">
               <input
                 type="checkbox"
                 name="consent"
@@ -538,7 +539,7 @@ function Signup() {
 
             <button
               disabled={!complete || loading}
-              className={`px-8 py-4 rounded-full text-white text-base font-semibold ${
+              className={`px-8 py-4 rounded-full text-white text-base font-semibold mt-2 ${
                 !complete || loading ? "bg-slate-500" : "bg-primary"
               }`}
               type="submit"

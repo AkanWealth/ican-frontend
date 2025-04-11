@@ -652,7 +652,7 @@ function SettingsPage() {
 
         {/* Personal Details Section */}
         <div className="w-full mb-4">
-          <div className="grid grid-cols-3 w-full max-w-[550px] bg-gray-200 rounded-xl p-2">
+          <div className="grid grid-cols-2 w-full max-w-[450px] bg-gray-200 rounded-xl p-2">
             <button
               onClick={() => handleTabChange("password")}
               className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg hover:bg-blue-700 ${
@@ -673,7 +673,7 @@ function SettingsPage() {
             >
               Notification
             </button>
-            <button
+            {/* <button
               onClick={() => handleTabChange("delete")}
               className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg ${
                 activeTab === "delete"
@@ -682,7 +682,7 @@ function SettingsPage() {
               }`}
             >
               Delete Account
-            </button>
+            </button> */}
           </div>
           <div className="text-sm text-gray-500 mt-6">
             {getTabDescription()}
@@ -692,7 +692,7 @@ function SettingsPage() {
         <hr className="mb-8 border-gray-400" />
         {activeTab === "password" && renderPasswordTab()}
         {activeTab === "notification" && renderNotificationTab()}
-        {activeTab === "delete" && renderDeleteTab()}
+        {/* {activeTab === "delete" && renderDeleteTab()} */}
 
         <DeleteAccountModal
           isOpen={isModalOpen}

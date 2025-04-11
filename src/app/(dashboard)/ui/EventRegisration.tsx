@@ -15,8 +15,8 @@ import Image from "next/image";
 import SuccessModal from "./SuccessMessage";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-import { FlutterWaveButton } from "flutterwave-react-v3";
-import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
+import { FlutterWaveButton, closePaymentModal } from "flutterwave-react-v3";
+// import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
   const searchParams = useSearchParams();
@@ -307,7 +307,7 @@ const EventRegistration = () => {
       customer: {
         email: formData.email,
         name: formData.fullName,
-        phonenumber: "08012345678", // Replace with a valid phone number
+        phone_number: "08012345678", // Replace with a valid phone number
       },
       customizations: {
         title: eventDetails.topic,

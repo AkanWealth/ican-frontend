@@ -9,17 +9,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import {
-  MdEdit,
-  MdOutlineDelete,
-  MdOutlineRemoveRedEye,
-  
-} from "react-icons/md";
+import { MdEdit, MdOutlineDelete, MdOutlineRemoveRedEye } from "react-icons/md";
 
 import { MoreHorizontal } from "lucide-react";
 import CancelEvent from "./CancelEvent";
-import NewContent from "@/components/admincomps/content/create/NewContent";
-
+import NewEvent from "../create/NewEvent";
 import { useRouter } from "next/navigation";
 
 interface CellProps {
@@ -68,10 +62,11 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         </DropdownMenuContent>
       </DropdownMenu>
       {showEditModal && (
-        <NewContent
-          id={row.original.id}
-          showModal={showEditModal}
-          setShowModal={setshowEditModal}
+        <NewEvent
+          id={row.original.id} // Ensure NewEvent accepts this prop
+          mode="edit"
+          showNewEvent={showEditModal}
+          setShowNewEvent={setshowEditModal}
         />
       )}
 

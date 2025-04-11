@@ -5,7 +5,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
 import { BASE_API_URL } from "@/utils/setter";
-import { User } from "@/components/admincomps/user/datatable/colsdata";
+import { User } from "@/libs/types";
 
 function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();

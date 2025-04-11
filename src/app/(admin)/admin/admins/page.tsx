@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { adminscolumns } from "@/components/admincomps/user/datatable/columns";
-import { User } from "@/components/admincomps/user/datatable/colsdata";
+import { User } from "@/libs/types";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";

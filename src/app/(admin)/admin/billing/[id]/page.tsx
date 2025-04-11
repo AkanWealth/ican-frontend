@@ -10,8 +10,13 @@ import {
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { paymentdetailscoloumns } from "@/components/admincomps/payment/datatable/columns";
 
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+
+
 function BillingDetailsPage() {
   const router = useRouter();
+
 
   return (
     <div className="rounded-3xl flex flex-col gap-6 p-6">

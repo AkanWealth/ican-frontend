@@ -1,13 +1,22 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { Users, CalendarRange, MapPin, CalendarCheck, Copy, FilePlus, CircleAlert, ArrowLeft } from 'lucide-react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
-import SuccessModal from './SuccessMessage';
-import { useToast } from '@/hooks/use-toast';
-import axios from 'axios';
-import { FlutterWaveButton, closePaymentModal } from 'flutterwave-react-v3';
-import CertificateGenerator from '@/components/homecomps/CertificateGenerator';
+import React, { useState, useEffect } from "react";
+import {
+  Users,
+  CalendarRange,
+  MapPin,
+  CalendarCheck,
+  Copy,
+  FilePlus,
+  CircleAlert,
+  ArrowLeft,
+} from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
+import SuccessModal from "./SuccessMessage";
+import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+import { FlutterWaveButton } from "flutterwave-react-v3";
+import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
   const searchParams = useSearchParams();
@@ -15,35 +24,34 @@ const EventRegistration = () => {
   const { toast } = useToast();
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
   const [isToastVisible, setIsToastVisible] = useState(false);
-  const [emailError, setEmailError] = useState('');
+  const [emailError, setEmailError] = useState("");
   const router = useRouter();
   const [isRegistered, setIsRegistered] = useState(false);
 
   const [eventDetails, setEventDetails] = useState({
-    id: '',
-    topic: '',
-    date: '',
-    time: '',
-    venue: '',
-    eventFee: '',
-    eventPayment: '',
-    image: '',
-    registeredNo: '',
-    totalSpot: '',
-    isFull: ''
+    id: "",
+    topic: "",
+    date: "",
+    time: "",
+    venue: "",
+    eventFee: "",
+    eventPayment: "",
+    image: "",
+    registeredNo: "",
+    totalSpot: "",
+    isFull: "",
   });
   useEffect(() => {
 
     const originalDate = new Date(searchParams?.get('date') || '');
 
     // Format date
-    const formattedDate = originalDate.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
+    const formattedDate = originalDate.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
     });
-
 
     // Get event details from URL parameters
     setEventDetails({
@@ -99,18 +107,16 @@ const EventRegistration = () => {
 
   const handleGoBack = () => {
     router.back();
-  }
+  };
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    paymentMethod: '',
+    fullName: "",
+    email: "",
+    paymentMethod: "",
     receipt: null as File | null,
   });
 
   const handleCardPayment = () => {
-
-
     setIsToastVisible(true);
     setIsPaymentSuccessful(true);
     toast({
@@ -119,7 +125,6 @@ const EventRegistration = () => {
       variant: "default",
       duration: 2000,
     });
-
   };
 
   const validateEmail = (email: string) => {
@@ -128,9 +133,9 @@ const EventRegistration = () => {
   };
 
   const [bankDetails] = useState({
-    bankName: 'FirstBank',
-    accountNumber: '2045417438',
-    accountName: 'ICAN Surulere & District Society'
+    bankName: "FirstBank",
+    accountNumber: "2045417438",
+    accountName: "ICAN Surulere & District Society",
   });
 
   const [isReceiptUploaded, setIsReceiptUploaded] = useState(false);
@@ -138,9 +143,9 @@ const EventRegistration = () => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        receipt: file
+        receipt: file,
       }));
       setIsReceiptUploaded(true);
     }
@@ -148,22 +153,22 @@ const EventRegistration = () => {
 
   const isFormValidAndToastVisible = () => {
     return (
-      isFormValid() || 
+      isFormValid() ||
       (isPaymentSuccessful && Number(eventDetails.eventFee) > 0) // Ensure payment is successful for paid events
     );
   };
 
-  const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    if (name === 'email') {
-      setEmailError('');
+    if (name === "email") {
+      setEmailError("");
       // Validate email as user types
       if (value && !validateEmail(value)) {
-        setEmailError('Invalid email address');
+        setEmailError("Invalid email address");
       }
     }
   };
@@ -199,6 +204,7 @@ const EventRegistration = () => {
       setIsModalOpen(true); // Show the success modal after successful registration
     } catch (error) {
       console.error("Submission error:", error);
+      console.error("Submission error:", error);
       toast({
         title: "Submission Failed",
         description: "Unable to complete registration. Please try again.",
@@ -231,7 +237,7 @@ const EventRegistration = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text: ', err);
+      console.error("Failed to copy text: ", err);
     }
   };
 
@@ -278,6 +284,7 @@ const EventRegistration = () => {
       }
     } catch (error) {
       console.error("Registration failed:", error);
+      console.error("Registration failed:", error);
 
       toast({
         title: "Registration Failed",
@@ -290,20 +297,22 @@ const EventRegistration = () => {
 
   const handleFlutterwavePayment = () => {
     const config = {
-      public_key: process.env.FLW_PUBLIC_KEY || "FLWPUBK_TEST-534b5997be3928deed468163ca379112-X", // Replace with your actual public key
+      public_key:
+        process.env.FLW_PUBLIC_KEY ||
+        "FLWPUBK_TEST-534b5997be3928deed468163ca379112-X", // Replace with your actual public key
       tx_ref: Date.now().toString(),
       amount: Number(eventDetails.eventFee),
-      currency: 'NGN',
-      payment_options: 'card, banktransfer',
+      currency: "NGN",
+      payment_options: "card, banktransfer",
       customer: {
         email: formData.email,
         name: formData.fullName,
-        phone_number: '08012345678', // Replace with a valid phone number
+        phonenumber: "08012345678", // Replace with a valid phone number
       },
       customizations: {
         title: eventDetails.topic,
-        description: 'Event Registration Payment',
-        logo: 'https://your-logo-url.com/logo.png', // Replace with your logo URL
+        description: "Event Registration Payment",
+        logo: "https://your-logo-url.com/logo.png", // Replace with your logo URL
       },
     };
 
@@ -311,8 +320,8 @@ const EventRegistration = () => {
   };
 
   return (
-  <div className='py-2 px-4'>
-    <button
+    <div className="py-2 px-4">
+      <button
         onClick={handleGoBack}
         className="z-10 flex items-center justify-center 
         w-10 h-10 bg-white rounded-full shadow-md hover:bg-gray-100 
@@ -324,57 +333,77 @@ const EventRegistration = () => {
           transition-colors duration-300"
         />
       </button>
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-screen mt-2">
-
-
-      
-      {/* Left Column */}
-      <div className="order-1 lg:order-1">
-      
-        <div className={`rounded-lg shadow-md p-6 ${Number(eventDetails.eventFee) > 0 ? 'bg-white' : 'bg-gray-100'}`}>
-          <div className="flex items-center mb-4">
-            <div className={`flex ${Number(eventDetails.eventFee) > 0 ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-600'} px-3 py-1 rounded-full text-sm mr-2`}>
-              <CalendarCheck className={`w-5 h-5 mr-1 ${Number(eventDetails.eventFee) > 0 ? 'text-green-600' : 'text-gray-600'}`} />
-              {Number(eventDetails.eventFee) > 0 ? 'Paid Event' : 'Free Event'}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-screen mt-2">
+        {/* Left Column */}
+        <div className="order-1 lg:order-1">
+          <div
+            className={`rounded-lg shadow-md p-6 ${
+              Number(eventDetails.eventFee) > 0 ? "bg-white" : "bg-gray-100"
+            }`}
+          >
+            <div className="flex items-center mb-4">
+              <div
+                className={`flex ${
+                  Number(eventDetails.eventFee) > 0
+                    ? "bg-green-100 text-green-600"
+                    : "bg-gray-200 text-gray-600"
+                } px-3 py-1 rounded-full text-sm mr-2`}
+              >
+                <CalendarCheck
+                  className={`w-5 h-5 mr-1 ${
+                    Number(eventDetails.eventFee) > 0
+                      ? "text-green-600"
+                      : "text-gray-600"
+                  }`}
+                />
+                {Number(eventDetails.eventFee) > 0
+                  ? "Paid Event"
+                  : "Free Event"}
+              </div>
             </div>
-          </div>
 
-          <h1 className="font-Spartan text-3xl font-bold mb-4">
-            {eventDetails.topic} - Understanding Accounting
-          </h1>
+            <h1 className="font-Spartan text-3xl font-bold mb-4">
+              {eventDetails.topic} - Understanding Accounting
+            </h1>
 
-          {eventDetails.image && (
-            <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
-              <Image
-                src={eventDetails.image}
-                alt={eventDetails.topic}
-                fill
-                className="w-full h-full object-cover"
-              />
+            {eventDetails.image && (
+              <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
+                <Image
+                  src={eventDetails.image}
+                  alt={eventDetails.topic}
+                  fill
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <div className="mb-4">
+              <div className="flex items-center mb-2 text-sm text-gray-500">
+                <CalendarRange className="h-5 w-5 mr-2 text-gray-500" />
+                <span>
+                  {eventDetails.date} at {eventDetails.time}
+                </span>
+              </div>
+              <div className="flex items-center text-sm text-gray-500">
+                <MapPin className="h-5 w-5 mr-2 text-gray-500" />
+                <span>{eventDetails.venue}</span>
+              </div>
             </div>
-          )}
-          <div className="mb-4">
-            <div className="flex items-center mb-2 text-sm text-gray-500">
-              <CalendarRange className="h-5 w-5 mr-2 text-gray-500" />
-              <span>{eventDetails.date} at  {eventDetails.time}</span>
 
+            <p className="text-gray-600 text-base mb-4">
+              Join us for an insightful evening focused on managing life's
+              challenges and prioritizing mental well-being. Network, learn, and
+              unwind in a supportive environment.
+            </p>
+
+            <div className="flex items-center text-sm mb-2 text-gray-500">
+              <Users className="h-5 w-5 mr-2 text-gray-500" />
+              <span>
+                {eventDetails.registeredNo}/{eventDetails.totalSpot} registered
+                people
+              </span>
             </div>
-            <div className="flex items-center text-sm text-gray-500">
-              <MapPin className="h-5 w-5 mr-2 text-gray-500" />
-              <span>{eventDetails.venue}</span>
-            </div>
-          </div>
-
-          <p className="text-gray-600 text-base mb-4">
-            Join us for an insightful evening focused on managing life's challenges and prioritizing mental well-being. Network, learn, and unwind in a supportive environment.
-          </p>
-
-          <div className="flex items-center text-sm mb-2 text-gray-500">
-            <Users className="h-5 w-5 mr-2 text-gray-500" />
-            <span>{eventDetails.registeredNo}/{eventDetails.totalSpot} registered people</span>
           </div>
         </div>
-      </div>
 
       {/* Right Column */}
       <div className="order-2 lg:order-2">
@@ -677,5 +706,5 @@ const EventRegistration = () => {
     </div>
     </div>
   );
-}
+};
 export default EventRegistration;

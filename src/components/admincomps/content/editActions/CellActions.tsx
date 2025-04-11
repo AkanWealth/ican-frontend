@@ -15,9 +15,10 @@ import DeleteContent from "./DeleteContent";
 
 interface CellProps {
   row: any; // Replace 'any' with the actual type of 'row'
+  contentCategory: string;
 }
 
-const ActionsCell: React.FC<CellProps> = ({ row }) => {
+const ActionsCell: React.FC<CellProps> = ({ row, contentCategory }) => {
   const [showUnpublishModal, setShowUnpublishModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -55,6 +56,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         <UnpublishContent
           id={row.original.id}
           title={row.original.title}
+          contentCategory={contentCategory}
           category={capitalizeWords(row.original.category ?? "")}
           date={row.original.published_date ?? ""}
           onClose={() => setShowUnpublishModal(false)}
@@ -64,6 +66,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         <DeleteContent
           id={row.original.id}
           title={row.original.title}
+          contentCategory={contentCategory}
           category={capitalizeWords(row.original.category ?? "")}
           date={row.original.published_date ?? ""}
           onClose={() => setShowDeleteModal(false)}

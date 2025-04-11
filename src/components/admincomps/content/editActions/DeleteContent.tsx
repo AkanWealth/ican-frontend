@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   MdSubtitles,
@@ -6,10 +8,15 @@ import {
 } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+import Toast from "@/components/genui/Toast";
+
 interface DeleteContentProps {
   id: string;
   title: string;
   category: string;
+  contentCategory: string;
   date: string;
   onClose: () => void;
 }
@@ -18,11 +25,27 @@ function DeleteContent({
   id,
   title,
   category,
+  contentCategory,
   date,
   onClose,
 }: DeleteContentProps) {
-  const handleDelete = () => {
-    console.log({ id, title, category, date });
+  const handleDelete = async () => {
+    const config = {
+      method: "DELETE",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/${contentCategory}/${id}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    };
+    try {
+      const response = await axios.request(config);
+      console.log("Content deleted successfully:", response.data);
+      return <Toast type="success" message="Content deleted successfully!" />;
+    } catch (error) {
+      console.error("Error deleting:", error);
+    }
   };
 
   return (

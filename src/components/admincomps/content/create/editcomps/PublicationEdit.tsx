@@ -1,7 +1,17 @@
+"use client";
+
 import React, { useState } from "react";
 import InputEle from "@/components/genui/InputEle";
 
-function PublicationEdit() {
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+import { CreateContentProps } from "@/libs/types";
+
+import Toast from "@/components/genui/Toast";
+
+function PublicationEdit({ mode, id }: CreateContentProps) {
+  const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
+
   const [publication, setPublication] = useState("");
 
   return (

@@ -1,12 +1,17 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { FaRegDotCircle } from 'react-icons/fa';
-import { Eye, EyeOff, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { Modal } from '@mui/material';
+"use client";
+import React, { useState, useEffect } from "react";
+import { FaRegDotCircle } from "react-icons/fa";
+import { Eye, EyeOff, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Modal } from "@mui/material";
+import axios from "axios";
+import DeleteAccountModal from "@/components/Modal/Delete";
 
-
-type NotificationType = 'generalNotifications' | 'eventRegistrations' | 'payments' | 'mcpdUpdates';
+type NotificationType =
+  | "generalNotifications"
+  | "eventRegistrations"
+  | "payments"
+  | "mcpdUpdates";
 
 interface NotificationState {
   generalNotifications: boolean;
@@ -15,75 +20,95 @@ interface NotificationState {
   mcpdUpdates: boolean;
 }
 
-
 function SettingsPage() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('password');
-  const [deleteReason, setDeleteReason] = useState('');
-  const [comment, setComment] = useState('');
+  const [activeTab, setActiveTab] = useState("password");
+  const [deleteReason, setDeleteReason] = useState("");
+  const [comment, setComment] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [formData, setFormData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
+
+  
 
   const handleDeleteClick = () => {
     setIsModalOpen(true);
   };
 
   const confirmDelete = () => {
-    console.log('Account deleted');
+    // Handle the confirmation logic
+    console.log("Account deleted");
     setIsModalOpen(false);
-  };
 
+    // Show success toast
+    toast({
+      title: "Confimation email sent",
+      description: "Please check your email for confirmation",
+      variant: "default",
+      duration: 3000,
+    });
+  };
 
   const getTabDescription = () => {
     switch (activeTab) {
-      case 'password':
-        return 'Update your password here';
-      case 'notification':
+      case "password":
+        return (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleDeleteClick}
+              className="px-8 py-2 rounded-full bg-red-600 text-white"
+            >
+              Delete account
+            </button>
+          </div>
+        );
+      case "notification":
         return (
           <div>
-            <p className="text-lg text-black font-semibold mb-2">Notification Preferences</p>
-            <p className="text-sm text-gray-500">Choose the notification you like to receive</p>
-          </div>);
-      case 'delete':
-        return 'You can delete your account here';
+            <p className="text-lg text-black font-semibold mb-2">
+              Notification Preferences
+            </p>
+            <p className="text-sm text-gray-500">
+              Choose the notification you like to receive
+            </p>
+          </div>
+        );
+      case "delete":
+        return "You can delete your account here";
       default:
-        return '';
+        return "";
     }
   };
   const [notifications, setNotifications] = useState<NotificationState>({
-    generalNotifications: true,  // Set to true by default
-    eventRegistrations: true,    // Set to true by default
+    generalNotifications: true,
+    eventRegistrations: true,
     payments: false,
-    mcpdUpdates: false
+    mcpdUpdates: false,
   });
-
-
 
   const handleTabChange = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
 
   const handleCancel = () => {
-    setActiveTab('password');
-    setDeleteReason('');
-    setComment('');
+    setActiveTab("password");
+    setDeleteReason("");
+    setComment("");
   };
-
-
 
   const [criteria, setCriteria] = useState({
     hasUpperCase: false,
     hasLowerCase: false,
     hasMinLength: false,
-    hasSpecialChar: false
+    hasSpecialChar: false,
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
@@ -93,25 +118,29 @@ function SettingsPage() {
       hasUpperCase: /[A-Z]/.test(password),
       hasLowerCase: /[a-z]/.test(password),
       hasMinLength: password.length >= 8,
-      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
     });
   };
 
-  const handleInputChange = (e: { target: { id: any; value: any; }; }) => {
+  const handleInputChange = (e: { target: { id: any; value: any } }) => {
     const { id, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [id]: value
+      [id]: value,
     }));
 
-    if (id === 'newPassword') {
+    if (id === "newPassword") {
       validatePassword(value);
     }
     // Check password match when either password field changes
-    if (id === 'newPassword' || id === 'confirmPassword') {
-      if (id === 'confirmPassword' && value !== formData.newPassword) {
+    if (id === "newPassword" || id === "confirmPassword") {
+      if (id === "confirmPassword" && value !== formData.newPassword) {
         setPasswordsMatch(false);
-      } else if (id === 'newPassword' && value !== formData.confirmPassword && formData.confirmPassword !== '') {
+      } else if (
+        id === "newPassword" &&
+        value !== formData.confirmPassword &&
+        formData.confirmPassword !== ""
+      ) {
         setPasswordsMatch(false);
       } else {
         setPasswordsMatch(true);
@@ -120,20 +149,21 @@ function SettingsPage() {
   };
 
   const handleNotificationChange = (notificationType: NotificationType) => {
-    setNotifications(prev => {
+    setNotifications((prev) => {
       const newState = {
         ...prev,
-        [notificationType]: !prev[notificationType]
+        [notificationType]: !prev[notificationType],
       };
 
       // Show toast when general notifications are toggled
-      if (notificationType === 'generalNotifications') {
+      if (notificationType === "generalNotifications") {
         toast({
           title: "Policy Update",
-          variant: 'primary',
+          variant: "primary",
           description: (
             <div>
-              We've updated our Terms of Service.<br />{' '}
+              We've updated our Terms of Service.
+              <br />{" "}
               <a
                 href="/policy"
                 className="text-primary font-semibold  hover:text-primary hover:underline"
@@ -151,31 +181,83 @@ function SettingsPage() {
   };
 
   useEffect(() => {
-
-    const allFieldsFilled = Object.values(formData).every(value => value !== '');
-    const allCriteriaMet = Object.values(criteria).every(criterion => criterion);
+    const allFieldsFilled = Object.values(formData).every(
+      (value) => value !== ""
+    );
+    const allCriteriaMet = Object.values(criteria).every(
+      (criterion) => criterion
+    );
     const passwordsMatch = formData.newPassword === formData.confirmPassword;
 
     setIsFormValid(allFieldsFilled && allCriteriaMet && passwordsMatch);
   }, [formData, criteria]);
 
-  const handlePasswordSubmit = async (e: { preventDefault: () => void; }) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid) {
-      try {
+
+    // Validate form before submission
+    if (!isFormValid) {
+      toast({
+        title: "Validation Error",
+        description: "Please ensure all password requirements are met.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      // Get the authentication token from localStorage or your auth context
+      const token = localStorage.getItem("token");
+      console.log("token", token);
+
+      // API call to change password
+      const response = await axios.patch(
+        "https://ican-api-6000e8d06d3a.herokuapp.com/api/users/password",
+        {
+          oldPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Success handling
+      if (response.status === 200) {
         showToastOnPasswordChange();
+
+        // Reset form fields
         setFormData({
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
         });
+
+        // Reset password criteria
         setCriteria({
           hasUpperCase: false,
           hasLowerCase: false,
           hasMinLength: false,
-          hasSpecialChar: false
+          hasSpecialChar: false,
         });
-      } catch (error) {
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to update password";
+
+        toast({
+          title: "Password Change Error",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 3000,
+        });
+      } else {
+        // Generic error handling
         showToastOnPasswordChangeError();
       }
     }
@@ -199,13 +281,12 @@ function SettingsPage() {
     });
   };
 
-
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   const getCriteriaColor = (isValid: boolean) => {
-    return isValid ? 'text-green-500' : 'text-gray-400';
+    return isValid ? "text-green-500" : "text-gray-400";
   };
 
   const renderDeleteTab = () => (
@@ -214,8 +295,10 @@ function SettingsPage() {
         <h2 className="text-base font-medium mb-4">Delete Account</h2>
         <div className="w-full md:w-[50%] space-y-6">
           <p className="text-base text-semibold">
-            Are you sure you want to delete your account? This will<br />
-            go into effect immediately and you will no longer have<br />
+            Are you sure you want to delete your account? This will
+            <br />
+            go into effect immediately and you will no longer have
+            <br />
             access to your account data.
           </p>
 
@@ -228,12 +311,24 @@ function SettingsPage() {
               onChange={(e) => setDeleteReason(e.target.value)}
               className="w-full p-2 border border-gray-400 text-sm rounded-lg"
             >
-              <option value="" className='text-black'>Select reason</option>
-              <option value="not-using" className='text-black'>Not using the service enough</option>
-              <option value="better-alternative" className='text-black'>Found a better alternative</option>
-              <option value="too-expensive" className='text-black'>Too expensive</option>
-              <option value="technical-issues" className='text-black'>Technical issues</option>
-              <option value="other" className='text-black'>Other</option>
+              <option value="" className="text-black">
+                Select reason
+              </option>
+              <option value="not-using" className="text-black">
+                Not using the service enough
+              </option>
+              <option value="better-alternative" className="text-black">
+                Found a better alternative
+              </option>
+              <option value="too-expensive" className="text-black">
+                Too expensive
+              </option>
+              <option value="technical-issues" className="text-black">
+                Technical issues
+              </option>
+              <option value="other" className="text-black">
+                Other
+              </option>
             </select>
           </div>
 
@@ -242,7 +337,7 @@ function SettingsPage() {
               Any Further comment
             </label>
             <input
-              type='text'
+              type="text"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               className="w-full p-2 border border-gray-400 text-sm rounded-lg "
@@ -258,19 +353,14 @@ function SettingsPage() {
               Cancel
             </button>
             <button
-              type='button'
+              type="button"
               disabled={!deleteReason || !comment}
               className="bg-red-500 text-white py-2 px-4 rounded-md disabled:opacity-50"
               onClick={handleDeleteClick}
             >
               Delete Account
             </button>
-
           </div>
-
-
-
-
         </div>
       </div>
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
@@ -284,7 +374,9 @@ function SettingsPage() {
             <h3 className="text-4xl font-semibold mb-8">Delete Account</h3>
 
             <p className="text-center text-base px-4">
-              Are you sure you want to delete your account? This will go into effect immediately and you will no longer have access to your account data.
+              Are you sure you want to delete your account? This will go into
+              effect immediately and you will no longer have access to your
+              account data.
             </p>
 
             <div className="mt-6 flex justify-end space-x-2">
@@ -304,9 +396,7 @@ function SettingsPage() {
           </div>
         </div>
       </Modal>
-
     </form>
-
   );
 
   const renderNotificationTab = () => (
@@ -317,7 +407,7 @@ function SettingsPage() {
             <h3 className="text-base font-semibold text-grey-700">
               General Notifications
             </h3>
-            <p className="pt-1 text-xs font-normal text-gray-500 text-base">
+            <p className="pt-1  font-normal text-gray-500 text-base">
               Get updates on new features, system updates, and policy changes.
             </p>
           </div>
@@ -329,7 +419,7 @@ function SettingsPage() {
               type="checkbox"
               id="projectAlerts"
               checked={notifications.generalNotifications}
-              onChange={() => handleNotificationChange('generalNotifications')}
+              onChange={() => handleNotificationChange("generalNotifications")}
               className="peer sr-only"
             />
             <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
@@ -340,7 +430,7 @@ function SettingsPage() {
             <h2 className="text-base font-semibold text-grey-900">
               Event Registrations
             </h2>
-            <p className="pt-1 text-xs font-normal text-gray-500 text-base">
+            <p className="pt-1  font-normal text-gray-500 text-base">
               Get updates on successful or failed event registrations.
             </p>
           </div>
@@ -352,7 +442,7 @@ function SettingsPage() {
               type="checkbox"
               id="projectUpdates"
               checked={notifications.eventRegistrations}
-              onChange={() => handleNotificationChange('eventRegistrations')}
+              onChange={() => handleNotificationChange("eventRegistrations")}
               className="peer sr-only"
             />
             <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
@@ -360,12 +450,10 @@ function SettingsPage() {
         </div>
         <div className="flex flex-row items-center justify-between gap-4">
           <div className="max-w-[80%]">
-            <h2 className="text-base font-semibold text-grey-900">
-              Payments
-
-            </h2>
-            <p className="pt-1 text-xs font-normal text-gray-500 text-base">
-              Be notified about successful payments, failed transactions, and receipts.
+            <h2 className="text-base font-semibold text-grey-900">Payments</h2>
+            <p className="pt-1  font-normal text-gray-500 text-base">
+              Be notified about successful payments, failed transactions, and
+              receipts.
             </p>
           </div>
           <label
@@ -385,19 +473,16 @@ function SettingsPage() {
             <h2 className="text-base font-semibold text-grey-900">
               MCPD Updates
             </h2>
-            <p className="pt-1 text-xs font-normal text-gray-500 text-base">
-              Stay updated on your MCPD points after completing qualifying activities.
+            <p className="pt-1  font-normal text-gray-500 text-base">
+              Stay updated on your MCPD points after completing qualifying
+              activities.
             </p>
           </div>
           <label
             htmlFor="Updates"
             className="relative h-5 w-8 cursor-pointer rounded-full bg-[hsla(240,3%,49%,0.16)] transition has-[:checked]:bg-[hsla(230,70%,30%,1)] lg:h-8 lg:w-12"
           >
-            <input
-              type="checkbox"
-              id="Updates"
-              className="peer sr-only"
-            />
+            <input type="checkbox" id="Updates" className="peer sr-only" />
             <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
           </label>
         </div>
@@ -411,10 +496,13 @@ function SettingsPage() {
         <h2 className="text-base font-medium mb-4">Change password</h2>
         <div className="w-full md:w-[50%] space-y-6">
           <div>
-            <label htmlFor="currentPassword" className="block text-sm text-gray-900 font-semibold mb-2">
+            <label
+              htmlFor="currentPassword"
+              className="block text-sm text-gray-900 font-semibold mb-2"
+            >
               Current Password
             </label>
-            <div className='relative'>
+            <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 id="currentPassword"
@@ -431,14 +519,19 @@ function SettingsPage() {
                 {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
-            <p className="text-xs text-gray-800 mt-2">Last modified 1year ago</p>
+            <p className="text-xs text-gray-800 mt-2">
+              Last modified 1year ago
+            </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
-            <div className='mb-4'>
-              <label htmlFor="newPassword" className="block text-sm text-gray-900 font-semibold mb-2">
+            <div className="mb-4">
+              <label
+                htmlFor="newPassword"
+                className="block text-sm text-gray-900 font-semibold mb-2"
+              >
                 New Password
               </label>
-              <div className='relative'>
+              <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   id="newPassword"
@@ -455,51 +548,94 @@ function SettingsPage() {
                   {showPassword ? <EyeOff /> : <Eye />}
                 </button>
               </div>
-              <div className='grid grid-cols-2 mt-4 gap-4'>
-                <div className='flex flex-row gap-2'>
-                  <FaRegDotCircle className={getCriteriaColor(criteria.hasUpperCase)} />
-                  <p className={`text-xs ${getCriteriaColor(criteria.hasUpperCase)}`}>One upper case character</p>
+              <div className="grid grid-cols-2 mt-4 gap-4">
+                <div className="flex flex-row gap-2">
+                  <FaRegDotCircle
+                    className={getCriteriaColor(criteria.hasUpperCase)}
+                  />
+                  <p
+                    className={`text-xs ${getCriteriaColor(
+                      criteria.hasUpperCase
+                    )}`}
+                  >
+                    One upper case character
+                  </p>
                 </div>
-                <div className='flex flex-row gap-2'>
-                  <FaRegDotCircle className={getCriteriaColor(criteria.hasMinLength)} />
-                  <p className={`text-xs ${getCriteriaColor(criteria.hasMinLength)}`}>8 characters minimum</p>
+                <div className="flex flex-row gap-2">
+                  <FaRegDotCircle
+                    className={getCriteriaColor(criteria.hasMinLength)}
+                  />
+                  <p
+                    className={`text-xs ${getCriteriaColor(
+                      criteria.hasMinLength
+                    )}`}
+                  >
+                    8 characters minimum
+                  </p>
                 </div>
-                <div className='flex flex-row gap-2'>
-                  <FaRegDotCircle className={getCriteriaColor(criteria.hasLowerCase)} />
-                  <p className={`text-xs ${getCriteriaColor(criteria.hasLowerCase)}`}>One lower case character</p>
+                <div className="flex flex-row gap-2">
+                  <FaRegDotCircle
+                    className={getCriteriaColor(criteria.hasLowerCase)}
+                  />
+                  <p
+                    className={`text-xs ${getCriteriaColor(
+                      criteria.hasLowerCase
+                    )}`}
+                  >
+                    One lower case character
+                  </p>
                 </div>
-                <div className='flex flex-row gap-2'>
-                  <FaRegDotCircle className={getCriteriaColor(criteria.hasSpecialChar)} />
-                  <p className={`text-xs ${getCriteriaColor(criteria.hasSpecialChar)}`}>At least one special character</p>
+                <div className="flex flex-row gap-2">
+                  <FaRegDotCircle
+                    className={getCriteriaColor(criteria.hasSpecialChar)}
+                  />
+                  <p
+                    className={`text-xs ${getCriteriaColor(
+                      criteria.hasSpecialChar
+                    )}`}
+                  >
+                    At least one special character
+                  </p>
                 </div>
               </div>
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm text-gray-900 font-semibold mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm text-gray-900 font-semibold mb-2"
+              >
                 Confirm New Password
               </label>
-              <div className='relative'>
+              <div className="relative">
                 <input
                   type="password"
                   id="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   placeholder="Enter your new password"
-                  className={`w-full p-2 border ${!passwordsMatch && formData.confirmPassword ? 'border-red-500' : 'border-gray-500'} rounded-lg focus:outline-none focus:ring-2 text-sm focus:ring-blue-500`}
+                  className={`w-full p-2 border ${
+                    !passwordsMatch && formData.confirmPassword
+                      ? "border-red-500"
+                      : "border-gray-500"
+                  } rounded-lg focus:outline-none focus:ring-2 text-sm focus:ring-blue-500`}
                 />
               </div>
               {!passwordsMatch && formData.confirmPassword && (
-                <p className="text-red-500 text-xs mt-2">Passwords do not match</p>
+                <p className="text-red-500 text-xs mt-2">
+                  Passwords do not match
+                </p>
               )}
             </div>
             <div>
               <button
                 type="submit"
                 disabled={!isFormValid}
-                className={`w-full px-8 py-2 mt-8 rounded-full ${isFormValid
-                  ? 'bg-primary text-white hover:bg-blue-700'
-                  : 'bg-blue-200 text-gray-100 cursor-not-allowed'
-                  }`}>
+                className={`w-full px-8 py-2 mt-8 rounded-full ${
+                  isFormValid
+                    ? "bg-primary text-white hover:bg-blue-700"
+                    : "bg-blue-200 text-gray-100 cursor-not-allowed"
+                }`}
+              >
                 Change Password
               </button>
             </div>
@@ -509,53 +645,61 @@ function SettingsPage() {
     </form>
   );
 
-
-
   return (
-    <div className="p-4 md:p-8 bg-white rounded-lg border-2 border-gray-400">
-      <h1 className="text-2xl md:text-2xl font-bold mb-4">Settings</h1>
+    <div className="py-4 px-4">
+      <div className="p-4 md:p-8 bg-white rounded-lg border border-gray-300">
+        <h1 className="lg:text-2xl md:text-xl font-semibold mb-4">Settings</h1>
 
-      {/* Personal Details Section */}
-      <div className="w-full mb-4">
-        <div className='w-[450px] bg-gray-200 rounded-xl p-2'>
-          <button
-            onClick={() => handleTabChange('password')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg hover:bg-blue-700 ${activeTab === 'password'
-              ? 'bg-primary text-white'
-              : 'text-gray-800 hover:bg-gray-300'
-              }`}>
-            Change Password
-          </button>
-          <button
-            onClick={() => handleTabChange('notification')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'notification'
-              ? 'bg-primary text-white'
-              : 'text-gray-800 hover:bg-gray-300'
+        {/* Personal Details Section */}
+        <div className="w-full mb-4">
+          <div className="grid grid-cols-2 w-full max-w-[450px] bg-gray-200 rounded-xl p-2">
+            <button
+              onClick={() => handleTabChange("password")}
+              className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg hover:bg-blue-700 ${
+                activeTab === "password"
+                  ? "bg-primary text-white"
+                  : "text-gray-800 hover:bg-gray-300"
               }`}
-          >
-            Notification
-          </button>
-          <button
-            onClick={() => handleTabChange('delete')}
-            className={`sm:w-auto text-xs px-8 py-2 rounded-lg ${activeTab === 'delete'
-              ? 'bg-primary text-white'
-              : 'text-gray-800 hover:bg-gray-300'
+            >
+              Change Password
+            </button>
+            <button
+              onClick={() => handleTabChange("notification")}
+              className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg  ${
+                activeTab === "notification"
+                  ? "bg-primary text-white"
+                  : "text-gray-800 hover:bg-gray-300"
               }`}
-          >
-            Delete Account
-          </button>
+            >
+              Notification
+            </button>
+            {/* <button
+              onClick={() => handleTabChange("delete")}
+              className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg ${
+                activeTab === "delete"
+                  ? "bg-primary text-white"
+                  : "text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              Delete Account
+            </button> */}
+          </div>
+          <div className="text-sm text-gray-500 mt-6">
+            {getTabDescription()}
+          </div>
         </div>
-        <div className="text-sm text-gray-500 mt-6">{getTabDescription()}</div>
+
+        <hr className="mb-8 border-gray-400" />
+        {activeTab === "password" && renderPasswordTab()}
+        {activeTab === "notification" && renderNotificationTab()}
+        {/* {activeTab === "delete" && renderDeleteTab()} */}
+
+        <DeleteAccountModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={confirmDelete}
+        />
       </div>
-
-      <hr className="mb-8 border-gray-400" />
-      {activeTab === 'password' && renderPasswordTab()}
-      {activeTab === 'notification' && renderNotificationTab()}
-      {activeTab === 'delete' && renderDeleteTab()}
-
-
-
-
     </div>
   );
 }

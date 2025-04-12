@@ -6,9 +6,11 @@ import Verification from "@/app/(dashboard)/ui/Verification";
 const ConfirmEmailPage = () => {
   return (
     <Suspense>
-      <Verification />;
+      <Verification />
     </Suspense>
   );
 };
 
 export default ConfirmEmailPage;
+
+

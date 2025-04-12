@@ -7,8 +7,12 @@ import Sent from "./steps/Sent";
 
 function ForgotPassword() {
   const [step, setStep] = useState(1);
+  //   const [toast, setToast] = useState<{ type: 'success' | 'error' | 'info'; message: string; } | null>(null);
 
-
+  const steps = [
+    { number: 1, title: "Forgot Password" },
+    { number: 2, title: "Link Sent" },
+  ];
 
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {
@@ -25,9 +29,8 @@ function ForgotPassword() {
     }
   };
   return (
-    <div className="m-auto flex flex-col items-center justify-center">
-
-      <div className="flex flex-col items-center rounded-2xl bg-white p-8 gap-6 w-full max-w-md sm:max-w-lg md:max-w-xl">
+    <div className=" m-auto ">
+      <div className="flex flex-col w-96 sm:w-[440px] items-center rounded-2xl  bg-white p-8  ">
         {step === 1 && <Base onNext={handleNext} />}
         {step === 2 && <Sent onNext={handleNext} />}
       </div>

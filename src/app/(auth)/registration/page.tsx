@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Biodata from "@/components/homecomps/Biodata";
+import Biodata from "@/components/Biodata";
 
 function Registration() {
   return (

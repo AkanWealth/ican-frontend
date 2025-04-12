@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
 import React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Heroimg from "@/components/Heroimg";
+import Heroimg from "@/components/homecomps/Heroimg";
 import { galleryItems } from "@/lib/gallerydata"; // Import the gallery items data
 
 function MainGalleryPage() {
@@ -11,9 +11,14 @@ function MainGalleryPage() {
 
   return (
     <main className="flex flex-col items-center bg-white mt-20 2xl:container mx-auto">
-      <Heroimg maintxt="Visual stories from our events and activities." imageUrl="/galleryhero.png" />
+      <Heroimg
+        maintxt="Visual stories from our events and activities."
+        imageUrl="/galleryhero.png"
+      />
       <section className="p-4 sm:p-20 lg:px-40">
-        <h1 className=" text-3xl sm:text-4xl font-bold mb-8">Gallery Collection</h1>
+        <h1 className=" text-3xl sm:text-4xl font-bold mb-8">
+          Gallery Collection
+        </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {galleryItems.map((item) => (
             <div

@@ -1,5 +1,5 @@
 import React from "react";
-import Heroimg from "@/components/Heroimg";
+import Heroimg from "@/components/homecomps/Heroimg";
 import Exco from "@/components/genui/Exco";
 
 function Ourteam() {

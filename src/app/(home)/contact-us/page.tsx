@@ -1,8 +1,8 @@
 import React from "react";
-import Heroimg from "@/components/Heroimg";
-import Getin from "@/components/Getin";
-import Cinfo from "@/components/Cinfo";
-import Findus from "@/components/Findus";
+import Heroimg from "@/components/homecomps/Heroimg";
+import Getin from "@/components/homecomps/Getin";
+import Cinfo from "@/components/homecomps/Cinfo";
+import Findus from "@/components/homecomps/Findus";
 
 function ContactUs() {
   return (

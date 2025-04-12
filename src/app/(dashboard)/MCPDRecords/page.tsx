@@ -1,11 +1,12 @@
 import React from "react";
-import MCPDRecords from "../ui/MCPDRecords";
+// import MCPDRecords from "../ui/MCPDRecords";
 const MCPDRecordsPage = () => {
-    return (
-        <div>
-            <MCPDRecords/>
-        </div>
-    );
+  return (
+    <div>
+      apples
+      {/* <MCPDRecords/> */}
+    </div>
+  );
 };
 
 export default MCPDRecordsPage;

@@ -1,9 +1,9 @@
 import React from "react";
-import Heroimg from "@/components/Heroimg";
-import Meminfo from "@/components/Meminfo";
+import Heroimg from "@/components/homecomps/Heroimg";
+import Meminfo from "@/components/homecomps/Meminfo";
 // import Infocard from "@/components/genui/Infocard";
 import Itemcard from "@/components/genui/Itemcard";
-import Aims from "../../../components/Aims";
+import Aims from "@/components/homecomps/Aims";
 import {
   MdOutlineLightbulb,
   MdFamilyRestroom,
@@ -17,8 +17,7 @@ function Aboutus() {
       <Heroimg
         subtxt={""}
         toggle={false}
-
-        maintxt="About Surulere and District Society"
+        maintxt="About Surulere and District Society (SDS)"
         imageUrl="/aboutushero.png"
       >
         <></>
@@ -34,10 +33,8 @@ function Aboutus() {
           </h4>
         </div>
         <div className="flex w-fit flex-col sm:flex-row  gap-12 justify-between">
-
           <div className="flex flex-col rounded-xl gap-6 bg-[#C1EBCD] max-w-sm p-8 lg:px-8 lg:py-12 text-black">
             <h6 className=" text-xl font-medium">
-
               OUR VISION
               <hr className="border opacity-50 w-full border-[#36A757]  my-4" />
             </h6>
@@ -58,7 +55,7 @@ function Aboutus() {
           </div>
         </div>
       </div>
-      
+
       {/* <div className=" w-full p-4 sm:py-20 sm:px-40 flex flex-col items-center justify-center gap-16 bg-[#E0F5E6]">
         <div className="flex flex-col w-fit items-center gap-2">
           <h4 className="text-primary font-mono text-2xl sm:text-5xl font-bold text-center">
@@ -109,9 +106,9 @@ function Aboutus() {
           />
         </div>
       </div> */}
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 p-4 md:p-40 bg-[#d9f5e3] rounded-lg">
-        <h4 className="text-2xl font-bold text-center col-span-1 sm:col-span-2 text-primary font-mono text-2xl sm:text-5xl">
+        <h4 className="text-2xl font-bold text-center col-span-1 sm:col-span-2 text-primary font-mono  sm:text-5xl">
           Our Core Values
         </h4>
 
@@ -121,7 +118,8 @@ function Aboutus() {
           </div>
           <h3 className="font-semibold text-xl mb-2">Discipline</h3>
           <p className="text-base text-gray-600">
-            Members maintain self-control and adhere to ethical and professional standards
+            Members maintain self-control and adhere to ethical and professional
+            standards
           </p>
         </div>
 
@@ -141,7 +139,8 @@ function Aboutus() {
           </div>
           <h3 className="font-semibold text-xl mb-2">Agility</h3>
           <p className="text-base text-gray-600">
-            Members experiment, learn from failures and iterate on successes quickly and efficiently
+            Members experiment, learn from failures and iterate on successes
+            quickly and efficiently
           </p>
         </div>
 

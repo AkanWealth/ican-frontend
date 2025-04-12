@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Clock, Info } from "lucide-react";
 import Attendance from "../ui/Attendance";
 
@@ -11,35 +10,19 @@ function DashboardContent() {
   const [accountStatus, setAccountStatus] = useState("pending");
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    // Use client-side only logic
+    const getUserData = () => {
       try {
-        if (typeof window === "undefined") return; // Ensure code runs only on the client side
-
-        const user = localStorage.getItem("user");
-        const userId = user ? JSON.parse(user)?.id : null;
-        const token = localStorage.getItem("token"); 
-        console.log(userId, token);
-// console.log(userId, token);
-        if (!userId || !token) throw new Error("User ID or token not found in localStorage");
-
-        const response = await axios.get(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/users/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-// console.log(response);
-        const data = response.data;
-        setUserName(data.firstname || "User");
-        setAccountStatus(data.isVerified ? "approved" : "pending");
+        const userData = localStorage.getItem("user");
+        console.log("User data:", userData);
+        if (userData) {
+          const user = JSON.parse(userData);
+          return user.lastName || user.last_name || user.firstname || user.first_name || "User";
+        }
+        return "User";
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        setUserName("User");
-        setAccountStatus("pending");
-      } finally {
-        setLoading(false);
+        console.error("Error getting user data:", error);
+        return "User";
       }
     };
 
@@ -47,14 +30,16 @@ function DashboardContent() {
       const date = new Date();
       const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
       const months = [
-        "January", "February", "March", "April", "May", "June",
+        "January", "February", "March", "April", "May", "June", 
         "July", "August", "September", "October", "November", "December"
       ];
       return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
     };
 
-    fetchUserData();
-    setCurrentDate(formatCurrentDate()); // Set the current date
+    // Set state only after component mounts
+    setUserName(getUserData());
+    setCurrentDate(formatCurrentDate());
+    setLoading(false);
   }, []);
 
   const renderStatusBadge = () => {

@@ -130,87 +130,12 @@ function Verification() {
   };
 
   return (
-    <div className="m-auto flex flex-col items-center justify-center">
-      <div className="flex flex-col lg:w-96 md:w-80 items-center rounded-2xl bg-white p-8 gap-6">
-        <Image src="/Logo_big.png" alt="Logo" width={100} height={50} />
-        <div className="w-fit">
-          <h4 className="text-primary text-center text-3xl font-bold font-mono">
-            Continue Registration
-          </h4>
-          <p className="text-sm font-sans text-center text-gray-600">
-          Email verification was successful. Please enter your details to continue your registration
-          </p>
-        </div>
-        <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
-          <div className="w-full flex flex-col">
-            <label
-              className="text-base font-sans font-semibold"
-              htmlFor="email"
-            >
-              Email Address <span className="text-red-600">*</span>
-            </label>
-            <input
-              className={`p-3 rounded border ${
-                emailError ? "border-red-500" : "border-gray-400"
-              }`}
-              placeholder="Enter your email address"
-              name="email"
-              value={formData.email}
-              required
-              type="email"
-              onChange={handleChange}
-            />
-            {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
-          </div>
-          <div className="w-full flex flex-col">
-            <label
-              className="text-base font-sans font-semibold"
-              htmlFor="password"
-            >
-              Password <span className="text-red-600">*</span>
-            </label>
-            <input
-              className={`p-3 rounded border ${
-                passwordError ? "border-red-500" : "border-gray-400"
-              }`}
-              placeholder="Enter password"
-              name="password"
-              value={formData.password}
-              required
-              type="password"
-              onChange={handleChange}
-            />
-            {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
-          </div>
-          <div className="flex flex-row justify-between">
-            <div className="flex flex-row gap-2">
-              {/* <input type="checkbox" name="remember" id="remember" />
-              <p className="text-base font-medium">Remember me</p> */}
-            </div>
-            <Link
-              className="text-primary text-base font-medium"
-              href={"/forgot-password"}
-            >
-              Forgot Password?
-            </Link>
-          </div>
-          <button
-            className="px-8 py-4 bg-primary rounded-full text-white text-base font-semibold"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "Submitting..." : "Continue"}
-          </button>
-        </form>
-        {/* <p className="text-base font-medium">
-       
-          <Link className="text-primary" href={"/forgot-password"}>
-            Forgot Password?
-          </Link>
-        </p> */}
-      </div>
-    </div>
+    <Suspense>
+      <Verification />
+    </Suspense>
   );
-}
+};
 
-export default Verification;
+export default ConfirmEmailPage;
+
+

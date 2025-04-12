@@ -15,7 +15,6 @@ interface InputEleProps {
   placeholder?: string;
   label: string;
   addStyle?: string;
-  addStyle2?: string;
   errorMsg?: string;
   options?: { value: string; label: string }[];
 
@@ -35,7 +34,6 @@ function InputEle({
   options = [],
   placeholder = "",
   addStyle = "",
-  addStyle2 = "",
   errorMsg = "",
   value = "",
   onChange = () => { },
@@ -101,7 +99,7 @@ function InputEle({
             {label} {required ? <span className="text-red-600">*</span> : ""}
           </label>
           <select
-            className={` p-3 rounded border bg-white border-gray-400 ${addStyle2}  `}
+            className=" p-3 rounded border bg-white border-gray-400  "
             name={id}
             id={id}
             value={value}
@@ -110,8 +108,8 @@ function InputEle({
             onChange={onChange}
           >
             <option value="select">Select...</option>
-            <option value="Male">Male </option>
-            <option value="Female">Female</option>
+            <option value="male">Male </option>
+            <option value="female">Female</option>
           </select>
           <p></p>
         </div>
@@ -123,7 +121,7 @@ function InputEle({
             {label} {required ? <span className="text-red-600">*</span> : ""}
           </label>
           <select
-            className={` p-3 rounded border bg-white border-gray-400 ${addStyle2}  `}
+            className=" p-3 rounded border bg-white border-gray-400  "
             name={id}
             id={id}
             value={value}
@@ -141,13 +139,13 @@ function InputEle({
       );
     case "marriage":
       return (
-        <div className={` w-full flex flex-col gap-3 ${addStyle} `}>
+        <div className={` w-full h-fit flex flex-col gap-3 ${addStyle} `}>
           <label className=" text-base font-sans font-semibold  " htmlFor={id}>
             Marital Status
             {required ? <span className="text-red-600">*</span> : ""}
           </label>
           <select
-            className={`p-3 rounded border bg-white border-gray-400 ${addStyle2}  `}
+            className=" p-3 rounded border bg-white border-gray-400  "
             name={id}
             id={id}
             value={value}
@@ -156,22 +154,22 @@ function InputEle({
             onChange={onChange}
           >
             <option value="select">Select...</option>
-            <option value="Single">Single </option>
-            <option value="Married">Married </option>
-            <option value="Divorced">Divorced </option>
-            <option value="Widowed">Widowed </option>
+            <option value="single">Single </option>
+            <option value="married">Married </option>
+            <option value="divorced">Divorced </option>
+            <option value="widowed">Widowed </option>
           </select>
           <p></p>
         </div>
       );
     case "country":
       return (
-        <div className={` w-full flex flex-col gap-3 ${addStyle} `}>
+        <div className={` w-full h-fit flex flex-col gap-3 ${addStyle} `}>
           <label className=" text-base font-sans font-semibold  " htmlFor={id}>
             {label} {required ? <span className="text-red-600">*</span> : ""}
           </label>
           <select
-            className={`bg-white p-3 rounded border border-gray-400 ${addStyle2} `}
+            className=" bg-white p-3 rounded border border-gray-400  "
             name={id}
             id={id}
             value={value}
@@ -498,12 +496,12 @@ function InputEle({
       );
     case "qualification":
       return (
-        <div className={`w-full h-full flex flex-col gap-3 ${addStyle}`}>
+        <div className={`w-full h-fit flex flex-col gap-3 ${addStyle}`}>
           <label className="text-base font-sans font-semibold" htmlFor={id}>
             {label} {required ? <span className="text-red-600">*</span> : ""}
           </label>
           <select
-            className={`p-3 rounded border bg-white border-gray-400 ${addStyle2} `}
+            className="p-3 rounded border bg-white border-gray-400"
             name={id}
             id={id}
             value={value}

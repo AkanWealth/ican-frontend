@@ -1,25 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Trash2, Eye, EyeOff } from 'lucide-react';
-import axios from 'axios';
 
 interface DeleteAccountModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm?: () => void; // Making this optional as we'll handle the API call in the component
+    onConfirm: () => void;
 }
 
 const DeleteAccountModal = ({ isOpen, onClose, onConfirm }: DeleteAccountModalProps) => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const modalContentRef = useRef<HTMLDivElement>(null);
+
 
     useEffect(() => {
         if (!isOpen) {
             setCurrentPassword('');
             setShowPassword(false);
-            setError(null);
         }
     }, [isOpen]);
 
@@ -46,54 +43,6 @@ const DeleteAccountModal = ({ isOpen, onClose, onConfirm }: DeleteAccountModalPr
         };
     }, [isOpen, onClose]);
 
-    const handleDeleteAccount = async () => {
-        if (!currentPassword) {
-            setError('Password is required');
-            return;
-        }
-
-        try {
-            setIsLoading(true);
-            setError(null);
-            
-            // Get the authentication token from localStorage or your auth context
-            const token = localStorage.getItem("token");
-            
-            // Make the API call to delete the account
-            await axios.post(
-                "https://ican-api-6000e8d06d3a.herokuapp.com/api/users/delete-request",
-                {
-                    password: currentPassword
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-            
-            // If successful, run the onConfirm callback if provided
-            if (onConfirm) {
-                onConfirm();
-            }
-            
-            // Close the modal
-            onClose();
-            
-        } catch (error) {
-            // Handle error response
-            if (axios.isAxiosError(error)) {
-                const errorMessage = error.response?.data?.message || "Failed to delete account";
-                setError(errorMessage);
-            } else {
-                setError("An unexpected error occurred. Please try again.");
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     if (!isOpen) return null;
 
     return (
@@ -101,7 +50,11 @@ const DeleteAccountModal = ({ isOpen, onClose, onConfirm }: DeleteAccountModalPr
             <div 
             ref={modalContentRef}
             className="relative flex flex-col bg-white py-8 px-6 rounded-lg items-center justify-center shadow-lg w-[500px]">
-                <div className='flex items-center justify-between space-x-6'>
+                {/* <X
+          className="absolute right-4 top-4 w-4 h-4 text-gray-500 cursor-pointer hover:text-gray-700"
+          onClick={onClose}
+        /> */}
+                <div className='flex item-center justify-between space-x-6'>
                     <div className="mb-6 p-4 bg-red-100 w-12 h-12 rounded-full">
                         <Trash2 className="w-4 h-4 text-red-500" />
                     </div>
@@ -119,7 +72,7 @@ const DeleteAccountModal = ({ isOpen, onClose, onConfirm }: DeleteAccountModalPr
                                     type={showPassword ? "text" : "password"}
                                     value={currentPassword}
                                     onChange={(e) => setCurrentPassword(e.target.value)}
-                                    className={`w-full h-10 p-3 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
+                                    className="w-full h-10 p-3 border border-gray-300 rounded-lg"
                                     placeholder="Enter your current password"
                                 />
                                 <button
@@ -130,9 +83,6 @@ const DeleteAccountModal = ({ isOpen, onClose, onConfirm }: DeleteAccountModalPr
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </button>
                             </div>
-                            {error && (
-                                <p className="text-xs text-red-500 mt-2">{error}</p>
-                            )}
                             <p className="text-xs text-gray-500 mt-2">A confirmation email will be sent to your registered email address.</p>
                         </div>
                     </div>
@@ -141,22 +91,22 @@ const DeleteAccountModal = ({ isOpen, onClose, onConfirm }: DeleteAccountModalPr
                 <div className="w-full grid space-y-4">
                     <div>
                         <button
-                            onClick={handleDeleteAccount}
-                            disabled={!currentPassword || isLoading}
+                            onClick={onConfirm}
+                            disabled={!currentPassword}
                             className="w-full bg-red-600 text-white px-8 py-2 rounded-full text-sm disabled:opacity-50"
                         >
-                            {isLoading ? 'Deleting...' : 'Confirm Account Delete'}
+                            Confirm Account Delete
                         </button>
                     </div>
                     <div>
                         <button
                             onClick={onClose}
                             className="w-full border-2 border-primary text-primary px-8 py-2 rounded-full text-sm"
-                            disabled={isLoading}
                         >
                             Cancel
                         </button>
                     </div>
+
                 </div>
             </div>
         </div>

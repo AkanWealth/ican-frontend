@@ -101,7 +101,6 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             label=" Residential Country"
             onChange={handleChange}
             value={formData.contactDetails?.residentialCountry}
-            addStyle2="h-[50px]"
           />
           <InputEle
             id="residentialCity"

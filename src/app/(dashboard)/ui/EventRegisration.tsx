@@ -15,8 +15,8 @@ import Image from "next/image";
 import SuccessModal from "./SuccessMessage";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-import { FlutterWaveButton, closePaymentModal } from "flutterwave-react-v3";
-// import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
+import { FlutterWaveButton } from "flutterwave-react-v3";
+import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
   const searchParams = useSearchParams();
@@ -26,7 +26,6 @@ const EventRegistration = () => {
   const [isToastVisible, setIsToastVisible] = useState(false);
   const [emailError, setEmailError] = useState("");
   const router = useRouter();
-  const [isRegistered, setIsRegistered] = useState(false);
 
   const [eventDetails, setEventDetails] = useState({
     id: "",
@@ -42,8 +41,7 @@ const EventRegistration = () => {
     isFull: "",
   });
   useEffect(() => {
-
-    const originalDate = new Date(searchParams?.get('date') || '');
+    const originalDate = new Date(searchParams.get("date") || "");
 
     // Format date
     const formattedDate = originalDate.toLocaleDateString("en-US", {
@@ -55,55 +53,19 @@ const EventRegistration = () => {
 
     // Get event details from URL parameters
     setEventDetails({
-      id: searchParams?.get('id') || '',
-      time: searchParams?.get('time') || '',
-      topic: searchParams?.get('topic') || '',
+      id: searchParams.get("id") || "",
+      time: searchParams.get("time") || "",
+      topic: searchParams.get("topic") || "",
       date: formattedDate,
-      venue: searchParams?.get('venue') || '',
-      eventFee: searchParams?.get('eventFee') || '',
-      eventPayment: searchParams?.get('eventPayment') || '',
-      image: searchParams?.get('image') || "",
-      registeredNo: searchParams?.get('registeredNo') || '',
-      totalSpot: searchParams?.get('totalSpot') || '',
-      isFull: searchParams?.get('isFull') || '',
+      venue: searchParams.get("venue") || "",
+      eventFee: searchParams.get("eventFee") || "",
+      eventPayment: searchParams.get("eventPayment") || "",
+      image: searchParams.get("image") || "",
+      registeredNo: searchParams.get("registeredNo") || "",
+      totalSpot: searchParams.get("totalSpot") || "",
+      isFull: searchParams.get("isFull") || "",
     });
   }, [searchParams]);
-
-  useEffect(() => {
-    const checkUserRegistration = async () => {
-      try {
-        const user = localStorage.getItem("user");
-        const email = user ? JSON.parse(user)?.email : null; 
-        if (!email) return;
-
-        const response = await axios.get(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/registrations/user/${email}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`, 
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        const registeredEvents = response.data || [];
-        const isUserRegistered = registeredEvents.some(
-          (event: { id: string }) => event.id === eventDetails.id
-        );
-
-        setIsRegistered(isUserRegistered);
-      } catch (error: any) {
-        if (error.response && error.response.status === 404) {
-          // User is not registered for this event
-          setIsRegistered(false);
-        } else {
-          console.error('Error checking registration:', error);
-        }
-      }
-    };
-
-    checkUserRegistration();
-  }, [eventDetails.id]);
 
   const handleGoBack = () => {
     router.back();
@@ -173,37 +135,23 @@ const EventRegistration = () => {
     }
   };
 
-
-
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    console.log("Form submission triggered"); // Debugging log
-    console.log("Form data:", formData); // Debugging log
-    console.log("Event details:", eventDetails); // Debugging log
-    console.log("isPaymentSuccessful:", isPaymentSuccessful); // Debugging log
-    console.log("isReceiptUploaded:", isReceiptUploaded); // Debugging log
-
     // Validate form before submission
     if (!isFormValid() && Number(eventDetails.eventFee) > 0) {
-      console.log("Form is invalid for paid event"); // Debugging log
-      console.log("isFormValid result:", isFormValid()); // Debugging log
       return;
     }
 
     if (!isNoFeeFormValid() && Number(eventDetails.eventFee) === 0) {
-      console.log("Form is invalid for free event"); // Debugging log
-      console.log("isNoFeeFormValid result:", isNoFeeFormValid()); // Debugging log
       return;
     }
 
     try {
-      console.log("Calling registerForEvent..."); // Debugging log
       await registerForEvent();
       console.log("Registration successful, opening modal..."); // Debugging log
       setIsModalOpen(true); // Show the success modal after successful registration
     } catch (error) {
-      console.error("Submission error:", error);
       console.error("Submission error:", error);
       toast({
         title: "Submission Failed",
@@ -215,20 +163,17 @@ const EventRegistration = () => {
   };
 
   const isFormValid = () => {
-    const result =
+    return (
       formData.fullName &&
       formData.email &&
-      isPaymentSuccessful; // Check if payment is successful
-    console.log("isFormValid check:", result); // Debugging log
-    return result;
+      formData.paymentMethod === "bankTransfer" &&
+      isReceiptUploaded
+    );
   };
 
   const isNoFeeFormValid = () => {
-    const result = formData.fullName && formData.email;
-    console.log("isNoFeeFormValid check:", result); // Debugging log
-    return result;
+    return formData.fullName && formData.email;
   };
-
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = async (text: string) => {
@@ -243,47 +188,38 @@ const EventRegistration = () => {
 
   const registerForEvent = async () => {
     try {
+      const membership = "MEMBER";
       const eventId = eventDetails.id;
-      console.log("eventId:", eventId); // Debugging log
+      console.log("eventId", eventId);
 
-      // Construct the payload
       const registrationPayload = {
         fullName: formData.fullName,
         email: formData.email,
-        membership: "MEMBER", 
-        proofOfPayment: isPaymentSuccessful ? "PAID" : "PENDING", // Set to "PAID" if payment is successful
+        membership: membership,
+        proofOfPayment: isPaymentSuccessful
+          ? "PAID"
+          : formData.paymentMethod === "bankTransfer"
+          ? "PAID"
+          : "PENDING",
       };
 
-      console.log("Registration payload:", registrationPayload); // Debugging log
-
-      // Send the payload to the endpoint
+      console.log(registrationPayload);
       const response = await axios.post(
         `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/registrations/register`,
         registrationPayload,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Ensure the token is stored in localStorage
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
           },
         }
       );
+      console.log("Registration response:", response.data);
 
-      console.log("Registration response:", response.data); // Debugging log
-
-      // Only show the success modal if the response status is 200 or 201
       if (response.status === 200 || response.status === 201) {
-        setIsModalOpen(true); // Open the success modal
-      } else {
-        console.error("Unexpected response status:", response.status);
-        toast({
-          title: "Registration Failed",
-          description: "Unexpected response from the server. Please try again.",
-          variant: "destructive",
-          duration: 3000,
-        });
+        setIsModalOpen(true);
       }
     } catch (error) {
-      console.error("Registration failed:", error);
       console.error("Registration failed:", error);
 
       toast({
@@ -307,7 +243,7 @@ const EventRegistration = () => {
       customer: {
         email: formData.email,
         name: formData.fullName,
-        phone_number: "08012345678", // Replace with a valid phone number
+        phonenumber: "08012345678", // Replace with a valid phone number
       },
       customizations: {
         title: eventDetails.topic,
@@ -405,305 +341,312 @@ const EventRegistration = () => {
           </div>
         </div>
 
-      {/* Right Column */}
-      <div className="order-2 lg:order-2">
-        {isRegistered ? (
-            <div className="text-center border-2 border-gray-300 rounded-lg p-6 bg-gray-50">
-              <h2 className="text-2xl font-bold mb-4">You have already registered for this event. </h2>
-              
-              <p className="text-gray-700">If you need to make changes to your registration, please contact support.</p>
-            </div>
-          ) : (
-            <>
-              <p className="flex flex-row text-sm font-medium">
-                Event fee - <span className='flex text-base text-primary'>₦{eventDetails.eventFee}</span>
-              </p>
-              <h2 className="text-2xl font-bold mb-2">Register for the Event</h2>
-              <p className="text-gray-700 mb-6">Secure your spot by filling out the form below.</p>
-              <p className="text-gray-800 text-sm mb-2 font-semibold">Personal Details</p>
+        {/* Right Column */}
+        <div className="order-2 lg:order-2">
+          <p className="flex flex-row text-sm font-medium">
+            Event fee -{" "}
+            <span className="flex text-base text-primary">
+              ₦{eventDetails.eventFee}
+            </span>
+          </p>
+          <h2 className="text-2xl font-bold mb-2">Register for the Event</h2>
+          <p className="text-gray-700 mb-6">
+            Secure your spot by filling out the form below.
+          </p>
+          <p className="text-gray-800 text-sm mb-2 font-semibold">
+            Personal Details
+          </p>
+          <hr className="mb-4 border-gray-500" />
+
+          {Number(eventDetails.eventFee) > 0 ? (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Personal Details Section */}
+              <div>
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
+                  Full Name
+                  <span className="text-red-600 text-base mr-1">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  required
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  placeholder="Enter your first and last name"
+                  className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
+                  Email Address<span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Enter your email address"
+                  className={`w-full px-3 py-2 border ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  } text-sm rounded-md focus:outline-none focus:ring-2 ${
+                    emailError ? "focus:ring-red-500" : "focus:ring-blue-500"
+                  }`}
+                />
+              </div>
+              {emailError && (
+                <div className="flex items-center mt-1">
+                  <CircleAlert className="w-4 h-4 text-red-500 mr-1" />
+                  <span className="text-red-500 text-sm">{emailError}</span>
+                </div>
+              )}
+
+              {/* Payment Section */}
+              <div>
+                {/* <label className="block text-sm font-semibold text-gray-800 mb-2">
+                Payment
+              </label>
               <hr className='mb-4 border-gray-500' />
+              <p className="text-sm text-gray-600 mb-4">This event is paid, payment is required to register</p>
 
-              {Number(eventDetails.eventFee) > 0 ? (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Personal Details Section */}
-                  <div>
-                    <label htmlFor="fullName" className="block text-sm font-semibold text-gray-900 mb-2">
-                      Full Name<span className='text-red-600 text-base mr-1'>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      required
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      placeholder="Enter your first and last name"
-                      className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
+              <label htmlFor="select" className="block text-sm font-medium text-gray-600 mb-6">
+                Select Payment Method<span className='text-red-600'>*</span>
+              </label>
 
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
-                      Email Address<span className='text-red-600'>*</span>
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="Enter your email address"
-                      className={`w-full px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'
-                        } text-sm rounded-md focus:outline-none focus:ring-2 ${emailError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
-                        }`}
+              <div className="flex gap-12 mb-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    id="card"
+                    name="paymentMethod"
+                    value="card"
+                    required
+                    checked={formData.paymentMethod === 'card'}
+                    onChange={handleInputChange}
+                  />
+                  <label htmlFor="card" className="text-sm text-gray-700">Card Payment</label>
+                </div>
 
-                    />
-                  </div>
-                  {emailError && (
-                    <div className="flex items-center mt-1">
-                      <CircleAlert
-                        className="w-4 h-4 text-red-500 mr-1"
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    id="bankTransfer"
+                    name="paymentMethod"
+                    value="bankTransfer"
+                    required
+                    checked={formData.paymentMethod === 'bankTransfer'}
+                    onChange={handleInputChange}
+                  />
+                  <label htmlFor="bankTransfer" className="text-sm text-gray-700">Bank Transfer</label>
+                </div>
+              </div> */}
 
-                      />
-                      <span className="text-red-500 text-sm">{emailError}</span>
-                    </div>)}
+                {/* {formData.paymentMethod === 'card' && ( */}
+                <FlutterWaveButton
+                  {...handleFlutterwavePayment()}
+                  callback={(response) => {
+                    if (response.status === "successful") {
+                      setIsPaymentSuccessful(true); // Mark payment as successful
+                      toast({
+                        title: "Payment Successful",
+                        description:
+                          "You can proceed to submit your registration",
+                        variant: "default",
+                        duration: 3000, // Ensure duration is long enough to be visible
+                      });
+                    } else {
+                      toast({
+                        title: "Payment Failed",
+                        description: "Something went wrong. Please try again.",
+                        variant: "destructive",
+                        duration: 3000,
+                      });
+                    }
+                  }}
+                  onClose={() => {
+                    console.log("Payment closed");
+                    toast({
+                      title: "Payment Cancelled",
+                      description: "You cancelled the payment process.",
+                      variant: "default",
+                      duration: 3000,
+                    });
+                  }}
+                  text={`Pay ₦${eventDetails.eventFee}`}
+                  className={`w-full py-2 px-4 rounded-full ${
+                    isPaymentSuccessful
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  } text-white transition duration-300 mb-4`}
+                  disabled={isPaymentSuccessful}
+                />
+                {/* )} */}
 
-                  {/* Payment Section */}
-                  <div>
-                    {/* <label className="block text-sm font-semibold text-gray-800 mb-2">
-                      Payment
-                    </label>
-                    <hr className='mb-4 border-gray-500' />
-                    <p className="text-sm text-gray-600 mb-4">This event is paid, payment is required to register</p>
-
-                    <label htmlFor="select" className="block text-sm font-medium text-gray-600 mb-6">
-                      Select Payment Method<span className='text-red-600'>*</span>
-                    </label>
-
-                    <div className="flex gap-12 mb-4">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="card"
-                          name="paymentMethod"
-                          value="card"
-                          required
-                          checked={formData.paymentMethod === 'card'}
-                          onChange={handleInputChange}
-                        />
-                        <label htmlFor="card" className="text-sm text-gray-700">Card Payment</label>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="bankTransfer"
-                          name="paymentMethod"
-                          value="bankTransfer"
-                          required
-                          checked={formData.paymentMethod === 'bankTransfer'}
-                          onChange={handleInputChange}
-                        />
-                        <label htmlFor="bankTransfer" className="text-sm text-gray-700">Bank Transfer</label>
-                      </div>
-                    </div> */}
-
-                    
-                      {/* {formData.paymentMethod === 'card' && ( */}
-                        <FlutterWaveButton
-                          {...handleFlutterwavePayment()}
-                          callback={(response) => {
-                            if (response.status === 'successful') {
-                              setIsPaymentSuccessful(true); // Mark payment as successful
-                              toast({
-                                title: "Payment Successful",
-                                description: "You can proceed to submit your registration",
-                                variant: "default",
-                                duration: 3000, // Ensure duration is long enough to be visible
-                              });
-                            } else {
-                              toast({
-                                title: "Payment Failed",
-                                description: "Something went wrong. Please try again.",
-                                variant: "destructive",
-                                duration: 3000,
-                              });
-                            }
-                            closePaymentModal(); // Close the modal programmatically
-                          }}
-                          onClose={() => {
-                            console.log('Payment closed');
-                            toast({
-                              title: "Payment Cancelled",
-                              description: "You cancelled the payment process.",
-                              variant: "default",
-                              duration: 3000,
-                            });
-                          }}
-                          text={`Pay ₦${eventDetails.eventFee}`}
-                          className={`w-full py-2 px-4 rounded-full ${isPaymentSuccessful
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700'
-                          } text-white transition duration-300 mb-4`}
-                          disabled={isPaymentSuccessful}
-                        />
-                      {/* )} */}
-                
-
-                    {/* {formData.paymentMethod === 'bankTransfer' && (
-                      <div>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <h3 className="text-sm font-semibold mb-4">Account Details</h3>
-                          <div className="space-y-4">
-                            <div className='flex items-center space-x-6'>
-                              <div className="flex items-center">
-                                <Image
-                                  src="/firstBankLogo.png"
-                                  alt="FirstBank"
-                                  width={90}
-                                  height={70}
-                                  className="object-contain"
-                                />
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="text-sm text-gray-600">Account Number</span>
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-lg text-gray-600 font-semibold">
-                                    {bankDetails.accountNumber}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => copyToClipboard(bankDetails.accountNumber)}
-                                    className="p-1 hover:bg-gray-100 rounded-md transition-colors"
-                                    title="Copy account number"
-                                  >
-                                    <Copy
-                                      className={`w-4 h-4 ${copied ? 'text-green-500' : 'text-gray-400'}`}
-                                    />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                    
-                            <div className="flex flex-col">
-                              <span className="text-sm text-gray-600">Account Name</span>
-                              <span className="text-sm text-gray-600 font-semibold">{bankDetails.accountName}</span>
-                            </div>
-                    
-                            <div>
-                              <label className="block text-sm font-semibold text-gray-800 mb-2">
-                                Upload your Receipt<span className='text-red-500'>*</span>
-                              </label>
-                              <div className="border-2 border-gray-400 rounded-lg p-10 text-center">
-                                <input
-                                  type="file"
-                                  id="receipt"
-                                  accept="image/*,.pdf"
-                                  onChange={handleFileUpload}
-                                  className="hidden"
-                                />
-                                <label
-                                  htmlFor="receipt"
-                                  className="cursor-pointer flex flex-col items-center"
-                                >
-                                  <FilePlus className="w-12 h-12 text-gray-800 mb-2" />
-                                  <span className="text-sm text-gray-800">
-                                    {isReceiptUploaded ? 'Receipt uploaded' : 'Click to add file or drag any attachment here'}
-                                  </span>
-                                </label>
-                              </div>
-                            </div>
+                {/* {formData.paymentMethod === 'bankTransfer' && (
+                <div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="text-sm font-semibold mb-4">Account Details</h3>
+                    <div className="space-y-4">
+                      <div className='flex items-center space-x-6'>
+                        <div className="flex items-center">
+                          <Image
+                            src="/firstBankLogo.png"
+                            alt="FirstBank"
+                            width={90}
+                            height={70}
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm text-gray-600">Account Number</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-lg text-gray-600 font-semibold">
+                              {bankDetails.accountNumber}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(bankDetails.accountNumber)}
+                              className="p-1 hover:bg-gray-100 rounded-md transition-colors"
+                              title="Copy account number"
+                            >
+                              <Copy
+                                className={`w-4 h-4 ${copied ? 'text-green-500' : 'text-gray-400'}`}
+                              />
+                            </button>
                           </div>
                         </div>
                       </div>
-                    )} */}
-                    <button
-                      type="submit"
-                      className={`w-full py-2 rounded-full transition duration-300 ${isFormValidAndToastVisible()
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                          : 'bg-blue-200 text-white cursor-not-allowed'
-                        }`}
-                      // onClick={(e) => {
-                      //   e.preventDefault(); // Prevent default form submission
-                      //   if (isFormValidAndToastVisible()) {
-                      //     setIsModalOpen(true); // Open the success modal
-                      //   }
-                      // }}
-                      disabled={!isFormValidAndToastVisible()} // Disable button if form is invalid
-                    >
-                      Submit Registration
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                // Simplified form for free events
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label htmlFor="fullName" className="block text-sm font-semibold text-gray-900 mb-2">
-                      Full Name<span className='text-red-600'>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      required
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      placeholder="Enter your first and last name"
-                      className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
-                      Email Address<span className='text-red-600'>*</span>
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="Enter your email address"
-                      className={`w-full px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'
-                        } text-sm rounded-md focus:outline-none focus:ring-2 ${emailError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
-                        }`}
-
-                    />
-                  </div>
-                  {emailError && (
-                    <div className="flex items-center mt-1">
-                      <CircleAlert
-                        className="w-4 h-4 text-red-500 mr-1"
-
-                      />
-                      <span className="text-red-500 text-sm">{emailError}</span>
+              
+                      <div className="flex flex-col">
+                        <span className="text-sm text-gray-600">Account Name</span>
+                        <span className="text-sm text-gray-600 font-semibold">{bankDetails.accountName}</span>
+                      </div>
+              
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-2">
+                          Upload your Receipt<span className='text-red-500'>*</span>
+                        </label>
+                        <div className="border-2 border-gray-400 rounded-lg p-10 text-center">
+                          <input
+                            type="file"
+                            id="receipt"
+                            accept="image/*,.pdf"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                          <label
+                            htmlFor="receipt"
+                            className="cursor-pointer flex flex-col items-center"
+                          >
+                            <FilePlus className="w-12 h-12 text-gray-800 mb-2" />
+                            <span className="text-sm text-gray-800">
+                              {isReceiptUploaded ? 'Receipt uploaded' : 'Click to add file or drag any attachment here'}
+                            </span>
+                          </label>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                  <button
-                    type="submit"
-                    className={`w-full py-2 rounded-full transition duration-300 bg-blue-600 hover:bg-blue-700 text-white`}
-                    disabled={!isNoFeeFormValid()}
-                  >
-                    Submit Registration
-                  </button>
-                </form>
-              )}
+                  </div>
+                </div>
+              )} */}
+                <button
+                  type="submit"
+                  className={`w-full py-2 rounded-full transition duration-300 ${
+                    isFormValidAndToastVisible()
+                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      : "bg-blue-200 text-white cursor-not-allowed"
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent default form submission
+                    if (isFormValidAndToastVisible()) {
+                      setIsModalOpen(true); // Open the success modal
+                    }
+                  }}
+                  disabled={!isFormValidAndToastVisible()} // Disable button if form is invalid
+                >
+                  Submit Registration
+                </button>
+              </div>
+            </form>
+          ) : (
+            // Simplified form for free events
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
+                  Full Name<span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  required
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  placeholder="Enter your first and last name"
+                  className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
-              <SuccessModal
-                isOpen={isModalOpen}
-                onClose={() => {
-                  console.log("Closing modal..."); // Debugging log
-                  setIsModalOpen(false);
-                }}
-                email={formData.email}
-              />
-            </>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
+                  Email Address<span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Enter your email address"
+                  className={`w-full px-3 py-2 border ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  } text-sm rounded-md focus:outline-none focus:ring-2 ${
+                    emailError ? "focus:ring-red-500" : "focus:ring-blue-500"
+                  }`}
+                />
+              </div>
+              {emailError && (
+                <div className="flex items-center mt-1">
+                  <CircleAlert className="w-4 h-4 text-red-500 mr-1" />
+                  <span className="text-red-500 text-sm">{emailError}</span>
+                </div>
+              )}
+              <button
+                type="submit"
+                className={`w-full py-2 rounded-full transition duration-300 bg-blue-600 hover:bg-blue-700 text-white`}
+                disabled={!isNoFeeFormValid()}
+              >
+                Submit Registration
+              </button>
+            </form>
           )}
+
+          <SuccessModal
+            isOpen={isModalOpen}
+            onClose={() => {
+              console.log("Closing modal..."); // Debugging log
+              setIsModalOpen(false);
+            }}
+            email={formData.email}
+          />
+        </div>
       </div>
-    </div>
     </div>
   );
 };

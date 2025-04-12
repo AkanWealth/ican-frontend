@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNotifications } from "@/app/(dashboard)/Context/NotificationContext";
-import Image from "next/image";
 
 const Notification = () => {
   const {
@@ -10,27 +9,6 @@ const Notification = () => {
     markAsRead,
     removeNotification,
   } = useNotifications();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate fetching notifications from an endpoint
-    const fetchNotifications = async () => {
-      setLoading(true);
-      // Simulate a delay for fetching
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setLoading(false);
-    };
-
-    fetchNotifications();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="w-80 bg-white rounded-lg shadow-lg p-4 text-center">
-        <p className="text-gray-500">Loading notifications...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="w-80 bg-white rounded-lg shadow-lg">
@@ -50,22 +28,8 @@ const Notification = () => {
 
       <div className="max-h-[400px] overflow-y-auto">
         {notifications.length === 0 ? (
-          <div className="py-8 text-center flex justify-center items-center">
-            <div className="flex flex-col items-center">
-              <Image
-                src="/data-alert 1.png"
-                alt="No notifications"
-                width={100}
-                height={50}
-                className="mt-4 mb-4"
-              />
-              <h3 className="text-black font-medium text-lg">
-                No new notifications at the moment
-              </h3>
-              <p className="text-xs text-gray-500">
-                Check back later for updates.
-              </p>
-            </div>
+          <div className="py-8 text-center text-gray-500">
+            No new notifications at the moment
           </div>
         ) : (
           notifications.map((notification) => (

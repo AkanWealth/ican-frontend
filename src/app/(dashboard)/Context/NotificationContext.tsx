@@ -7,7 +7,6 @@ interface Notification {
   details: string;
   read: boolean;
   timestamp: string;
-  category: string; // Added category property
 }
 
 interface NotificationContextProps {
@@ -22,43 +21,8 @@ interface NotificationContextProps {
 
 const NotificationContext = createContext<NotificationContextProps | undefined>(undefined);
 
-const dummyNotifications = [
-  {
-    id: "1",
-    message: "New Feature Released",
-    details: "Explore how this new tool can enhance your experience.",
-    category: "General", // Example category
-    timestamp: new Date().toISOString(),
-    read: false,
-  },
-  {
-    id: "2",
-    message: "Event Registration Confirmed",
-    details: "Your registration for [Event Name] has been confirmed.",
-    category: "Events", // Example category
-    timestamp: new Date().toISOString(),
-    read: false,
-  },
-  {
-    id: "3",
-    message: "Payment Successful",
-    details: "Thank you for your payment of $100.",
-    category: "Payments", // Example category
-    timestamp: new Date().toISOString(),
-    read: true,
-  },
-  {
-    id: "4",
-    message: "MCPD Points Updated",
-    details: "You've earned 10 MCPD points.",
-    category: "MCPD Updates", 
-    timestamp: new Date().toISOString(),
-    read: false,
-  },
-];
-
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>(dummyNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const unreadCount = notifications.filter((notification) => !notification.read).length;
 

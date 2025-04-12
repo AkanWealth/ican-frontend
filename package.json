@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@aws-sdk/s3-presigned-post": "^3.782.0",
     "@emailjs/browser": "^4.4.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -43,7 +42,6 @@
     "@types/downloadjs": "^1.4.6",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.9",
-    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "downloadjs": "^1.4.7",

@@ -15,7 +15,7 @@ import Image from "next/image";
 import SuccessModal from "./SuccessMessage";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-import { FlutterWaveButton, closePaymentModal } from "flutterwave-react-v3";
+import { FlutterWaveButton } from "flutterwave-react-v3";
 // import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
@@ -307,7 +307,7 @@ const EventRegistration = () => {
       customer: {
         email: formData.email,
         name: formData.fullName,
-        phone_number: "08012345678", // Replace with a valid phone number
+        phonenumber: "08012345678", // Replace with a valid phone number
       },
       customizations: {
         title: eventDetails.topic,
@@ -530,7 +530,6 @@ const EventRegistration = () => {
                                 duration: 3000,
                               });
                             }
-                            closePaymentModal(); // Close the modal programmatically
                           }}
                           onClose={() => {
                             console.log('Payment closed');

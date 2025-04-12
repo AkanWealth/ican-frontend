@@ -1,16 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 import { MdClose } from "react-icons/md";
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+
+import Toast from "@/components/genui/Toast";
 
 function NewEvent({
+  id,
+  mode,
   showNewEvent,
   setShowNewEvent,
 }: {
+  id?: string;
+  mode?: "create" | "edit";
   showNewEvent: boolean;
   setShowNewEvent: (show: boolean) => void;
 }) {
+  const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     event_id: "",
     eventName: "",
@@ -22,6 +31,46 @@ function NewEvent({
     mcpdCredit: "",
     eventPhoto: null,
   });
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/events/${id}`,
+        headers: {},
+      };
+
+      const response = await axios.request(config);
+      console.log(JSON.stringify(response.data));
+
+      // Populate formData with fetched data
+      setFormData({
+        event_id: response.data.id || "",
+        eventName: response.data.name || "",
+        venue: response.data.venue || "",
+        eventDescription: response.data.description || "",
+        eventDate: response.data.date || "",
+        eventTime: response.data.time || "",
+        eventFee: response.data.fee ? response.data.fee.toString() : "",
+        mcpdCredit: response.data.mcpd_credit
+          ? response.data.mcpd_credit.toString()
+          : "",
+        eventPhoto: response.data.eventPhoto || null,
+      });
+
+      setEditDataFetched(true);
+      } catch (error) {
+      console.error("Error fetching event details:", error);
+      }
+    };
+
+    if (mode === "edit" && id && !editDataFetched) {
+      fetchDetails();
+    }
+  }, [editDataFetched, id, mode]);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -58,7 +107,42 @@ function NewEvent({
   };
 
   const handlePublish = () => {
-    // Handle publish event action
+    const publishEvent = async () => {
+      try {
+        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const formDataToSend = {
+          eventName: formData.eventName,
+          venue: formData.venue,
+          eventDescription: formData.eventDescription,
+          eventDate: formData.eventDate,
+          eventTime: formData.eventTime,
+          eventFee: formData.eventFee ? parseFloat(formData.eventFee) : 0,
+          eventPhoto: formData.eventPhoto, // Assuming this is a URL or file path
+          mcpdCredit: formData.mcpdCredit ? parseInt(formData.mcpdCredit) : 0,
+          status: "UPCOMING",
+        };
+
+        const config = {
+          method: "post",
+          url: `${BASE_API_URL}/events`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          data: JSON.stringify(formDataToSend),
+        };
+
+        const response = await axios.request(config);
+        console.log("Event published successfully:", response.data);
+        handleCancel(); // Close the modal after successful publish
+        return <Toast type="success" message="Event published successfully!" />;
+      } catch (error) {
+        console.error("Error publishing event:", error);
+        return <Toast type="error" message="Error publishing event!" />;
+      }
+    };
+
+    publishEvent();
   };
 
   return (
@@ -125,7 +209,6 @@ function NewEvent({
             value={formData.eventFee}
             onChange={handleChange}
           />
-          
         </div>
         <InputEle
           type="file"

@@ -1,13 +1,22 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { Users, CalendarRange, MapPin, CalendarCheck, Copy, FilePlus, CircleAlert, ArrowLeft } from 'lucide-react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
-import SuccessModal from './SuccessMessage';
-import { useToast } from '@/hooks/use-toast';
-import axios from 'axios';
-import { FlutterWaveButton } from 'flutterwave-react-v3';
-import CertificateGenerator from '@/components/homecomps/CertificateGenerator';
+import React, { useState, useEffect } from "react";
+import {
+  Users,
+  CalendarRange,
+  MapPin,
+  CalendarCheck,
+  Copy,
+  FilePlus,
+  CircleAlert,
+  ArrowLeft,
+} from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
+import SuccessModal from "./SuccessMessage";
+import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+import { FlutterWaveButton } from "flutterwave-react-v3";
+import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
   const searchParams = useSearchParams();
@@ -15,66 +24,61 @@ const EventRegistration = () => {
   const { toast } = useToast();
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
   const [isToastVisible, setIsToastVisible] = useState(false);
-  const [emailError, setEmailError] = useState('');
+  const [emailError, setEmailError] = useState("");
   const router = useRouter();
 
-
   const [eventDetails, setEventDetails] = useState({
-    id: '',
-    topic: '',
-    date: '',
-    time: '',
-    venue: '',
-    eventFee: '',
-    eventPayment: '',
-    image: '',
-    registeredNo: '',
-    totalSpot: '',
-    isFull: ''
+    id: "",
+    topic: "",
+    date: "",
+    time: "",
+    venue: "",
+    eventFee: "",
+    eventPayment: "",
+    image: "",
+    registeredNo: "",
+    totalSpot: "",
+    isFull: "",
   });
   useEffect(() => {
-
-    const originalDate = new Date(searchParams.get('date') || '');
+    const originalDate = new Date(searchParams.get("date") || "");
 
     // Format date
-    const formattedDate = originalDate.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
+    const formattedDate = originalDate.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
     });
-
 
     // Get event details from URL parameters
     setEventDetails({
-      id: searchParams.get('id') || '',
-      time: searchParams.get('time') || '',
-      topic: searchParams.get('topic') || '',
+      id: searchParams.get("id") || "",
+      time: searchParams.get("time") || "",
+      topic: searchParams.get("topic") || "",
       date: formattedDate,
-      venue: searchParams.get('venue') || '',
-      eventFee: searchParams.get('eventFee') || '',
-      eventPayment: searchParams.get('eventPayment') || '',
-      image: searchParams.get('image') || "",
-      registeredNo: searchParams.get('registeredNo') || '',
-      totalSpot: searchParams.get('totalSpot') || '',
-      isFull: searchParams.get('isFull') || '',
+      venue: searchParams.get("venue") || "",
+      eventFee: searchParams.get("eventFee") || "",
+      eventPayment: searchParams.get("eventPayment") || "",
+      image: searchParams.get("image") || "",
+      registeredNo: searchParams.get("registeredNo") || "",
+      totalSpot: searchParams.get("totalSpot") || "",
+      isFull: searchParams.get("isFull") || "",
     });
   }, [searchParams]);
 
   const handleGoBack = () => {
     router.back();
-  }
+  };
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    paymentMethod: '',
+    fullName: "",
+    email: "",
+    paymentMethod: "",
     receipt: null as File | null,
   });
 
   const handleCardPayment = () => {
-
-
     setIsToastVisible(true);
     setIsPaymentSuccessful(true);
     toast({
@@ -83,7 +87,6 @@ const EventRegistration = () => {
       variant: "default",
       duration: 2000,
     });
-
   };
 
   const validateEmail = (email: string) => {
@@ -92,9 +95,9 @@ const EventRegistration = () => {
   };
 
   const [bankDetails] = useState({
-    bankName: 'FirstBank',
-    accountNumber: '2045417438',
-    accountName: 'ICAN Surulere & District Society'
+    bankName: "FirstBank",
+    accountNumber: "2045417438",
+    accountName: "ICAN Surulere & District Society",
   });
 
   const [isReceiptUploaded, setIsReceiptUploaded] = useState(false);
@@ -102,9 +105,9 @@ const EventRegistration = () => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        receipt: file
+        receipt: file,
       }));
       setIsReceiptUploaded(true);
     }
@@ -112,29 +115,27 @@ const EventRegistration = () => {
 
   const isFormValidAndToastVisible = () => {
     return (
-      isFormValid() || 
+      isFormValid() ||
       (isPaymentSuccessful && Number(eventDetails.eventFee) > 0) // Ensure payment is successful for paid events
     );
   };
 
-  const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    if (name === 'email') {
-      setEmailError('');
+    if (name === "email") {
+      setEmailError("");
       // Validate email as user types
       if (value && !validateEmail(value)) {
-        setEmailError('Invalid email address');
+        setEmailError("Invalid email address");
       }
     }
   };
 
-
-
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     // Validate form before submission
@@ -151,7 +152,7 @@ const EventRegistration = () => {
       console.log("Registration successful, opening modal..."); // Debugging log
       setIsModalOpen(true); // Show the success modal after successful registration
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error("Submission error:", error);
       toast({
         title: "Submission Failed",
         description: "Unable to complete registration. Please try again.",
@@ -162,15 +163,16 @@ const EventRegistration = () => {
   };
 
   const isFormValid = () => {
-    return formData.fullName &&
+    return (
+      formData.fullName &&
       formData.email &&
-      formData.paymentMethod === 'bankTransfer' &&
-      isReceiptUploaded;
+      formData.paymentMethod === "bankTransfer" &&
+      isReceiptUploaded
+    );
   };
 
   const isNoFeeFormValid = () => {
-    return formData.fullName &&
-      formData.email;
+    return formData.fullName && formData.email;
   };
   const [copied, setCopied] = useState(false);
 
@@ -180,14 +182,13 @@ const EventRegistration = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text: ', err);
+      console.error("Failed to copy text: ", err);
     }
   };
 
   const registerForEvent = async () => {
     try {
-
-      const membership = 'MEMBER';
+      const membership = "MEMBER";
       const eventId = eventDetails.id;
       console.log("eventId", eventId);
 
@@ -195,26 +196,31 @@ const EventRegistration = () => {
         fullName: formData.fullName,
         email: formData.email,
         membership: membership,
-        proofOfPayment: isPaymentSuccessful ? 'PAID' : (formData.paymentMethod === 'bankTransfer' ? 'PAID' : 'PENDING')
+        proofOfPayment: isPaymentSuccessful
+          ? "PAID"
+          : formData.paymentMethod === "bankTransfer"
+          ? "PAID"
+          : "PENDING",
       };
 
       console.log(registrationPayload);
-      const response = await axios.post(`https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/registrations/register`, registrationPayload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json',
+      const response = await axios.post(
+        `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/registrations/register`,
+        registrationPayload,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
-console.log("Registration response:", response.data);
+      );
+      console.log("Registration response:", response.data);
 
       if (response.status === 200 || response.status === 201) {
         setIsModalOpen(true);
-
       }
     } catch (error) {
-
-      console.error('Registration failed:', error);
-
+      console.error("Registration failed:", error);
 
       toast({
         title: "Registration Failed",
@@ -227,20 +233,22 @@ console.log("Registration response:", response.data);
 
   const handleFlutterwavePayment = () => {
     const config = {
-      public_key: process.env.FLW_PUBLIC_KEY || "FLWPUBK_TEST-534b5997be3928deed468163ca379112-X", // Replace with your actual public key
+      public_key:
+        process.env.FLW_PUBLIC_KEY ||
+        "FLWPUBK_TEST-534b5997be3928deed468163ca379112-X", // Replace with your actual public key
       tx_ref: Date.now().toString(),
       amount: Number(eventDetails.eventFee),
-      currency: 'NGN',
-      payment_options: 'card, banktransfer',
+      currency: "NGN",
+      payment_options: "card, banktransfer",
       customer: {
         email: formData.email,
         name: formData.fullName,
-        phonenumber: '08012345678', // Replace with a valid phone number
+        phonenumber: "08012345678", // Replace with a valid phone number
       },
       customizations: {
         title: eventDetails.topic,
-        description: 'Event Registration Payment',
-        logo: 'https://your-logo-url.com/logo.png', // Replace with your logo URL
+        description: "Event Registration Payment",
+        logo: "https://your-logo-url.com/logo.png", // Replace with your logo URL
       },
     };
 
@@ -248,8 +256,8 @@ console.log("Registration response:", response.data);
   };
 
   return (
-  <div className='py-2 px-4'>
-    <button
+    <div className="py-2 px-4">
+      <button
         onClick={handleGoBack}
         className="z-10 flex items-center justify-center 
         w-10 h-10 bg-white rounded-full shadow-md hover:bg-gray-100 
@@ -261,117 +269,150 @@ console.log("Registration response:", response.data);
           transition-colors duration-300"
         />
       </button>
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-screen mt-2">
-
-
-      
-      {/* Left Column */}
-      <div className="order-1 lg:order-1">
-      
-        <div className={`rounded-lg shadow-md p-6 ${Number(eventDetails.eventFee) > 0 ? 'bg-white' : 'bg-gray-100'}`}>
-          <div className="flex items-center mb-4">
-            <div className={`flex ${Number(eventDetails.eventFee) > 0 ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-600'} px-3 py-1 rounded-full text-sm mr-2`}>
-              <CalendarCheck className={`w-5 h-5 mr-1 ${Number(eventDetails.eventFee) > 0 ? 'text-green-600' : 'text-gray-600'}`} />
-              {Number(eventDetails.eventFee) > 0 ? 'Paid Event' : 'Free Event'}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-screen mt-2">
+        {/* Left Column */}
+        <div className="order-1 lg:order-1">
+          <div
+            className={`rounded-lg shadow-md p-6 ${
+              Number(eventDetails.eventFee) > 0 ? "bg-white" : "bg-gray-100"
+            }`}
+          >
+            <div className="flex items-center mb-4">
+              <div
+                className={`flex ${
+                  Number(eventDetails.eventFee) > 0
+                    ? "bg-green-100 text-green-600"
+                    : "bg-gray-200 text-gray-600"
+                } px-3 py-1 rounded-full text-sm mr-2`}
+              >
+                <CalendarCheck
+                  className={`w-5 h-5 mr-1 ${
+                    Number(eventDetails.eventFee) > 0
+                      ? "text-green-600"
+                      : "text-gray-600"
+                  }`}
+                />
+                {Number(eventDetails.eventFee) > 0
+                  ? "Paid Event"
+                  : "Free Event"}
+              </div>
             </div>
-          </div>
 
-          <h1 className="font-Spartan text-3xl font-bold mb-4">
-            {eventDetails.topic} - Understanding Accounting
-          </h1>
+            <h1 className="font-Spartan text-3xl font-bold mb-4">
+              {eventDetails.topic} - Understanding Accounting
+            </h1>
 
-          {eventDetails.image && (
-            <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
-              <Image
-                src={eventDetails.image}
-                alt={eventDetails.topic}
-                fill
-                className="w-full h-full object-cover"
-              />
+            {eventDetails.image && (
+              <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
+                <Image
+                  src={eventDetails.image}
+                  alt={eventDetails.topic}
+                  fill
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <div className="mb-4">
+              <div className="flex items-center mb-2 text-sm text-gray-500">
+                <CalendarRange className="h-5 w-5 mr-2 text-gray-500" />
+                <span>
+                  {eventDetails.date} at {eventDetails.time}
+                </span>
+              </div>
+              <div className="flex items-center text-sm text-gray-500">
+                <MapPin className="h-5 w-5 mr-2 text-gray-500" />
+                <span>{eventDetails.venue}</span>
+              </div>
             </div>
-          )}
-          <div className="mb-4">
-            <div className="flex items-center mb-2 text-sm text-gray-500">
-              <CalendarRange className="h-5 w-5 mr-2 text-gray-500" />
-              <span>{eventDetails.date} at  {eventDetails.time}</span>
 
+            <p className="text-gray-600 text-base mb-4">
+              Join us for an insightful evening focused on managing life's
+              challenges and prioritizing mental well-being. Network, learn, and
+              unwind in a supportive environment.
+            </p>
+
+            <div className="flex items-center text-sm mb-2 text-gray-500">
+              <Users className="h-5 w-5 mr-2 text-gray-500" />
+              <span>
+                {eventDetails.registeredNo}/{eventDetails.totalSpot} registered
+                people
+              </span>
             </div>
-            <div className="flex items-center text-sm text-gray-500">
-              <MapPin className="h-5 w-5 mr-2 text-gray-500" />
-              <span>{eventDetails.venue}</span>
-            </div>
-          </div>
-
-          <p className="text-gray-600 text-base mb-4">
-            Join us for an insightful evening focused on managing life's challenges and prioritizing mental well-being. Network, learn, and unwind in a supportive environment.
-          </p>
-
-          <div className="flex items-center text-sm mb-2 text-gray-500">
-            <Users className="h-5 w-5 mr-2 text-gray-500" />
-            <span>{eventDetails.registeredNo}/{eventDetails.totalSpot} registered people</span>
           </div>
         </div>
-      </div>
 
-      {/* Right Column */}
-      <div className="order-2 lg:order-2">
-        <p className="flex flex-row text-sm font-medium">
-          Event fee - <span className='flex text-base text-primary'>₦{eventDetails.eventFee}</span>
-        </p>
-        <h2 className="text-2xl font-bold mb-2">Register for the Event</h2>
-        <p className="text-gray-700 mb-6">Secure your spot by filling out the form below.</p>
-        <p className="text-gray-800 text-sm mb-2 font-semibold">Personal Details</p>
-        <hr className='mb-4 border-gray-500' />
+        {/* Right Column */}
+        <div className="order-2 lg:order-2">
+          <p className="flex flex-row text-sm font-medium">
+            Event fee -{" "}
+            <span className="flex text-base text-primary">
+              ₦{eventDetails.eventFee}
+            </span>
+          </p>
+          <h2 className="text-2xl font-bold mb-2">Register for the Event</h2>
+          <p className="text-gray-700 mb-6">
+            Secure your spot by filling out the form below.
+          </p>
+          <p className="text-gray-800 text-sm mb-2 font-semibold">
+            Personal Details
+          </p>
+          <hr className="mb-4 border-gray-500" />
 
-        {Number(eventDetails.eventFee) > 0 ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Personal Details Section */}
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-semibold text-gray-900 mb-2">
-                Full Name<span className='text-red-600 text-base mr-1'>*</span>
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                required
-                value={formData.fullName}
-                onChange={handleInputChange}
-                placeholder="Enter your first and last name"
-                className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
-                Email Address<span className='text-red-600'>*</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="Enter your email address"
-                className={`w-full px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'
-                  } text-sm rounded-md focus:outline-none focus:ring-2 ${emailError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
-                  }`}
-
-              />
-            </div>
-            {emailError && (
-              <div className="flex items-center mt-1">
-                <CircleAlert
-                  className="w-4 h-4 text-red-500 mr-1"
-
+          {Number(eventDetails.eventFee) > 0 ? (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Personal Details Section */}
+              <div>
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
+                  Full Name
+                  <span className="text-red-600 text-base mr-1">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  required
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  placeholder="Enter your first and last name"
+                  className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="text-red-500 text-sm">{emailError}</span>
-              </div>)}
+              </div>
 
-            {/* Payment Section */}
-            <div>
-              {/* <label className="block text-sm font-semibold text-gray-800 mb-2">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
+                  Email Address<span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Enter your email address"
+                  className={`w-full px-3 py-2 border ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  } text-sm rounded-md focus:outline-none focus:ring-2 ${
+                    emailError ? "focus:ring-red-500" : "focus:ring-blue-500"
+                  }`}
+                />
+              </div>
+              {emailError && (
+                <div className="flex items-center mt-1">
+                  <CircleAlert className="w-4 h-4 text-red-500 mr-1" />
+                  <span className="text-red-500 text-sm">{emailError}</span>
+                </div>
+              )}
+
+              {/* Payment Section */}
+              <div>
+                {/* <label className="block text-sm font-semibold text-gray-800 mb-2">
                 Payment
               </label>
               <hr className='mb-4 border-gray-500' />
@@ -409,48 +450,48 @@ console.log("Registration response:", response.data);
                 </div>
               </div> */}
 
-              
                 {/* {formData.paymentMethod === 'card' && ( */}
-                  <FlutterWaveButton
-                    {...handleFlutterwavePayment()}
-                    callback={(response) => {
-                      if (response.status === 'successful') {
-                        setIsPaymentSuccessful(true); // Mark payment as successful
-                        toast({
-                          title: "Payment Successful",
-                          description: "You can proceed to submit your registration",
-                          variant: "default",
-                          duration: 3000, // Ensure duration is long enough to be visible
-                        });
-                      } else {
-                        toast({
-                          title: "Payment Failed",
-                          description: "Something went wrong. Please try again.",
-                          variant: "destructive",
-                          duration: 3000,
-                        });
-                      }
-                    }}
-                    onClose={() => {
-                      console.log('Payment closed');
+                <FlutterWaveButton
+                  {...handleFlutterwavePayment()}
+                  callback={(response) => {
+                    if (response.status === "successful") {
+                      setIsPaymentSuccessful(true); // Mark payment as successful
                       toast({
-                        title: "Payment Cancelled",
-                        description: "You cancelled the payment process.",
+                        title: "Payment Successful",
+                        description:
+                          "You can proceed to submit your registration",
                         variant: "default",
+                        duration: 3000, // Ensure duration is long enough to be visible
+                      });
+                    } else {
+                      toast({
+                        title: "Payment Failed",
+                        description: "Something went wrong. Please try again.",
+                        variant: "destructive",
                         duration: 3000,
                       });
-                    }}
-                    text={`Pay ₦${eventDetails.eventFee}`}
-                    className={`w-full py-2 px-4 rounded-full ${isPaymentSuccessful
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700'
-                    } text-white transition duration-300 mb-4`}
-                    disabled={isPaymentSuccessful}
-                  />
+                    }
+                  }}
+                  onClose={() => {
+                    console.log("Payment closed");
+                    toast({
+                      title: "Payment Cancelled",
+                      description: "You cancelled the payment process.",
+                      variant: "default",
+                      duration: 3000,
+                    });
+                  }}
+                  text={`Pay ₦${eventDetails.eventFee}`}
+                  className={`w-full py-2 px-4 rounded-full ${
+                    isPaymentSuccessful
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  } text-white transition duration-300 mb-4`}
+                  disabled={isPaymentSuccessful}
+                />
                 {/* )} */}
-            
 
-              {/* {formData.paymentMethod === 'bankTransfer' && (
+                {/* {formData.paymentMethod === 'bankTransfer' && (
                 <div>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h3 className="text-sm font-semibold mb-4">Account Details</h3>
@@ -517,91 +558,96 @@ console.log("Registration response:", response.data);
                   </div>
                 </div>
               )} */}
+                <button
+                  type="submit"
+                  className={`w-full py-2 rounded-full transition duration-300 ${
+                    isFormValidAndToastVisible()
+                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      : "bg-blue-200 text-white cursor-not-allowed"
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent default form submission
+                    if (isFormValidAndToastVisible()) {
+                      setIsModalOpen(true); // Open the success modal
+                    }
+                  }}
+                  disabled={!isFormValidAndToastVisible()} // Disable button if form is invalid
+                >
+                  Submit Registration
+                </button>
+              </div>
+            </form>
+          ) : (
+            // Simplified form for free events
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
+                  Full Name<span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  required
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  placeholder="Enter your first and last name"
+                  className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
+                  Email Address<span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Enter your email address"
+                  className={`w-full px-3 py-2 border ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  } text-sm rounded-md focus:outline-none focus:ring-2 ${
+                    emailError ? "focus:ring-red-500" : "focus:ring-blue-500"
+                  }`}
+                />
+              </div>
+              {emailError && (
+                <div className="flex items-center mt-1">
+                  <CircleAlert className="w-4 h-4 text-red-500 mr-1" />
+                  <span className="text-red-500 text-sm">{emailError}</span>
+                </div>
+              )}
               <button
                 type="submit"
-                className={`w-full py-2 rounded-full transition duration-300 ${isFormValidAndToastVisible()
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-blue-200 text-white cursor-not-allowed'
-                  }`}
-                onClick={(e) => {
-                  e.preventDefault(); // Prevent default form submission
-                  if (isFormValidAndToastVisible()) {
-                    setIsModalOpen(true); // Open the success modal
-                  }
-                }}
-                disabled={!isFormValidAndToastVisible()} // Disable button if form is invalid
+                className={`w-full py-2 rounded-full transition duration-300 bg-blue-600 hover:bg-blue-700 text-white`}
+                disabled={!isNoFeeFormValid()}
               >
                 Submit Registration
               </button>
-            </div>
-          </form>
-        ) : (
-          // Simplified form for free events
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-semibold text-gray-900 mb-2">
-                Full Name<span className='text-red-600'>*</span>
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                required
-                value={formData.fullName}
-                onChange={handleInputChange}
-                placeholder="Enter your first and last name"
-                className="w-full px-3 py-2 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            </form>
+          )}
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
-                Email Address<span className='text-red-600'>*</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="Enter your email address"
-                className={`w-full px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'
-                  } text-sm rounded-md focus:outline-none focus:ring-2 ${emailError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
-                  }`}
-
-              />
-            </div>
-            {emailError && (
-              <div className="flex items-center mt-1">
-                <CircleAlert
-                  className="w-4 h-4 text-red-500 mr-1"
-
-                />
-                <span className="text-red-500 text-sm">{emailError}</span>
-              </div>
-            )}
-            <button
-              type="submit"
-              className={`w-full py-2 rounded-full transition duration-300 bg-blue-600 hover:bg-blue-700 text-white`}
-              disabled={!isNoFeeFormValid()}
-            >
-              Submit Registration
-            </button>
-          </form>
-        )}
-
-        <SuccessModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            console.log("Closing modal..."); // Debugging log
-            setIsModalOpen(false);
-          }}
-          email={formData.email}
-        />
+          <SuccessModal
+            isOpen={isModalOpen}
+            onClose={() => {
+              console.log("Closing modal..."); // Debugging log
+              setIsModalOpen(false);
+            }}
+            email={formData.email}
+          />
+        </div>
       </div>
     </div>
-    </div>
   );
-}
+};
 export default EventRegistration;

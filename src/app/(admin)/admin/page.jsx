@@ -10,6 +10,7 @@ import PaymentActivities from "@/components/admincomps/dashboard/PaymentActiviti
 import EventActivities from "@/components/admincomps/dashboard/EventActivities";
 
 function AdminDashboard() {
+
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">

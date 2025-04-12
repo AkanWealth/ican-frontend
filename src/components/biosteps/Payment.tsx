@@ -1,10 +1,11 @@
+
 "use client";
 
 import React from "react";
 import { useState, useEffect } from "react";
 import { BiodataFormData } from "../homecomps/Biodata";
 import { useToast } from "@/hooks/use-toast";
-import { FlutterWaveButton } from "flutterwave-react-v3";
+import { FlutterWaveButton } from 'flutterwave-react-v3';
 
 interface PaymentProps {
   isShown: boolean;
@@ -27,10 +28,8 @@ function Payment({ formData, updateFormData }: PaymentProps) {
       payment_options: "card,banktransfer,ussd",
       customer: {
         email: userEmail,
-        name: `${formData.personalData.firstName || ""} ${
-          formData.personalData.surname || ""
-        }`,
-        phonenumber: formData.contactDetails.mobileNumber || "",
+        name: `${formData.personalData.firstName || ""} ${formData.personalData.surname || ""}`,
+        phonenumber: formData.contactDetails.mobileNumber || ""
       },
       customizations: {
         title: "Registration Payment",

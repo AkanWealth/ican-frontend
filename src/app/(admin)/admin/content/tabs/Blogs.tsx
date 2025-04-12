@@ -4,27 +4,27 @@ import React, { useEffect, useState } from "react";
 // import { Pagination } from "@/components/ui/pagination";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { blogscolumns } from "@/components/admincomps/content/datatable/columns";
-import {
-  Content,
-  contents,
-} from "@/components/admincomps/content/datatable/colsdata";
-
-async function getData(): Promise<Content[]> {
-  return contents;
-}
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
 
 function Blogs() {
-  const [data, setData] = useState<Content[]>([]);
-
+  const [data, setData] = useState([]);
   useEffect(() => {
-    async function fetchData() {
-      const result = await getData();
-      const filteredData = result.filter(
-        (content) => content.category === "blogs"
-      );
-      setData(filteredData);
+    async function fetchBlogsData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/blogs`,
+        headers: {},
+      };
+      try {
+        const response = await axios.request(config);
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
     }
-    fetchData();
+    fetchBlogsData();
   }, []);
 
   return (

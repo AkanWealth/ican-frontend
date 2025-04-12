@@ -61,7 +61,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching Technical Sessions details for edit mode");
       fetchDetails();
     }
-  }, []);
+  }, [editDataFetched, id, mode]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({

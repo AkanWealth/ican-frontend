@@ -55,13 +55,13 @@ function FaqEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching FAQ details for edit mode");
       fetchDetails();
     }
-  }, []);
+  }, [editDataFetched, id, mode]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({
       name: faq.question,
       answer: faq.answer,
-      status: status,
+
     });
 
     const config = {

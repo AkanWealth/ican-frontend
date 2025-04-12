@@ -3,24 +3,31 @@
 import React, { useEffect, useState } from "react";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { allcolumns } from "@/components/admincomps/content/datatable/columns";
-import {
-  Content,
-  contents,
-} from "@/components/admincomps/content/datatable/colsdata";
 
-export async function getData(): Promise<Content[]> {
-  return contents;
-}
+import { BASE_API_URL } from "@/utils/setter";
+import axios from "axios";
+
+
 
 function All() {
-  const [data, setData] = useState<Content[]>([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
-      const result = await getData();
-      setData(result);
+    async function fetchAllContentData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/content`,
+        headers: {},
+      };
+      try {
+        const response = await axios.request(config);
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
     }
-    fetchData();
+    fetchAllContentData();
   }, []);
 
   return (

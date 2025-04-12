@@ -122,15 +122,18 @@ function AdminLogin() {
 
         // Set secure cookies instead of localStorage
         localStorage.setItem("user", JSON.stringify(user));
+        document.cookie = `user=${encodeURIComponent(JSON.stringify(user))}; path=/; secure; samesite=strict`;
+
         localStorage.setItem("access_token", access_token);
         document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
 
-        if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
+        console.log("User data:", user);
+        console.log("Access token:", access_token);
+
+        setTimeout(() => {
           router.push("/admin");
-        } else {
-          // Handle unauthorized access attempt
-          router.push("/login");
-        }
+        }, 5000);
+
         return <Toast type="success" message="Login successful" />;
       } catch (error) {
         return <Toast type="error" message="An error occurred during login." />;

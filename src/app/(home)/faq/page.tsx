@@ -1,8 +1,9 @@
 "use client";
 
-import Heroimg from "@/components/homecomps/Heroimg";
+import Heroimg from "@/components/Heroimg";
 import React from "react";
-import Faq from "@/components/homecontent/Faq";
+import Faq from "@/components/Faq";
+import StudentStudy from "@/components/StudentStudy";
 
 function FaqPage() {
   return (
@@ -13,6 +14,7 @@ function FaqPage() {
         maintxt="FAQ"
         imageUrl="/faqhero.png"
       />
+      
 
       <Faq />
     </div>

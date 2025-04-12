@@ -1,12 +1,10 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { hasRole } from "@/lib/auth";
-
 import "../globals.css";
-import Sidebar from "@/components/admincomps/Sidebar";
-import Header from "@/components/admincomps/Header";
+import { Toaster } from "@/components/ui/toaster";
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "ICAN Surulere",
+  description: "Empowering Professionals, Building Futures",
+};
 
 export default function AdminLayout({
   children,
@@ -15,11 +13,11 @@ export default function AdminLayout({
 }) {
   return (
     <html lang="en">
-      <body className=" h-full flex flex-row">
-        <Sidebar />
-        <div className=" w-full overflow-auto bg-neutral-100">
-          <Header />
-          <main className="p-6">{children}</main>
+      <body>
+        <div className="mt-40">
+          <h1>Admin layout</h1>
+          <div>{children}</div>
+          <Toaster />
         </div>
       </body>
     </html>

@@ -3,9 +3,8 @@
 import React, { useState } from "react";
 import Success from "./steps/Success";
 import New from "./steps/New";
-import { Suspense } from "react";
 
-function ResetPasswordContent() {
+function ResetPassword() {
   const [step, setStep] = useState(1);
 
   const steps = [
@@ -38,10 +37,4 @@ function ResetPasswordContent() {
   );
 }
 
-export default function ResetPassword() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ResetPasswordContent />
-    </Suspense>
-  );
-}
+export default ResetPassword;

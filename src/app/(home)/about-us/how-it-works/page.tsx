@@ -1,7 +1,7 @@
-import Heroimg from "@/components/homecomps/Heroimg";
-import Meminfo from "@/components/homecomps/Meminfo";
+import Heroimg from "@/components/Heroimg";
+import Meminfo from "@/components/Meminfo";
 import React from "react";
-import Faq from "@/components/homecontent/Faq";
+import Faq from "@/components/Faq";
 import Infocard from "@/components/genui/Infocard";
 
 function Howiw() {

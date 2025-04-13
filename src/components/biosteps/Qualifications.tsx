@@ -43,7 +43,7 @@ function Qualifications({
         <hr />
       </h3>
 
-      <div className="w-full grid lg:grid-cols-2 md:grid-col-1  lg:gap-10 md:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputEle
           id="insitution"
           placeholder="Enter your Insitution"

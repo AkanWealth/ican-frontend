@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Search, BellIcon, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Notification from "@/components/membercomps/Notification";
@@ -12,11 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export const Header = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null); // State for profile picture
   const notificationRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
@@ -53,11 +55,44 @@ export const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isNotificationOpen, isMobile]);
-  const handleLogout = () => {
 
+  // Fetch the user's profile picture
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        const user = localStorage.getItem("user");
+        const userId = user ? JSON.parse(user)?.id : null;
+
+        if (!userId) {
+          console.error("User ID not found in local storage");
+          return;
+        }
+
+        const response = await axios.get(
+          `https://ican-api-6000e8d06d3a.herokuapp.com/api/users/${userId}`,{
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        const profilePictureUrl = response.data?.profilePicture;
+        if (profilePictureUrl) {
+          setProfilePicture(profilePictureUrl); // Update the profile picture state
+        } else {
+          console.warn("Profile picture not found in user data");
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchProfilePicture();
+  }, []);
+
+  const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-  
     router.push("/login");
   };
 
@@ -68,7 +103,7 @@ export const Header = () => {
       } z-30 p-2 transition-all duration-300`}
     >
       <div className="h-full bg-white border-b border-gray-400 shadow-sm px-4 md:px-12 flex items-center justify-between">
-        {/* Search Bar - with better positioning for mobile */}
+        {/* Search Bar */}
         <div
           className={`flex items-center ${
             isMobile ? "ml-10" : isTablet ? "ml-6" : "ml-0"
@@ -116,27 +151,18 @@ export const Header = () => {
             <DropdownMenuTrigger className="flex items-center space-x-2 outline-none">
               <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
                 <Image
-                  src="/Ellipse 1732.png"
+                  src={profilePicture || "/default-avatar.png"} // Use default avatar if profile picture is not available
                   alt="Profile"
                   width={200}
                   height={200}
                   className="w-full h-full object-cover"
                 />
               </div>
-              {/* Show notification badge on dropdown for mobile */}
-              {/* {isMobile && (
-                <div className="relative mr-2">
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-                    5
-                  </span>
-                </div>
-              )} */}
               <ChevronDown className="w-4 h-4 text-gray-600" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {/* Show notifications in dropdown on mobile */}
               {isMobile && (
                 <>
                   <DropdownMenuItem className="flex justify-between items-center">
@@ -151,9 +177,16 @@ export const Header = () => {
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem onClick={() => router.push("/Profile")}>Profile</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push("/Setting")}>Settings</DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+              <DropdownMenuItem onClick={() => router.push("/Profile")}>
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/Setting")}>
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="text-red-600"
+              >
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

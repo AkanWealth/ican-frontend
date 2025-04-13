@@ -16,6 +16,7 @@ import SuccessModal from "./SuccessMessage";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { FlutterWaveButton } from "flutterwave-react-v3";
+import { BASE_API_URL } from "@/utils/setter";
 // import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
@@ -70,14 +71,15 @@ const EventRegistration = () => {
   }, [searchParams]);
 
   useEffect(() => {
+    // Look for the checkUserRegistration function and update it:
     const checkUserRegistration = async () => {
       try {
         const user = localStorage.getItem("user");
         const email = user ? JSON.parse(user)?.email : null; 
         if (!email) return;
-
+    
         const response = await axios.get(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/registrations/user/${email}`,
+          `${BASE_API_URL}/events/registrations/user/${email}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`, 
@@ -85,13 +87,24 @@ const EventRegistration = () => {
             },
           }
         );
-
-        const registeredEvents = response.data || [];
-        const isUserRegistered = registeredEvents.some(
-          (event: { id: string }) => event.id === eventDetails.id
-        );
-
-        setIsRegistered(isUserRegistered);
+    
+        console.log("Registration response data:", response.data);
+        
+        // Check if response data is an array
+        if (Array.isArray(response.data)) {
+          // Handle array response
+          const isUserRegistered = response.data.some(
+            (event) => event.eventId === eventDetails.id
+          );
+          setIsRegistered(isUserRegistered);
+        } else if (response.data && typeof response.data === 'object') {
+          // Handle single object response
+          const isUserRegistered = response.data.eventId === eventDetails.id;
+          setIsRegistered(isUserRegistered);
+        } else {
+          // No valid registration data
+          setIsRegistered(false);
+        }
       } catch (error: any) {
         if (error.response && error.response.status === 404) {
           // User is not registered for this event
@@ -258,7 +271,7 @@ const EventRegistration = () => {
 
       // Send the payload to the endpoint
       const response = await axios.post(
-        `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/registrations/register`,
+        `${BASE_API_URL}/events/registrations/${eventId}/register`,
         registrationPayload,
         {
           headers: {
@@ -406,13 +419,17 @@ const EventRegistration = () => {
         </div>
 
       {/* Right Column */}
-      <div className="order-2 lg:order-2">
-        {isRegistered ? (
-            <div className="text-center border-2 border-gray-300 rounded-lg p-6 bg-gray-50">
-              <h2 className="text-2xl font-bold mb-4">You have already registered for this event. </h2>
-              
-              <p className="text-gray-700">If you need to make changes to your registration, please contact support.</p>
+        <div className="order-2 lg:order-2">
+          {isRegistered ? (
+            <div className="text-center border border-gray-300 rounded-lg p-2 bg-gray-50">
+            <div className="flex items-center justify-center">
+              <CircleAlert className="w-6 h-6 text-red-500 mr-2" />
+              <div>
+                <h2 className="text-lg font-bold mb-2">You have already registered for this event.</h2>
+                <p className="text-gray-600 text-xs">If you need to make changes to your registration, please contact support.</p>
+              </div>
             </div>
+          </div>
           ) : (
             <>
               <p className="flex flex-row text-sm font-medium">

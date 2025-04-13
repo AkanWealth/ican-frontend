@@ -43,7 +43,7 @@ function Qualifications({
         <hr />
       </h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputEle
           id="insitution"
           placeholder="Enter your Insitution"
@@ -69,7 +69,6 @@ function Qualifications({
           onChange={handleChange}
           required={false}
           value={formData?.education?.qualification}
-          addStyle2="h-[50px]"
         />
         <InputEle
           id="graduation"
@@ -86,7 +85,6 @@ function Qualifications({
           onChange={handleChange}
           required={false}
           value={formData?.education?.status}
-          addStyle2="h-[50px]"
         />
         {/* <InputEle
           id="firstQualDate"

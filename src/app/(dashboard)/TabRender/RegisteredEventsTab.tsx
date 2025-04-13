@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuIte
 import FeedbackModal from '../ui/FeedbackModal';
 import CertificateGenerator from '@/components/homecomps/CertificateGenerator';
 import axios from 'axios';
+import { BASE_API_URL } from "@/utils/setter";
 
 interface Event {
     id: string;
@@ -35,7 +36,7 @@ const RegisteredEventsTab: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
     const [registrationsMap, setRegistrationsMap] = useState<Record<string, Registration[]>>({});
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -44,30 +45,68 @@ const RegisteredEventsTab: React.FC = () => {
         const fetchUserRegistrations = async () => {
             setLoading(true);
             try {
+                // Get authentication details
                 const token = localStorage.getItem('token');
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const email = user.email;
-
-                if (!token || !email) {
+                const userJson = localStorage.getItem('user');
+                
+                if (!token || !userJson) {
+                    console.log('Missing authentication data');
                     setError('User is not authenticated. Please log in again.');
                     setLoading(false);
                     return;
                 }
+                
+                // Parse user data with error handling
+                let user;
+                try {
+                    user = JSON.parse(userJson);
+                } catch (parseError) {
+                    console.error('Failed to parse user data:', parseError);
+                    setError('Invalid user data. Please log in again.');
+                    setLoading(false);
+                    return;
+                }
+                
+                const email = user?.email;
+                
+                if (!email) {
+                    console.log('No email found in user data');
+                    setError('User email not found. Please log in again.');
+                    setLoading(false);
+                    return;
+                }
 
+                console.log('Fetching registrations for:', email);
+                
                 // Fetch user registrations
                 const registrationsResponse = await axios.get(
-                    'https://ican-api-6000e8d06d3a.herokuapp.com/api/events/registrations/user-events',
+                    `${BASE_API_URL}/events/registrations/user-events`,
                     {
                         params: { email },
                         headers: { Authorization: `Bearer ${token}` },
                     }
                 );
+                
+                console.log('Registration response:', registrationsResponse);
 
-                // Ensure the response contains the expected data structure
-                const registrationsData: Registration[] = registrationsResponse.data?.data || [];
+                // Check if response exists and contains data
+                if (!registrationsResponse?.data) {
+                    console.log('No data in registration response');
+                    setRegisteredEvents([]);
+                    setLoading(false);
+                    return;
+                }
+
+                // Handle potential different response structures
+                const registrationsData = Array.isArray(registrationsResponse.data) 
+                    ? registrationsResponse.data 
+                    : registrationsResponse.data?.data || [];
+                
+                console.log('Registrations data:', registrationsData);
 
                 if (!Array.isArray(registrationsData) || registrationsData.length === 0) {
-                    setRegisteredEvents([]); // Set empty list for no registered events
+                    console.log('No registered events found');
+                    setRegisteredEvents([]);
                     setLoading(false);
                     return;
                 }
@@ -80,30 +119,52 @@ const RegisteredEventsTab: React.FC = () => {
                     }
                     registrationsMap[registration.eventId].push(registration);
                 });
+                
+                console.log('Registrations map created:', Object.keys(registrationsMap).length);
 
-                // Fetch event details for each registration
-                const eventPromises = registrationsData.map(async (registration) => {
-                    const eventResponse = await axios.get(
-                        `http://localhost:4000/api/events/${registration.eventId}`,
-                        {
-                            headers: { Authorization: `Bearer ${token}` },
+                // Fetch event details for each registration with better error handling
+                const eventsData: Event[] = [];
+                
+                for (const registration of registrationsData) {
+                    if (!registration.eventId) {
+                        console.log('Registration missing eventId:', registration);
+                        continue;
+                    }
+                    
+                    try {
+                        const eventResponse = await axios.get(
+                            `${BASE_API_URL}/events/${registration.eventId}`,
+                            {
+                                headers: { Authorization: `Bearer ${token}` },
+                            }
+                        );
+                        
+                        if (eventResponse?.data) {
+                            // Extract event data depending on response structure
+                            const eventData = eventResponse.data.data || eventResponse.data;
+                            eventsData.push(eventData);
                         }
-                    );
-                    return eventResponse.data;
-                });
-
-                const eventsData: Event[] = await Promise.all(eventPromises);
+                    } catch (eventError) {
+                        console.error(`Failed to fetch event ${registration.eventId}:`, eventError);
+                        // Continue with other events instead of failing completely
+                    }
+                }
+                
+                console.log('Events data fetched:', eventsData.length);
 
                 setEvents(eventsData);
                 setRegisteredEvents(eventsData);
                 setRegistrationsMap(registrationsMap);
             } catch (err) {
+                console.error('Error in fetchUserRegistrations:', err);
+                
                 if (axios.isAxiosError(err)) {
-                    console.error('Error details:', err.response ? err.response.data : err.message);
+                    const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch registered events';
+                    console.error('Axios error details:', err.response?.data);
+                    setError(`${errorMessage}. Please try again later.`);
                 } else {
-                    console.error('Error details:', err);
+                    setError('An unexpected error occurred. Please try again later.');
                 }
-                setError('Failed to fetch registered events. Please try again later.');
             } finally {
                 setLoading(false);
             }
@@ -116,14 +177,14 @@ const RegisteredEventsTab: React.FC = () => {
 
     const handleOpenFeedbackModal = (event: Event) => {
         setSelectedEvent(event);
-        setSelectedEventId(event.id); // Set the selected event ID
+        setSelectedEventId(event.id);
         setIsFeedbackModalOpen(true);
     };
 
     const handleCloseFeedbackModal = () => {
         setIsFeedbackModalOpen(false);
         setSelectedEvent(null);
-        setSelectedEventId(null); // Reset selected event ID
+        setSelectedEventId(null);
     };
 
     const filterEvents = (events: Event[]) => {
@@ -142,27 +203,52 @@ const RegisteredEventsTab: React.FC = () => {
     };
 
     if (loading) {
-        return <div className="text-center mt-10">Loading registered events...</div>;
-    }
-
-    if (error) {
-        return <div className="text-center text-red-500 mt-10">Error: {error}</div>;
-    }
-
-    if (registeredEvents.length === 0) {
         return (
-            <div className="flex-grow flex items-center justify-center mt-40">
-                <div className="text-center p-16">
-                    <div className="flex justify-center">
-                        <Image src="/calendar.png" width={150} height={50} alt="calendar-image" />
-                    </div>
-                    <h2 className="mt-10 text-xl font-bold text-gray-800">No Registered Events</h2>
-                    <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
-                        Please check back later for updates or explore other sections for more opportunities.
-                    </p>
+            <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-800"></div>
+                    <p className="mt-4">Loading registered events...</p>
                 </div>
             </div>
         );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center p-8 mt-10">
+                <div className="text-red-500 mb-4">
+                    <svg className="inline-block h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 className="text-xl font-bold mb-2">Error</h2>
+                <p className="text-gray-700">{error}</p>
+                <button 
+                    onClick={() => window.location.reload()}
+                    className="mt-4 px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-700"
+                >
+                    Try Again
+                </button>
+            </div>
+        );
+    }
+
+    const emptyEventsDisplay = (
+        <div className="flex-grow flex items-center justify-center mt-40">
+            <div className="text-center p-16">
+                <div className="flex justify-center">
+                    <Image src="/calendar.png" width={150} height={50} alt="calendar-image" />
+                </div>
+                <h2 className="mt-10 text-xl font-bold text-gray-800">No Registered Events</h2>
+                <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
+                    Please check back later for updates or explore other sections for more opportunities.
+                </p>
+            </div>
+        </div>
+    );
+
+    if (registeredEvents.length === 0) {
+        return emptyEventsDisplay;
     }
 
     return (
@@ -189,75 +275,58 @@ const RegisteredEventsTab: React.FC = () => {
                 </DropdownMenu>
             </div>
 
-            {registeredEvents.length > 0 ? (
-                <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6 mt-8">
-                    {filterEvents(registeredEvents).map((event) => (
-                        <div key={event.id} className="rounded-lg relative border-l-4 border-green-600 p-4 bg-white">
-                            <div className="">
-                                <span
-                                    className={`rounded-full px-2 py-0.5 text-sm  ${
-                                        event.IsAttended
-                                            ? 'text-green-700 bg-green-100 font-medium'
-                                            : 'text-gray-700 bg-gray-100 font-medium'
-                                    }`}
+            <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6 mt-8">
+                {filterEvents(registeredEvents).map((event) => (
+                    <div key={event.id} className="rounded-lg relative border-l-4 border-green-600 p-4 bg-white">
+                        <div className="">
+                            <span
+                                className={`rounded-full px-2 py-0.5 text-sm  ${
+                                    event.IsAttended
+                                        ? 'text-green-700 bg-green-100 font-medium'
+                                        : 'text-gray-700 bg-gray-100 font-medium'
+                                }`}
+                            >
+                                {event.IsAttended ? 'Attended' : 'Not Attended'}
+                            </span>
+                        </div>
+
+                        <div className="">
+                            <h3 className="font-bold text-lg mb-2">{event.topic}</h3>
+                            <p className="text-sm text-gray-600 mb-4">{event.subtitle}</p>
+
+                            <div className="flex flex-col text-sm gap-2 text-gray-600 mb-4">
+                                <div className="flex items-center">
+                                    <CalendarDays className="w-4 h-4 mr-1" />
+                                    {event.date}
+                                </div>
+                                <div className="flex items-center">
+                                    <MapPin className="w-4 h-4 mr-1" />
+                                    {event.location}
+                                </div>
+                            </div>
+
+                            <div className="text-sm text-gray-500 mb-4">
+                                Registrations: {registrationsMap[event.id]?.length || 0}
+                            </div>
+
+                            <div className="flex items-center justify-end gap-2 ml-4">
+                                {event.IsAttended && (
+                                    <CertificateGenerator
+                                        eventId={event.id}
+                                        eventTitle={event.topic}
+                                    />
+                                )}
+                                <button
+                                    onClick={() => handleOpenFeedbackModal(event)}
+                                    className="px-6 py-2 rounded-full transition-colors bg-blue-800 text-white hover:bg-blue-700"
                                 >
-                                    {event.IsAttended ? 'Attended' : 'Not Attended'}
-                                </span>
-                            </div>
-
-                            <div className="">
-                                <h3 className="font-bold text-lg mb-2">{event.topic}</h3>
-                                <p className="text-sm text-gray-600 mb-4">{event.subtitle}</p>
-
-                                <div className="flex flex-col text-sm gap-2 text-gray-600 mb-4">
-                                    <div className="flex items-center">
-                                        <CalendarDays className="w-4 h-4 mr-1" />
-                                        {event.date}
-                                    </div>
-                                    <div className="flex items-center">
-                                        <MapPin className="w-4 h-4 mr-1" />
-                                        {event.location}
-                                    </div>
-                                </div>
-
-                                <div className="text-sm text-gray-500 mb-4">
-                                    Registrations: {registrationsMap[event.id]?.length || 0}
-                                </div>
-
-                                <div className="flex items-center justify-end gap-2 ml-4">
-                                    
-                                        <CertificateGenerator
-                                            eventId={event.id}
-                                            eventTitle={event.topic}
-                                        />
-                                    <button
-                                        onClick={() => handleOpenFeedbackModal(event)}
-                                        className={`px-6 py-2 rounded-full transition-colors ${
-                                            !event.IsAttended
-                                                ? 'bg-blue-800 text-white'
-                                                : 'bg-blue-800 text-white'
-                                        }`}
-                                    >
-                                        Write Feedback
-                                    </button>
-                                </div>
+                                    Write Feedback
+                                </button>
                             </div>
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="flex-grow flex items-center justify-center mt-40">
-                    <div className="text-center p-16">
-                        <div className="flex justify-center">
-                            <Image src="/calendar.png" width={150} height={50} alt="calendar-image" />
-                        </div>
-                        <h2 className="mt-10 text-xl font-bold text-gray-800">No Registered Events</h2>
-                        <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
-                            Please check back later for updates or explore other sections for more opportunities.
-                        </p>
                     </div>
-                </div>
-            )}
+                ))}
+            </div>
 
             <FeedbackModal
                 isOpen={isFeedbackModalOpen}

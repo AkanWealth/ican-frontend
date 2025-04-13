@@ -29,8 +29,8 @@ function ResetPasswordContent() {
   };
 
   return (
-    <div className=" m-auto ">
-      <div className="flex flex-col w-96 sm:w-[440px] items-center rounded-2xl  bg-white p-8 gap-6 ">
+    <div className=" m-auto flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center rounded-2xl bg-white p-2 gap-6 w-full max-w-md sm:max-w-lg md:max-w-xl">
         {step === 1 && <New onNext={handleNext} />}
         {step === 2 && <Success onNext={handleNext} />}
       </div>

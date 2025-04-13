@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 interface Propsval {
   onNext: () => void;
@@ -15,10 +15,28 @@ function   New({ onNext }: Propsval) {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
-  const {toast} = useToast()
+  const {toast} = useToast();
   // Extract token from URL
   const token = searchParams ? searchParams.get("token") : null;
+  const router = useRouter();
 
+
+
+
+  useEffect(() => {
+    
+    if (!token) {
+      toast({
+        title: "Invalid Request",
+        description: "Reset token is missing. Please use the link from your email.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      router.push("/forgot-password"); // Redirect to forgot password page
+      return;
+    }
+  }
+  , [token]);
   // Password validation
   const validatePassword = (password: string) => {
     // Minimum 8 characters, at least one uppercase letter, one lowercase letter, one number, and one special character
@@ -90,7 +108,7 @@ function   New({ onNext }: Propsval) {
   };
 
   return (
-    <div className="flex flex-col w-full sm:w-[440px] items-center gap-6 p-8">
+    <div className="flex flex-col w-full sm:w-[440px] items-center gap-6 p-2">
       <Image src="/Logo_big.png" alt="Logo" width={143} height={60} />
       <div className="w-fit">
         <h4 className="text-primary text-center text-3xl font-bold font-mono">

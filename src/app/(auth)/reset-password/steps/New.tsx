@@ -36,7 +36,7 @@ function   New({ onNext }: Propsval) {
       return;
     }
   }
-  , [token]);
+  , [token, toast, router]);
   // Password validation
   const validatePassword = (password: string) => {
     // Minimum 8 characters, at least one uppercase letter, one lowercase letter, one number, and one special character

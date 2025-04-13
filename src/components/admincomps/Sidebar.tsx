@@ -54,7 +54,8 @@ function Sidebar() {
       bottomMenuItems.find((item) => item.href === pathname)
     );
   };
-  const item = findMenuItem(pathname);
+  const item = pathname ? findMenuItem(pathname) : null;
+
   const activePage = item?.label;
 
   return (

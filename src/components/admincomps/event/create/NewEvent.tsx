@@ -35,34 +35,34 @@ function NewEvent({
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-      const config = {
-        method: "get",
-        maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/events/${id}`,
-        headers: {},
-      };
+        const config = {
+          method: "get",
+          maxBodyLength: Infinity,
+          url: `${BASE_API_URL}/events/${id}`,
+          headers: {},
+        };
 
-      const response = await axios.request(config);
-      console.log(JSON.stringify(response.data));
+        const response = await axios.request(config);
+        console.log(JSON.stringify(response.data));
 
-      // Populate formData with fetched data
-      setFormData({
-        event_id: response.data.id || "",
-        eventName: response.data.name || "",
-        venue: response.data.venue || "",
-        eventDescription: response.data.description || "",
-        eventDate: response.data.date || "",
-        eventTime: response.data.time || "",
-        eventFee: response.data.fee ? response.data.fee.toString() : "",
-        mcpdCredit: response.data.mcpd_credit
-          ? response.data.mcpd_credit.toString()
-          : "",
-        eventPhoto: response.data.eventPhoto || null,
-      });
+        // Populate formData with fetched data
+        setFormData({
+          event_id: response.data.id || "",
+          eventName: response.data.name || "",
+          venue: response.data.venue || "",
+          eventDescription: response.data.description || "",
+          eventDate: response.data.date || "",
+          eventTime: response.data.time || "",
+          eventFee: response.data.fee ? response.data.fee.toString() : "",
+          mcpdCredit: response.data.mcpd_credit
+            ? response.data.mcpd_credit.toString()
+            : "",
+          eventPhoto: response.data.eventPhoto || null,
+        });
 
-      setEditDataFetched(true);
+        setEditDataFetched(true);
       } catch (error) {
-      console.error("Error fetching event details:", error);
+        console.error("Error fetching event details:", error);
       }
     };
 
@@ -206,6 +206,7 @@ function NewEvent({
             type="text"
             id="eventFee"
             label="Event Fee in Naira (Optional)"
+            required={false}
             value={formData.eventFee}
             onChange={handleChange}
           />

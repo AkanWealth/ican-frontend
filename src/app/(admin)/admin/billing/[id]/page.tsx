@@ -12,11 +12,29 @@ import { paymentdetailscoloumns } from "@/components/admincomps/payment/datatabl
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
+import { BillingDetails } from "@/libs/types";
 
-
-function BillingDetailsPage() {
+function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const [data, setData] = useState<BillingDetails>();
 
+  useEffect(() => {
+    async function fetchData() {
+      const billingId = await params;
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/billing/${billingId}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      };
+      const result = await axios.request(config);
+
+      setData(result.data);
+    }
+    fetchData();
+  }, [params]);
 
   return (
     <div className="rounded-3xl flex flex-col gap-6 p-6">
@@ -39,25 +57,33 @@ function BillingDetailsPage() {
         <div className="grid grid-cols-2 gap-6">
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Bill Name
-            <span className="text-base text-black font-medium">Bill Name</span>
+            <span className="text-base text-black font-medium">
+              {data?.name}
+            </span>
           </p>
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Bill Type
-            <span className="text-base text-black font-medium">Dues</span>
+            <span className="text-base text-black font-medium">
+              {data?.type}
+            </span>
           </p>
-          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+          {/* <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Bill Description
             <span className="text-base text-black font-medium">
               Bill description
             </span>
-          </p>
+          </p> */}
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Bill Amount{" "}
-            <span className="text-base text-black font-medium">5,000</span>
+            <span className="text-base text-black font-medium">
+              {data?.amount}
+            </span>
           </p>{" "}
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-            Due Date{" "}
-            <span className="text-base text-black font-medium">12/5/2005</span>
+            Status{" "}
+            <span className="text-base text-black font-medium">
+              {data?.status}
+            </span>
           </p>{" "}
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Reciepients{" "}
@@ -68,7 +94,10 @@ function BillingDetailsPage() {
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
         <h2 className="text-xl font-semibold text-left">Payment Details</h2>
         <hr />
-        <PaymentTable data={payments} columns={paymentdetailscoloumns} />
+        <PaymentTable
+          data={data?.payments || []}
+          columns={paymentdetailscoloumns}
+        />
       </div>
     </div>
   );

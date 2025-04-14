@@ -78,13 +78,24 @@ const RegisteredEventsTab: React.FC = () => {
 
                 console.log('Fetching registrations for:', email);
                 
+                // const response = await axios.get(
+                //           `${BASE_API_URL}/events/registrations/user/${email}`,
+                //           {
+                //             headers: {
+                //               Authorization: `Bearer ${localStorage.getItem('token')}`, 
+                //               'Content-Type': 'application/json',
+                //             },
+                //           }
+                //         );
                 // Fetch user registrations
                 const registrationsResponse = await axios.get(
-                    `${BASE_API_URL}/events/registrations/user-events`,
-                    {
-                        params: { email },
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
+                    `${BASE_API_URL}/events/registrations/user/${email}`,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${localStorage.getItem('token')}`, 
+                              'Content-Type': 'application/json',
+                            },
+                          }
                 );
                 
                 console.log('Registration response:', registrationsResponse);

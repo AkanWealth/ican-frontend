@@ -158,10 +158,21 @@ const FeedbackHistoryTab: React.FC = () => {
         return sorted;
     }, [feedbackHistory, filter]);
 
+    // if (isLoading) {
+    //     return (
+    //         <div className="flex justify-center items-center h-full">
+    //             <p>Loading...</p>
+    //         </div>
+    //     );
+    // }
+
     if (isLoading) {
         return (
-            <div className="flex justify-center items-center h-full">
-                <p>Loading...</p>
+            <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-800"></div>
+                    <p className="mt-4">Loading registered events...</p>
+                </div>
             </div>
         );
     }

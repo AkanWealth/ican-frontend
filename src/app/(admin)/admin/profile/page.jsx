@@ -6,7 +6,7 @@ import InputEle from "@/components/genui/InputEle";
 
 function Profile() {
   const [admin, setAdmin] = useState({
-    firstName: "Admin",
+    firstname: "Admin",
     surname: "Admin",
     email: "",
     membershipId: "",
@@ -16,7 +16,7 @@ function Profile() {
   const handleCancel = () => {
     // Reset admin state to initial values
     setAdmin({
-      firstName: "Admin",
+      firstname: "Admin",
       surname: "Admin",
       email: "",
       membershipId: "",
@@ -51,8 +51,8 @@ function Profile() {
           <div className="mx-auto flex flex-col items-center gap-2">
             {/* <Image src="./img.png" width={50} height={50}  alt="Profile img" /> */}
             <h5 className="flex flex-col items-center text-center text-black text-xl font-medium">
-              Admin Name
-              <span className="text-xs text-neutral-400">admin role</span>
+              {admin.firstname} {admin.surname}
+              <span className="text-xs text-neutral-400">{admin.role}</span>
             </h5>
           </div>
           <div className="flex flex-col gap-4 mt-4">
@@ -65,9 +65,9 @@ function Profile() {
                 label="First Name"
                 type="text"
                 placeholder="First Name"
-                value={admin.firstName}
+                value={admin.firstname}
                 onChange={(e) =>
-                  setAdmin({ ...admin, firstName: e.target.value })
+                  setAdmin({ ...admin, firstname: e.target.value })
                 }
               />
               <InputEle

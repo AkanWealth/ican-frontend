@@ -50,11 +50,17 @@ function CreateBillingPage() {
     setNewBill((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
   const saveBill = async () => {
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/billing`,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    };
     try {
-      const response = await axios.post(`${BASE_API_URL}/billing`, {
-        ...newBill,
-        recipients: recipientType === "all" ? "all" : selected,
-      });
+      const response = await axios.request(config);
+
       if (response.status === 200) {
         Toast({
           type: "success",

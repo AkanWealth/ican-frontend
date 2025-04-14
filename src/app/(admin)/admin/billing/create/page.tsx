@@ -50,6 +50,13 @@ function CreateBillingPage() {
     setNewBill((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
   const saveBill = async () => {
+    let data = JSON.stringify({
+      name: newBill.billing_name,
+      type: newBill.billing_type,
+      amount: newBill.billing_amount,
+      affectedUserIds: newBill.reciepients,
+    });
+
     const config = {
       method: "post",
       maxBodyLength: Infinity,
@@ -57,6 +64,7 @@ function CreateBillingPage() {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
+      data: data,
     };
     try {
       const response = await axios.request(config);

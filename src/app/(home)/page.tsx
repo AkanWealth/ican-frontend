@@ -1,5 +1,6 @@
 "use client";
 
+
 import { motion } from "framer-motion";
 import Heroimg from "../../components/homecomps/Heroimg";
 import Cta from "../../components/homecomps/Cta";

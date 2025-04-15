@@ -75,5 +75,23 @@ type CreateContentProps = {
   id?: string;
   mode: "create" | "edit";
 };
+type RolesData = {
+  id: string;
+  name: string;
+  description: string | null;
+  isSuperAdmin: boolean;
+  createdAt: string;
+  permissions: {
+    id: string;
+    roleId: string;
+    permissionId: string;
+  }[];
+};
 
-export type { User, StatCardProps, CreateContentProps, BillingDetails };
+export type {
+  User,
+  StatCardProps,
+  CreateContentProps,
+  BillingDetails,
+  RolesData,
+};

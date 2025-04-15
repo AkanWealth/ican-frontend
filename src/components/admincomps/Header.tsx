@@ -34,7 +34,8 @@ function Header() {
       bottomMenuItems.find((item) => item.href === pathname)
     );
   };
-  const item = findMenuItem(pathname);
+  const item = pathname ? findMenuItem(pathname) : null;
+
 
   return (
     <header className="h-24 w-full py-6 bg-white shadow-sm px-8 flex items-center justify-between">

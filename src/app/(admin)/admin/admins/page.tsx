@@ -9,9 +9,12 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
 import CreateNewAdmin from "@/components/admincomps/admin/CreateNewAdmin";
+import Rolemanager from "@/components/admincomps/admin/Rolemanager";
 
 function AdminManagementPage() {
   const [data, setData] = useState<User[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [showRoleManager, setShowRoleManager] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,10 +43,10 @@ function AdminManagementPage() {
           <p>View and manage all admins details here</p>
         </div>
         <div className="flex flex-row items-center gap-4 justify-end">
-          <button className="rounded-full py-2 px-3 bg-transparent text-primary border-primary text-base w-fit">
+          <button onClick={() => setShowRoleManager(true)} className="rounded-full py-2 px-3 bg-transparent text-primary border-primary text-base w-fit">
             Manage Roles
           </button>
-          <button className=" py-2 px-3 text-white bg-primary  text-base rounded-full w-fit">
+          <button onClick={() => setShowModal(true)} className=" py-2 px-3 text-white bg-primary  text-base rounded-full w-fit">
             Add Administrator
           </button>
         </div>
@@ -54,6 +57,18 @@ function AdminManagementPage() {
           <UserTable columns={adminscolumns} data={data} />
         </div>
       </div>
+      {showModal && (
+        <CreateNewAdmin
+          setShowModal={() => setShowModal(false)}
+          showModal={showModal}
+        />
+      )}
+      {showRoleManager && (
+        <Rolemanager
+          setShowModal={() => setShowRoleManager(false)}
+          showModal={showRoleManager}
+        />
+      )}
     </div>
   );
 }

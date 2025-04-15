@@ -16,7 +16,7 @@ interface CreateNewAdminProps {
   setShowModal: (show: boolean) => void;
 }
 // Form data interface
-interface FormData {
+export interface FormData {
   userId: string;
   roleId: string;
 }
@@ -66,6 +66,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
     setFormData(initialFormData);
     // Reset loading state
     setIsLoading(false);
+    setShowModal(false);
   };
 
   // Fetch roles on component mount using axios
@@ -95,6 +96,10 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         });
       }
     };
+
+    fetchRoles();
+  }, []); // Empty dependency array means this runs once on mount
+  useEffect(() => {
     const fetchUsers = async () => {
       const config = {
         method: "get",
@@ -110,7 +115,8 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
 
         if (response.status === 200) {
           // Update roles state with fetched data
-          setUsers(response.data);
+          setUsers(response.data.data);
+          console.log(response.data.data);
         }
       } catch (error) {
         console.error("Failed to fetch roles:", error);
@@ -121,9 +127,16 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
       }
     };
 
-    fetchRoles();
     fetchUsers();
   }, []); // Empty dependency array means this runs once on mount
+
+  const selectedUser = Array.isArray(users)
+    ? users.find((user) => user.id === formData.userId)
+    : null;
+  const selectedRole = Array.isArray(roles)
+    ? roles.find((role) => role.id === formData.roleId)
+    : null;
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,17 +193,32 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <p className="text-base text-black font-medium"></p>
+          <p className="text-base text-black font-medium">
+            Name: {selectedUser?.firstname} {selectedUser?.surname}
+            <br />
+            Email: {selectedUser?.email}
+            <br />
+            Current Role: {selectedUser?.role.name.replace(/[_-]/g, " ")}
+            <br />
+            New Role: {selectedRole?.name.replace(/[_-]/g, " ")}
+          </p>
 
           <InputEle
-            label="Role Type"
+            label="User"
             type="select"
             id="userId"
             value={formData.userId}
-            options={users.map((user) => ({
-              value: user.id,
-              label: `${user.firstname} ${user.surname}`,
-            }))}
+            options={
+              Array.isArray(users)
+                ? [
+                    { value: "", label: "Select User" },
+                    ...users.map((user) => ({
+                      value: user.id,
+                      label: `${user.firstname} ${user.surname}`,
+                    }))
+                  ]
+                : [{ value: "", label: "Select User" }]
+            }
             onChange={(e) =>
               setFormData({ ...formData, userId: e.target.value })
             }
@@ -200,10 +228,13 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
             type="select"
             id="roleId"
             value={formData.roleId}
-            options={roles.map((role) => ({
-              value: role.id,
-              label: role.name,
-            }))}
+            options={[
+              { value: "", label: "Select Role" },
+              ...roles.map((role) => ({
+                value: role.id,
+                label: role.name.replace(/[_-]/g, " "),
+              }))
+            ]}
             onChange={(e) =>
               setFormData({ ...formData, roleId: e.target.value })
             }

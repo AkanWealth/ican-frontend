@@ -1,5 +1,22 @@
 import { IconType } from "react-icons";
 
+type BillingDetails = {
+  id: string;
+  name: string;
+  type: string;
+  amount: number;
+  createdBy: string;
+  status: string;
+  createdAt: string;
+  createdByUser: User;
+  payments: any[];
+  affectedUsers: {
+    id: string;
+    billingId: string;
+    userId: string;
+  }[];
+};
+
 type User = {
   id: string;
   email: string;
@@ -58,5 +75,23 @@ type CreateContentProps = {
   id?: string;
   mode: "create" | "edit";
 };
+type RolesData = {
+  id: string;
+  name: string;
+  description: string | null;
+  isSuperAdmin: boolean;
+  createdAt: string;
+  permissions: {
+    id: string;
+    roleId: string;
+    permissionId: string;
+  }[];
+};
 
-export type { User, StatCardProps, CreateContentProps };
+export type {
+  User,
+  StatCardProps,
+  CreateContentProps,
+  BillingDetails,
+  RolesData,
+};

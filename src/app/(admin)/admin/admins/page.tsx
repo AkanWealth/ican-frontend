@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { adminscolumns } from "@/components/admincomps/user/datatable/columns";
 import { User } from "@/libs/types";
@@ -8,8 +10,12 @@ import { User } from "@/libs/types";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
+import CreateNewAdmin from "@/components/admincomps/admin/CreateNewAdmin";
+
 function AdminManagementPage() {
+  const router = useRouter();
   const [data, setData] = useState<User[]>([]);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -28,7 +34,6 @@ function AdminManagementPage() {
     fetchData();
   }, []);
 
-
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
@@ -39,10 +44,16 @@ function AdminManagementPage() {
           <p>View and manage all admins details here</p>
         </div>
         <div className="flex flex-row items-center gap-4 justify-end">
-          <button className="rounded-full py-2 px-3 bg-transparent text-primary border-primary text-base w-fit">
+          <button
+            onClick={() => router.push("admins/roles")}
+            className="rounded-full py-2 px-3 bg-transparent text-primary border-primary text-base w-fit"
+          >
             Manage Roles
           </button>
-          <button className=" py-2 px-3 text-white bg-primary  text-base rounded-full w-fit">
+          <button
+            onClick={() => setShowModal(true)}
+            className=" py-2 px-3 text-white bg-primary  text-base rounded-full w-fit"
+          >
             Add Administrator
           </button>
         </div>
@@ -53,6 +64,13 @@ function AdminManagementPage() {
           <UserTable columns={adminscolumns} data={data} />
         </div>
       </div>
+      {showModal && (
+        <CreateNewAdmin
+          setShowModal={() => setShowModal(false)}
+          showModal={showModal}
+        />
+      )}
+     
     </div>
   );
 }

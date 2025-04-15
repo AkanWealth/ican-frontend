@@ -31,38 +31,116 @@ function NewEvent({
     mcpdCredit: "",
     eventPhoto: null,
   });
+  // State to handle form validation errors
+  const [formErrors, setFormErrors] = useState({
+    eventName: "",
+    venue: "",
+    eventDescription: "", 
+    eventDate: "",
+    eventTime: "",
+    eventFee: "",
+    mcpdCredit: "",
+    eventPhoto: ""
+  });
+
+  // Function to validate form fields
+  const validateForm = () => {
+    let isValid = true;
+    const errors = {
+      eventName: "",
+      venue: "",
+      eventDescription: "",
+      eventDate: "",
+      eventTime: "",
+      eventFee: "",
+      mcpdCredit: "",
+      eventPhoto: "",
+    };
+
+    // Validate event name
+    if (!formData.eventName.trim()) {
+      errors.eventName = "Event name is required";
+      isValid = false;
+    }
+
+    // Validate venue
+    if (!formData.venue.trim()) {
+      errors.venue = "Venue is required";
+      isValid = false;
+    }
+
+    // Validate description
+    if (!formData.eventDescription.trim()) {
+      errors.eventDescription = "Event description is required";
+      isValid = false;
+    }
+
+    // Validate date
+    if (!formData.eventDate) {
+      errors.eventDate = "Event date is required";
+      isValid = false;
+    }
+
+    // Validate time
+    if (!formData.eventTime) {
+      errors.eventTime = "Event time is required";
+      isValid = false;
+    }
+
+    // Validate fee (must be zero or positive number)
+    if (
+      formData.eventFee === "" ||
+      isNaN(Number(formData.eventFee)) ||
+      Number(formData.eventFee) < 0
+    ) {
+      errors.eventFee = "Please enter a valid event fee (0 or greater)";
+      isValid = false;
+    }
+    // Validate event date
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    if (!formData.eventDate) {
+      errors.eventDate = "Event date is required";
+    } else if (new Date(formData.eventDate) < tomorrow) {
+      errors.eventDate = "Event date must be at least tomorrow";
+    }
+    setFormErrors(errors);
+    return isValid;
+  };
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-      const config = {
-        method: "get",
-        maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/events/${id}`,
-        headers: {},
-      };
+        const config = {
+          method: "get",
+          maxBodyLength: Infinity,
+          url: `${BASE_API_URL}/events/${id}`,
+          headers: {},
+        };
 
-      const response = await axios.request(config);
-      console.log(JSON.stringify(response.data));
+        const response = await axios.request(config);
+        console.log(JSON.stringify(response.data));
 
-      // Populate formData with fetched data
-      setFormData({
-        event_id: response.data.id || "",
-        eventName: response.data.name || "",
-        venue: response.data.venue || "",
-        eventDescription: response.data.description || "",
-        eventDate: response.data.date || "",
-        eventTime: response.data.time || "",
-        eventFee: response.data.fee ? response.data.fee.toString() : "",
-        mcpdCredit: response.data.mcpd_credit
-          ? response.data.mcpd_credit.toString()
-          : "",
-        eventPhoto: response.data.eventPhoto || null,
-      });
+        // Populate formData with fetched data
+        setFormData({
+          event_id: response.data.id || "",
+          eventName: response.data.name || "",
+          venue: response.data.venue || "",
+          eventDescription: response.data.description || "",
+          eventDate: response.data.date || "",
+          eventTime: response.data.time || "",
+          eventFee: response.data.fee ? response.data.fee.toString() : "",
+          mcpdCredit: response.data.mcpd_credit
+            ? response.data.mcpd_credit.toString()
+            : "",
+          eventPhoto: response.data.eventPhoto || null,
+        });
 
-      setEditDataFetched(true);
+        setEditDataFetched(true);
       } catch (error) {
-      console.error("Error fetching event details:", error);
+        console.error("Error fetching event details:", error);
       }
     };
 
@@ -85,6 +163,9 @@ function NewEvent({
     }
   };
 
+
+
+
   const handleCancel = () => {
     // Reset form data to initial state
     setFormData({
@@ -103,7 +184,43 @@ function NewEvent({
   };
 
   const handleSaveDraft = () => {
-    // Handle save as draft action
+
+    const draftEvent = async () => {
+      try {
+        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const formDataToSend = {
+          eventName: formData.eventName,
+          venue: formData.venue,
+          eventDescription: formData.eventDescription,
+          eventDate: formData.eventDate,
+          eventTime: formData.eventTime,
+          eventFee: formData.eventFee ? parseFloat(formData.eventFee) : 0,
+          eventPhoto: formData.eventPhoto, // Assuming this is a URL or file path
+          mcpdCredit: formData.mcpdCredit ? parseInt(formData.mcpdCredit) : 0,
+          status: "DRAFT",
+        };
+
+        const config = {
+          method: "post",
+          url: `${BASE_API_URL}/events`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          data: JSON.stringify(formDataToSend),
+        };
+
+        const response = await axios.request(config);
+        console.log("Event added to drafts successfully:", response.data);
+        handleCancel(); // Close the modal after successful draft
+        return <Toast type="success" message="Event added to drafts successfully!" />;
+      } catch (error) {
+        console.error("Error adding the event to draft:", error);
+        return <Toast type="error" message="Error drafting event!" />;
+      }
+    };
+
+    draftEvent();
   };
 
   const handlePublish = () => {
@@ -166,6 +283,7 @@ function NewEvent({
             required
             value={formData.eventName}
             onChange={handleChange}
+            errorMsg={formErrors.eventName}
           />
           <InputEle
             type="text"
@@ -174,6 +292,7 @@ function NewEvent({
             required
             value={formData.venue}
             onChange={handleChange}
+            errorMsg={formErrors.venue}   
           />
         </div>
         <InputEle
@@ -182,6 +301,8 @@ function NewEvent({
           label="Event Description"
           value={formData.eventDescription}
           onChange={handleChange}
+          
+          errorMsg={formErrors.eventDescription}
         />
         <div className="flex flex-row items-center gap-4 justify-between">
           <InputEle
@@ -190,7 +311,8 @@ function NewEvent({
             label="Event Date"
             required
             value={formData.eventDate}
-            onChange={handleChange}
+            onChange={handleChange} 
+            errorMsg={formErrors.eventDate}
           />
           <InputEle
             type="time"
@@ -199,6 +321,7 @@ function NewEvent({
             required
             value={formData.eventTime}
             onChange={handleChange}
+            errorMsg={formErrors.eventTime}
           />
         </div>
         <div className="flex flex-row items-center gap-4 justify-between">
@@ -206,12 +329,14 @@ function NewEvent({
             type="text"
             id="eventFee"
             label="Event Fee in Naira (Optional)"
+            required={false}
             value={formData.eventFee}
             onChange={handleChange}
+            errorMsg={formErrors.eventFee}
           />
         </div>
         <InputEle
-          type="file"
+          type="images"
           id="eventPhoto"
           label="Upload Event Photo/Flyer"
           onChange={handleChange}

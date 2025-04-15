@@ -103,7 +103,42 @@ function NewEvent({
   };
 
   const handleSaveDraft = () => {
-    // Handle save as draft action
+    const draftEvent = async () => {
+      try {
+        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const formDataToSend = {
+          eventName: formData.eventName,
+          venue: formData.venue,
+          eventDescription: formData.eventDescription,
+          eventDate: formData.eventDate,
+          eventTime: formData.eventTime,
+          eventFee: formData.eventFee ? parseFloat(formData.eventFee) : 0,
+          eventPhoto: formData.eventPhoto, // Assuming this is a URL or file path
+          mcpdCredit: formData.mcpdCredit ? parseInt(formData.mcpdCredit) : 0,
+          status: "DRAFT",
+        };
+
+        const config = {
+          method: "post",
+          url: `${BASE_API_URL}/events`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          data: JSON.stringify(formDataToSend),
+        };
+
+        const response = await axios.request(config);
+        console.log("Event added to drafts successfully:", response.data);
+        handleCancel(); // Close the modal after successful draft
+        return <Toast type="success" message="Event added to drafts successfully!" />;
+      } catch (error) {
+        console.error("Error adding the event to draft:", error);
+        return <Toast type="error" message="Error drafting event!" />;
+      }
+    };
+
+    draftEvent();
   };
 
   const handlePublish = () => {

@@ -8,6 +8,8 @@ import { User } from "@/libs/types";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
+import CreateNewAdmin from "@/components/admincomps/admin/CreateNewAdmin";
+
 function AdminManagementPage() {
   const [data, setData] = useState<User[]>([]);
 
@@ -27,7 +29,6 @@ function AdminManagementPage() {
     }
     fetchData();
   }, []);
-
 
   return (
     <div className="rounded-3xl p-6">

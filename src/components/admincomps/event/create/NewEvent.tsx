@@ -212,7 +212,7 @@ function NewEvent({
           />
         </div>
         <InputEle
-          type="file"
+          type="images"
           id="eventPhoto"
           label="Upload Event Photo/Flyer"
           onChange={handleChange}

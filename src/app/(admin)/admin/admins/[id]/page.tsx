@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 function AdminDetails() {
+  const router = useRouter();
   const [permissions, setPermissions] = useState([
     {
       action: "Event management",
@@ -50,6 +52,24 @@ function AdminDetails() {
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
         <div className="flex flex-col gap-3">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-primary hover:text-primary/80"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
           <h2 className="font-semibol text-2xl text-black">Manage Roles </h2>
           <p className=" text-base text-neutral-600  ">Create new role here</p>
         </div>

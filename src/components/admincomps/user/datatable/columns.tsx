@@ -127,24 +127,7 @@ export const adminscolumns: ColumnDef<User>[] = [
       return capitalizeWords(row.original.role.name);
     },
   },
-  {
-    accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
-    },
-  },
+
   {
     id: "actions",
     cell: ({ row }) => {

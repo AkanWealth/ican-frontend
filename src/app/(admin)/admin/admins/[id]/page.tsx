@@ -8,14 +8,14 @@ import { BASE_API_URL } from "@/utils/setter";
 
 import { User } from "@/libs/types";
 
-function AdminDetails({ params }: { params: { id: string } }) {
+function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [adminData, setAdminData] = useState<User>();
   const [permissions, setPermissions] = useState<any>([]);
 
   useEffect(() => {
     async function fetchAdminData() {
-      const id = params.id;
+      const id = params;
 
       const config = {
         method: "get",

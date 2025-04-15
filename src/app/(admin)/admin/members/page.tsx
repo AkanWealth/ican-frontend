@@ -22,8 +22,9 @@ function MembersPage() {
         },
       };
       const result = await axios.request(config);
-  
-      setData(result.data);
+      if (result.status === 200) {
+        setData(result.data);
+      }
     }
     fetchData();
   }, []);

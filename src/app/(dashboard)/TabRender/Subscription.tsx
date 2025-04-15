@@ -150,8 +150,8 @@ const Subscription = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white max-w-[1100px] flex flex-col item-center rounded-xl border border-gray-300 p-6 mb-10">
+      <div className="w-full mx-auto">
+        <div className="bg-white w-full flex flex-col item-center rounded-xl border border-gray-300 p-6 mb-10">
           <h1 className="font-medium text-lg mb-6">Subscription Payment</h1>
           <div className="flex justify-between items-center w-full">
             <div className="relative group w-3/4">

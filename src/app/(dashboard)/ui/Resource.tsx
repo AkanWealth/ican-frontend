@@ -15,7 +15,7 @@ interface Resource {
     date: string;
     isPremium: boolean;
     isBookmarked: boolean;
-    icon: 'REC' | 'PDF' | 'VIDEO' | 'AUDIO';
+    icon: 'WEBINAR' | 'ARTICLE' | 'VIDEO' | 'AUDIO'| 'PODCAST';
     description?: string;
     duration?: string;
     // fullDescription?: string;
@@ -30,27 +30,32 @@ function ResourcePage() {
     const [sortBy, setShowSortBy] = useState<boolean>(false);
     const [filterBy, setShowFilterBy] = useState<boolean>(false);
     const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+    const [resourceDetails, setResourceDetails] = useState(null);
+    const [detailsLoading, setDetailsLoading] = useState(false);
+
 
     const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
     const [resources, setResources] = useState<Resource[]>([]); 
-    const [loading, setLoading] = useState<boolean>(true); 
+    const [loading, setLoading] = useState<boolean>(true);
+    const [recommended, setRecommened] = useState<Resource[]>([]);
 
+    // Fetch all resources
     useEffect(() => {
         const fetchResources = async () => {
           try {
             setLoading(true); 
             const token = localStorage.getItem("token");
 
-    console.log('Token:', token);
+            console.log('Token:', token);
     
-      const response = await axios.get(
-        "https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/contents",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, 
-          },
-        }
-      );
+            const response = await axios.get(
+              "https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/contents",
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`, 
+                },
+              }
+            );
             setResources(response.data); 
             console.log('Resources:', response.data);
           } catch (error) {
@@ -66,53 +71,85 @@ function ResourcePage() {
         };
     
         fetchResources();
-      }, [toast]);
+    }, [toast]);
 
-
-    const [recommended, setRecommened] = useState<Resource[]>([
-       { 
-            id: 1,
-            type: 'Webinar',
-            title: 'Mastering Communication Skills in the Digital Age',
-            date: '22, October 2024',
-            isPremium: false,
-            isBookmarked: false,
-            icon: 'REC',
-            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
-            duration: '56:10',
+    // Fetch recommended resources
+    useEffect(() => {
+        const fetchRecommendedResources = async () => {
+          try {
+            setLoading(true);
+            const token = localStorage.getItem("token");
             
-        },
-        { 
-            id: 2,
-            type: 'PDF',
-            title: '5 Strategies for Time Management in the Workplace',
-            date: '22, October 2024',
-            isPremium: false,
-            isBookmarked: false,
-            icon: 'PDF',
-            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
-        },
-        { 
-            id: 3,
-            type: 'Video',
-            title: 'The Future of Leadership: Insights for 2025',
-            date: '22, October 2024',
-            isPremium: false,
-            isBookmarked: true,
-            icon: 'VIDEO',
-            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
-        },
-        { 
-            id: 4,
-            type: 'Audio',
-            title: 'The Future of Leadership: Insights for 2025',
-            date: '22, October 2024',
-            isPremium: false,
-            isBookmarked: false,
-            icon: 'AUDIO',
-            description: 'Learn how to navigate digital communication tools effectively and make your messages impactful in this interactive.',
-        },
-    ]);
+            const response = await axios.get(
+              "https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/recommended",
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            
+            setRecommened(response.data);
+            console.log('Recommended Resources:', response.data);
+          } catch (error) {
+            console.error('Error fetching recommended resources:', error);
+            toast({
+              title: 'Error',
+              description: 'Failed to fetch recommended resources',
+              variant: 'destructive',
+            });
+          } finally {
+            setLoading(false);
+          }
+        };
+      
+        fetchRecommendedResources();
+    }, [toast]);
+
+    // Function to toggle bookmark via API
+    const toggleBookmark = async (resourceId: any) => {
+        try {
+          const token = localStorage.getItem("token");
+          
+          // Call the bookmark API endpoint
+          const response = await axios.post(
+            `https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/${resourceId}/bookmark`,
+            {},  // Empty body as it's a toggle action
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          
+          // Update the local state based on the API response
+          if (response.status === 200) {
+            // If successful, update the UI
+            // For resources array
+            setResources(resources.map(resource => 
+              resource.id === resourceId ? {...resource, isBookmarked: !resource.isBookmarked} : resource
+            ));
+            
+            // For recommended array
+            setRecommened(recommended.map(item => 
+              item.id === resourceId ? {...item, isBookmarked: !item.isBookmarked} : item
+            ));
+            
+            toast({
+              title: 'Success',
+              description: 'Bookmark status updated successfully',
+              variant: 'default',
+            });
+          }
+        } catch (error) {
+          console.error('Error toggling bookmark:', error);
+          toast({
+            title: 'Error',
+            description: 'Failed to update bookmark status',
+            variant: 'destructive',
+          });
+        }
+    };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
@@ -123,18 +160,10 @@ function ResourcePage() {
     };
 
     const handleBookmark = (id: number, isRecommended: boolean = false) => {
-        if (isRecommended) {
-           
-            setRecommened(recommended.map(item => 
-                item.id === id ? {...item, isBookmarked: !item.isBookmarked} : item
-            ));
-        } else {
-           
-            setResources(resources.map(resource => 
-                resource.id === id ? {...resource, isBookmarked: !resource.isBookmarked} : resource
-            ));
-        }
+        // Call the API to toggle bookmark
+        toggleBookmark(id);
     };
+    
     const handleFilterSelect = (filter: string) => {
         setSelectedFilter(filter);
         setShowFilterBy(false);
@@ -154,7 +183,7 @@ function ResourcePage() {
         setShowSortBy(false);
     };
 
-    const filterTypes: string[] = ['Webinar', 'Video', 'Articles', 'Audio'];
+    const filterTypes: string[] = ['Webinar', 'Video', 'Articles', 'Audio','Podcast'];
     const sortOptions: string[] = ['Latest', 'Most viewed'];
 
     const filteredResources = resources.filter(resource => {
@@ -173,14 +202,43 @@ function ResourcePage() {
         return true;
     });
 
-    const openResourceModal = (resource: Resource) => {
-        setSelectedResource(resource);
-    };
+    const openResourceModal = async (resource: Resource) => {
+      try {
+          setDetailsLoading(true);
+          setSelectedResource(resource); // Set selected resource immediately for UI feedback
+          
+          const token = localStorage.getItem("token");
+          const response = await axios.get(
+              `https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/content/${resource.id}`,
+              {
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                  },
+              }
+          );
+          
+          // Set the detailed data received from API
+          setResourceDetails(response.data);
+          console.log('Resource details:', response.data);
+          
+      } catch (error) {
+          console.error('Error fetching resource details:', error);
+          toast({
+              title: 'Error',
+              description: 'Failed to fetch resource details. Please try again later.',
+              variant: 'destructive',
+          });
+          // Keep the basic resource data as fallback
+      } finally {
+          setDetailsLoading(false);
+      }
+  };
 
     // Function to close resource details modal
     const closeResourceModal = () => {
-        setSelectedResource(null);
-    };
+      setSelectedResource(null);
+      setResourceDetails(null); // Clear the detailed data when closing
+  };
 
     const handleCancel = () => {
         setActiveTab('resource');
@@ -203,6 +261,17 @@ function ResourcePage() {
         </div>
     );
 
+    // Loading state component
+    const LoadingState = () => (
+        <div className="flex-grow flex items-center justify-center mt-40">
+            <div className="text-center p-16">
+                <h2 className="text-xl font-bold text-gray-800">
+                    Loading resources...
+                </h2>
+            </div>
+        </div>
+    );
+
     // Resource card component
     const ResourceCard = ({ resource }: { resource: Resource }) => (
         <div key={resource.id} className="border rounded-lg p-5 relative">
@@ -210,22 +279,27 @@ function ResourcePage() {
         <div className="flex justify-between items-start mb-2">
           {/* Left icon */}
           <div>
-            {resource.icon === 'REC' && (
+            {resource.type === 'WEBINAR' && (
               <div className="w-12 h-12 flex items-center justify-center">
                 <Image src="/rec.png" width={38} height={34} alt="rec-icon" />
               </div>
             )}
-            {resource.icon === 'PDF' && (
+             {resource.type === 'PODCAST' && (
+              <div className="w-12 h-12 flex items-center justify-center">
+                <Image src="/rec.png" width={38} height={34} alt="rec-icon" />
+              </div>
+            )}
+            {resource.type === 'ARTICLE' && (
               <div className="w-12 h-12 flex items-center justify-center">
                 <Image src="/PdfIcon.png" width={38} height={34} alt="pdf-icon" />
               </div>
             )}
-            {resource.icon === 'VIDEO' && (
+            {resource.type === 'VIDEO' && (
               <div className="w-12 h-12 flex items-center justify-center">
                 <Image src="/Utube.png" width={38} height={30} alt="video-icon" />
               </div>
             )}
-            {resource.icon === 'AUDIO' && (
+            {resource.type === 'AUDIO' && (
               <div className="w-12 h-12 flex items-center justify-center">
                 <Image src="/Audio.png" width={38} height={30} alt="audio-icon" />
               </div>
@@ -281,7 +355,10 @@ function ResourcePage() {
       );
 
     const renderResouceTab = () => {
-   
+        if (loading) {
+            return <LoadingState />;
+        }
+        
         if (filteredResources.length === 0) {
             return <EmptyState />;
         }
@@ -303,12 +380,17 @@ function ResourcePage() {
         <div className="flex justify-between items-start mb-2">
           {/* Left icon */}
           <div>
-            {recommended.icon === 'REC' && (
+            {recommended.icon === 'WEBINAR' && (
               <div className="w-12 h-12 flex items-center justify-center">
                 <Image src="/rec.png" width={38} height={34} alt="rec-icon" />
               </div>
             )}
-            {recommended.icon === 'PDF' && (
+            {recommended.icon === 'PODCAST' && (
+              <div className="w-12 h-12 flex items-center justify-center">
+                <Image src="/rec.png" width={38} height={34} alt="rec-icon" />
+              </div>
+            )}
+            {recommended.icon === 'ARTICLE' && (
               <div className="w-12 h-12 flex items-center justify-center">
                 <Image src="/PdfIcon.png" width={38} height={34} alt="pdf-icon" />
               </div>
@@ -374,6 +456,10 @@ function ResourcePage() {
       );
 
       const renderRecommendedTab = () => {
+        if (loading) {
+            return <LoadingState />;
+        }
+        
         // Filter recommended resources based on search and filters
         const filteredRecommended = recommended.filter(rec => {
             // Filter based on search query
@@ -403,6 +489,9 @@ function ResourcePage() {
     };
 
     const renderBookmarkTab = () => {
+        if (loading) {
+            return <LoadingState />;
+        }
 
         const bookmarkedResources = filteredResources.filter(resource => resource.isBookmarked);
         
@@ -528,14 +617,13 @@ function ResourcePage() {
             {activeTab === 'recommended' && renderRecommendedTab()}
             {activeTab === 'bookmark' && renderBookmarkTab()}
 
-
-
             {selectedResource && (
-                <ResourceDetailsModal 
-                    resource={selectedResource} 
-                    onClose={closeResourceModal} 
-                />
-            )}
+    <ResourceDetailsModal 
+        resource={resourceDetails || selectedResource} // Use detailed data if available, otherwise use basic data
+        isLoading={detailsLoading}
+        onClose={closeResourceModal} 
+    />
+)}
         </div>
     );
 }

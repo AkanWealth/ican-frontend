@@ -88,7 +88,7 @@ function DashboardContent() {
   };
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto py-6 px-4">
+    <div className="w-full mx-auto py-6 px-4">
       {/* Main Card */}
       <div className="flex flex-col p-4 sm:p-6 bg-blue-900 rounded-lg">
         {/* Greeting Section */}

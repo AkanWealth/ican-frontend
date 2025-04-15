@@ -57,6 +57,7 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
             },
           }
         );
+        console.log("Response:", response);
 
         if (!response.ok) {
           throw new Error("Failed to fetch events");

@@ -59,7 +59,13 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             // Submit feedback to API
             const response = await axios.post(
                 `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/feedback`,
-                payload
+                payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`, 
+                        'Content-Type': 'application/json',
+                    },
+                }
             );
             console.log("response",response);
             // setTimeout(() => {

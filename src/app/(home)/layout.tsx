@@ -15,16 +15,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div lang="en" className={`${inter.variable}  ${league_spartan.variable}`}>
-      {/* <head>
+    <html lang="en" className={`${inter.variable}  ${league_spartan.variable}`}>
+      <head>
       
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </head>
-      <body> */}
+      <body>
         <Mainheader />
         {children}
         <Mainfooter />
-      {/* </body> */}
-    </div>
+      </body>
+    </html>
   );
 }

@@ -11,10 +11,10 @@ import { BASE_API_URL } from "@/utils/setter";
 
 interface Event {
     id: string;
-    topic: string;
-    subtitle: string;
+    name: string;
+    description: string;
     date: string;
-    location: string;
+    venue: string;
     IsAttended: boolean;
 }
 
@@ -75,31 +75,22 @@ const RegisteredEventsTab: React.FC = () => {
                     setLoading(false);
                     return;
                 }
-
+        
                 console.log('Fetching registrations for:', email);
                 
-                // const response = await axios.get(
-                //           `${BASE_API_URL}/events/registrations/user/${email}`,
-                //           {
-                //             headers: {
-                //               Authorization: `Bearer ${localStorage.getItem('token')}`, 
-                //               'Content-Type': 'application/json',
-                //             },
-                //           }
-                //         );
                 // Fetch user registrations
                 const registrationsResponse = await axios.get(
                     `${BASE_API_URL}/events/registrations/user/${email}`,
-                          {
-                            headers: {
-                              Authorization: `Bearer ${localStorage.getItem('token')}`, 
-                              'Content-Type': 'application/json',
-                            },
-                          }
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`, 
+                            'Content-Type': 'application/json',
+                        },
+                    }
                 );
                 
                 console.log('Registration response:', registrationsResponse);
-
+        
                 // Check if response exists and contains data
                 if (!registrationsResponse?.data) {
                     console.log('No data in registration response');
@@ -107,62 +98,56 @@ const RegisteredEventsTab: React.FC = () => {
                     setLoading(false);
                     return;
                 }
-
-                // Handle potential different response structures
-                const registrationsData = Array.isArray(registrationsResponse.data) 
-                    ? registrationsResponse.data 
-                    : registrationsResponse.data?.data || [];
+        
+                // Looking at your console log, the registration data is directly in response.data
+                // and it appears to be a single object, not an array
+                const registrationData = registrationsResponse.data;
                 
-                console.log('Registrations data:', registrationsData);
-
-                if (!Array.isArray(registrationsData) || registrationsData.length === 0) {
-                    console.log('No registered events found');
+                // Convert the single registration object to an array with one item
+                const registrationsData = [registrationData];
+                
+                console.log('Processed registrations data:', registrationsData);
+        
+                if (!registrationData || !registrationData.eventId) {
+                    console.log('No registered events found or missing eventId');
                     setRegisteredEvents([]);
                     setLoading(false);
                     return;
                 }
-
+        
                 // Map to store registrations by event ID
                 const registrationsMap: Record<string, Registration[]> = {};
-                registrationsData.forEach((registration) => {
-                    if (!registrationsMap[registration.eventId]) {
-                        registrationsMap[registration.eventId] = [];
-                    }
-                    registrationsMap[registration.eventId].push(registration);
-                });
+                if (!registrationsMap[registrationData.eventId]) {
+                    registrationsMap[registrationData.eventId] = [];
+                }
+                registrationsMap[registrationData.eventId].push(registrationData);
                 
                 console.log('Registrations map created:', Object.keys(registrationsMap).length);
-
-                // Fetch event details for each registration with better error handling
+        
+                // Fetch event details for the registration
                 const eventsData: Event[] = [];
                 
-                for (const registration of registrationsData) {
-                    if (!registration.eventId) {
-                        console.log('Registration missing eventId:', registration);
-                        continue;
-                    }
-                    
-                    try {
-                        const eventResponse = await axios.get(
-                            `${BASE_API_URL}/events/${registration.eventId}`,
-                            {
-                                headers: { Authorization: `Bearer ${token}` },
-                            }
-                        );
-                        
-                        if (eventResponse?.data) {
-                            // Extract event data depending on response structure
-                            const eventData = eventResponse.data.data || eventResponse.data;
-                            eventsData.push(eventData);
+                try {
+                    const eventResponse = await axios.get(
+                        `${BASE_API_URL}/events/${registrationData.eventId}`,
+                        {
+                            headers: { Authorization: `Bearer ${token}` },
                         }
-                    } catch (eventError) {
-                        console.error(`Failed to fetch event ${registration.eventId}:`, eventError);
-                        // Continue with other events instead of failing completely
+                    );
+                    console.log('Event response:', eventResponse);
+                    
+                    if (eventResponse?.data) {
+                        // Extract event data depending on response structure
+                        const eventData = eventResponse.data.data || eventResponse.data;
+                        eventsData.push(eventData);
+                        console.log('Event data fetched:', eventData);
                     }
+                } catch (eventError) {
+                    console.error(`Failed to fetch event ${registrationData.eventId}:`, eventError);
                 }
                 
                 console.log('Events data fetched:', eventsData.length);
-
+        
                 setEvents(eventsData);
                 setRegisteredEvents(eventsData);
                 setRegistrationsMap(registrationsMap);
@@ -180,7 +165,6 @@ const RegisteredEventsTab: React.FC = () => {
                 setLoading(false);
             }
         };
-
         if (typeof window !== 'undefined') {
             fetchUserRegistrations();
         }
@@ -302,8 +286,8 @@ const RegisteredEventsTab: React.FC = () => {
                         </div>
 
                         <div className="">
-                            <h3 className="font-bold text-lg mb-2">{event.topic}</h3>
-                            <p className="text-sm text-gray-600 mb-4">{event.subtitle}</p>
+                            <h3 className="font-bold text-lg mb-2">{event.name}</h3>
+                            <p className="text-sm text-gray-600 mb-4">{event.description}</p>
 
                             <div className="flex flex-col text-sm gap-2 text-gray-600 mb-4">
                                 <div className="flex items-center">
@@ -312,19 +296,19 @@ const RegisteredEventsTab: React.FC = () => {
                                 </div>
                                 <div className="flex items-center">
                                     <MapPin className="w-4 h-4 mr-1" />
-                                    {event.location}
+                                    {event.venue}
                                 </div>
                             </div>
-
+{/* 
                             <div className="text-sm text-gray-500 mb-4">
                                 Registrations: {registrationsMap[event.id]?.length || 0}
-                            </div>
+                            </div> */}
 
                             <div className="flex items-center justify-end gap-2 ml-4">
                                 {event.IsAttended && (
                                     <CertificateGenerator
                                         eventId={event.id}
-                                        eventTitle={event.topic}
+                                        eventTitle={event.name}
                                     />
                                 )}
                                 <button

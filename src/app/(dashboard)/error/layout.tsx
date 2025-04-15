@@ -1,7 +1,7 @@
 import "../globals.css";
-import { inter, league_spartan } from "../fonts";
-import Mainheader from "../../components/homecomps/Mainheader";
-import Mainfooter from "../../components/homecomps/Mainfooter";
+import { inter, league_spartan } from "../../fonts";
+import Mainheader from "../../../components/homecomps/Mainheader";
+import Mainfooter from "../../../components/homecomps/Mainfooter";
 
 import type { Metadata } from "next";
 export const metadata: Metadata = {

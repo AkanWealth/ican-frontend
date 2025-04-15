@@ -70,7 +70,7 @@ export const allcolumns: ColumnDef<Event>[] = [
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      return <Statbtn status={row.original.status.toLowerCase()} />;
     },
   },
   {

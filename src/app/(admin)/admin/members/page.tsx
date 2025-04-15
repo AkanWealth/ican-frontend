@@ -23,7 +23,7 @@ function MembersPage() {
       };
       const result = await axios.request(config);
       if (result.status === 200) {
-        setData(result.data);
+        setData(result.data.data);
       }
     }
     fetchData();

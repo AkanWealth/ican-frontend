@@ -21,7 +21,7 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
     console.log({ id, fullName, role });
     async function fetchData() {
       const data = JSON.stringify({
-        userId: "",
+        userId: id,
         suspend: true,
       });
       const config = {
@@ -63,10 +63,10 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
           <div>
             <div className="flex flex-col gap-2">
               <h5 className="font-semibold text-xl text-black">
-                Disable Admin
+                Disable User
               </h5>
               <p className="text-sm text-neutral-600">
-                Are you sure you want to disable this admin?
+                Are you sure you want to disable this user?
               </p>
             </div>
             <div className="flex flex-col gap-2 mt-4">

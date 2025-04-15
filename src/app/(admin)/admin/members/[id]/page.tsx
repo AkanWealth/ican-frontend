@@ -13,7 +13,7 @@ function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
 
   useEffect(() => {
     async function fetchData() {
-      const userId = await params;
+      const userId = (await params).id;
       const config = {
         method: "get",
         maxBodyLength: Infinity,

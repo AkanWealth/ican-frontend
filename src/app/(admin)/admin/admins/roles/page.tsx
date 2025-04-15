@@ -46,7 +46,6 @@ function RolesPage() {
 
         if (response.status === 200) {
           setRoles(response.data);
-
         }
       } catch (error) {
         console.error("Failed to fetch roles:", error);
@@ -66,7 +65,12 @@ function RolesPage() {
     <div className="rounded-3xl bg-white p-6">
       <div className="flex flex-row justify-between py-4 items-center">
         <h2 className="text-lg font-semibold">Roles and Permissions</h2>
-        <button className="bg-blue-600 text-white rounded-md px-4 py-2">
+        <button
+          onClick={() => {
+            setShowModal(true);
+          }}
+          className="bg-blue-600 text-white rounded-md px-4 py-2"
+        >
           Create a New Role
         </button>
       </div>

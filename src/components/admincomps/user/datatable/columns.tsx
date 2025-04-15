@@ -218,7 +218,7 @@ export const memberscolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      return row.original.isSuspended ? "suspended" : "active";
     },
   },
   {

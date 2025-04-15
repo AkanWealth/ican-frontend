@@ -10,6 +10,10 @@ import {
   BillUser,
   billings,
 } from "@/components/admincomps/billing/create/colsdata";
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+
+import Toast from "@/components/genui/Toast";
 
 interface IBilling {
   billing_name: string;
@@ -45,7 +49,39 @@ function CreateBillingPage() {
   ) => {
     setNewBill((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
+  const saveBill = async () => {
+    let data = JSON.stringify({
+      name: newBill.billing_name,
+      type: newBill.billing_type,
+      amount: newBill.billing_amount,
+      affectedUserIds: newBill.reciepients,
+    });
 
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/billing`,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      data: data,
+    };
+    try {
+      const response = await axios.request(config);
+
+      if (response.status === 200) {
+        Toast({
+          type: "success",
+          message: "Bill created successfully",
+        });
+      }
+    } catch (error) {
+      Toast({
+        type: "error",
+        message: "Failed to create bill",
+      });
+    }
+  };
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-col mb-6 w-full items-start justify-start">
@@ -116,6 +152,12 @@ function CreateBillingPage() {
             onChange={(e) => setRecipientType(e.target.value)}
           />
         </div>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          onClick={saveBill}
+        >
+          Create Bill
+        </button>
       </div>
       {recipientType === "select" && (
         <div className="rounded-3xl mt-10 px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">

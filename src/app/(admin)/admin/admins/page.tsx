@@ -66,7 +66,7 @@ function AdminManagementPage() {
       </div>
       {showModal && (
         <CreateNewAdmin
-          setShowModal={() => setShowModal(false)}
+          setShowModal={setShowModal}
           showModal={showModal}
         />
       )}

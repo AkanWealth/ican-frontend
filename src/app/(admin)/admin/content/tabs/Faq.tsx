@@ -7,6 +7,8 @@ import { faqcolumns } from "@/components/admincomps/content/datatable/columns";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
+import { FaqData } from "@/libs/types";
+
 function Faq() {
   const [data, setData] = useState([]);
 
@@ -20,7 +22,7 @@ function Faq() {
       };
       try {
         const response = await axios.request(config);
-        setData(response.data);
+        setData(response.data.faqs);
       } catch (error) {
         console.error(error);
       }

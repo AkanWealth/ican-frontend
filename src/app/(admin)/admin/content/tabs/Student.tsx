@@ -21,7 +21,7 @@ function Student() {
       };
       try {
         const response = await axios.request(config);
-        setData(response.data);
+        setData(response.data.studyPacks);
       } catch (error) {
         console.error(error);
       }

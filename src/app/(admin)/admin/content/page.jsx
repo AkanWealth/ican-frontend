@@ -16,11 +16,28 @@ import NewContent from "@/components/admincomps/content/create/NewContent";
 
 function Content() {
   const [showModal, setShowModal] = useState(false);
+  const [data, setData] = useState([]);
+
   const handleCloseModal = () => {
     setShowModal(false);
   };
 
   useEffect(() => {
+    async function fetchAllContent() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/content`,
+        headers: {},
+      };
+      try {
+        const response = await axios.request(config);
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchAllContent();
   }, []);
 
   return (

@@ -86,7 +86,7 @@ export const allcolumns: ColumnDef<Content>[] = [
 
 export const advertscolumns: ColumnDef<Content>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -116,7 +116,7 @@ export const advertscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "start_date",
+    accessorKey: "startDate",
     header: ({ column }) => {
       return (
         <Button
@@ -131,7 +131,7 @@ export const advertscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "end_date",
+    accessorKey: "endDate",
     header: ({ column }) => {
       return (
         <Button
@@ -188,7 +188,7 @@ export const blogscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "author",
+    accessorKey: "authorName",
     header: ({ column }) => {
       return (
         <Button
@@ -203,7 +203,7 @@ export const blogscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "date_created",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -212,39 +212,6 @@ export const blogscolumns: ColumnDef<Content>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Date Created
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
-    },
-  },
-  {
-    accessorKey: "published_date",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Published Date
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -348,7 +315,7 @@ export const publicationscolumns: ColumnDef<Content>[] = [
 ];
 export const galleriescolumns: ColumnDef<Content>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -363,7 +330,7 @@ export const galleriescolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "author",
+    accessorKey: "user.email",
     header: ({ column }) => {
       return (
         <Button
@@ -378,7 +345,7 @@ export const galleriescolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "date_created",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -393,7 +360,7 @@ export const galleriescolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "materials",
+    accessorKey: "images",
     header: ({ column }) => {
       return (
         <Button
@@ -401,7 +368,22 @@ export const galleriescolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Images/Videos
+          Images
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "videos",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Videos
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -425,21 +407,6 @@ export const galleriescolumns: ColumnDef<Content>[] = [
       return <Statbtn status={row.original.status} />;
     },
   },
-  {
-    accessorKey: "published_date",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date Uploaded
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
 
   {
     id: "actions",
@@ -451,7 +418,7 @@ export const galleriescolumns: ColumnDef<Content>[] = [
 
 export const technicalcolumns: ColumnDef<Content>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -466,7 +433,7 @@ export const technicalcolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "materials",
+    accessorKey: "Document",
     header: ({ column }) => {
       return (
         <Button
@@ -474,14 +441,14 @@ export const technicalcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Format <ArrowUpDown className="ml-2 h-4 w-4" />
+          Document <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
 
   {
-    accessorKey: "date_created",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -522,7 +489,7 @@ export const technicalcolumns: ColumnDef<Content>[] = [
 
 export const studentcolumns: ColumnDef<Content>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -530,14 +497,14 @@ export const studentcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Title
+          Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "materials",
+    accessorKey: "document",
     header: ({ column }) => {
       return (
         <Button
@@ -545,28 +512,13 @@ export const studentcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Material Type <ArrowUpDown className="ml-2 h-4 w-4" />
+          Document <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "author",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Uploaded By
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "date_created",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -608,7 +560,7 @@ export const studentcolumns: ColumnDef<Content>[] = [
 ];
 export const faqcolumns: ColumnDef<Content>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -616,14 +568,15 @@ export const faqcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Title
+          Question
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
+
   {
-    accessorKey: "materials",
+    accessorKey: "answer",
     header: ({ column }) => {
       return (
         <Button
@@ -631,57 +584,9 @@ export const faqcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Material Type <ArrowUpDown className="ml-2 h-4 w-4" />
+          Answer <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
-    },
-  },
-  {
-    accessorKey: "author",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Uploaded By
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "date_created",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date Uploaded
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
     },
   },
 

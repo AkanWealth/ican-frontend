@@ -21,7 +21,7 @@ function Technical() {
       };
       try {
         const response = await axios.request(config);
-        setData(response.data);
+        setData(response.data.sessions);
       } catch (error) {
         console.error(error);
       }

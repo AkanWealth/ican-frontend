@@ -19,7 +19,7 @@ function Adverts() {
       };
       try {
         const response = await axios.request(config);
-        setData(response.data);
+        setData(response.data.data);
       } catch (error) {
         console.error(error);
       }

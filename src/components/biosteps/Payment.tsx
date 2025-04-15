@@ -11,17 +11,41 @@ interface PaymentProps {
   isShown: boolean;
   formData: BiodataFormData;
   updateFormData: (data: Partial<BiodataFormData>) => void;
+  onClose: () => void; 
 }
 
-function Payment({ formData, updateFormData }: PaymentProps) {
+function Payment({ formData, updateFormData, }: PaymentProps) {
   const { toast } = useToast();
   const userEmail = localStorage.getItem("userEmail") || "";
+
+  // const handleFlutterwavePayment = () => {
+  //   const config = {
+  //     public_key: process.env.FLW_PUBLIC_KEY || "FLWPUBK_TEST-534b5997be3928deed468163ca379112-X",
+  //     tx_ref: Date.now().toString(),
+  //     amount: formData.payment?.amount || 25000, // Use dynamic amount from formData or fallback to 25000
+  //     currency: 'NGN',
+  //     payment_options: 'card,banktransfer,ussd',
+  //     customer: {
+  //       email: userEmail,
+  //       name: `${formData.personalData.firstName || ""} ${formData.personalData.surname || ""}`,
+  //       phonenumber: formData.contactDetails.mobileNumber || ""
+  //     },
+  //     customizations: {
+  //       title: "Registration Payment",
+  //       description: "Payment for registration completion",
+  //       logo: "", // Add your logo URL here if needed
+  //     },
+  //   };
+
+  //   return config;
+  // };
+
 
   const handleFlutterwavePayment = () => {
     const config = {
       public_key: process.env.FLW_PUBLIC_KEY || "FLWPUBK_TEST-534b5997be3928deed468163ca379112-X",
       tx_ref: Date.now().toString(),
-      amount: formData.payment?.amount || 25000, // Use dynamic amount from formData or fallback to 25000
+      amount: formData.payment?.amount || 25000,
       currency: 'NGN',
       payment_options: 'card,banktransfer,ussd',
       customer: {
@@ -34,11 +58,65 @@ function Payment({ formData, updateFormData }: PaymentProps) {
         description: "Payment for registration completion",
         logo: "", // Add your logo URL here if needed
       },
+      callback: function(response: any) {
+        // This function runs after payment completes
+        if (response.status === "successful") {
+          // Create payment data with transaction ID from response
+          const paymentData = {
+            paymentType: "Bank Transfer", // or determine dynamically based on user selection
+            amount: formData.payment?.amount || 25000,
+            transactionId: response.transaction_id,
+          };
+          
+          // Call your API to record the payment
+          sendPaymentToApi(paymentData);
+        } else {
+          // Handle failed payment
+          console.error("Payment failed:", response);
+          // Show error message to user
+        }
+      },
+      onclose: function() {
+        // This runs when the payment modal is closed
+        console.log("Payment modal closed");
+      }
     };
 
+    // Initialize Flutterwave payment
+    // FlutterwaveCheckout(config);
     return config;
-  };
+};
 
+// Function to send payment data to your API
+const sendPaymentToApi = async (paymentData: any) => {
+  const token = localStorage.getItem("token");
+        
+        if (!token) {
+          throw new Error("Authentication token not found");
+        }
+  try {
+    const apiResponse = await fetch("https://ican-api-6000e8d06d3a.herokuapp.com/api/payments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(paymentData),
+    });
+    
+    if (!apiResponse.ok) {
+      throw new Error("API request failed");
+    }
+    
+    const data = await apiResponse.json();
+    console.log("Payment recorded successfully:", data);
+    // Show success message to user
+    
+  } catch (error) {
+    console.error("Error recording payment:", error);
+    // Show error message to user
+  }
+};
   return (
     <div className="pt-4 flex flex-col justify-between gap-4 mt-4">
       <h3 className="font-bold font-mono text-xl text-black">

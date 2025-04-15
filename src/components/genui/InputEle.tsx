@@ -512,18 +512,50 @@ function InputEle({
             onChange={onChange}
           >
             <option value="">Select qualification</option>
-            <option value="HND">HND</option>
-            <option value="BBA">
-              Bachelor of Business Administration (BBA)
-            </option>
-            <option value="BSc">Bachelor of Science (BSc)</option>
-            <option value="BTech">Bachelor of Technology (BTech)</option>
-            <option value="BScEdu">
-              Bachelor of Science Education (BSc Edu)
-            </option>
-            <option value="MBA">Master of Business Administration (MBA)</option>
-            <option value="ME">Master of Engineering (ME)</option>
-            <option value="MSc">Master of Science (MSc)</option>
+            {/* Diploma and Certificates */}
+  <option value="SSCE">Senior Secondary Certificate Examination (SSCE)</option>
+  <option value="OND">Ordinary National Diploma (OND)</option>
+  <option value="NCE">Nigeria Certificate in Education (NCE)</option>
+  <option value="HND">Higher National Diploma (HND)</option>
+  
+  {/* Bachelor's Degrees */}
+  <option value="BA">Bachelor of Arts (BA)</option>
+  <option value="BSc">Bachelor of Science (BSc)</option>
+  <option value="BTech">Bachelor of Technology (BTech)</option>
+  <option value="BEng">Bachelor of Engineering (BEng)</option>
+  <option value="BEd">Bachelor of Education (BEd)</option>
+  <option value="BScEd">Bachelor of Science Education (BSc Ed)</option>
+  <option value="LLB">Bachelor of Laws (LLB)</option>
+  <option value="BPharm">Bachelor of Pharmacy (BPharm)</option>
+  <option value="MBBS">Bachelor of Medicine, Bachelor of Surgery (MBBS)</option>
+  <option value="BMLS">Bachelor of Medical Laboratory Science (BMLS)</option>
+  <option value="BBA">Bachelor of Business Administration (BBA)</option>
+  <option value="BNSc">Bachelor of Nursing Science (BNSc)</option>
+
+  {/* Master's Degrees */}
+  <option value="MA">Master of Arts (MA)</option>
+  <option value="MSc">Master of Science (MSc)</option>
+  <option value="MBA">Master of Business Administration (MBA)</option>
+  <option value="MEd">Master of Education (MEd)</option>
+  <option value="MTech">Master of Technology (MTech)</option>
+  <option value="MEng">Master of Engineering (MEng)</option>
+  <option value="LLM">Master of Laws (LLM)</option>
+  <option value="MPH">Master of Public Health (MPH)</option>
+
+  {/* Doctoral and Professional Degrees */}
+  <option value="PhD">Doctor of Philosophy (PhD)</option>
+  <option value="DBA">Doctor of Business Administration (DBA)</option>
+  <option value="DSc">Doctor of Science (DSc)</option>
+  <option value="EdD">Doctor of Education (EdD)</option>
+  <option value="JD">Doctor of Jurisprudence (JD)</option>
+
+  {/* Professional Certifications */}
+  <option value="ICAN">Institute of Chartered Accountants of Nigeria (ICAN)</option>
+  <option value="CIBN">Chartered Institute of Bankers of Nigeria (CIBN)</option>
+  <option value="CIS">Chartered Institute of Stockbrokers (CIS)</option>
+  <option value="CITN">Chartered Institute of Taxation of Nigeria (CITN)</option>
+  <option value="NIM">Nigerian Institute of Management (NIM)</option>
+  <option value="COREN">Council for the Regulation of Engineering in Nigeria (COREN)</option>
           </select>
           <p className="text-red-500 text-base font-medium">{errorMsg}</p>
         </div>

@@ -106,13 +106,16 @@ const FeedbackHistoryTab: React.FC = () => {
 
             try {
                 setIsLoading(true);
+                if (typeof window === "undefined") return; // Ensure code runs only on the client side
 
                 // Retrieve the token from localStorage
                 const token = localStorage.getItem("token");
 
+                const user = localStorage.getItem("user");
+                const userId = user ? JSON.parse(user)?.id : null;
                 // Fetch feedback for the selected event
                 const feedbackResponse = await axios.get<{ data: Feedback[]; meta: any }>(
-                    `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${selectedEvent.id}/feedback`,
+                    `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${userId}/feedback`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`, 
@@ -120,6 +123,7 @@ const FeedbackHistoryTab: React.FC = () => {
                         },
                     }
                 );
+                console.log("feedbackResponse", feedbackResponse);
 
                 const fetchedFeedback = feedbackResponse.data.data || [];
                 setFeedbackHistory(fetchedFeedback);

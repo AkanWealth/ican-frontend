@@ -502,6 +502,12 @@ function Biodata() {
                     isShown={activeStep === 4}
                     formData={formData}
                     updateFormData={updateFormData}
+                    onClose={() => {
+                      // Define what should happen when the payment component is closed
+                      // This could be resetting form state, hiding modals, etc.
+                      console.log("Payment component closed");
+                      // You could also add specific behavior here if needed
+                    }}
                   />
                 )}
               </motion.div>

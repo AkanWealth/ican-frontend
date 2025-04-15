@@ -22,11 +22,11 @@ function Sent({ onNext }: Propsval) {
         follow the instructions to reset your password.
         
       </p>
-      <Link className="w-full flex items-center " href={"/reset-password"}>
-        <button className="w-1/2 p-3 mx-auto rounded-full bg-primary text-white text-base font-semibold">
-          Reset Password
-        </button>
-      </Link>
+      <Link href="https://mail.google.com" target="_blank" className="w-full">
+          <button className="w-full bg-primary text-white py-3 rounded-full text-base font-semibold my-2 hover:bg-primary/90 transition">
+            Go to your email
+          </button>
+        </Link>
     </div>
   );
 }

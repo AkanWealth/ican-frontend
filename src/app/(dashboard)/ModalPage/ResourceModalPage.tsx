@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Image from 'next/image';
-import { Bookmark, CircleDollarSign, SquareLibrary, CircleX, Loader2 } from 'lucide-react';
+import { Bookmark, CircleDollarSign, SquareLibrary, CircleX, Loader2, Download } from 'lucide-react';
 import { FaSpotify } from 'react-icons/fa';
 
 interface Resource {
@@ -16,6 +16,7 @@ interface Resource {
     duration?: string;
     content?: string; // Full content from API
     url?: string; // URL for external resources
+    fileUrl?: string; // URL for downloadable files
     attachments?: Array<{name: string, url: string}>; // For downloadable resources
 }
 
@@ -27,6 +28,40 @@ interface ResourceDetailsModalProps {
 
 const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({ resource, isLoading = false, onClose }) => {
     if (!resource) return null;
+
+    // Function to handle file download
+    const handleDownload = (url: string, filename?: string) => {
+        if (!url) return;
+        
+        // Create a temporary anchor element
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Set download attribute with filename if provided
+        if (filename) {
+            link.setAttribute('download', filename);
+        } else {
+            link.setAttribute('download', '');
+        }
+        
+        // Append to body, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    // Get appropriate filename based on resource title
+    const getFilename = (url: string) => {
+        if (!resource.title) return '';
+        
+        // Extract file extension from URL
+        const extension = url.split('.').pop() || '';
+        
+        // Create a filename from the title
+        const filename = resource.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        
+        return `${filename}.${extension}`;
+    };
 
     // Loading state
     if (isLoading) {
@@ -138,14 +173,14 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({ resource, i
                             </a>
                         )}
                         
-                        {resource.downloadUrl && (
-                            <a
-                                href={resource.downloadUrl}
-                                download
-                                className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors"
+                        {(resource.fileUrl || resource.url) && (
+                            <button
+                                onClick={() => handleDownload(resource.fileUrl || resource.url || '', getFilename(resource.fileUrl || resource.url || ''))}
+                                className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors flex items-center"
                             >
+                                <Download className="w-4 h-4 mr-2" />
                                 Download
-                            </a>
+                            </button>
                         )}
                     </div>
                 </div>
@@ -205,7 +240,11 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({ resource, i
                             )}
                         </div>
                         <div className="mt-4 flex space-x-4">
-                            <button className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors">
+                            <button 
+                                className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors flex items-center"
+                                onClick={() => handleDownload(resource.fileUrl || '', getFilename(resource.fileUrl || ''))}
+                            >
+                                <Download className="w-4 h-4 mr-2" />
                                 Download video
                             </button>
                         </div>
@@ -213,7 +252,6 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({ resource, i
                 );
             case 'PODCAST':
                 // Podcast content rendering
-                // Similar to the existing code for other resource types
                 return (
                     <div className="p-6">
                         <div className="relative w-full h-80 mb-6">
@@ -264,7 +302,11 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({ resource, i
                             )}
                         </div>
                         <div className="mt-4 flex space-x-4">
-                            <button className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors">
+                            <button 
+                                className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors flex items-center"
+                                onClick={() => handleDownload(resource.fileUrl || '', getFilename(resource.fileUrl || ''))}
+                            >
+                                <Download className="w-4 h-4 mr-2" />
                                 Download audio
                             </button>
                         </div>
@@ -322,7 +364,11 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({ resource, i
                             )}
                         </div>
                         <div className="mt-4 flex space-x-4">
-                            <button className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors">
+                            <button 
+                                className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors flex items-center"
+                                onClick={() => handleDownload(resource.fileUrl || '', getFilename(resource.fileUrl || ''))}
+                            >
+                                <Download className="w-4 h-4 mr-2" />
                                 Download video
                             </button>
                         </div>
@@ -368,8 +414,12 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({ resource, i
                             )}
                         </div>
                         <div className="mt-4 flex space-x-4">
-                            <button className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors">
-                                Download ARTICLE
+                            <button 
+                                className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors flex items-center"
+                                onClick={() => handleDownload(resource.fileUrl || '', getFilename(resource.fileUrl || ''))}
+                            >
+                                <Download className="w-4 h-4 mr-2" />
+                                Download article
                             </button>
                         </div>
                     </div>
@@ -414,12 +464,33 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({ resource, i
                             )}
                         </div>
                         <div className="mt-4 flex space-x-4">
-                            <button className="bg-primary text-white px-2 py-2 rounded-full hover:bg-blue-800 transition-colors">
-                                <span className="text-white mr-4 text-sm flex items-center">
-                                    <FaSpotify className="w-4 h-4 mr-1" />
-                                    Download on Spotify
-                                </span>
-                            </button>
+                            {resource.fileUrl ? (
+                                <button 
+                                    className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors flex items-center"
+                                    onClick={() => handleDownload(resource.fileUrl || '', getFilename(resource.fileUrl || ''))}
+                                >
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Download audio
+                                </button>
+                            ) : resource.url && resource.url.includes('spotify') ? (
+                                <a 
+                                    href={resource.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors flex items-center"
+                                >
+                                    <FaSpotify className="w-4 h-4 mr-2" />
+                                    Listen on Spotify
+                                </a>
+                            ) : (
+                                <button 
+                                    className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors flex items-center"
+                                    onClick={() => handleDownload(resource.url || '', getFilename(resource.url || ''))}
+                                >
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Download audio
+                                </button>
+                            )}
                         </div>
                     </div>
                 );
@@ -438,6 +509,17 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({ resource, i
                         <div className="mb-2 flex items-center text-gray-800">
                             <span className="text-xs mr-4">{resource.date}</span>
                         </div>
+                        {resource.fileUrl && (
+                            <div className="mt-4 flex space-x-4">
+                                <button 
+                                    className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors flex items-center"
+                                    onClick={() => handleDownload(resource.fileUrl || '', getFilename(resource.fileUrl || ''))}
+                                >
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Download resource
+                                </button>
+                            </div>
+                        )}
                     </div>
                 );
         }

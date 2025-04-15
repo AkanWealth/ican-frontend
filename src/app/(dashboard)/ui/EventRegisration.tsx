@@ -551,12 +551,12 @@ const EventRegistration = () => {
                           }}
                           onClose={() => {
                             console.log('Payment closed');
-                            toast({
-                              title: "Payment Cancelled",
-                              description: "You cancelled the payment process.",
-                              variant: "default",
-                              duration: 3000,
-                            });
+                            // toast({
+                            //   title: "Payment Cancelled",
+                            //   description: "You cancelled the payment process.",
+                            //   variant: "default",
+                            //   duration: 3000,
+                            // });
                           }}
                           text={`Pay ₦${eventDetails.eventFee}`}
                           className={`w-full py-2 px-4 rounded-full ${isPaymentSuccessful

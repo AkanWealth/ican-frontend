@@ -36,7 +36,7 @@ function InputEle({
   addStyle = "",
   errorMsg = "",
   value = "",
-  onChange = () => { },
+  onChange = () => {},
 }: InputEleProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [images, setImages] = useState<File[]>([]);
@@ -114,7 +114,7 @@ function InputEle({
           <p></p>
         </div>
       );
-      case "status":
+    case "status":
       return (
         <div className={` w-full h-fit flex flex-col gap-3 ${addStyle} `}>
           <label className=" text-base font-sans font-semibold  " htmlFor={id}>
@@ -130,9 +130,9 @@ function InputEle({
             onChange={onChange}
           >
             <option value="">Select status</option>
-              <option value="FCA">FCA </option>
-              <option value="ACA">ACA</option>
-              <option value="Student">Student</option>
+            <option value="FCA">FCA </option>
+            <option value="ACA">ACA</option>
+            <option value="Student">Student</option>
           </select>
           <p></p>
         </div>
@@ -511,10 +511,14 @@ function InputEle({
           >
             <option value="">Select qualification</option>
             <option value="HND">HND</option>
-            <option value="BBA">Bachelor of Business Administration (BBA)</option>
+            <option value="BBA">
+              Bachelor of Business Administration (BBA)
+            </option>
             <option value="BSc">Bachelor of Science (BSc)</option>
             <option value="BTech">Bachelor of Technology (BTech)</option>
-            <option value="BScEdu">Bachelor of Science Education (BSc Edu)</option>
+            <option value="BScEdu">
+              Bachelor of Science Education (BSc Edu)
+            </option>
             <option value="MBA">Master of Business Administration (MBA)</option>
             <option value="ME">Master of Engineering (ME)</option>
             <option value="MSc">Master of Science (MSc)</option>
@@ -606,18 +610,18 @@ function InputEle({
               <FaUpload className="inline mr-2" />
               Upload Images
             </label>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {images.map((image, index) => (
-              <div key={index} className="w-24 h-24 relative">
-                <Image
-                  fill={true}
-                  src={URL.createObjectURL(image)}
-                  alt={`upload-${index}`}
-                  className="w-full h-full object-cover rounded"
-                />
-              </div>
-            ))}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {images.map((image, index) => (
+                <div key={index} className="w-24 h-24 relative">
+                  <Image
+                    fill={true}
+                    src={URL.createObjectURL(image)}
+                    alt={`upload-${index}`}
+                    className="w-full h-full object-cover rounded"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
           <p className="text-red-600 text-sm font-light">{errorMsg}</p>
         </div>

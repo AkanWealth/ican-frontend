@@ -31,6 +31,84 @@ function NewEvent({
     mcpdCredit: "",
     eventPhoto: null,
   });
+  // State to handle form validation errors
+  const [formErrors, setFormErrors] = useState({
+    eventName: "",
+    venue: "",
+    eventDescription: "", 
+    eventDate: "",
+    eventTime: "",
+    eventFee: "",
+    mcpdCredit: "",
+    eventPhoto: ""
+  });
+
+  // Function to validate form fields
+  const validateForm = () => {
+    let isValid = true;
+    const errors = {
+      eventName: "",
+      venue: "",
+      eventDescription: "",
+      eventDate: "",
+      eventTime: "",
+      eventFee: "",
+      mcpdCredit: "",
+      eventPhoto: "",
+    };
+
+    // Validate event name
+    if (!formData.eventName.trim()) {
+      errors.eventName = "Event name is required";
+      isValid = false;
+    }
+
+    // Validate venue
+    if (!formData.venue.trim()) {
+      errors.venue = "Venue is required";
+      isValid = false;
+    }
+
+    // Validate description
+    if (!formData.eventDescription.trim()) {
+      errors.eventDescription = "Event description is required";
+      isValid = false;
+    }
+
+    // Validate date
+    if (!formData.eventDate) {
+      errors.eventDate = "Event date is required";
+      isValid = false;
+    }
+
+    // Validate time
+    if (!formData.eventTime) {
+      errors.eventTime = "Event time is required";
+      isValid = false;
+    }
+
+    // Validate fee (must be zero or positive number)
+    if (
+      formData.eventFee === "" ||
+      isNaN(Number(formData.eventFee)) ||
+      Number(formData.eventFee) < 0
+    ) {
+      errors.eventFee = "Please enter a valid event fee (0 or greater)";
+      isValid = false;
+    }
+    // Validate event date
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    if (!formData.eventDate) {
+      errors.eventDate = "Event date is required";
+    } else if (new Date(formData.eventDate) < tomorrow) {
+      errors.eventDate = "Event date must be at least tomorrow";
+    }
+    setFormErrors(errors);
+    return isValid;
+  };
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -85,6 +163,9 @@ function NewEvent({
     }
   };
 
+
+
+
   const handleCancel = () => {
     // Reset form data to initial state
     setFormData({
@@ -103,6 +184,7 @@ function NewEvent({
   };
 
   const handleSaveDraft = () => {
+
     const draftEvent = async () => {
       try {
         const token = localStorage.getItem("access_token"); // Retrieve token from local storage
@@ -201,6 +283,7 @@ function NewEvent({
             required
             value={formData.eventName}
             onChange={handleChange}
+            errorMsg={formErrors.eventName}
           />
           <InputEle
             type="text"
@@ -209,6 +292,7 @@ function NewEvent({
             required
             value={formData.venue}
             onChange={handleChange}
+            errorMsg={formErrors.venue}   
           />
         </div>
         <InputEle
@@ -217,6 +301,8 @@ function NewEvent({
           label="Event Description"
           value={formData.eventDescription}
           onChange={handleChange}
+          
+          errorMsg={formErrors.eventDescription}
         />
         <div className="flex flex-row items-center gap-4 justify-between">
           <InputEle
@@ -225,7 +311,8 @@ function NewEvent({
             label="Event Date"
             required
             value={formData.eventDate}
-            onChange={handleChange}
+            onChange={handleChange} 
+            errorMsg={formErrors.eventDate}
           />
           <InputEle
             type="time"
@@ -234,6 +321,7 @@ function NewEvent({
             required
             value={formData.eventTime}
             onChange={handleChange}
+            errorMsg={formErrors.eventTime}
           />
         </div>
         <div className="flex flex-row items-center gap-4 justify-between">
@@ -244,6 +332,7 @@ function NewEvent({
             required={false}
             value={formData.eventFee}
             onChange={handleChange}
+            errorMsg={formErrors.eventFee}
           />
         </div>
         <InputEle

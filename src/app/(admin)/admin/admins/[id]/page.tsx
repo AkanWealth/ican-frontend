@@ -10,7 +10,7 @@ import { User } from "@/libs/types";
 
 function AdminDetails({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const [adminData, setAdminData] = useState<User>([]);
+  const [adminData, setAdminData] = useState<User>();
   const [permissions, setPermissions] = useState<any>([]);
 
   useEffect(() => {
@@ -29,7 +29,20 @@ function AdminDetails({ params }: { params: { id: string } }) {
         const result = await axios.request(config);
         if (result.status === 200) {
           setAdminData(result.data);
-          setPermissions(result.data.permissions);
+
+          const getPermissions = async () => {
+            const permissionsConfig = {
+              method: "get",
+              maxBodyLength: Infinity,
+              url: `${BASE_API_URL}/roles/${result.data.role.id}/permissions`,
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+              },
+            };
+            const permissionsResult = await axios.request(permissionsConfig);
+            setPermissions(permissionsResult.data.permissions);
+          };
+          getPermissions();
         }
       } catch (error) {
         console.error("Error fetching admin data:", error);
@@ -73,7 +86,9 @@ function AdminDetails({ params }: { params: { id: string } }) {
         <div className="grid grid-cols-2 gap-6">
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Role Name
-            <span className="text-base text-black font-medium">Admin</span>
+            <span className="text-base text-black font-medium">
+              {adminData?.role?.name}
+            </span>
           </p>
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Role Description
@@ -82,10 +97,16 @@ function AdminDetails({ params }: { params: { id: string } }) {
         </div>
         <p className=" text-sm text-neutral-600 flex flex-col gap-1">
           Permissions
-          <span className="text-base text-black font-medium">
-            {permissions.join(", ")}
-          </span>
         </p>
+        <div className="grid grid-cols-6 gap-2 mt-2">
+          {permissions.map((permission: string, index: string) => (
+            <div key={index} className="p-3 bg-gray-50 rounded-lg">
+              <span className="text-base text-black font-medium">
+                {permission}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

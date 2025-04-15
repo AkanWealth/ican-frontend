@@ -22,9 +22,7 @@ function MembersPage() {
         },
       };
       const result = await axios.request(config);
-      const filteredData = result.data.filter(
-        (user: User) => user.role.name === "MEMBER"
-      );
+  
       setData(result.data);
     }
     fetchData();

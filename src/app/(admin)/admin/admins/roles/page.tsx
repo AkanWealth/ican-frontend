@@ -47,7 +47,6 @@ function RolesPage() {
         if (response.status === 200) {
           setRoles(response.data);
 
-          // Map basic role data
         }
       } catch (error) {
         console.error("Failed to fetch roles:", error);

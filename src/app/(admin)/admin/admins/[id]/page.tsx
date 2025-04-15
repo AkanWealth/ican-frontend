@@ -1,52 +1,46 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-function AdminDetails() {
-  const router = useRouter();
-  const [permissions, setPermissions] = useState([
-    {
-      action: "Event management",
-      create: false,
-      view: false,
-      manage: false,
-      delete: false,
-    },
-    {
-      action: "Members accounts",
-      create: false,
-      view: false,
-      manage: false,
-      delete: false,
-    },
-    {
-      action: "Payments",
-      create: false,
-      view: false,
-      manage: false,
-      delete: false,
-    },
-    {
-      action: "Content management",
-      create: false,
-      view: false,
-      manage: false,
-      delete: false,
-    },
-  ]);
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
 
-  const handleCheckboxChange = (
-    index: number,
-    column: "create" | "view" | "manage" | "delete"
-  ) => {
-    setPermissions((prev) =>
-      prev.map((row, i) =>
-        i === index ? { ...row, [column]: !row[column] } : row
-      )
-    );
-    console.log(permissions);
-  };
+import { User } from "@/libs/types";
+
+function AdminDetails({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const [adminData, setAdminData] = useState<User>([]);
+  const [permissions, setPermissions] = useState<any>([]);
+
+  useEffect(() => {
+    async function fetchAdminData() {
+      const id = params.id;
+
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/users/${id}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      };
+      try {
+        const result = await axios.request(config);
+        if (result.status === 200) {
+          setAdminData(result.data);
+          setPermissions(result.data.permissions);
+        }
+      } catch (error) {
+        console.error("Error fetching admin data:", error);
+        // Handle error appropriately, e.g. show error message to user
+      } finally {
+        // Any cleanup code if needed
+      }
+    }
+
+    fetchAdminData();
+  });
 
   return (
     <div className="rounded-3xl p-6">
@@ -76,76 +70,22 @@ function AdminDetails() {
         <div className="flex flex-row items-center gap-4 justify-end"></div>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <div>
-          <h2 className="text-lg font-semibold text-black">Roles </h2>
+        <div className="grid grid-cols-2 gap-6">
+          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+            Role Name
+            <span className="text-base text-black font-medium">Admin</span>
+          </p>
+          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+            Role Description
+            <span className="text-base text-black font-medium">Admin</span>
+          </p>
         </div>
-
-        <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-          <table className="table-auto w-full border-collapse border border-neutral-300">
-            <thead>
-              <tr>
-                <th className="border border-neutral-300 px-4 py-2 text-left">
-                  Action
-                </th>
-                <th className="border border-neutral-300 px-4 py-2">Create</th>
-                <th className="border border-neutral-300 px-4 py-2">View</th>
-                <th className="border border-neutral-300 px-4 py-2">Manage</th>
-                <th className="border border-neutral-300 px-4 py-2">Delete</th>
-              </tr>
-            </thead>
-            <tbody>
-              {permissions.map((row, index) => (
-                <tr key={index}>
-                  <td className="border border-neutral-300 px-4 py-2">
-                    {row.action}
-                  </td>
-                  {["create", "view", "manage", "delete"].map((column) => (
-                    <td
-                      key={column}
-                      className="border border-neutral-300 px-4 py-2 text-center"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={Boolean(row[column as keyof typeof row])}
-                        onChange={() =>
-                          handleCheckboxChange(
-                            index,
-                            column as "create" | "view" | "manage" | "delete"
-                          )
-                        }
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="flex justify-end gap-4 mt-4">
-            <button
-              className="px-4 py-2 border-primary border bg-white text-primary rounded-full "
-              onClick={() =>
-                setPermissions((prev) =>
-                  prev.map((row) => ({
-                    ...row,
-                    create: false,
-                    view: false,
-                    manage: false,
-                    delete: false,
-                  }))
-                )
-              }
-            >
-              Reset all
-            </button>
-            <button
-              className="px-4 py-2 bg-primary text-white rounded-full"
-              onClick={() => console.log("Saved Permissions:", permissions)}
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>
+        <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+          Permissions
+          <span className="text-base text-black font-medium">
+            {permissions.join(", ")}
+          </span>
+        </p>
       </div>
     </div>
   );

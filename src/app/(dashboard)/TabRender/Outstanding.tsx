@@ -657,8 +657,8 @@ import {  X,
   
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="">
-          <div className="max-w-6xl mx-auto">
+        <div className="w-full">
+          <div className="w-full mx-auto">
             <div className="grid grid-cols-1 gap-6 mb-8">
               <div className="lg:w-1/2 md:w-full h-30 bg-white p-6 rounded-xl border border-gray-200">
                 <h3 className="text-gray-600 mb-2">Total Outstanding</h3>
@@ -679,7 +679,7 @@ import {  X,
               </div>
             </div>
   
-            <div className="bg-white max-w-[1100px] flex flex-col item-center rounded-xl border border-gray-300 p-6 mb-10">
+            <div className="bg-white w-full flex flex-col item-center rounded-xl border border-gray-300 p-6 mb-10">
               <h1 className="font-semibold lg:text-lg md:text-base mb-6">
                 Outstanding Dues Breakdown
               </h1>

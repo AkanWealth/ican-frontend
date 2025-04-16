@@ -12,7 +12,7 @@ const handleTabChange = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
     return (
-        <div className="p-4 md:p-8 bg-white rounded-lg border border-gray-400">
+        <div className="w-full p-4 md:p-8 bg-white rounded-lg border border-gray-400">
           <h1 className="text-2xl md:text-3xl font-bold mb-6">Overview</h1>
     
           <div className="w-full mb-4">

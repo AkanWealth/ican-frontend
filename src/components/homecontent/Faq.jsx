@@ -12,7 +12,6 @@ import {
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
-import { FaqData } from "@/libs/types";
 
 function Faq() {
   const [faqs, setFaqs] = useState([]); // State to store FAQ data from API

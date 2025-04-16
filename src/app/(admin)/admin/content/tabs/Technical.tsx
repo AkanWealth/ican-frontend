@@ -31,7 +31,9 @@ function Technical() {
 
   return (
     <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-      <h2 className="text-xl font-semibold text-left">All Content</h2>
+      <h2 className="text-xl font-semibold text-left">
+        All Technical Sessions
+      </h2>
       <div>
         <ContentTable columns={technicalcolumns} data={data} />
       </div>

@@ -22,7 +22,7 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl lg:p-12 md:p-8 w-full lg:max-w-2xl md:w-2xl relative">
         <button
           onClick={onClose}
@@ -63,21 +63,21 @@ const PaymentHistory = () => {
   useEffect(() => {
     const fetchPaymentHistory = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
 
         if (!token) {
-          console.error('User is not authenticated. Please log in again.');
+          console.error("User is not authenticated. Please log in again.");
           setLoading(false);
           return;
         }
 
         const response = await axios.get(
-          'https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/total-outstanding',
+          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/total-outstanding",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        
+
         // Make sure we're dealing with an array
         const data = Array.isArray(response.data) ? response.data : [];
         setPaymentHistoryData(data);
@@ -103,7 +103,7 @@ const PaymentHistory = () => {
     const selectedDate = new Date(date);
     setSelectedDate(selectedDate);
     setIsFiltered(true);
-    
+
     // Filter payment history data based on the selected date
     const filteredData = originalData.filter((payment: Payment) => {
       const paymentDate = new Date(payment.date);
@@ -113,7 +113,7 @@ const PaymentHistory = () => {
         paymentDate.getFullYear() === selectedDate.getFullYear()
       );
     });
-    
+
     setPaymentHistoryData(filteredData);
     setCurrentPage(1); // Reset to first page when filtering
   };
@@ -121,7 +121,7 @@ const PaymentHistory = () => {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    
+
     if (!term.trim()) {
       // If search is cleared, show all data or filtered by date if date is selected
       if (selectedDate) {
@@ -132,18 +132,19 @@ const PaymentHistory = () => {
       }
       return;
     }
-    
+
     setIsFiltered(true);
-    
+
     // Filter based on search term and possibly selected date
     let dataToFilter = selectedDate ? paymentHistoryData : originalData;
-    
-    const filtered = dataToFilter.filter((payment: Payment) => 
-      payment.TransactionID.toLowerCase().includes(term) ||
-      payment.PaymentMethod.toLowerCase().includes(term) ||
-      payment.SubscriptionPeriod.toLowerCase().includes(term)
+
+    const filtered = dataToFilter.filter(
+      (payment: Payment) =>
+        payment.TransactionID.toLowerCase().includes(term) ||
+        payment.PaymentMethod.toLowerCase().includes(term) ||
+        payment.SubscriptionPeriod.toLowerCase().includes(term)
     );
-    
+
     setPaymentHistoryData(filtered);
     setCurrentPage(1); // Reset to first page when searching
   };
@@ -193,7 +194,7 @@ const PaymentHistory = () => {
         </div>
       );
     }
-    
+
     // No data from API
     if (originalData.length === 0) {
       return (
@@ -204,7 +205,7 @@ const PaymentHistory = () => {
         </div>
       );
     }
-    
+
     // Data exists but filter returned no results
     if (isFiltered && paymentHistoryData.length === 0) {
       return (
@@ -221,7 +222,7 @@ const PaymentHistory = () => {
         </div>
       );
     }
-    
+
     // Data exists and should be displayed
     return (
       <>
@@ -288,7 +289,7 @@ const PaymentHistory = () => {
             </tbody>
           </table>
         </div>
-        
+
         <TablePagination
           currentPage={currentPage}
           totalPages={Math.ceil(paymentHistoryData.length / itemsPerPage)}

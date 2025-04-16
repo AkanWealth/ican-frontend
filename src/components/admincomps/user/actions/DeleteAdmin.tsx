@@ -33,14 +33,19 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
         return <Toast type="success" message={results.data.message} />;
       } catch (error: any) {
         console.error(error);
-        return <Toast type="error" message={error.response?.data?.message || "An error occurred"} />;
+        return (
+          <Toast
+            type="error"
+            message={error.response?.data?.message || "An error occurred"}
+          />
+        );
       }
     }
     fetchData();
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
       <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
         <div className="flex flex-row justify-start gap-4">
           <div className="rounded-full  h-fit w-fit p-4 bg-red-200">

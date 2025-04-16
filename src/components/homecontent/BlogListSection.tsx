@@ -8,6 +8,9 @@ import { blogPosts } from "@/lib/data";
 import { handleReadMore } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+
 /**
  * BlogList Component
  * @description Displays a list of blog posts with tab filtering and pagination.

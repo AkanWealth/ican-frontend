@@ -32,7 +32,7 @@ function Faq() {
 
   return (
     <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-      <h2 className="text-xl font-semibold text-left">FAQ</h2>
+      <h2 className="text-xl font-semibold text-left">All FAQ</h2>
       <div>
         <ContentTable columns={faqcolumns} data={data} />
       </div>

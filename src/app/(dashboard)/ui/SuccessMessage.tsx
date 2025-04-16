@@ -1,35 +1,38 @@
-import React from 'react';
-import Image from 'next/image';
-import { Modal } from '@mui/material';
-
+import React from "react";
+import Image from "next/image";
+import { Modal } from "@mui/material";
 
 interface SuccessModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    email: string;
-  }
+  isOpen: boolean;
+  onClose: () => void;
+  email: string;
+}
 
-const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, email }) => {
-  const handleBackdropClick = (event: { target: any; currentTarget: any; }) => {
+const SuccessModal: React.FC<SuccessModalProps> = ({
+  isOpen,
+  onClose,
+  email,
+}) => {
+  const handleBackdropClick = (event: { target: any; currentTarget: any }) => {
     if (event.target === event.currentTarget) {
       onClose();
     }
   };
 
   return (
-    <Modal 
-      open={isOpen} 
+    <Modal
+      open={isOpen}
       onClose={onClose}
       aria-labelledby="success-modal"
       BackdropProps={{
-        onClick: handleBackdropClick
+        onClick: handleBackdropClick,
       }}
     >
-      <div 
-        className="fixed inset-0 flex items-center justify-center"
+      <div
+        className="fixed inset-0 z-10 flex items-center justify-center"
         onClick={handleBackdropClick}
       >
-        <div 
+        <div
           className="relative flex flex-col bg-white py-8 px-6 rounded-lg items-center justify-center shadow-lg w-96 mx-4"
           onClick={(e) => e.stopPropagation()} // Prevent clicks on the content from closing the modal
         >
@@ -46,7 +49,8 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, email }) =
             Thank you for registering!
           </h3>
           <p className="text-center text-base px-4">
-            A confirmation email has been sent to {email || 'your email address'}
+            A confirmation email has been sent to{" "}
+            {email || "your email address"}
           </p>
         </div>
       </div>

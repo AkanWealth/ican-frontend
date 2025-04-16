@@ -179,7 +179,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      className="fixed inset-0 z-10 bg-black bg-opacity-50 flex items-center justify-center"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           // Close modal when clicking outside
@@ -215,7 +215,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
                     ...users.map((user) => ({
                       value: user.id,
                       label: `${user.firstname} ${user.surname}`,
-                    }))
+                    })),
                   ]
                 : [{ value: "", label: "Select User" }]
             }
@@ -233,7 +233,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
               ...roles.map((role) => ({
                 value: role.id,
                 label: role.name.replace(/[_-]/g, " "),
-              }))
+              })),
             ]}
             onChange={(e) =>
               setFormData({ ...formData, roleId: e.target.value })

@@ -15,7 +15,7 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
       <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
         <div className="flex flex-row justify-start gap-4">
           <div className="rounded-full  h-fit w-fit p-4 bg-red-200">

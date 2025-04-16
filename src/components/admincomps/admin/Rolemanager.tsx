@@ -241,7 +241,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      className="fixed inset-0 z-10 bg-black bg-opacity-50 flex items-center justify-center"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           // Close modal when clicking outside

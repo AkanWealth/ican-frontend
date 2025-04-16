@@ -35,12 +35,12 @@ function NewEvent({
   const [formErrors, setFormErrors] = useState({
     eventName: "",
     venue: "",
-    eventDescription: "", 
+    eventDescription: "",
     eventDate: "",
     eventTime: "",
     eventFee: "",
     mcpdCredit: "",
-    eventPhoto: ""
+    eventPhoto: "",
   });
 
   // Function to validate form fields
@@ -163,9 +163,6 @@ function NewEvent({
     }
   };
 
-
-
-
   const handleCancel = () => {
     // Reset form data to initial state
     setFormData({
@@ -184,7 +181,6 @@ function NewEvent({
   };
 
   const handleSaveDraft = () => {
-
     const draftEvent = async () => {
       try {
         const token = localStorage.getItem("access_token"); // Retrieve token from local storage
@@ -213,7 +209,9 @@ function NewEvent({
         const response = await axios.request(config);
         console.log("Event added to drafts successfully:", response.data);
         handleCancel(); // Close the modal after successful draft
-        return <Toast type="success" message="Event added to drafts successfully!" />;
+        return (
+          <Toast type="success" message="Event added to drafts successfully!" />
+        );
       } catch (error) {
         console.error("Error adding the event to draft:", error);
         return <Toast type="error" message="Error drafting event!" />;
@@ -263,7 +261,7 @@ function NewEvent({
   };
 
   return (
-    <div className="fixed z-10 inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
+    <div className="fixed z-10 inset-0 z-10 bg-gray-800 bg-opacity-75 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg w-1/2">
         <div className="flex flex-row justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Create New Event</h2>
@@ -292,7 +290,7 @@ function NewEvent({
             required
             value={formData.venue}
             onChange={handleChange}
-            errorMsg={formErrors.venue}   
+            errorMsg={formErrors.venue}
           />
         </div>
         <InputEle
@@ -301,7 +299,6 @@ function NewEvent({
           label="Event Description"
           value={formData.eventDescription}
           onChange={handleChange}
-          
           errorMsg={formErrors.eventDescription}
         />
         <div className="flex flex-row items-center gap-4 justify-between">
@@ -311,7 +308,7 @@ function NewEvent({
             label="Event Date"
             required
             value={formData.eventDate}
-            onChange={handleChange} 
+            onChange={handleChange}
             errorMsg={formErrors.eventDate}
           />
           <InputEle

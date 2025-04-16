@@ -22,7 +22,7 @@ const ImageOverlay = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-10 bg-black/60 z-50 flex items-center justify-center">
       <div className="relative max-w-6xl mx-auto">
         {/* Image Container with Navigation */}
         <div className="relative">
@@ -191,11 +191,10 @@ function Gallery() {
                             fill={true}
                             src={item.imgurl}
                             alt={item.title}
-
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/70 to-transparent flex items-end">
                           <h4 className="text-white text-xl font-semibold p-6">
                             {item.title}
                           </h4>

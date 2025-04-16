@@ -22,7 +22,7 @@ const ImageOverlay = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-10 bg-black/60 z-50 flex items-center justify-center">
+    <div className="fixed inset-0  bg-black/60 z-50 flex items-center justify-center">
       <div className="relative max-w-6xl mx-auto">
         {/* Image Container with Navigation */}
         <div className="relative">

@@ -77,7 +77,7 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({
   // Loading state
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-10 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="fixed inset-0  bg-black bg-opacity-50 z-50 flex items-center justify-center">
         <div className="bg-white w-full max-w-2xl rounded-lg p-8">
           <div className="flex flex-col items-center justify-center">
             <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
@@ -600,7 +600,7 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-10 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white w-full max-w-2xl rounded-lg max-h-[90vh] overflow-y-auto relative">
         <button
           onClick={onClose}

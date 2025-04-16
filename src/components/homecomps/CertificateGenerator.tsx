@@ -114,7 +114,7 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({
     <>
       {/* Certificate Preview Modal */}
       {showPreview && (
-        <div className="fixed inset-0 z-10 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg max-w-4xl max-h-[90vh] overflow-auto">
             <div className="flex justify-between mb-4">
               <h3 className="text-lg font-bold">Certificate Preview</h3>

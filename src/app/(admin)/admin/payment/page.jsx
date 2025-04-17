@@ -14,7 +14,7 @@ function Payment() {
 
   useEffect(() => {
     async function fetchData() {
-      const result = payments.filter(payment => payment.status === "overdue");
+      const result = payments
       setData(result);
     }
     fetchData();

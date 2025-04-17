@@ -59,14 +59,14 @@ function Sidebar() {
   const activePage = item?.label;
 
   return (
-    <aside className="h-fit w-fit bg-white text-black border-r flex flex-col p-4">
+    <aside className="h-full w-fit bg-white text-black border-r flex flex-col justify-between p-4">
       {/* Logo */}
       <div className="h-16 flex items-center px-6 py-12 border-b border-gray-200">
         <Image alt="Logo" width={200} height={80} src="/Logo_big.png" />
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex flex-col">
+      <nav className="flex flex-col h-full justify-between">
         {/* Top Menu Group */}
         <div className="flex flex-col py-12">
           <div className="my-4 flex flex-col gap-4">
@@ -107,9 +107,8 @@ function Sidebar() {
 
         <div>
           <button
-            
             onClick={logout}
-            className="flex text-red-500 fill-red-500 items-center space-x-3 px-6 py-2 rounded-lg mt-32 mb-20"
+            className="flex w-full text-red-500 fill-red-500 items-center space-x-3 px-6 py-2 rounded-lg hover:bg-red-100 hover:text-red-600 hover:fill-red-600"
           >
             <LogOut className="w-5 h-5 transform scale-x-[-1]" />
             <span className=" test-xs">Logout</span>

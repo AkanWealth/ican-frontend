@@ -38,7 +38,7 @@ const Toast: React.FC<ToastProps> = ({ type, message, onClose }) => {
 
   return (
     <div
-      className={`toast-container fixed top-5 right-5 px-5 py-3 rounded-xl text-base text-black z-50 ${type}`}
+      className={`toast-container fixed top-5 right-5 px-5 py-3 rounded-xl text-base text-black z-100 ${type}`}
     >
       <div className="flex items-center gap-4 justify-end">
         <div className="rounded-full bg-white p-2">

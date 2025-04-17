@@ -1,5 +1,13 @@
 import { IconType } from "react-icons";
 
+type FaqData = {
+  id: string;
+  name: string;
+  answer: string;
+  createdAt: string;
+};
+
+
 type BillingDetails = {
   id: string;
   name: string;
@@ -94,4 +102,5 @@ export type {
   CreateContentProps,
   BillingDetails,
   RolesData,
+  FaqData
 };

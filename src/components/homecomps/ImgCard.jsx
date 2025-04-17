@@ -16,7 +16,7 @@ const Imgcard = ({ title, imgurl }) => {
       </div>
 
       {/* Title overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
         <h4 className="text-white font-medium text-lg">{title}</h4>
       </div>
     </div>

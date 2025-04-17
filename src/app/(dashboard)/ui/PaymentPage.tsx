@@ -17,7 +17,7 @@ import "jspdf-autotable";
 import { Checkbox } from "@mui/material";
 import TablePagination from "@/components/Pagenation";
 import { useToast } from "@/hooks/use-toast";
-import axios from 'axios';
+import axios from "axios";
 import PaymentHistory from "../TabRender/PaymentHistory";
 import Outstanding from "../TabRender/Outstanding";
 import Subscription from "../TabRender/Subscription";
@@ -47,7 +47,7 @@ interface PaymentDetails {
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl lg:p-12 md:p-8 w-full lg:max-w-2xl md:w-2xl relative">
         <button
           onClick={onClose}
@@ -1416,42 +1416,44 @@ const PaymentPage = () => {
 
   useEffect(() => {
     const fetchOutstandingData = async () => {
-        try {
-            const token = localStorage.getItem('token');
+      try {
+        const token = localStorage.getItem("token");
 
-            if (!token) {
-                console.error('User is not authenticated. Please log in again.');
-                return;
-            }
-
-            // Fetch total outstanding payment
-            const totalOutstandingResponse = await axios.get(
-                'https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/total-outstanding',
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            const totalOutstanding = totalOutstandingResponse.data?.totalOutstanding || 0;
-
-            // Fetch outstanding breakdown
-            const outstandingBreakdownResponse = await axios.get(
-                'https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/outstanding-breakdown',
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            const outstandingBreakdown = outstandingBreakdownResponse.data?.breakdown || [];
-
-            // Update state with API data
-            setTotalOutstanding(totalOutstanding);
-            setActivities(outstandingBreakdown);
-        } catch (error) {
-            console.error('Failed to fetch outstanding data:', error);
+        if (!token) {
+          console.error("User is not authenticated. Please log in again.");
+          return;
         }
+
+        // Fetch total outstanding payment
+        const totalOutstandingResponse = await axios.get(
+          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/total-outstanding",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const totalOutstanding =
+          totalOutstandingResponse.data?.totalOutstanding || 0;
+
+        // Fetch outstanding breakdown
+        const outstandingBreakdownResponse = await axios.get(
+          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/outstanding-breakdown",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const outstandingBreakdown =
+          outstandingBreakdownResponse.data?.breakdown || [];
+
+        // Update state with API data
+        setTotalOutstanding(totalOutstanding);
+        setActivities(outstandingBreakdown);
+      } catch (error) {
+        console.error("Failed to fetch outstanding data:", error);
+      }
     };
 
     fetchOutstandingData();
-}, []);
+  }, []);
 
   const renderOutstanding = () => (
     <div className="min-h-screen bg-gray-50">
@@ -1670,9 +1672,9 @@ const PaymentPage = () => {
         {/* <div className="text-sm text-gray-500 mt-6">{getTabDescription()}</div> */}
       </div>
 
-      {activeTab === "Outstanding" && <Outstanding/>}
-      {activeTab === "Subcription" && <Subscription/>}
-      {activeTab === "PaymentHistory" && <PaymentHistory/>}
+      {activeTab === "Outstanding" && <Outstanding />}
+      {activeTab === "Subcription" && <Subscription />}
+      {activeTab === "PaymentHistory" && <PaymentHistory />}
 
       {renderDonationModal()}
     </div>

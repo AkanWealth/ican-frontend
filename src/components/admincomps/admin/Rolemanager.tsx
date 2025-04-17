@@ -202,7 +202,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
 
     // Update formData with selected permissions
     const submitData = JSON.stringify({
-      name: formData.name,
+      name: formData.name.replace(/[^a-zA-Z]/g, "_"),
       permissions: selectedPermissionValues,
     });
 
@@ -214,6 +214,8 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
         url: `${BASE_API_URL}/roles/create`,
 
         headers: {
+          "Content-Type": "application/json",
+
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
         data: submitData,
@@ -222,28 +224,24 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
 
       if (response.status === 200) {
         // Show success message
-        Toast({
-          type: "success",
-          message: "Role created successfully",
-        });
 
         // Reset form and close modal
         setFormData(initialFormData);
         setPermissions([]);
         setShowModal(false);
+        return <Toast type="success" message="Role created successfully" />;
       }
     } catch (error) {
       console.error("Error creating role:", error);
-      Toast({
-        type: "error",
-        message: "Failed to create role",
-      });
+      return (
+        <Toast type="error" message="Error occured when creating the role" />
+      );
     }
   };
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      className="fixed inset-0 z-10 bg-black bg-opacity-50 flex items-center justify-center"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           // Close modal when clicking outside
@@ -263,14 +261,14 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
           <p className="text-primary">
-            Your selection:{" "}
-            {permissions.map((permission) => permission.label).join(", ")}
+            Number of selected roles: {permissions.length}
           </p>
           <MultipleSelector
             value={permissions}
             onChange={setPermissions}
             defaultOptions={OPTIONS}
             placeholder="Select Permissions for the role you like..."
+            groupBy="group"
             emptyIndicator={
               <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                 No more roles to assign.

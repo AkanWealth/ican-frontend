@@ -35,6 +35,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const capitalizeWords = (str: string): string => {
+    if (typeof str !== "string") return "";
     return str.replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
@@ -73,6 +74,22 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        {showDisableModal && (
+          <DisableAdmin
+            id={row.original.id}
+            fullName={row.original.firstname + " " + row.original.surname}
+            role={capitalizeWords(row.original.role.name ?? "")}
+            onClose={() => setShowDisableModal(false)}
+          />
+        )}
+        {showEnableModal && (
+          <EnableAdmin
+            id={row.original.id}
+            fullName={row.original.firstname + " " + row.original.surname}
+            role={capitalizeWords(row.original.role.name ?? "")}
+            onClose={() => setShowEnableModal(false)}
+          />
+        )}
       </>
     );
   } else {
@@ -122,7 +139,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         {showDisableModal && (
           <DisableAdmin
             id={row.original.id}
-            fullName={row.original.firstName + " " + row.original.lastName}
+            fullName={row.original.firstname + " " + row.original.surname}
             role={capitalizeWords(row.original.role.name ?? "")}
             onClose={() => setShowDisableModal(false)}
           />
@@ -130,9 +147,9 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         {showEnableModal && (
           <EnableAdmin
             id={row.original.id}
-            fullName={row.original.fullName}
-            role={capitalizeWords(row.original.role ?? "")}
-            onClose={() => setShowDisableModal(false)}
+            fullName={row.original.firstname + " " + row.original.surname}
+            role={capitalizeWords(row.original.role.name ?? "")}
+            onClose={() => setShowEnableModal(false)}
           />
         )}
         {showDeleteModal && (

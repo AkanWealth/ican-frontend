@@ -132,7 +132,7 @@ function AdminLogin() {
 
         setTimeout(() => {
           router.push("/admin");
-        }, 5000);
+        }, 1000);
 
         return <Toast type="success" message="Login successful" />;
       } catch (error) {

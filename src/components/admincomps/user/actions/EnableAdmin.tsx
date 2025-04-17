@@ -17,7 +17,7 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
     console.log({ id, fullName, role });
     async function fetchData() {
       const data = JSON.stringify({
-        userId: "",
+        userId: id,
         suspend: false,
       });
       const config = {
@@ -50,7 +50,7 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
       <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
         <div className="flex flex-row justify-start gap-4">
           <div className="rounded-full  h-fit w-fit p-4 bg-green-200">
@@ -58,9 +58,9 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
           </div>
           <div>
             <div className="flex flex-col gap-2">
-              <h5 className="font-semibold text-xl text-black">Enable Admin</h5>
+              <h5 className="font-semibold text-xl text-black">Enable User</h5>
               <p className="text-sm text-neutral-600">
-                Are you sure you want to enable this admin?
+                Are you sure you want to enable this user?
               </p>
             </div>
             <div className="flex flex-col gap-2 mt-4">

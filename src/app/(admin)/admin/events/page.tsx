@@ -19,12 +19,12 @@ function EventsPage() {
         const config = {
           method: 'get',
           maxBodyLength: Infinity,
-          url: `${BASE_API_URL}/api/events`,
+          url: `${BASE_API_URL}/events`,
           headers: {}
         };
 
         const response = await axios.request(config);
-        setData(response.data);
+        setData(response.data.data);
       } catch (error) {
         console.error("Error fetching events data:", error);
       }

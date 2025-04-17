@@ -35,9 +35,6 @@ function SettingsPage() {
     confirmPassword: "",
   });
 
-
-  
-
   const handleDeleteClick = () => {
     setIsModalOpen(true);
   };
@@ -364,7 +361,7 @@ function SettingsPage() {
         </div>
       </div>
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-10">
+        <div className="fixed inset-0 z-10 flex items-center justify-center bg-white bg-opacity-10">
           <div className="relative flex flex-col bg-white py-8 px-6 rounded-lg items-center justify-center shadow-lg w-[560px]">
             <X
               className="absolute right-4 top-4 w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700"

@@ -77,6 +77,7 @@ export const Header = () => {
         );
 
         const profilePictureUrl = response.data?.profilePicture;
+        console.log("Profile Picture URL:", profilePictureUrl); // Log the URL for debugging
         if (profilePictureUrl) {
           setProfilePicture(profilePictureUrl); // Update the profile picture state
         } else {
@@ -155,7 +156,7 @@ export const Header = () => {
                   alt="Profile"
                   width={200}
                   height={200}
-                  className="w-full h-full object-cover"
+                  className="w-full rounded-full object-cover"
                 />
               </div>
               <ChevronDown className="w-4 h-4 text-gray-600" />

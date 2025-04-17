@@ -111,6 +111,20 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
     router.push(`/EventRegistration?${params.toString()}`);
   };
 
+  // const filteredEvents = events.filter((event) => {
+  //   const matchesName = event.name
+  //     .toLowerCase()
+  //     .includes(searchTerm.toLowerCase());
+  //   const matchesDescription = event.description
+  //     .toLowerCase()
+  //     .includes(searchTerm.toLowerCase());
+  //   const matchesLocation = selectedLocation
+  //     ? event.venue.includes(selectedLocation)
+  //     : true;
+
+  //   return (matchesName || matchesDescription) && matchesLocation;
+  // });
+
   const filteredEvents = events.filter((event) => {
     const matchesName = event.name
       .toLowerCase()
@@ -121,8 +135,10 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
     const matchesLocation = selectedLocation
       ? event.venue.includes(selectedLocation)
       : true;
-
-    return (matchesName || matchesDescription) && matchesLocation;
+  
+    const isUpcoming = new Date(event.date) >= new Date(); // <-- Only allow future events
+  
+    return (matchesName || matchesDescription) && matchesLocation && isUpcoming;
   });
 
   if (isLoading) {
@@ -248,7 +264,7 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
             <div key={event.id} className="border rounded-lg relative">
               <div className="relative h-52 mb-4 rounded-lg overflow-hidden">
                 <Image
-                  src={event.flyer}
+                  src={event.flyer|| "/Event3.jpg"}
                   alt={event.name}
                   fill
                   className="w-full h-full object-cover"

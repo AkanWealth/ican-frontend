@@ -489,8 +489,9 @@ function Profile() {
                     <Image
                       src={URL.createObjectURL(profilePhoto)}
                       alt="Profile picture"
-                      fill={true}
-                      className="rounded-full object-cover"
+                      width={200}
+                      height={200}
+                      className="w-full rounded-full object-cover"
                     />
                   </div>
                 )}

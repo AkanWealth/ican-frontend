@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import axios from 'axios';
 import { Search, ChevronDown, ListFilter, ChevronUp, Bookmark, CircleDollarSign, SquareLibrary } from 'lucide-react';
 import { FaBookmark } from 'react-icons/fa6';
@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Modal } from '@mui/material';
 import Image from 'next/image';
 import ResourceDetailsModal from '../ModalPage/ResourceModalPage';
+import { BASE_API_URL } from "@/utils/setter";
 
 interface Resource {
     id: number;
@@ -39,6 +40,9 @@ function ResourcePage() {
     const [loading, setLoading] = useState<boolean>(true);
     const [recommended, setRecommened] = useState<Resource[]>([]);
 
+    const [bookmarkedResources, setBookmarkedResources] = useState<Resource[]>([]);
+    const [bookmarksLoading, setBookmarksLoading] = useState<boolean>(false);
+
     // Fetch all resources
     useEffect(() => {
         const fetchResources = async () => {
@@ -49,7 +53,7 @@ function ResourcePage() {
             console.log('Token:', token);
     
             const response = await axios.get(
-              "https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/contents",
+              `${BASE_API_URL}/resources/contents`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`, 
@@ -81,7 +85,7 @@ function ResourcePage() {
             const token = localStorage.getItem("token");
             
             const response = await axios.get(
-              "https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/recommended",
+              `${BASE_API_URL}/resources/recommended`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -106,49 +110,102 @@ function ResourcePage() {
         fetchRecommendedResources();
     }, [toast]);
 
+
+    const fetchBookmarkedResources = useCallback(async () => {
+      try {
+        setBookmarksLoading(true);
+        if (typeof window === "undefined") return;
+    
+        const user = localStorage.getItem("user");
+        const userId = user ? JSON.parse(user)?.id : null;
+        const token = localStorage.getItem("token");
+        
+        const response = await axios.get(
+          `https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/${userId}/bookmarks`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        
+        const bookmarkedItems = response.data.map((item: any) => ({
+          ...item,
+          isBookmarked: true
+        }));
+        
+        setBookmarkedResources(bookmarkedItems);
+        console.log('Bookmarked Resources:', bookmarkedItems);
+      } catch (error) {
+        console.error('Error fetching bookmarked resources:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch bookmarked resources',
+          variant: 'destructive',
+        });
+      } finally {
+        setBookmarksLoading(false);
+      }
+    }, [toast]); // Dependencies for fetchBookmarkedResources
+    
+    // Then your original useEffect stays almost the same
+    useEffect(() => {
+      if (activeTab === 'bookmark') {
+        fetchBookmarkedResources();
+      }
+    }, [activeTab, fetchBookmarkedResources]);
+
+
     // Function to toggle bookmark via API
+    const handleBookmark = async (id: any) => {
+      console.log('Bookmark clicked for ID:', id);
+      await toggleBookmark(id);
+    };
+    
+    // Then, update the toggleBookmark function to properly update both arrays
     const toggleBookmark = async (resourceId: any) => {
-        try {
-          const token = localStorage.getItem("token");
-          
-          // Call the bookmark API endpoint
-          const response = await axios.post(
-            `https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/${resourceId}/bookmark`,
-            {},  // Empty body as it's a toggle action
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
+      try {
+        const token = localStorage.getItem("token");
+        
+        // Call the bookmark API endpoint
+        const response = await axios.post(
+          `${BASE_API_URL}/resources/${resourceId}/bookmark`,
+          {},  // Empty body as it's a toggle action
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log('Bookmark response:', response);
+        if (response.status === 200|| response.status === 201) {
+          // Update both arrays regardless of where the bookmark was clicked
+          setResources(prevResources => 
+            prevResources.map(resource => 
+              resource.id === resourceId ? {...resource, isBookmarked: !resource.isBookmarked} : resource
+            )
           );
           
-          // Update the local state based on the API response
-          if (response.status === 200) {
-            // If successful, update the UI
-            // For resources array
-            setResources(resources.map(resource => 
-              resource.id === resourceId ? {...resource, isBookmarked: !resource.isBookmarked} : resource
-            ));
-            
-            // For recommended array
-            setRecommened(recommended.map(item => 
+          setRecommened(prevRecommended => 
+            prevRecommended.map(item => 
               item.id === resourceId ? {...item, isBookmarked: !item.isBookmarked} : item
-            ));
-            
-            toast({
-              title: 'Success',
-              description: 'Bookmark status updated successfully',
-              variant: 'default',
-            });
-          }
-        } catch (error) {
-          console.error('Error toggling bookmark:', error);
+            )
+          );
+          
           toast({
-            title: 'Error',
-            description: 'Failed to update bookmark status',
-            variant: 'destructive',
+            title: 'Success',
+            description: 'Bookmark status updated successfully',
+            variant: 'default',
           });
         }
+      } catch (error) {
+        console.error('Error toggling bookmark:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to update bookmark status',
+          variant: 'destructive',
+        });
+      }
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,10 +216,10 @@ function ResourcePage() {
         setActiveTab(tab);
     };
 
-    const handleBookmark = (id: number, isRecommended: boolean = false) => {
-        // Call the API to toggle bookmark
-        toggleBookmark(id);
-    };
+    // const handleBookmark = (id: number, isRecommended: boolean = false) => {
+    //     // Call the API to toggle bookmark
+    //     toggleBookmark(id);
+    // };
     
     const handleFilterSelect = (filter: string) => {
         setSelectedFilter(filter);
@@ -209,7 +266,7 @@ function ResourcePage() {
           
           const token = localStorage.getItem("token");
           const response = await axios.get(
-              `https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/content/${resource.id}`,
+              `${BASE_API_URL}/resources/content/${resource.id}`,
               {
                   headers: {
                       Authorization: `Bearer ${token}`,
@@ -307,7 +364,7 @@ function ResourcePage() {
           </div>
    
           <button 
-            onClick={() => handleBookmark(resource.id)}
+             onClick={() => handleBookmark(resource.id)}
             className="text-gray-400 hover:text-blue-600"
             aria-label={resource.isBookmarked ? "Remove bookmark" : "Add bookmark"}
           >
@@ -408,7 +465,7 @@ function ResourcePage() {
           </div>
    
           <button 
-                onClick={() => handleBookmark(recommended.id, true)} // Pass true to indicate this is a recommended item
+                onClick={() => handleBookmark(recommended.id)} // Pass true to indicate this is a recommended item
                 className="text-gray-400 hover:text-blue-600"
                 aria-label={recommended.isBookmarked ? "Remove bookmark" : "Add bookmark"}
             >
@@ -488,25 +545,61 @@ function ResourcePage() {
         );
     };
 
-    const renderBookmarkTab = () => {
-        if (loading) {
-            return <LoadingState />;
-        }
+    // const renderBookmarkTab = () => {
+    //     if (loading) {
+    //         return <LoadingState />;
+    //     }
 
-        const bookmarkedResources = filteredResources.filter(resource => resource.isBookmarked);
+    //     const bookmarkedResources = filteredResources.filter(resource => resource.isBookmarked);
         
-        if (bookmarkedResources.length === 0) {
-            return <EmptyState />;
-        }
+    //     if (bookmarkedResources.length === 0) {
+    //         return <EmptyState />;
+    //     }
 
-        return (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {bookmarkedResources.map(resource => (
-                    <ResourceCard key={resource.id} resource={resource} />
-                ))}
-            </div>
-        );
-    };
+    //     return (
+    //         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    //             {bookmarkedResources.map(resource => (
+    //                 <ResourceCard key={resource.id} resource={resource} />
+    //             ))}
+    //         </div>
+    //     );
+    // };
+
+    const renderBookmarkTab = () => {
+      // Show loading state while fetching bookmarks
+      if (bookmarksLoading) {
+          return <LoadingState />;
+      }
+      
+      // Apply filters to bookmarked resources
+      const filteredBookmarks = bookmarkedResources.filter(resource => {
+          // Filter based on search query
+          if (searchQuery && !resource.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+              return false;
+          }
+          
+          // Filter based on selected filter type if one is selected
+          if (selectedFilter && resource.type.toLowerCase() !== selectedFilter.toLowerCase()) {
+              return false;
+          }
+          
+          return true;
+      });
+      
+      // Show empty state if no bookmarks found or all filtered out
+      if (filteredBookmarks.length === 0) {
+          return <EmptyState />;
+      }
+  
+      // Render the bookmarked resources grid
+      return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredBookmarks.map(resource => (
+                  <ResourceCard key={resource.id} resource={resource} />
+              ))}
+          </div>
+      );
+  };
 
     return (
         <div className="p-4">

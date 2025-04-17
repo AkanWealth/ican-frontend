@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ChevronDown, Video, Mic, Files, Calendar } from "lucide-react";
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+
+
+
+
 
 function MetricMeetingRender() {
   // Sample activity data (you would replace this with your actual data)
@@ -20,10 +26,19 @@ function MetricMeetingRender() {
   const [timeFilter, setTimeFilter] = useState("This month");
   const [isTimeFilterOpen, setIsTimeFilterOpen] = useState(false);
   
+  // Added from AttendanceRender
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
+  const [apiMeetingsData, setApiMeetingsData] = useState<any[]>([]);
+  const [userRegistrations, setUserRegistrations] = useState<any[]>([]);
+  const [userAttendance, setUserAttendance] = useState<any[]>([]);
+  const [isLoadingRegistrations, setIsLoadingRegistrations] = useState(true);
+  const [isLoadingAttendance, setIsLoadingAttendance] = useState(true);
+  
+  // Metrics state from AttendanceRender
   const [metrics, setMetrics] = useState({
-    totalMeetings: 4,
-    numberRegistered: 4,
-    numberAttended: 3
+    totalMeetings: 0,
+    numberRegistered: 0,
+    numberAttended: 0
   });
 
   // Monthly attendance data for the bar chart
@@ -44,25 +59,28 @@ function MetricMeetingRender() {
     notAttended: 30
   });
 
-  const months = [
+  const months = useMemo(() => [
     "All", "January", "February", "March", "April", "May", "June", 
     "July", "August", "September", "October", "November", "December"
-  ];
+  ], []);
 
-  const shortMonths = {
-    "January": "Jan",
-    "February": "Feb",
-    "March": "Mar",
-    "April": "Apr",
-    "May": "May",
-    "June": "Jun",
-    "July": "Jul",
-    "August": "Aug",
-    "September": "Sep",
-    "October": "Oct",
-    "November": "Nov",
-    "December": "Dec"
-  };
+  const shortMonths = useMemo(
+    () => ({
+      January: "Jan",
+      February: "Feb",
+      March: "Mar",
+      April: "Apr",
+      May: "May",
+      June: "Jun",
+      July: "Jul",
+      August: "Aug",
+      September: "Sep",
+      October: "Oct",
+      November: "Nov",
+      December: "Dec",
+    }),
+    []
+  );
 
   const dateRanges = [
     "jan-jul",
@@ -78,34 +96,264 @@ function MetricMeetingRender() {
     "This year"
   ];
 
- 
-  
+  // Fetch meetings data from API for metrics only (from AttendanceRender)
+  useEffect(() => {
+    const fetchMeetingsMetrics = async () => {
+      setIsLoadingMetrics(true);
+      try {
+        const response = await axios.get(
+          "https://ican-api-6000e8d06d3a.herokuapp.com/api/meetings",{
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log("Meetings response", response);
 
-  const updateMetrics = useCallback((filteredActivities: { id: number; month: string; status: string; }[]) => {
-    const totalMeetings = filteredActivities.length;
-    const numberAttended = filteredActivities.filter(activity => activity.status === "present").length;
-    
-    setMetrics({
-      totalMeetings,
-      numberRegistered: totalMeetings, // Assuming all meetings are registered
-      numberAttended
-    });
+        // Check if the response status is not 200 (OK)
+        if (response.status !== 200) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+        
+        const data = response.data;
+        
+        // Transform API data for metrics calculation
+        const formattedMeetingsData = data.map((meeting: any) => {
+          const meetingDate = new Date(meeting.date || new Date().toISOString());
+          const currentDate = new Date();
+          
+          // Check if meeting date has passed
+          const hasHeld = currentDate > meetingDate;
+          
+          // Format date to match the component's expected format
+          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          const formattedDate = `${monthNames[meetingDate.getMonth()]} ${meetingDate.getDate()}, ${meetingDate.getFullYear()}`;
+          
+          return {
+            MeetingTitle: meeting.title || "Monthly ICAN Meeting",
+            date: formattedDate,
+            status: meeting.attended ? "present" : "absent",
+            hasHeld: hasHeld
+          };
+        });
+        
+        // Filter to only include meetings that have been held
+        const heldMeetings = formattedMeetingsData.filter((meeting: any) => meeting.hasHeld);
+        
+        setApiMeetingsData(heldMeetings);
+        // Update the metrics state with the total meetings count
+        setMetrics(prev => ({
+          ...prev,
+          totalMeetings: heldMeetings.length
+        }));
+        setIsLoadingMetrics(false);
+      } catch (err) {
+        console.error("Error fetching meetings metrics:", err);
+        setIsLoadingMetrics(false);
+      }
+    };
+
+    fetchMeetingsMetrics();
   }, []);
 
-  const filterActivitiesByMonth = useCallback((month: string) => {
-    let filtered = activities;
-    if (month !== "All") {
-      filtered = activities.filter(activity => activity.month === month);
-    }
-    setFilteredActivities(filtered);
-    updateMetrics(filtered);
-  }, [activities, updateMetrics]);
-
-
+  // Fetch user registrations for metrics only (from AttendanceRender)
   useEffect(() => {
-    filterActivitiesByMonth(selectedMonth);
-  }, [selectedMonth, filterActivitiesByMonth]);
+    const fetchUserRegistrations = async () => {
+      setIsLoadingRegistrations(true);
+      try {
+        // Get user info from local storage
+        const userInfo = localStorage.getItem('user');
+        if (!userInfo) {
+          console.error("User info not found in localStorage");
+          setIsLoadingRegistrations(false);
+          return;
+        }
+        
+        const parsedUserInfo = JSON.parse(userInfo);
+        const email = parsedUserInfo.email;
+        
+        if (!email) {
+          console.error("User email not found in userInfo");
+          setIsLoadingRegistrations(false);
+          return;
+        }
 
+        const registrationsResponse = await axios.get(
+          `${BASE_API_URL}/events/registrations/user/${email}`, 
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        
+        console.log("User registrations:", registrationsResponse.data);
+        
+        // Check if the response is an array or a single object
+        let registrations = Array.isArray(registrationsResponse.data) 
+          ? registrationsResponse.data 
+          : [registrationsResponse.data];
+        
+        setUserRegistrations(registrations);
+        
+        // Get total number of registrations
+        const totalRegistrations = registrations.length;
+        
+        // Update metrics with registration count
+        setMetrics(prev => ({
+          ...prev,
+          numberRegistered: totalRegistrations
+        }));
+        
+        setIsLoadingRegistrations(false);
+      } catch (err) {
+        console.error("Error fetching user registrations:", err);
+        setUserRegistrations([]);
+        setIsLoadingRegistrations(false);
+      }
+    };
+
+    fetchUserRegistrations();
+  }, []);
+
+  // Fetch user attendance (from AttendanceRender)
+  useEffect(() => {
+    const fetchUserAttendance = async () => {
+      setIsLoadingAttendance(true);
+      try {
+        // Get user ID from local storage
+        const userInfo = localStorage.getItem('user');
+        if (!userInfo) {
+          console.error("User info not found");
+          setIsLoadingAttendance(false);
+          return;
+        }
+        
+        const parsedUserInfo = JSON.parse(userInfo);
+        const userId = parsedUserInfo.id;
+        
+        if (!userId) {
+          console.error("User ID not found");
+          setIsLoadingAttendance(false);
+          return;
+        }
+
+        try {
+          const attendanceResponse = await axios.get(
+            `${BASE_API_URL}/events/registrations/attendance/${userId}`, 
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          
+          console.log("User attendance:", attendanceResponse.data);
+          
+          // Check if the response is an array or a single object
+          let attendanceData = Array.isArray(attendanceResponse.data)
+            ? attendanceResponse.data
+            : [attendanceResponse.data];
+          
+          setUserAttendance(attendanceData);
+          
+          // Get total number of attended meetings
+          const totalAttended = attendanceData.filter((item: any) => item.status === "ATTENDED").length;
+          
+          // Update metrics with attendance count
+          setMetrics(prev => ({
+            ...prev,
+            numberAttended: totalAttended
+          }));
+          
+        } catch (error: any) {
+          // If we get a 404, it means the user has no attendance records
+          if (error.response && error.response.status === 404) {
+            console.log("No attendance records found for this user");
+            setUserAttendance([]);
+            setMetrics(prev => ({
+              ...prev,
+              numberAttended: 0
+            }));
+          } else {
+            // Re-throw for other errors
+            throw error;
+          }
+        }
+        
+        setIsLoadingAttendance(false);
+      } catch (err) {
+        console.error("Error fetching user attendance:", err);
+        setUserAttendance([]);
+        setIsLoadingAttendance(false);
+      }
+    };
+
+    fetchUserAttendance();
+  }, []);
+
+  // Effect to update ONLY metrics when selectedMonth changes (from AttendanceRender)
+ // Modified useEffect with better dependency control
+// Modified useEffect with all required dependencies
+useEffect(() => {
+  if (!isLoadingRegistrations && !isLoadingAttendance && !isLoadingMetrics) {
+    let totalMeetings, numberRegistered, numberAttended;
+    
+    if (selectedMonth === "All") {
+      totalMeetings = apiMeetingsData.length;
+      numberRegistered = userRegistrations.length;
+      numberAttended = userAttendance.filter((item) => item.status === "ATTENDED").length;
+    } else {
+      const shortMonth = shortMonths[selectedMonth as keyof typeof shortMonths];
+      
+      const filteredMeetings = apiMeetingsData.filter((meeting) => {
+        return meeting.date.startsWith(shortMonth);
+      });
+      
+      const filteredRegistrations = userRegistrations.filter((reg) => {
+        if (!reg.createdAt) return false;
+        const regDate = new Date(reg.createdAt);
+        return months[regDate.getMonth() + 1] === selectedMonth;
+      });
+      
+      const filteredAttendance = userAttendance.filter((att) => {
+        if (!att.createdAt) return false;
+        const attDate = new Date(att.createdAt);
+        return months[attDate.getMonth() + 1] === selectedMonth;
+      });
+      
+      totalMeetings = filteredMeetings.length;
+      numberRegistered = filteredRegistrations.length;
+      numberAttended = filteredAttendance.filter((item) => item.status === "ATTENDED").length;
+    }
+    
+    // Only update if values have changed
+    if (metrics.totalMeetings !== totalMeetings || 
+        metrics.numberRegistered !== numberRegistered || 
+        metrics.numberAttended !== numberAttended) {
+      setMetrics({
+        totalMeetings,
+        numberRegistered,
+        numberAttended
+      });
+    }
+  }
+}, [
+  selectedMonth, 
+  isLoadingRegistrations, 
+  isLoadingAttendance, 
+  isLoadingMetrics, 
+  apiMeetingsData, 
+  userRegistrations, 
+  userAttendance,
+  metrics.totalMeetings,
+  metrics.numberRegistered,
+  metrics.numberAttended,
+  months,
+  shortMonths
+]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -240,7 +488,11 @@ function MetricMeetingRender() {
                       </div>
                       <p className="text-sm text-center p-2">Total Meetings held</p>
                     </div>
-                    <p className="font-bold text-3xl">{metrics.totalMeetings}</p>
+                    {isLoadingMetrics ? (
+                      <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>
+                    ) : (
+                      <p className="font-bold text-3xl">{metrics.totalMeetings}</p>
+                    )}
                   </div>
                   <div className="border border-gray-300 rounded-lg p-4 gap-4">
                     <div className="flex item-center mb-4">
@@ -249,7 +501,11 @@ function MetricMeetingRender() {
                       </div>
                       <p className="text-sm text-center p-2">Number registered</p>
                     </div>
-                    <p className="font-bold text-3xl">{metrics.numberRegistered}</p>
+                    {isLoadingRegistrations ? (
+                      <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>
+                    ) : (
+                      <p className="font-bold text-3xl">{metrics.numberRegistered}</p>
+                    )}
                   </div>
                   <div className="border border-gray-300 rounded-lg p-4 gap-4">
                     <div className="flex item-center mb-4">
@@ -258,7 +514,11 @@ function MetricMeetingRender() {
                       </div>
                       <p className="text-sm text-center p-2">Number Attended</p>
                     </div>
-                    <p className="font-bold text-3xl">{metrics.numberAttended}</p>
+                    {isLoadingAttendance ? (
+                      <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>
+                    ) : (
+                      <p className="font-bold text-3xl">{metrics.numberAttended}</p>
+                    )}
                   </div>
                 </div>
               </div>

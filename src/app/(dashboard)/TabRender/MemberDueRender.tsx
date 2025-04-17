@@ -14,7 +14,10 @@ import {
   EllipsisVertical,
 } from "lucide-react";
 import CalendarFilter from "@/components/homecomps/CalendarFilter";
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
 import { Checkbox } from "@mui/material";
+
 
 function MemberDueRender() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,31 +26,29 @@ function MemberDueRender() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>("All");
-
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
+  const [apiMeetingsData, setApiMeetingsData] = useState<any[]>([]);
+  const [userRegistrations, setUserRegistrations] = useState<any[]>([]);
+  const [userAttendance, setUserAttendance] = useState<any[]>([]);
+  const [isLoadingRegistrations, setIsLoadingRegistrations] = useState(true);
+  const [isLoadingAttendance, setIsLoadingAttendance] = useState(true);
+  const [originalAttendanceRecords, setOriginalAttendanceRecords] = useState<any[]>([]);
+  const [attendanceRecords, setAttendanceRecords] = useState<any[]>([]);
+  
   // Metrics state
   const [metrics, setMetrics] = useState({
-    totalMeetings: 4,
-    numberRegistered: 4,
-    numberAttended: 4,
+    totalMeetings: 0,
+    numberRegistered: 0,
+    numberAttended: 0,
   });
 
+  // const BASE_API_URL = "https://ican-api-6000e8d06d3a.herokuapp.com/api";
   const itemsPerPage = 4;
 
-  const months = [
-    "All",
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const months = useMemo(() => [
+    "All", "January", "February", "March", "April", "May", "June", 
+    "July", "August", "September", "October", "November", "December"
+  ], []);
 
   const shortMonths = useMemo(
     () => ({
@@ -66,173 +67,307 @@ function MemberDueRender() {
     }),
     []
   );
-  // Example data for all activities (used for metrics calculation only)
-  const allActivitiesData = useMemo(
-    () => [
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Jan 15, 2022",
-        status: "present",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Feb 15, 2024",
-        status: "absent",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Mar 15, 2023",
-        status: "present",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Apr 15, 2025",
-        status: "absent",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "May 15, 2022",
-        status: "present",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Jun 15, 2024",
-        status: "present",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Jul 15, 2023",
-        status: "absent",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Aug 15, 2025",
-        status: "present",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Jan 20, 2022",
-        status: "present",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Feb 20, 2024",
-        status: "present",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Mar 20, 2023",
-        status: "absent",
-      },
-      {
-        MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-        date: "Sep 15, 2025",
-        status: "present",
-      },
-    ],
-    []
-  );
 
-  // Table data (not affected by month filter)
-  const [activities, setActivities] = useState([
-    {
-      MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-      date: "Jan 15, 2022",
-      status: "present",
-    },
-    {
-      MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-      date: "Feb 15, 2024",
-      status: "absent",
-    },
-    {
-      MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-      date: "Mar 15, 2023",
-      status: "present",
-    },
-    {
-      MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-      date: "Apr 15, 2025",
-      status: "absent",
-    },
-    {
-      MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-      date: "May 15, 2022",
-      status: "present",
-    },
-    {
-      MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-      date: "Jun 15, 2024",
-      status: "present",
-    },
-    {
-      MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-      date: "Jul 15, 2023",
-      status: "absent",
-    },
-    {
-      MeetingTitle: "Monthly ICAN Surulere and District Meeting",
-      date: "Aug 15, 2025",
-      status: "present",
-    },
-  ]);
-
-  const [originalActivities, setOriginalActivities] = useState([...activities]);
-
-  const resetActivities = () => {
-    setActivities([...originalActivities]);
-  };
-
-  const updateMetrics = (filteredActivities: any[]) => {
-    const totalMeetings = filteredActivities.length;
-    const numberAttended = filteredActivities.filter(
-      (activity) => activity.status === "present"
-    ).length;
-
-    setMetrics({
-      totalMeetings,
-      numberRegistered: totalMeetings,
-      numberAttended,
-    });
-  };
-
-  // Effect to update metrics when selectedMonth changes
+  // Fetch meetings data from API for metrics only
   useEffect(() => {
-    if (selectedMonth === "All") {
-      updateMetrics(allActivitiesData);
-    } else {
-      const shortMonth = shortMonths[selectedMonth as keyof typeof shortMonths];
-      const filteredForMetrics = allActivitiesData.filter((activity) =>
-        activity.date.startsWith(shortMonth)
-      );
-      updateMetrics(filteredForMetrics);
+    const fetchMeetingsMetrics = async () => {
+      setIsLoadingMetrics(true);
+      try {
+        const response = await axios.get(
+          "https://ican-api-6000e8d06d3a.herokuapp.com/api/meetings",{
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log("Meetings response", response);
+
+        // Check if the response status is not 200 (OK)
+        if (response.status !== 200) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+        
+        const data = response.data;
+        
+        // Transform API data for metrics calculation
+        const formattedMeetingsData = data.map((meeting: any) => {
+          const meetingDate = new Date(meeting.date || new Date().toISOString());
+          const currentDate = new Date();
+          
+          // Check if meeting date has passed
+          const hasHeld = currentDate > meetingDate;
+          
+          // Format date to match the component's expected format
+          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          const formattedDate = `${monthNames[meetingDate.getMonth()]} ${meetingDate.getDate()}, ${meetingDate.getFullYear()}`;
+          
+          return {
+            MeetingTitle: meeting.title || "Monthly ICAN Meeting",
+            date: formattedDate,
+            status: meeting.attended ? "present" : "absent",
+            hasHeld: hasHeld
+          };
+        });
+        
+        // Filter to only include meetings that have been held
+        const heldMeetings = formattedMeetingsData.filter((meeting: any) => meeting.hasHeld);
+        
+        setApiMeetingsData(heldMeetings);
+        // Update the metrics state with the total meetings count
+        setMetrics(prev => ({
+          ...prev,
+          totalMeetings: heldMeetings.length
+        }));
+        setIsLoadingMetrics(false);
+      } catch (err) {
+        console.error("Error fetching meetings metrics:", err);
+        setIsLoadingMetrics(false);
+      }
+    };
+
+    fetchMeetingsMetrics();
+  }, []);
+
+  // Fetch user registrations for metrics only
+  useEffect(() => {
+    const fetchUserRegistrations = async () => {
+      setIsLoadingRegistrations(true);
+      try {
+        // Get user info from local storage
+        const userInfo = localStorage.getItem('user');
+        if (!userInfo) {
+          console.error("User info not found in localStorage");
+          setIsLoadingRegistrations(false);
+          return;
+        }
+        
+        const parsedUserInfo = JSON.parse(userInfo);
+        const email = parsedUserInfo.email;
+        
+        if (!email) {
+          console.error("User email not found in userInfo");
+          setIsLoadingRegistrations(false);
+          return;
+        }
+
+        const registrationsResponse = await axios.get(
+          `${BASE_API_URL}/events/registrations/user/${email}`, 
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        
+        console.log("User registrations:", registrationsResponse.data);
+        
+        // Check if the response is an array or a single object
+        let registrations = Array.isArray(registrationsResponse.data) 
+          ? registrationsResponse.data 
+          : [registrationsResponse.data];
+        
+        setUserRegistrations(registrations);
+        
+        // Get total number of registrations
+        const totalRegistrations = registrations.length;
+        
+        // Update metrics with registration count
+        setMetrics(prev => ({
+          ...prev,
+          numberRegistered: totalRegistrations
+        }));
+        
+        setIsLoadingRegistrations(false);
+      } catch (err) {
+        console.error("Error fetching user registrations:", err);
+        setUserRegistrations([]);
+        setIsLoadingRegistrations(false);
+      }
+    };
+
+    fetchUserRegistrations();
+  }, []);
+
+  // Fetch user attendance - This will populate the table and metrics
+  useEffect(() => {
+    const fetchUserAttendance = async () => {
+      setIsLoadingAttendance(true);
+      try {
+        // Get user ID from local storage
+        const userInfo = localStorage.getItem('user');
+        if (!userInfo) {
+          console.error("User info not found");
+          setIsLoadingAttendance(false);
+          return;
+        }
+        
+        const parsedUserInfo = JSON.parse(userInfo);
+        const userId = parsedUserInfo.id;
+        
+        if (!userId) {
+          console.error("User ID not found");
+          setIsLoadingAttendance(false);
+          return;
+        }
+
+        try {
+          const attendanceResponse = await axios.get(
+            `${BASE_API_URL}/events/registrations/attendance/${userId}`, 
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          
+          console.log("User attendance:", attendanceResponse.data);
+          
+          // Check if the response is an array or a single object
+          let attendanceData = Array.isArray(attendanceResponse.data)
+            ? attendanceResponse.data
+            : [attendanceResponse.data];
+          
+          setUserAttendance(attendanceData);
+          
+          // Get total number of attended meetings
+          const totalAttended = attendanceData.filter((item: any) => item.status === "ATTENDED").length;
+          
+          // Update metrics with attendance count
+          setMetrics(prev => ({
+            ...prev,
+            numberAttended: totalAttended
+          }));
+          
+          // Format attendance data for table display
+          const formattedAttendance = attendanceData.map((att: any) => {
+            const attDate = new Date(att.createdAt || new Date().toISOString());
+            
+            // Format date to match the component's expected format
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const formattedDate = `${monthNames[attDate.getMonth()]} ${attDate.getDate()}, ${attDate.getFullYear()}`;
+            
+            return {
+              MeetingTitle: att.eventTitle || "ICAN Meeting",
+              date: formattedDate,
+              status: att.status === "ATTENDED" ? "present" : "absent",
+              id: att.id
+            };
+          });
+          
+          // Set both original and current attendance records
+          setOriginalAttendanceRecords(formattedAttendance);
+          setAttendanceRecords(formattedAttendance);
+          
+        } catch (error: any) {
+          // If we get a 404, it means the user has no attendance records
+          if (error.response && error.response.status === 404) {
+            console.log("No attendance records found for this user");
+            setUserAttendance([]);
+            setOriginalAttendanceRecords([]);
+            setAttendanceRecords([]);
+            setMetrics(prev => ({
+              ...prev,
+              numberAttended: 0
+            }));
+          } else {
+            // Re-throw for other errors
+            throw error;
+          }
+        }
+        
+        setIsLoadingAttendance(false);
+      } catch (err) {
+        console.error("Error fetching user attendance:", err);
+        setUserAttendance([]);
+        setOriginalAttendanceRecords([]);
+        setAttendanceRecords([]);
+        setIsLoadingAttendance(false);
+      }
+    };
+
+    fetchUserAttendance();
+  }, []);
+
+  // Effect to update ONLY metrics when selectedMonth changes
+  useEffect(() => {
+    if (!isLoadingRegistrations && !isLoadingAttendance && !isLoadingMetrics) {
+      if (selectedMonth === "All") {
+        // Update metrics with all data
+        const totalRegistrations = userRegistrations.length;
+        const totalAttended = userAttendance.filter((item: any) => item.status === "ATTENDED").length;
+        const totalMeetings = apiMeetingsData.length;
+        
+        setMetrics({
+          totalMeetings: totalMeetings,
+          numberRegistered: totalRegistrations,
+          numberAttended: totalAttended
+        });
+      } else {
+        // Filter meetings data by month for metrics ONLY
+        const shortMonth = shortMonths[selectedMonth as keyof typeof shortMonths];
+        
+        const filteredMeetings = apiMeetingsData.filter((meeting) => {
+          return meeting.date.startsWith(shortMonth);
+        });
+        
+        // Filter registrations by month for metrics
+        const filteredRegistrations = userRegistrations.filter((reg: any) => {
+          if (!reg.createdAt) return false;
+          const regDate = new Date(reg.createdAt);
+          return months[regDate.getMonth() + 1] === selectedMonth;
+        });
+        
+        // Filter attendance by month for metrics
+        const filteredAttendance = userAttendance.filter((att: any) => {
+          if (!att.createdAt) return false;
+          const attDate = new Date(att.createdAt);
+          return months[attDate.getMonth() + 1] === selectedMonth;
+        });
+        
+        // Update metrics with filtered counts
+        setMetrics({
+          totalMeetings: filteredMeetings.length,
+          numberRegistered: filteredRegistrations.length,
+          numberAttended: filteredAttendance.filter((item: any) => item.status === "ATTENDED").length
+        });
+      }
+      
+      // NOTE: We do NOT update the attendance records table here
+      // The table should always show all records regardless of month filter
     }
-  }, [selectedMonth, allActivitiesData, shortMonths]);
+  }, [selectedMonth, isLoadingRegistrations, isLoadingAttendance, isLoadingMetrics, userRegistrations, userAttendance, apiMeetingsData,months, shortMonths]);
 
-  const totalPages = Math.ceil(activities.length / itemsPerPage);
-
-  const filteredActivities = activities.filter(
-    (activity) =>
-      activity.MeetingTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      activity.date.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      activity.status.toLowerCase().includes(searchQuery)
-  );
+  const resetFilters = () => {
+    setSelectedDate(null);
+    setSelectedMonth("All");
+    setAttendanceRecords([...originalAttendanceRecords]);
+  };
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
 
     const selectedDateObj = new Date(date);
 
-    const filteredActivities = originalActivities.filter((activity) => {
-      const activityDate = new Date(activity.date);
-      return (
-        activityDate.getDate() === selectedDateObj.getDate() &&
-        activityDate.getMonth() === selectedDateObj.getMonth() &&
-        activityDate.getFullYear() === selectedDateObj.getFullYear()
-      );
-    });
+    if (originalAttendanceRecords.length > 0) {
+      const filteredAttendance = originalAttendanceRecords.filter((record) => {
+        const recordDate = new Date(record.date);
+        return (
+          recordDate.getDate() === selectedDateObj.getDate() &&
+          recordDate.getMonth() === selectedDateObj.getMonth() &&
+          recordDate.getFullYear() === selectedDateObj.getFullYear()
+        );
+      });
 
-    setActivities(filteredActivities);
+      setAttendanceRecords(filteredAttendance);
+    }
+  };
+
+  const handleMonthSelect = (month: string) => {
+    setSelectedMonth(month);
+    setIsMonthDropdownOpen(false);
+    // Do NOT filter table data here - only metrics will be affected
   };
 
   const handleSearchChange = (e: {
@@ -241,18 +376,23 @@ function MemberDueRender() {
     setSearchQuery(e.target.value);
   };
 
+  // Filter attendance records based on search query
+  const filteredAttendanceRecords = attendanceRecords.filter(
+    (record) =>
+      record.MeetingTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.date.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.status.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredAttendanceRecords.length / itemsPerPage);
+
   const getCurrentItems = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredActivities.slice(startIndex, startIndex + itemsPerPage);
+    return filteredAttendanceRecords.slice(startIndex, startIndex + itemsPerPage);
   };
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-  };
-
-  const handleMonthSelect = (month: string) => {
-    setSelectedMonth(month);
-    setIsMonthDropdownOpen(false);
   };
 
   const renderStatusBadge = (status: string) => {
@@ -280,8 +420,8 @@ function MemberDueRender() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="">
-        <div className="max-w-6xl mx-auto">
+      <div className="w-full">
+        <div className="w-full mx-auto">
           <div className="grid grid-cols-1 gap-6 mb-8">
             <div className="w-full h-30 bg-white p-6 rounded-xl border border-gray-200">
               <h3 className="mb-2 text-lg font-semibold">Metric</h3>
@@ -338,9 +478,13 @@ function MemberDueRender() {
                         Total Meetings held
                       </p>
                     </div>
-                    <p className="font-bold text-3xl">
-                      {metrics.totalMeetings}
-                    </p>
+                    {isLoadingMetrics ? (
+                      <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>
+                    ) : (
+                      <p className="font-bold text-3xl">
+                        {metrics.totalMeetings}
+                      </p>
+                    )}
                   </div>
                   <div className="border border-gray-300 rounded-lg p-4 gap-4">
                     <div className="flex item-center mb-4">
@@ -351,9 +495,13 @@ function MemberDueRender() {
                         Number registered
                       </p>
                     </div>
-                    <p className="font-bold text-3xl">
-                      {metrics.numberRegistered}
-                    </p>
+                    {isLoadingRegistrations ? (
+                      <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>
+                    ) : (
+                      <p className="font-bold text-3xl">
+                        {metrics.numberRegistered}
+                      </p>
+                    )}
                   </div>
                   <div className="border border-gray-300 rounded-lg p-4 gap-4">
                     <div className="flex item-center mb-4">
@@ -362,16 +510,20 @@ function MemberDueRender() {
                       </div>
                       <p className="text-sm text-center p-2">Number Attended</p>
                     </div>
-                    <p className="font-bold text-3xl">
-                      {metrics.numberAttended}
-                    </p>
+                    {isLoadingAttendance ? (
+                      <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>
+                    ) : (
+                      <p className="font-bold text-3xl">
+                        {metrics.numberAttended}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white max-w-[1100px] flex flex-col item-center rounded-xl border border-gray-300 p-6 mb-10">
+          <div className="bg-white w-full flex flex-col item-center rounded-xl border border-gray-300 p-6 mb-10">
             <h1 className="font-semibold lg:text-lg md:text-base mb-6">
               Your attendance records
             </h1>
@@ -412,20 +564,30 @@ function MemberDueRender() {
               </div>
             </div>
 
-            {activities.length === 0 ? (
+            {isLoadingAttendance ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : attendanceRecords.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8">
                 <p className="text-center text-gray-500 py-4">
-                  No Record found for the selected date.
+                  {selectedDate ? 
+                    "No records found for the selected date." : 
+                    originalAttendanceRecords.length === 0 ? 
+                      "No attendance records found for this user." : 
+                      "No records match the current filters."}
                 </p>
-                <button
-                  onClick={resetActivities}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700"
-                >
-                  Reset Filter
-                </button>
+                {(selectedDate || searchQuery) && (
+                  <button
+                    onClick={resetFilters}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Reset Filter
+                  </button>
+                )}
               </div>
             ) : (
-              <div className="relative overflow-x-auto">
+              <div className="w-full relative overflow-x-auto">
                 <table className="w-full justify-center item-center border-b border-gray-200 px-10 mt-6">
                   <thead className="border-b border-t-none border-gray-300">
                     <tr>
@@ -433,7 +595,7 @@ function MemberDueRender() {
                         Meeting Title
                       </th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">
-                        Due Created
+                        Date
                       </th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">
                         Status
@@ -444,16 +606,16 @@ function MemberDueRender() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-300">
-                    {getCurrentItems().map((activity, index) => (
+                    {getCurrentItems().map((record, index) => (
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                          {activity.MeetingTitle}
+                          {record.MeetingTitle}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                          {activity.date}
+                          {record.date}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {renderStatusBadge(activity.status)}
+                          {renderStatusBadge(record.status)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <EllipsisVertical className="w-5 h-5" />
@@ -465,12 +627,14 @@ function MemberDueRender() {
               </div>
             )}
 
-            <TablePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              itemsPerPage={itemsPerPage}
-            />
+            {attendanceRecords.length > 0 && (
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                itemsPerPage={itemsPerPage}
+              />
+            )}
           </div>
         </div>
       </div>

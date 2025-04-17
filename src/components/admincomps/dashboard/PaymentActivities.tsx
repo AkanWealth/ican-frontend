@@ -90,7 +90,7 @@ function PaymentActivities() {
 
   useEffect(() => {
     async function fetchPaymentData() {
-      const result = payments;
+      const result = payments.filter((payment) => payment.status === "overdue");;
       setPaymentData(result);
     }
     fetchPaymentData();

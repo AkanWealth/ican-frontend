@@ -7,6 +7,13 @@ import { MdVerifiedUser } from "react-icons/md";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
+import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
+import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
+import {
+  payments,
+  PaymentDets,
+} from "@/components/admincomps/payment/datatable/colsdata";
+
 import { TrendingUp } from "lucide-react";
 import {
   Area,
@@ -47,37 +54,47 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 function PaymentActivities() {
-  
-   const [data, setData] = useState({
-     totalPayments: 0,
-     pendingPayments: 0,
-     completedPayments: 0,
-     failedPayments: 0,
-   });
+  const [data, setData] = useState({
+    totalPayments: 0,
+    pendingPayments: 0,
+    completedPayments: 0,
+    failedPayments: 0,
+  });
 
-   useEffect(() => {
-     const fetchData = async () => {
-       try {
-         const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+  const [paymentData, setPaymentData] = useState<PaymentDets[]>([]);
+  const [loading, setLoading] = useState(true);
 
-         const config = {
-           method: "get",
-           maxBodyLength: Infinity,
-           url: `${BASE_API_URL}/dashboard/payment-data`,
-           headers: {
-             Authorization: `Bearer ${token}`,
-           },
-         };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
 
-         const response = await axios.request(config);
-         setData(response.data);
-       } catch (error) {
-         console.error(error);
-       }
-     };
+        const config = {
+          method: "get",
+          maxBodyLength: Infinity,
+          url: `${BASE_API_URL}/dashboard/payment-data`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
 
-     fetchData();
-   }, []);
+        const response = await axios.request(config);
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchPaymentData() {
+      const result = payments;
+      setPaymentData(result);
+    }
+    fetchPaymentData();
+  }, []);
   return (
     <div className=" flex flex-col gap-4 items-start ">
       <div className="flex flex-row gap-2 items-center justify-start w-full">
@@ -141,7 +158,12 @@ function PaymentActivities() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <h1>User payment data table</h1>
+        <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
+          <h2 className="text-xl font-semibold text-left">All Payments</h2>
+          <div>
+            <PaymentTable columns={paymentcoloumns} data={paymentData} />
+          </div>
+        </div>{" "}
       </div>
     </div>
   );

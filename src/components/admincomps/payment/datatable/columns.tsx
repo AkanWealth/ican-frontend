@@ -99,6 +99,71 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
     },
   },
 ];
+export const dashPaymentcoloumns: ColumnDef<PaymentDets>[] = [
+  {
+    accessorKey: "member_name",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Member Name <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+
+  {
+    accessorKey: "payment_type",
+    header: "Payment Type",
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+  },
+  {
+    accessorKey: "date",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Due Date
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+
+  {
+    accessorKey: "status",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Invoice Status
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return <Statbtn status={row.original.status} />;
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      return <CellActions row={row} />;
+    },
+  },
+];
 
 export const paymentdetailscoloumns: ColumnDef<PaymentDets>[] = [
   {

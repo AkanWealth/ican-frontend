@@ -74,6 +74,16 @@ function DashboardContent() {
     switch (accountStatus) {
       case "approved":
         return <div className="flex flex-row gap-2 sm:gap-5 mt-4 sm:mt-8"></div>;
+      case "pending":
+        return ( 
+          <div className="flex flex-row gap-2 sm:gap-5 mt-4 sm:mt-8">
+            <Info className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />
+            <p className="text-gray-500 lg:text-base text-xs">
+              Your account is pending review. We will send an email to you once <br className="lg:block hidden" />
+              review is complete. Please keep an eye on your email.
+            </p>
+          </div>
+        );
       default:
         return (
           <div className="flex flex-row gap-2 sm:gap-5 mt-4 sm:mt-8">
@@ -90,7 +100,7 @@ function DashboardContent() {
   return (
     <div className="w-full mx-auto py-6 px-4">
       {/* Main Card */}
-      <div className="flex flex-col p-4 sm:p-6 bg-blue-900 rounded-lg">
+      <div className="flex flex-col p-4 sm:p-6 bg-blue-900 rounded-lg mb-8">
         {/* Greeting Section */}
         <div className="text-left">
           <h2 className="text-2xl sm:text-3xl font-semibold text-white">
@@ -98,13 +108,13 @@ function DashboardContent() {
           </h2>
           <div className="flex flex-row items-center text-white mt-4 sm:mt-6 text-sm">
             <span>{currentDate}</span>
-            {renderStatusBadge()}
+            {/* {renderStatusBadge()} */}
           </div>
         </div>
       </div>
 
       {/* Notification Section */}
-      {renderStatusNotification()}
+      {/* {renderStatusNotification()} */}
       {accountStatus === "approved" && <Attendance />}
     </div>
   );

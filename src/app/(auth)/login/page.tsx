@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/app/(dashboard)/LoginAuthentication/AuthContext";
 import { AuthProvider } from "@/app/(dashboard)/LoginAuthentication/AuthContext";
+import { Eye, EyeOff } from "lucide-react"; // Import the eye icons
 
 function Login() {
   const { toast } = useToast();
   const { login } = useAuth();
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Add state for password visibility
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -25,6 +27,11 @@ function Login() {
       ...formData,
       [name]: value,
     });
+  };
+
+  // Toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const validateForm = () => {
@@ -138,17 +145,30 @@ function Login() {
             >
               Password <span className="text-red-600">*</span>
             </label>
-            <input
-              className={`p-3 rounded border ${
-                passwordError ? "border-red-500" : "border-gray-400"
-              }`}
-              placeholder="Enter password"
-              name="password"
-              value={formData.password}
-              required
-              type="password"
-              onChange={handleChange}
-            />
+            <div className="relative">
+              <input
+                className={`p-3 rounded border w-full ${
+                  passwordError ? "border-red-500" : "border-gray-400"
+                }`}
+                placeholder="Enter password"
+                name="password"
+                value={formData.password}
+                required
+                type={showPassword ? "text" : "password"}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? (
+                  <EyeOff size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </button>
+            </div>
             {passwordError && (
               <p className="text-red-500 text-sm mt-1">{passwordError}</p>
             )}

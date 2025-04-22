@@ -233,6 +233,12 @@ function Profile() {
           ...prev,
           profilePictureUrl: imageUrl
         }));
+        toast({
+          title: "Photo uploaded successfully",
+          description: "Your profile photo has been updated",
+          variant: "default",
+          duration: 2000,
+        });
         
         setIsLoading(false);
       } catch (error) {
@@ -512,13 +518,17 @@ function Profile() {
               (JPG or PNG, 100KB Max)
             </span>
             <div className="flex flex-wrap gap-4">
-              <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
-                Update photo
+            <label className={`
+                bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap
+                ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}
+              `}>
+                {isLoading ? "Updating..." : "Update photo"}
                 <input
                   type="file"
                   accept="image/jpeg,image/png"
                   onChange={handlePhotoUpload}
                   className="hidden"
+                  disabled={isLoading}
                 />
               </label>
               <button

@@ -442,9 +442,9 @@ useEffect(() => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <div className="">
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full mx-auto">
           <div className="grid grid-cols-1 gap-6 mb-8">
             {/* Metrics Card */}
             <div className="w-full bg-white p-6 rounded-xl border border-gray-200">

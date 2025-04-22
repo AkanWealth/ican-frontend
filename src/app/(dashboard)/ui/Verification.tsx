@@ -140,7 +140,7 @@ function Verification() {
       localStorage.setItem("token", access_token);
       localStorage.setItem("user", user);
       // localStorage.setItem("userId", user.id);
-      localStorage.setItem("userName", user.name);
+      localStorage.setItem("userName", user.firstname);
       localStorage.setItem("userEmail", user.email);
       localStorage.setItem("memberId", user.membershipId);
 

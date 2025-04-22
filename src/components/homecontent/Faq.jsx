@@ -43,7 +43,7 @@ function Faq() {
         <div className=" flex flex-col text-black rounded-2xl py-6 px-6 sm:p-0  sm:text-white gap-4 bg-white sm:bg-transparent ">
           <Accordion type="single" collapsible>
             {faqs.map((faq) => (
-              <AccordionItem key={role.id} value={`item-${role.id}`}>
+              <AccordionItem key={faq.id} value={`item-${faq.id}`}>
                 <AccordionTrigger className=" text-lg">
                   {faq.name}
                 </AccordionTrigger>

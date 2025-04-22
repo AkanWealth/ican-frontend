@@ -4,18 +4,31 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
-import {
-  payments,
-  PaymentDets,
-} from "@/components/admincomps/payment/datatable/colsdata";
+
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
 
 function Payment() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
-      const result = payments;
-      setData(result);
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/payments`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      };
+
+      try {
+        const response = await axios.request(config);
+        setData(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching payments:", error);
+      }
     }
     fetchData();
   }, []);

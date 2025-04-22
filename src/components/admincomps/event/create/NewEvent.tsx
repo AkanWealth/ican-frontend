@@ -20,6 +20,8 @@ function NewEvent({
   setShowNewEvent: (show: boolean) => void;
 }) {
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [formData, setFormData] = useState({
     event_id: "",
     eventName: "",
@@ -88,11 +90,7 @@ function NewEvent({
     }
 
     // Validate fee (must be zero or positive number)
-    if (
-      formData.eventFee === "" ||
-      isNaN(Number(formData.eventFee)) ||
-      Number(formData.eventFee) < 0
-    ) {
+    if (isNaN(Number(formData.eventFee)) || Number(formData.eventFee) < 0) {
       errors.eventFee = "Please enter a valid event fee (0 or greater)";
       isValid = false;
     }
@@ -176,11 +174,28 @@ function NewEvent({
       mcpdCredit: "",
       eventPhoto: null,
     });
+    // Reset form errors to initial state
+    setFormErrors({
+      eventName: "",
+      venue: "",
+      eventDescription: "",
+      eventDate: "",
+      eventTime: "",
+      eventFee: "",
+      mcpdCredit: "",
+      eventPhoto: "",
+    });
     // Close the modal
     setShowNewEvent(false);
   };
 
   const handleSaveDraft = () => {
+    setIsSavingDraft(true);
+    // Validate form before saving as draft
+    if (!validateForm()) {
+      setIsSavingDraft(false);
+      return;
+    }
     const draftEvent = async () => {
       try {
         const token = localStorage.getItem("access_token"); // Retrieve token from local storage
@@ -209,19 +224,40 @@ function NewEvent({
         const response = await axios.request(config);
         console.log("Event added to drafts successfully:", response.data);
         handleCancel(); // Close the modal after successful draft
-        return (
-          <Toast type="success" message="Event added to drafts successfully!" />
-        );
+        alert("Event added to drafts successfully!");
       } catch (error) {
         console.error("Error adding the event to draft:", error);
-        return <Toast type="error" message="Error drafting event!" />;
+        setTimeout(() => {
+          handleCancel(); // Close the modal after 3 seconds
+        }, 3000); // Add a 3-second delay
+
+        return (
+          <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-4 rounded shadow-lg">
+              <p className="text-red-600 font-bold">
+                Error saving event to draft!
+              </p>
+              <button
+                className="mt-2 bg-red-500 text-white px-4 py-2 rounded"
+                onClick={() => setIsSavingDraft(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        );
       }
     };
-
     draftEvent();
   };
 
   const handlePublish = () => {
+    setIsPublishing(true);
+    // Validate form before publishing
+    if (!validateForm()) {
+      setIsPublishing(false);
+      return;
+    }
     const publishEvent = async () => {
       try {
         const token = localStorage.getItem("access_token"); // Retrieve token from local storage
@@ -249,11 +285,24 @@ function NewEvent({
 
         const response = await axios.request(config);
         console.log("Event published successfully:", response.data);
+
         handleCancel(); // Close the modal after successful publish
-        return <Toast type="success" message="Event published successfully!" />;
+        alert("Event published successfully!");
       } catch (error) {
         console.error("Error publishing event:", error);
-        return <Toast type="error" message="Error publishing event!" />;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-4 rounded shadow-lg">
+              <p className="text-red-600 font-bold">Error publishing event!</p>
+              <button
+                className="mt-2 bg-red-500 text-white px-4 py-2 rounded"
+                onClick={() => setIsPublishing(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        );
       }
     };
 
@@ -262,7 +311,7 @@ function NewEvent({
 
   return (
     <div className="fixed inset-0 z-10 bg-gray-800 bg-opacity-75 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg w-1/2">
+      <div className="bg-white p-8 rounded-lg w-fit ">
         <div className="flex flex-row justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Create New Event</h2>
 
@@ -346,16 +395,26 @@ function NewEvent({
             Cancel
           </button>
           <button
-            className="bg-white text-primary w-full px-4 py-2 rounded mr-2"
+            className={`bg-white text-primary w-full px-4 py-2 rounded mr-2 ${
+              isSavingDraft || isPublishing
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
             onClick={handleSaveDraft}
+            disabled={isSavingDraft || isPublishing}
           >
-            Save as Draft
+            {isSavingDraft ? "Saving Draft..." : "Save as Draft"}
           </button>
           <button
-            className="bg-primary text-white w-full px-4 py-2 rounded"
+            className={`bg-primary text-white w-full px-4 py-2 rounded ${
+              isPublishing || isSavingDraft
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
             onClick={handlePublish}
+            disabled={isPublishing || isSavingDraft}
           >
-            Publish Event
+            {isPublishing ? "Publishing..." : "Publish Event"}
           </button>
         </div>
       </div>

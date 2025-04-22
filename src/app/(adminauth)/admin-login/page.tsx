@@ -136,7 +136,20 @@ function AdminLogin() {
 
         return <Toast type="success" message="Login successful" />;
       } catch (error) {
-        return <Toast type="error" message="An error occurred during login." />;
+        // Display a popup for the error
+        alert("An error occurred during login. Please try again.");
+
+        // Reset the form
+        setFormData({
+          email: "",
+          password: "",
+        });
+        setFormErrors({
+          email: "",
+          password: "",
+        });
+        setComplete(false);
+        setOtp("");
       } finally {
         setLoading(false);
       }
@@ -234,10 +247,15 @@ function AdminLogin() {
             />
 
             <button
-              className=" px-8 py-4 bg-primary  rounded-full text-white text-base font-semibold "
+              className="px-8 py-4 bg-primary rounded-full text-white text-base font-semibold flex items-center justify-center"
               type="submit"
+              disabled={loading}
             >
-              Log In
+              {loading ? (
+              <span className="loader border-white border-2 rounded-full w-5 h-5 animate-spin"></span>
+              ) : (
+              "Log In"
+              )}
             </button>
             <div className=" flex flex-row justify-between  ">
               <p className=" text-base font-medium   ">

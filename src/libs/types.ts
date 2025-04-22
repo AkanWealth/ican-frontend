@@ -7,7 +7,6 @@ type FaqData = {
   createdAt: string;
 };
 
-
 type BillingDetails = {
   id: string;
   name: string;
@@ -95,6 +94,62 @@ type RolesData = {
     permissionId: string;
   }[];
 };
+type PaymentDets = {
+  id: string;
+  member_name: string;
+  member_id: string | number;
+  payment_type: string;
+  billing_name: string;
+  amount: string;
+  date: string;
+  created_by: string;
+  reciept_url: string;
+  status: "completed" | "overdue" | "pending";
+  user: {
+    firstname: string;
+    surname: string;
+  };
+  billing: {
+    name: string;
+    type: string;
+    createdAt: string;
+  };
+};
+
+/**
+ * Represents a payment transaction with details about the payment and associated user
+ */
+type PaymentDetails = {
+  /** Unique identifier for the payment */
+  id: string;
+
+  /** Amount of the payment */
+  amount: number;
+
+  /** Type of payment made (e.g., Bank Transfer) */
+  paymentType: string;
+
+  /** Current status of the payment */
+  status: "PENDING" | "COMPLETED" | "FAILED";
+
+  /** Date when the payment was made */
+  datePaid: string;
+
+  /** Unique transaction identifier */
+  transactionId: string;
+
+  /** ID of the associated billing record */
+  billingId: string | null;
+
+  /** ID of the associated subscription */
+  subscriptionId: string | null;
+
+  /** ID of the user who made the payment */
+  userId: string;
+
+  /** User details associated with the payment */
+  user: User;
+};
 
 export type {
   User,
@@ -102,5 +157,7 @@ export type {
   CreateContentProps,
   BillingDetails,
   RolesData,
-  FaqData
+  FaqData,
+  PaymentDetails,
+  PaymentDets,
 };

@@ -2,15 +2,15 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
-import { PaymentDets } from "./colsdata";
+import { PaymentDets, PaymentDetails } from "@/libs/types";
 
 import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
-import CellActions from "@/components/admincomps/billing/actions/CellActions";
+import CellActions from "@/components/admincomps/payment/actions/CellActions";
 
-export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
+export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
   {
-    accessorKey: "member_name",
+    accessorKey: "user.firstname",
     header: ({ column }) => {
       return (
         <Button
@@ -22,17 +22,17 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.original.user.firstname} {row.original.user.surname}
+        </div>
+      );
+    },
   },
+
   {
-    accessorKey: "member_id",
-    header: "Member ID",
-  },
-  {
-    accessorKey: "billing_name",
-    header: "Billing Name",
-  },
-  {
-    accessorKey: "payment_type",
+    accessorKey: "paymentType",
     header: "Payment Type",
   },
   {
@@ -40,7 +40,7 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
     header: "Amount",
   },
   {
-    accessorKey: "date",
+    accessorKey: "datePaid",
     header: ({ column }) => {
       return (
         <Button
@@ -48,14 +48,20 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Due Date
+          Date Paid
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
+    cell: ({ row }) => {
+      return (
+        <div>{new Date(row.original.datePaid).toLocaleDateString("en-GB")}</div>
+      );
+    },
   },
+
   {
-    accessorKey: "paid_date",
+    accessorKey: "status",
     header: ({ column }) => {
       return (
         <Button
@@ -63,15 +69,75 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Paid Date
+          Status
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
+    cell: ({ row }) => {
+      return <Statbtn status={row.original.status} />;
+    },
   },
   {
-    accessorKey: "created_by",
-    header: "Created By",
+    id: "actions",
+    cell: ({ row }) => {
+      return <CellActions row={row} />;
+    },
+  },
+];
+export const dashPaymentcoloumns: ColumnDef<PaymentDets>[] = [
+  {
+    accessorKey: "user.firstname",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Member Name <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.original.user.firstname} {row.original.user.surname}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "billing.type",
+    header: "Payment Type",
+  },
+  {
+    accessorKey: "billing.amount",
+    header: "Amount",
+  },
+  {
+    accessorKey: "billing.createdAt",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Created at
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {new Date(row.original.billing.createdAt).toLocaleDateString("en-GB")}
+        </div>
+      );
+    },
   },
 
   {

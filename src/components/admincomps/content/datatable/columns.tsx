@@ -10,7 +10,7 @@ import CellActions from "@/components/admincomps/content/editActions/CellActions
 
 export const allcolumns: ColumnDef<Content>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -24,25 +24,7 @@ export const allcolumns: ColumnDef<Content>[] = [
       );
     },
   },
-  {
-    accessorKey: "category",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Category
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "author",
-    header: "Author",
-  },
+
   {
     accessorKey: "date_created",
     header: ({ column }) => {

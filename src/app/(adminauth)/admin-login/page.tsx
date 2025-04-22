@@ -120,15 +120,17 @@ function AdminLogin() {
         const response = await axios.request(config);
         const { user, access_token } = response.data;
 
+        // Set secure cookies with expiration time of 1 hour
+        const expiryTime = new Date(Date.now() + 60 * 60 * 1000).toUTCString(); // 1 hour from now
+
+        document.cookie = `user=${encodeURIComponent(
+          JSON.stringify(user)
+        )}; path=/; secure; samesite=strict; expires=${expiryTime}`;
+        document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict; expires=${expiryTime}`;
+
         // Set secure cookies instead of localStorage
         localStorage.setItem("user", JSON.stringify(user));
-        document.cookie = `user=${encodeURIComponent(JSON.stringify(user))}; path=/; secure; samesite=strict`;
-
         localStorage.setItem("access_token", access_token);
-        document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
-
-        console.log("User data:", user);
-        console.log("Access token:", access_token);
 
         setTimeout(() => {
           router.push("/admin");
@@ -252,9 +254,9 @@ function AdminLogin() {
               disabled={loading}
             >
               {loading ? (
-              <span className="loader border-white border-2 rounded-full w-5 h-5 animate-spin"></span>
+                <span className="loader border-white border-2 rounded-full w-5 h-5 animate-spin"></span>
               ) : (
-              "Log In"
+                "Log In"
               )}
             </button>
             <div className=" flex flex-row justify-between  ">

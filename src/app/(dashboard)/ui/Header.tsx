@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Cookies from "universal-cookie";
 
 export const Header = () => {
+  const cookies = new Cookies();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -60,16 +62,17 @@ export const Header = () => {
   useEffect(() => {
     const fetchProfilePicture = async () => {
       try {
-        const user = localStorage.getItem("user");
+        const user = cookies.get("user");
         const userId = user ? JSON.parse(user)?.id : null;
 
         if (!userId) {
-          console.error("User ID not found in local storage");
+          console.error("User ID not found in Cookies storage");
           return;
         }
 
         const response = await axios.get(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/users/${userId}`,{
+          `https://ican-api-6000e8d06d3a.herokuapp.com/api/users/${userId}`,
+          {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
@@ -183,10 +186,7 @@ export const Header = () => {
               <DropdownMenuItem onClick={() => router.push("/Setting")}>
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-red-600"
-              >
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

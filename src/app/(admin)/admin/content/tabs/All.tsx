@@ -21,6 +21,7 @@ function All() {
       try {
         const response = await axios.request(config);
         setData((prevData) => [...prevData, ...response.data.data]);
+        console.log(response.data.data);
       } catch (error) {
         console.error(error);
       }
@@ -35,6 +36,8 @@ function All() {
       try {
         const response = await axios.request(config);
         setData((prevData) => [...prevData, ...response.data]);
+        
+        console.log(response.data);
       } catch (error) {
         console.error(error);
       }
@@ -49,6 +52,7 @@ function All() {
       try {
         const response = await axios.request(config);
         setData((prevData) => [...prevData, ...response.data.faqs]);
+        console.log(response.data.faqs);
       } catch (error) {
         console.error(error);
       }
@@ -63,6 +67,8 @@ function All() {
       try {
         const response = await axios.request(config);
         setData((prevData) => [...prevData, ...response.data.data]);
+         
+        console.log(response.data.data);
       } catch (error) {
         console.error(error);
       }
@@ -77,6 +83,7 @@ function All() {
       try {
         const response = await axios.request(config);
         setData((prevData) => [...prevData, ...response.data.studyPacks]);
+        console.log(response.data.studyPacks);
         
       } catch (error) {
         console.error(error);
@@ -92,6 +99,7 @@ function All() {
       try {
         const response = await axios.request(config);
         setData((prevData) => [...prevData, ...response.data.sessions]);
+        console.log(response.data.sessions);
       } catch (error) {
         console.error(error);
       }

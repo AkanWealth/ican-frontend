@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
 
   // Protect admin routes
   if (path.startsWith("/admin")) {
-    if (userObj?.role !== "SUPER_ADMIN" && userObj?.role !== "ADMIN") {
+    if (userObj?.role === "MEMBER") {
       // If user is logged in but not admin, redirect to dashboard
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
 
   // Prevent admin/super_admin from accessing regular dashboard
   if (path.startsWith("/dashboard")) {
-    if (userObj?.role === "SUPER_ADMIN" || userObj?.role === "ADMIN") {
+    if (userObj?.role === "MEMBER") {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
   }

@@ -8,11 +8,8 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
-import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
-import {
-  payments,
-  PaymentDets,
-} from "@/components/admincomps/payment/datatable/colsdata";
+import { dashPaymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
+import { PaymentDets } from "@/components/admincomps/payment/datatable/colsdata";
 
 import { TrendingUp } from "lucide-react";
 import {
@@ -90,8 +87,23 @@ function PaymentActivities() {
 
   useEffect(() => {
     async function fetchPaymentData() {
-      const result = payments.filter((payment) => payment.status === "overdue");;
-      setPaymentData(result);
+      try {
+        const token = localStorage.getItem("access_token");
+        const config = {
+          method: "get",
+          maxBodyLength: Infinity,
+          url: `${BASE_API_URL}/dashboard/overdue-payments`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        const response = await axios.request(config);
+        const result = response.data;
+        setPaymentData(result);
+        console.log(result);
+      } catch (error) {
+        console.error("Error fetching overdue payments:", error);
+      }
     }
     fetchPaymentData();
   }, []);
@@ -161,7 +173,7 @@ function PaymentActivities() {
         <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
           <h2 className="text-xl font-semibold text-left">All Payments</h2>
           <div>
-            <PaymentTable columns={paymentcoloumns} data={paymentData} />
+            <PaymentTable columns={dashPaymentcoloumns} data={paymentData} />
           </div>
         </div>{" "}
       </div>

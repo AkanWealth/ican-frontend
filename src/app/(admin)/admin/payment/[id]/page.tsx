@@ -8,13 +8,13 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { PaymentDetails } from "@/libs/types";
 
-function PaymentDetailsPage({ params }: { params: { id: string } }) {
+function PaymentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [data, setData] = useState<PaymentDetails>();
 
   useEffect(() => {
     async function fetchData() {
-      const paymentId = params.id;
+      const paymentId = params;
 
       const config = {
         method: "get",
@@ -48,19 +48,13 @@ function PaymentDetailsPage({ params }: { params: { id: string } }) {
       </div>
       {/* Tab sections */}
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl font-semibold text-left">Billing Details</h2>
+        <h2 className="text-xl font-semibold text-left">Payment Details</h2>
         <hr />
         <div className="grid grid-cols-2 gap-6">
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-            Bill Name
+            Payment type
             <span className="text-base text-black font-medium">
-              {data?.name}
-            </span>
-          </p>
-          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-            Bill Type
-            <span className="text-base text-black font-medium">
-              {data?.type}
+              {data?.paymentType}
             </span>
           </p>
           {/* <p className=" text-sm text-neutral-600 flex flex-col gap-1">

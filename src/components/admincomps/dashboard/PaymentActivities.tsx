@@ -9,8 +9,7 @@ import { BASE_API_URL } from "@/utils/setter";
 
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { dashPaymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
-import { PaymentDets } from "@/components/admincomps/payment/datatable/colsdata";
-
+import { PaymentDets } from "@/libs/types";
 import { TrendingUp } from "lucide-react";
 import {
   Area,

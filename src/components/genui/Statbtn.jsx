@@ -115,7 +115,7 @@ function Statbtn({ status }) {
     },
   };
 
-  const style = statusStyles[status.toLowerCase()];
+  const style = status ? statusStyles[status.toLowerCase()] : null;
 
   if (!style) return null;
 

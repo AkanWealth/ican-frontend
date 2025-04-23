@@ -7,6 +7,8 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
+import { useRouter } from "next/navigation";
+
 import Toast from "@/components/genui/Toast";
 
 type Faq = {
@@ -15,6 +17,8 @@ type Faq = {
 };
 
 function FaqEdit({ mode, id }: CreateContentProps) {
+  const router = useRouter();
+
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
 
   const [faq, setFaq] = useState<Faq>({ question: "", answer: "" });
@@ -61,7 +65,6 @@ function FaqEdit({ mode, id }: CreateContentProps) {
     const data = JSON.stringify({
       name: faq.question,
       answer: faq.answer,
-
     });
 
     const config = {
@@ -79,6 +82,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("FAQ submitted successfully:", response.data);
+      router.refresh();
       return <Toast type="success" message="FAQ submitted successfully!" />;
     } catch (error) {
       console.error("Error submitting FAQ:", error);

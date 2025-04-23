@@ -23,6 +23,8 @@ type Advert = {
 
 function AdvertEdit({ mode, id }: CreateContentProps) {
   const cookies = new Cookies();
+  const router = useRouter();
+
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
 
   const [advert, setAdvert] = useState<Advert>({
@@ -78,7 +80,17 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching transaction details for edit mode");
       fetchDetails();
     }
-  }, [advert.advertiser, advert.endDate, advert.image, advert.name, advert.startDate, advert.textBody, editDataFetched, id, mode]);
+  }, [
+    advert.advertiser,
+    advert.endDate,
+    advert.image,
+    advert.name,
+    advert.startDate,
+    advert.textBody,
+    editDataFetched,
+    id,
+    mode,
+  ]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({
@@ -108,6 +120,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("Advert submitted successfully:", response.data);
+      router.refresh();
       return <Toast type="success" message="Advert submitted successfully!" />;
     } catch (error) {
       console.error("Error submitting advert:", error);

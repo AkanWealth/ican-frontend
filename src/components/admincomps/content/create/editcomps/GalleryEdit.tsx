@@ -3,11 +3,15 @@
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 
+import { useRouter } from "next/navigation";
+import Cookies from "universal-cookie";
+
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
 import Toast from "@/components/genui/Toast";
+import { Router } from "lucide-react";
 
 interface GalleryProps {
   name: string;
@@ -16,6 +20,8 @@ interface GalleryProps {
 }
 
 function GalleryEdit({ mode, id }: CreateContentProps) {
+  const router = useRouter();
+
   const [gallery, setGallery] = useState<GalleryProps>({
     name: "",
     images: [""],
@@ -87,6 +93,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("Gallery submitted successfully:", response.data);
+      router.refresh();
       return <Toast type="success" message="Gallery submitted successfully!" />;
     } catch (error) {
       console.error("Error submitting gallery:", error);

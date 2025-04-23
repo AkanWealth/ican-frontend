@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 import { RichTextEditor } from "@/registry/new-york/rich-text-editor/rich-text-editor";
 
+import { useRouter } from "next/navigation";
+
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
@@ -20,6 +22,8 @@ interface BlogProps {
 }
 
 function BlogEdit({ mode, id }: CreateContentProps) {
+  const router = useRouter();
+
   const [blog, setBlog] = useState<BlogProps>({
     title: "",
     authorName: "",
@@ -100,6 +104,7 @@ function BlogEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("Blog submitted successfully:", response.data);
+      router.refresh();
       return <Toast type="success" message="Blog submitted successfully!" />;
     } catch (error) {
       console.error("Error submitting blog:", error);

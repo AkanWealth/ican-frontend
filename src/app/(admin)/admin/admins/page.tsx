@@ -9,6 +9,7 @@ import { User } from "@/libs/types";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 import CreateNewAdmin from "@/components/admincomps/admin/CreateNewAdmin";
 
@@ -29,7 +30,11 @@ function AdminManagementPage() {
       };
       const result = await axios.request(config);
 
-      setData(result.data);
+      if (result.status === 401) {
+        await handleUnauthorizedRequest(config, router, setData);
+      } else {
+        setData(result.data);
+      }
     }
     fetchData();
   }, []);
@@ -65,12 +70,8 @@ function AdminManagementPage() {
         </div>
       </div>
       {showModal && (
-        <CreateNewAdmin
-          setShowModal={setShowModal}
-          showModal={showModal}
-        />
+        <CreateNewAdmin setShowModal={setShowModal} showModal={showModal} />
       )}
-     
     </div>
   );
 }

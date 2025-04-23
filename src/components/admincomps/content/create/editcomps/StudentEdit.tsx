@@ -17,6 +17,8 @@ type StudyPack = {
 function StudentEdit({ mode, id }: CreateContentProps) {
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
   const [student, setStudent] = useState<StudyPack>({ name: "", document: "" });
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -80,11 +82,13 @@ function StudentEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("Study Pack submitted successfully:", response.data);
-      return (
-        <Toast type="success" message="Study Pack submitted successfully!" />
-      );
+      alert("Study Pack submitted successfully!");
+      setIsSubmitting(false);
+      setIsLoading(false);
     } catch (error) {
-      console.error("Error submitting Study Pack:", error);
+      alert("Error submitting Study Pack: " + error);
+      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -110,6 +114,8 @@ function StudentEdit({ mode, id }: CreateContentProps) {
         <button
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
+            setIsLoading(true);
             handleSubmit("published");
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
@@ -119,6 +125,8 @@ function StudentEdit({ mode, id }: CreateContentProps) {
         <button
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
+            setIsLoading(true);
             handleSubmit("draft");
           }}
           className=" py-2 text-primary border border-primary text-base rounded-full w-full"

@@ -227,11 +227,15 @@ function NewEvent({
         console.log("Event added to drafts successfully:", response.data);
         handleCancel(); // Close the modal after successful draft
         alert("Event added to drafts successfully!");
+        setIsPublishing(false);
+        setIsSavingDraft(false);
       } catch (error) {
         console.error("Error adding the event to draft:", error);
         setTimeout(() => {
           handleCancel(); // Close the modal after 3 seconds
         }, 3000); // Add a 3-second delay
+        setIsPublishing(false);
+        setIsSavingDraft(false);
 
         return (
           <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50">

@@ -121,8 +121,10 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
       </div>
       <div className="flex flex-col gap-2">
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("published");
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
@@ -130,8 +132,10 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           {mode === "edit" ? "Publish Edit" : "Publish Gallery"}
         </button>
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
 
             handleSubmit("draft");
           }}

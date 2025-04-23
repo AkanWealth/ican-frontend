@@ -49,7 +49,8 @@ function Statbtn({ status }) {
       fill: "fill-neutral-900",
       icon: <MdAccessTime className="w-4 h-4" />,
       label: "Pending",
-    }, registered: {
+    },
+    registered: {
       bg: "bg-neutral-200",
       text: "text-neutral-950",
       fill: "fill-neutral-900",
@@ -114,7 +115,7 @@ function Statbtn({ status }) {
     },
   };
 
-  const style = statusStyles[status];
+  const style = status ? statusStyles[status.toLowerCase()] : null;
 
   if (!style) return null;
 

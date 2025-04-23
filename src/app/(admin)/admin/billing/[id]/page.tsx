@@ -3,10 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
-import {
-  payments,
-  PaymentDets,
-} from "@/components/admincomps/payment/datatable/colsdata";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { paymentdetailscoloumns } from "@/components/admincomps/payment/datatable/columns";
 

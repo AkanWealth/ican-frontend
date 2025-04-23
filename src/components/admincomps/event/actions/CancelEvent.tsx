@@ -2,6 +2,9 @@ import React from "react";
 import { MdSubtitles, MdDeleteOutline } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+
 interface CancelEventProps {
   id: string;
   eventName: string;
@@ -11,7 +14,26 @@ interface CancelEventProps {
 
 function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
   const handleDelete = () => {
-    console.log({ id, eventName, date });
+    let config = {
+      method: "delete",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/events/${id}`,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        console.log("Event deleted successfully:", response.data);
+        onClose(); // Close the modal after successful deletion
+      })
+      .catch((error) => {
+        console.error("Error deleting event:", error);
+      });
+    window.location.reload();
   };
 
   return (

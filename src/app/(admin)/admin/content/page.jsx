@@ -22,23 +22,7 @@ function Content() {
     setShowModal(false);
   };
 
-  useEffect(() => {
-    async function fetchAllContent() {
-      const config = {
-        method: "get",
-        maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/content`,
-        headers: {},
-      };
-      try {
-        const response = await axios.request(config);
-        setData(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    fetchAllContent();
-  }, []);
+ 
 
   return (
     <div className="rounded-3xl p-6">

@@ -26,6 +26,8 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
 
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [advert, setAdvert] = useState<Advert>({
     name: "",
@@ -120,6 +122,8 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("Advert submitted successfully:", response.data);
+      setIsSubmitting(false);
+      setIsLoading(false);
       router.refresh();
       return <Toast type="success" message="Advert submitted successfully!" />;
     } catch (error) {
@@ -179,8 +183,10 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       </div>
       <div className="flex flex-col gap-2">
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("published");
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
@@ -188,8 +194,10 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           {mode === "edit" ? "Publish Edit" : "Publish Advert"}
         </button>
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("draft");
           }}
           className=" py-2 text-primary border border-primary text-base rounded-full w-full"

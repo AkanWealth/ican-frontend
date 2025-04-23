@@ -18,6 +18,7 @@ type Faq = {
 
 function FaqEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
 
@@ -39,6 +40,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           answer: response.data.amswer || "",
         });
         setEditDataFetched(true);
+        setIsSubmitting(false);
       } catch (error) {
         if (
           axios.isAxiosError(error) &&
@@ -111,8 +113,10 @@ function FaqEdit({ mode, id }: CreateContentProps) {
       </div>
       <div className="flex flex-col gap-2">
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("published");
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
@@ -120,8 +124,10 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           {mode === "edit" ? "Publish Edit" : "Publish FAQ"}
         </button>
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("draft");
           }}
           className=" py-2 text-primary border border-primary text-base rounded-full w-full"

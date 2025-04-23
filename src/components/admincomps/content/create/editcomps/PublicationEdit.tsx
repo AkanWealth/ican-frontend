@@ -16,6 +16,7 @@ function PublicationEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
   const cookies = new Cookies();
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [publication, setPublication] = useState("");
 

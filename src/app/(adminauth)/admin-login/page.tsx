@@ -127,6 +127,7 @@ function AdminLogin() {
           JSON.stringify(user)
         )}; path=/; secure; samesite=strict; expires=${expiryTime}`;
         document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict; expires=${expiryTime}`;
+        document.cookie = `${response.data.refresh_token}`;
 
         // Set secure cookies instead of localStorage
         localStorage.setItem("user", JSON.stringify(user));

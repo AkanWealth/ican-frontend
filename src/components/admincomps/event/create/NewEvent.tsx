@@ -101,8 +101,10 @@ function NewEvent({
 
     if (!formData.eventDate) {
       errors.eventDate = "Event date is required";
+      isValid = false;
     } else if (new Date(formData.eventDate) < tomorrow) {
       errors.eventDate = "Event date must be at least tomorrow";
+      isValid = false;
     }
     setFormErrors(errors);
     return isValid;

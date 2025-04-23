@@ -23,6 +23,8 @@ interface BlogProps {
 
 function BlogEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [blog, setBlog] = useState<BlogProps>({
     title: "",
@@ -104,10 +106,12 @@ function BlogEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("Blog submitted successfully:", response.data);
+      setIsSubmitting(false);
+      setIsLoading(false);
       router.refresh();
-      return <Toast type="success" message="Blog submitted successfully!" />;
+      alert("Blog submitted successfully!");
     } catch (error) {
-      console.error("Error submitting blog:", error);
+      alert("Error submitting blog: " + error);
     }
   };
 
@@ -136,8 +140,11 @@ function BlogEdit({ mode, id }: CreateContentProps) {
       </div>
       <div className="flex flex-col gap-2">
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
+            setIsLoading(true);
             handleSubmit("published");
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
@@ -145,8 +152,11 @@ function BlogEdit({ mode, id }: CreateContentProps) {
           {mode === "edit" ? "Publish Edit" : "Publish Blog"}
         </button>
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
+            setIsLoading(true);
             handleSubmit("draft");
           }}
           className=" py-2 text-primary border border-primary text-base rounded-full w-full"

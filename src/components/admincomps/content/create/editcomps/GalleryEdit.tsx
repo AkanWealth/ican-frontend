@@ -21,6 +21,7 @@ interface GalleryProps {
 
 function GalleryEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [gallery, setGallery] = useState<GalleryProps>({
     name: "",
@@ -94,8 +95,10 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
       const response = await axios.request(config);
       console.log("Gallery submitted successfully:", response.data);
       router.refresh();
+      setIsSubmitting(false);
       return <Toast type="success" message="Gallery submitted successfully!" />;
     } catch (error) {
+      setIsSubmitting(false);
       console.error("Error submitting gallery:", error);
     }
   };
@@ -129,6 +132,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
         <button
           onClick={(e) => {
             e.preventDefault();
+
             handleSubmit("draft");
           }}
           className=" py-2 text-primary border border-primary text-base rounded-full w-full"

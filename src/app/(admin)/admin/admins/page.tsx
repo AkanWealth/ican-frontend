@@ -29,7 +29,10 @@ function AdminManagementPage() {
       };
       const result = await axios.request(config);
 
-      setData(result.data);
+      if (result.status === 401) {
+      } else {
+        setData(result.data);
+      }
     }
     fetchData();
   }, []);
@@ -65,12 +68,8 @@ function AdminManagementPage() {
         </div>
       </div>
       {showModal && (
-        <CreateNewAdmin
-          setShowModal={setShowModal}
-          showModal={showModal}
-        />
+        <CreateNewAdmin setShowModal={setShowModal} showModal={showModal} />
       )}
-     
     </div>
   );
 }

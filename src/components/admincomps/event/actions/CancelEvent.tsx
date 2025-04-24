@@ -5,6 +5,8 @@ import { HiOutlineTag } from "react-icons/hi";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
+import { useToast } from "@/hooks/use-toast";
+
 interface CancelEventProps {
   id: string;
   eventName: string;
@@ -13,25 +15,43 @@ interface CancelEventProps {
 }
 
 function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
+  const { toast } = useToast();
   const handleDelete = () => {
+    let data = JSON.stringify({
+      status: "CANCELLED",
+    });
+
     let config = {
-      method: "delete",
+      method: "patch",
       maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/events/${id}`,
+      url: `${BASE_API_URL}/events/${id}/status`,
       headers: {
-        Accept: "application/json",
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
+      withCredentials: true,
+      // credentials: "include",
+      data: data,
     };
 
     axios
       .request(config)
       .then((response) => {
-        console.log("Event deleted successfully:", response.data);
-        onClose(); // Close the modal after successful deletion
+        toast({
+          title: "Event Cancelled",
+          description: "The event has been successfully cancelled.",
+          variant: "default",
+        });
+
+        onClose(); // Close the modal after successful update
       })
       .catch((error) => {
-        console.error("Error deleting event:", error);
+        toast({
+          title: "Error",
+          description:
+            "There was an error cancelling the event. Please try again.",
+          variant: "destructive",
+        });
       });
     window.location.reload();
   };
@@ -44,15 +64,15 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
             <MdDeleteOutline className="w-6 h-6 fill-red-600" />
           </div>
           <div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col w-fit gap-2">
               <h5 className="font-semibold text-xl text-black">Cancel Event</h5>
-              <p className="text-sm text-neutral-600">
+              <p className="text-sm text-neutral-600 text-wrap">
                 If you cancel this event, the event will no longer take place
                 and members will be notified via email. Are you sure you want to
                 proceed?{" "}
               </p>
             </div>
-            <div className="flex flex-col gap-2 mt-4">
+            <div className="flex flex-col w-fit gap-2 mt-4">
               <div className="flex flex-row items-center gap-4">
                 <p className="flex text-neutral-700 font-medium text-base flex-row  items-center gap-2">
                   <MdSubtitles className="w-4 h-4" /> Name:
@@ -60,20 +80,22 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
                 <p className="text-black font-medium text-base ">{eventName}</p>
               </div>
               <div className="flex flex-row items-center gap-4">
-                <p className="flex text-neutral-700 font-medium text-base   items-centerflex-row gap-2">
+                <p className="flex text-neutral-700 font-medium text-base   items-center flex-row gap-2">
                   <HiOutlineTag className="w-4 h-4" /> Date:
                 </p>
-                <p className="text-black font-medium text-base ">{date}</p>
+                <p className="text-black font-medium text-base ">
+                  {new Date(date).toLocaleDateString("en-GB")}
+                </p>
               </div>
             </div>
           </div>
         </div>
-        <div className="flex justify-between">
+        <div className="flex w-fit justify-between">
           <button
             onClick={handleDelete}
             className="flex items-center w-2/5 text-center justify-center bg-red-600 font-semibold text-base text-white rounded-full py-3 px-4 h-10"
           >
-            Yes, Please
+            Cancel Event
           </button>
           <button
             onClick={onClose}

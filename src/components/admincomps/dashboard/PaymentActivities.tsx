@@ -32,9 +32,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { request } from "http";
-import { url } from "inspector";
-import { headers } from "next/headers";
+
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+
 const chartData = [
   { month: "January", amount: 186 },
   { month: "February", amount: 305 },
@@ -56,6 +58,8 @@ function PaymentActivities() {
     completedPayments: 0,
     failedPayments: 0,
   });
+  const router = useRouter();
+  const { toast } = useToast();
 
   const [paymentData, setPaymentData] = useState<PaymentDets[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,12 +81,32 @@ function PaymentActivities() {
         const response = await axios.request(config);
         setData(response.data);
       } catch (error) {
-        console.error(error);
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 401
+        ) {
+          const config = {
+            method: "get",
+            maxBodyLength: Infinity,
+            url: `${BASE_API_URL}/dashboard/payment-data`,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+          };
+          await handleUnauthorizedRequest(config, router, setData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch payment data.",
+            variant: "destructive",
+          });
+        }
       }
     };
 
     fetchData();
-  }, []);
+  }, [router, toast]);
 
   useEffect(() => {
     async function fetchPaymentData() {

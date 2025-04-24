@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import Toast from "@/components/genui/Toast";
 
+import { useToast } from "@/hooks/use-toast";
 import InputEle from "@/components/genui/InputEle";
 import {
   InputOTP,
@@ -17,6 +17,7 @@ import { BASE_API_URL } from "@/utils/setter";
 
 function AdminLogin() {
   const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [complete, setComplete] = useState(false);
   const [isSwitchOn, setIsSwitchOn] = useState(false);
@@ -137,9 +138,18 @@ function AdminLogin() {
           router.push("/admin");
         }, 1000);
 
-        return <Toast type="success" message="Login successful" />;
+        toast({
+          title: "Login Successful",
+          description: "You have successfully logged in.",
+          variant: "default",
+        });
       } catch (error) {
         // Display a popup for the error
+        toast({
+          title: "Login Failed",
+          description: "Invalid email or password.",
+          variant: "destructive",
+        });
         alert("An error occurred during login. Please try again.");
 
         // Reset the form

@@ -73,7 +73,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
       {showDeleteModal && (
         <CancelEvent
           id={row.original.id}
-          eventName={row.original.eventName}
+          eventName={row.original.name}
           date={row.original.date}
           onClose={() => setShowDeleteModal(false)}
         />

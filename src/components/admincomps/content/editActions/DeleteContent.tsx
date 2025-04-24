@@ -10,7 +10,8 @@ import { HiOutlineTag } from "react-icons/hi";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
-import Toast from "@/components/genui/Toast";
+
+import { useToast } from "@/hooks/use-toast";
 
 interface DeleteContentProps {
   id: string;
@@ -29,6 +30,8 @@ function DeleteContent({
   date,
   onClose,
 }: DeleteContentProps) {
+  const { toast } = useToast();
+
   const handleDelete = async () => {
     const config = {
       method: "DELETE",
@@ -42,9 +45,20 @@ function DeleteContent({
     try {
       const response = await axios.request(config);
       console.log("Content deleted successfully:", response.data);
-      return <Toast type="success" message="Content deleted successfully!" />;
+      toast({
+        title: "Content Deleted",
+        description: "The content has been successfully deleted.",
+        variant: "default",
+      });
+
+      onClose();
     } catch (error) {
       console.error("Error deleting:", error);
+      toast({
+        title: "Error Deleting Content",
+        description: "There was an error while trying to delete the content.",
+        variant: "destructive",
+      });
     }
   };
 

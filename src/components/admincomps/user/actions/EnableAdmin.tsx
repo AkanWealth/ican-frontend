@@ -3,7 +3,7 @@ import { MdOutlinePublishedWithChanges, MdSubtitles } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
 import axios from "axios";
-import Toast from "@/components/genui/Toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface EnableAdminProps {
   id: string;
@@ -13,6 +13,7 @@ interface EnableAdminProps {
 }
 
 function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
+  const { toast } = useToast();
   const handleConfirm = () => {
     console.log({ id, fullName, role });
     async function fetchData() {
@@ -35,15 +36,21 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
         const results = await axios.request(config);
         console.log(results.data);
         onClose();
-        return <Toast type="success" message={results.data.message} />;
+        toast({
+          title: "User Enabled",
+          description: results.data.message,
+          variant: "default",
+          duration: 5000,
+        });
+        onClose();
       } catch (error: any) {
         console.error(error);
-        return (
-          <Toast
-            type="error"
-            message={error.response?.data?.message || "An error occurred"}
-          />
-        );
+        toast({
+          title: "Error",
+          description: error.response?.data?.message || "An error occurred",
+          variant: "destructive",
+          duration: 5000,
+        });
       }
     }
     fetchData();

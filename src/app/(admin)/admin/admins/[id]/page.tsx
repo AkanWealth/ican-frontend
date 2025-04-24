@@ -7,9 +7,12 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
 import { User } from "@/libs/types";
+import { useToast } from "@/hooks/use-toast";
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [adminData, setAdminData] = useState<User>();
   const [permissions, setPermissions] = useState<any>([]);
 
@@ -45,8 +48,19 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
           getPermissions();
         }
       } catch (error) {
-        console.error("Error fetching admin data:", error);
-        // Handle error appropriately, e.g. show error message to user
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 401
+        ) {
+          await handleUnauthorizedRequest(config, router, setAdminData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch user activities data.",
+            variant: "destructive",
+          });
+        }
       } finally {
         // Any cleanup code if needed
       }

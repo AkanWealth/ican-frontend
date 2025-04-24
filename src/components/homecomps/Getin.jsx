@@ -1,14 +1,16 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import axios from "axios";
-import Toast from "@/components/genui/Toast";
+import { useToast } from "@/hooks/use-toast";
 import InputEle from "../genui/InputEle";
 
 import { BASE_API_URL } from "@/utils/setter";
+import { title } from "process";
 
 // get in touch form used on the contact us page of the design
 function Getin({ heading, phoneNumber = true, className }) {
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -73,42 +75,47 @@ function Getin({ heading, phoneNumber = true, className }) {
       console.log("Form submitted", formData);
 
       const data = JSON.stringify({
-        "name": formData.name,
-        "email": formData.email,
-        "phone": formData.phone,
-        "message": formData.message
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
       });
 
-
       const config = {
-        method: 'post',
+        method: "post",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/contact-us`,
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-        data: data
+        data: data,
       };
-
     }
 
     try {
       const response = await axios.request(config);
-      console.log("Sending:", response)
+      console.log("Sending:", response);
 
-      return <Toast type="success" message="Message sent successfully" />;
+      toast({
+        title: "Message sent",
+        description: "The message has been sent successfully.",
+        variant: "success",
+      });
     } catch (error) {
       console.error("Sending:", error);
-      return <Toast type="error" message="An error occurred during Sending." />;
-
+      toast({
+        title: "Error",
+        description: "An error occurred while sending the message.",
+        variant: "destructive",
+      });
     } finally {
       setFormData({
         name: "",
         email: "",
         phone: "",
         message: "",
-      })
+      });
     }
   };
 
@@ -125,8 +132,10 @@ function Getin({ heading, phoneNumber = true, className }) {
           inquiries. We are here to assist you every step of the way.
         </p>
       </div>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-8 justify-start items-end" >
-
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-8 justify-start items-end"
+      >
         <InputEle
           id="name"
           type="text"
@@ -157,8 +166,6 @@ function Getin({ heading, phoneNumber = true, className }) {
           onChange={handleChange}
           errorMsg={formErrors.phone}
         />
-
-
 
         <div className="flex flex-col w-full gap-3 ">
           <label className=" text-base text-black  " htmlFor="message">

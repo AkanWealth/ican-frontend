@@ -37,7 +37,7 @@ export const Header = () => {
     return () => {
       window.removeEventListener("resize", checkScreenSize);
     };
-  }, []);
+  }, [cookies]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -8,8 +8,8 @@ import { BASE_API_URL } from "@/utils/setter";
 
 import { CreateContentProps } from "@/libs/types";
 import { useRouter } from "next/navigation";
-import Toast from "@/components/genui/Toast";
-import { cookies } from "next/headers";
+import { useToast } from "@/hooks/use-toast";
+import { uploadImageToCloud } from "@/lib/uploadImage";
 
 type Advert = {
   name: string;
@@ -24,11 +24,13 @@ type Advert = {
 function AdvertEdit({ mode, id }: CreateContentProps) {
   const cookies = new Cookies();
   const router = useRouter();
+  const { toast } = useToast();
 
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const [advertImage, setAdvertImage] = useState<string | null | File>(null);
   const [advert, setAdvert] = useState<Advert>({
     name: "",
     image: "",
@@ -94,6 +96,60 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
     mode,
   ]);
 
+  const handlePhotoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size <= 5 * 1024 * 1024) {
+      try {
+        // Show loading state
+        // You might want to add a loading state to your component
+        setIsLoading(true);
+
+        // Upload the file to cloud storage
+        const imageUrl = await uploadImageToCloud(file);
+
+        console.log("Uploaded image URL:", imageUrl);
+        // Update state with the new URL
+        setAdvertImage(imageUrl);
+        setAdvert((prev) => ({
+          ...prev,
+          image: imageUrl,
+        }));
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error uploading photo:", error);
+        // alert("Failed to upload photo. Please try again.");
+        toast({
+          title: "Failed to upload photo",
+          description: "Please try again. ",
+          variant: "destructive",
+          duration: 2000,
+        });
+        setIsLoading(false);
+      }
+    } else {
+      // alert("Please select an image under 5MB");
+      toast({
+        title: "Failed to upload photo",
+        description: "Please select an image under 5MB",
+        variant: "destructive",
+        duration: 2000,
+      });
+    }
+  };
+
+  const handleDeletePhoto = () => {
+    setAdvertImage(null);
+    setAdvert((prev) => ({
+      ...prev,
+      image: "",
+    }));
+  };
+
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({
       name: advert.name,
@@ -121,13 +177,22 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
 
     try {
       const response = await axios.request(config);
-      console.log("Advert submitted successfully:", response.data);
       setIsSubmitting(false);
       setIsLoading(false);
+      toast({
+        title: "Advert created successfully!",
+        description: "Refreach the page to see changes.",
+        variant: "default",
+        duration: 2000,
+      });
       router.refresh();
-      return <Toast type="success" message="Advert submitted successfully!" />;
     } catch (error) {
-      console.error("Error submitting advert:", error);
+      toast({
+        title: "Failed to create Advert",
+        description: "Please try again.",
+        variant: "destructive",
+        duration: 2000,
+      });
     }
   };
 
@@ -148,13 +213,27 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           value={advert.advertiser}
           onChange={(e) => setAdvert({ ...advert, advertiser: e.target.value })}
         />
-        <InputEle
-          label="Advertisement Image"
-          type="text"
-          id="advert_image"
-          value={advert.image}
-          onChange={(e) => setAdvert({ ...advert, image: e.target.value })}
-        />
+
+        <div className="flex flex-col gap-4">
+          <span className="text-sm text-gray-500">(Upload Advert Image)</span>
+          <div className="flex flex-wrap gap-4">
+            <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
+              Upload Image
+              <input
+                type="file"
+                accept="image/jpeg,image/png"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+            </label>
+            <button
+              onClick={handleDeletePhoto}
+              className="bg-[#E7EAFF] text-[#27378C] px-6 py-2 rounded-full hover:bg-gray-200 text-sm whitespace-nowrap"
+            >
+              Delete photo
+            </button>
+          </div>
+        </div>
         <InputEle
           label="Text Body"
           type="text"

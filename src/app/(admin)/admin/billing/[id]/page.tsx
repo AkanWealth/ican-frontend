@@ -10,8 +10,13 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { BillingDetails } from "@/libs/types";
 
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
+import { useToast } from "@/hooks/use-toast";
+
 function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { toast } = useToast();
+
   const [data, setData] = useState<BillingDetails>();
 
   useEffect(() => {
@@ -25,12 +30,33 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
       };
-      const result = await axios.request(config);
+      try {
+        const result = await axios.request(config);
 
-      setData(result.data);
+        setData(result.data);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            await handleUnauthorizedRequest(config, router, setData);
+          } else {
+            toast({
+              title: "Error",
+              description: "Failed to fetch billing data.",
+              variant: "destructive",
+            });
+          }
+        } else {
+          // Handle unexpected errors
+          toast({
+            title: "Error",
+            description: "An unexpected error occurred.",
+            variant: "destructive",
+          });
+        }
+      }
     }
     fetchData();
-  }, [params]);
+  }, [params, router, toast]);
 
   return (
     <div className="rounded-3xl flex flex-col gap-6 p-6">

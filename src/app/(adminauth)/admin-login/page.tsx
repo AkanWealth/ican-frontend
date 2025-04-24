@@ -119,6 +119,7 @@ function AdminLogin() {
     if (Object.values(errors).every((error) => error === "")) {
       try {
         const response = await axios.request(config);
+        console.log("Response:", response);
         const { user, access_token } = response.data;
 
         // Set secure cookies with expiration time of 1 hour
@@ -128,7 +129,7 @@ function AdminLogin() {
           JSON.stringify(user)
         )}; path=/; secure; samesite=strict; expires=${expiryTime}`;
         document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict; expires=${expiryTime}`;
-        document.cookie = `${response.data.refresh_token}`;
+        document.cookie = `refresh_token=${response.data.refresh_token}`;
 
         // Set secure cookies instead of localStorage
         localStorage.setItem("user", JSON.stringify(user));

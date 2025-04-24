@@ -12,6 +12,7 @@ import RoleManager from "@/components/admincomps/admin/Rolemanager";
 
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
@@ -53,15 +54,24 @@ function RolesPage() {
           setRoles(response.data);
         }
       } catch (error) {
-
         // Handle error
-
-
-        console.error("Failed to fetch roles:", error);
-        Toast({
-          type: "error",
-          message: "Failed to fetch roles",
-        });
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            await handleUnauthorizedRequest(config, router, setRoles);
+          } else {
+            toast({
+              title: "Error",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
+        } else {
+          toast({
+            title: "Error",
+            description: "An unexpected error occurred.",
+            variant: "destructive",
+          });
+        }
       }
     };
 

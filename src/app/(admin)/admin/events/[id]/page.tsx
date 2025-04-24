@@ -15,13 +15,11 @@ import { EventDetails } from "@/libs/types";
 
 import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useToast } from "@/hooks/use-toast";
-import { useParams } from "next/navigation";
 
 function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { toast } = useToast();
   const cookies = new Cookies();
 
-  const eventId = params;
   const router = useRouter();
   const [eventDetails, setEventDetails] = useState<EventDetails>({
     id: "",
@@ -54,26 +52,45 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     // ... more feedback items
   ];
   useEffect(() => {
-    let config = {
-      method: "get",
-      maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/events/${eventId}`,
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-      },
-      withCredentials: true,
-    };
+    async function fetchData() {
+      const eventId = (await params).id;
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/events/${eventId}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      };
+      try {
+        const result = await axios.request(config);
+        if (result.status === 200) {
+          setEventDetails(result.data);
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            await handleUnauthorizedRequest(config, router, setEventDetails);
+          } else {
+            toast({
+              title: "Error",
+              description: "Failed to fetch event data.",
+              variant: "destructive",
+            });
+          }
+        } else {
+          // Handle unexpected errors
+          toast({
+            title: "Error",
+            description: "An unexpected error occurred.",
+            variant: "destructive",
+          });
+        }
+      }
+    }
 
-    axios
-      .request(config)
-      .then((response) => {
-        console.log(JSON.stringify(response.data));
-        setEventDetails(response.data); // Assuming you want to store the event details in state
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [eventId]);
+    fetchData();
+  }, [params, router, toast]);
 
   return (
     <div className="flex flex-col w-full items-center">

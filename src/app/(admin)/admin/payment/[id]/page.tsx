@@ -14,7 +14,7 @@ function PaymentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
   useEffect(() => {
     async function fetchData() {
-      const paymentId = params;
+      const paymentId = (await params).id;
 
       const config = {
         method: "get",

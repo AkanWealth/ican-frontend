@@ -21,7 +21,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
   useEffect(() => {
     async function fetchData() {
-      const billingId = await params;
+      const billingId = (await params).id;
       const config = {
         method: "get",
         maxBodyLength: Infinity,

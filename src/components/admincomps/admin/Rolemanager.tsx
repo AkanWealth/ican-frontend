@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
-import Toast from "@/components/genui/Toast";
+import { useToast } from "@/hooks/use-toast";
+
 import InputEle from "@/components/genui/InputEle";
 
 import { User } from "@/libs/types";
@@ -27,6 +28,7 @@ const initialFormData: FormData = {
 };
 
 function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [permissions, setPermissions] = useState<Option[]>([]);
 
@@ -278,13 +280,27 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
         setFormData(initialFormData);
         setPermissions([]);
         setShowModal(false);
-        return <Toast type="success" message="Role created successfully" />;
+
+        toast({
+          title: "Role Created",
+          description: "The role  has been successfully created.",
+          variant: "default",
+        });
+      } else {
+        // Show error message
+        toast({
+          title: "Error",
+          description: "There was an error creating the role.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error creating role:", error);
-      return (
-        <Toast type="error" message="Error occured when creating the role" />
-      );
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
     }
   };
 

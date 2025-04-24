@@ -9,7 +9,7 @@ import { CreateContentProps } from "@/libs/types";
 
 import { useRouter } from "next/navigation";
 
-import Toast from "@/components/genui/Toast";
+import { useToast } from "@/hooks/use-toast";
 
 type Faq = {
   question: string;
@@ -18,6 +18,7 @@ type Faq = {
 
 function FaqEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
@@ -51,8 +52,19 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           console.error(
             "Faq not found (404). Stopping further fetch attempts."
           );
+          toast({
+            title: "Error",
+            description:
+              "Faq not found (404). Stopping further fetch attempts.",
+            variant: "destructive",
+          });
         } else {
           console.error("Error fetching Faq:", error);
+          toast({
+            title: "Error",
+            description: "An error occurred while fetching the Faq.",
+            variant: "destructive",
+          });
         }
       }
     };
@@ -84,10 +96,21 @@ function FaqEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("FAQ submitted successfully:", response.data);
+      toast({
+        title: "Success",
+        description: `FAQ ${
+          mode === "edit" ? "edited" : "created"
+        } successfully.`,
+        variant: "default",
+      });
       router.refresh();
-      return <Toast type="success" message="FAQ submitted successfully!" />;
     } catch (error) {
-      console.error("Error submitting FAQ:", error);
+      toast({
+        title: "Error",
+        description: `An error occurred while submitting the FAQ.`,
+        variant: "destructive",
+      });
+
     }
   };
 

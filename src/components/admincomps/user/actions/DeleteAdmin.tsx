@@ -3,8 +3,8 @@ import { MdSubtitles, MdDeleteOutline } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
 import axios from "axios";
-import Toast from "@/components/genui/Toast";
 
+import { useToast } from "@/hooks/use-toast";
 interface DeleteAdminProps {
   id: string;
   fullName: string;
@@ -13,6 +13,7 @@ interface DeleteAdminProps {
 }
 
 function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
+  const { toast } = useToast();
   const handleDelete = () => {
     console.log({ id, fullName, role });
     async function fetchData() {
@@ -29,16 +30,21 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
       try {
         const results = await axios.request(config);
         console.log(results.data);
+        toast({
+          title: "Admin Deleted",
+          description: results.data.message,
+          variant: "default",
+        });
         onClose();
-        return <Toast type="success" message={results.data.message} />;
       } catch (error: any) {
         console.error(error);
-        return (
-          <Toast
-            type="error"
-            message={error.response?.data?.message || "An error occurred"}
-          />
-        );
+        toast({
+          title: "Error",
+          description:
+            error.response?.data?.message || "An error occurred while deleting",
+          variant: "destructive",
+        });
+        onClose();
       }
     }
     fetchData();

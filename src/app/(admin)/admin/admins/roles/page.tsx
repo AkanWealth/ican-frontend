@@ -9,7 +9,9 @@ import {
 } from "@/components/ui/accordion";
 
 import RoleManager from "@/components/admincomps/admin/Rolemanager";
-import Toast from "@/components/genui/Toast";
+
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
@@ -27,6 +29,9 @@ function RolesPage() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [roles, setRoles] = useState<RolesData[]>([]); // Update state type to RolesData[]
   const [isLoading, setIsLoading] = useState(false); // Loading state
+
+  const { toast } = useToast();
+  const router = useRouter(); // Router instance
 
   // Fetch roles and parse permissions on component mount
   useEffect(() => {
@@ -48,6 +53,10 @@ function RolesPage() {
           setRoles(response.data);
         }
       } catch (error) {
+
+        // Handle error
+
+
         console.error("Failed to fetch roles:", error);
         Toast({
           type: "error",

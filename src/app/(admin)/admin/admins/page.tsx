@@ -37,7 +37,7 @@ function AdminManagementPage() {
       }
     }
     fetchData();
-  }, []);
+  }, [router]);
 
   return (
     <div className="rounded-3xl p-6">

@@ -47,7 +47,13 @@ const chartConfig = {
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+
 function UserActivities() {
+  const { toast } = useToast();
+  const router = useRouter();
   const [data, setData] = useState({
     activeUsers: 0,
     suspendedUsers: 0,
@@ -70,13 +76,39 @@ function UserActivities() {
 
         const response = await axios.request(config);
         setData(response.data);
+        toast({
+          title: "User Activities",
+          description: "User activities data fetched successfully.",
+          variant: "default",
+        });
       } catch (error) {
         console.error(error);
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 401
+        ) {
+          const config = {
+            method: "get",
+            maxBodyLength: Infinity,
+            url: `${BASE_API_URL}/dashboard/user-activity`,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+          };
+          await handleUnauthorizedRequest(config, router, setData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch user activities data.",
+            variant: "destructive",
+          });
+        }
       }
     };
 
     fetchData();
-  }, []);
+  }, [router, toast]);
 
   return (
     <div className=" flex flex-col gap-4 items-start ">

@@ -10,7 +10,6 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
-import Toast from "@/components/genui/Toast";
 import { useToast } from "@/hooks/use-toast";
 
 import { Router } from "lucide-react";
@@ -84,7 +83,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching Gallery details for edit mode");
       fetchDetails();
     }
-  }, [editDataFetched, id, mode]);
+  }, [editDataFetched, id, mode, toast]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({

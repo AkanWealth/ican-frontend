@@ -120,6 +120,8 @@ function AdminLogin() {
       try {
         const response = await axios.request(config);
         console.log("Response:", response);
+        localStorage.setItem("loginResponse", JSON.stringify(response));
+
         const { user, access_token } = response.data;
 
         // Set secure cookies with expiration time of 1 hour

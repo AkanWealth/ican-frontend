@@ -76,7 +76,7 @@ function RolesPage() {
     };
 
     fetchRolesAndPermissions();
-  }, []); // Only run once on mount
+  }, [router, toast]); // Include router and toast as dependencies
 
   // Parse roles data to extract required fields
 

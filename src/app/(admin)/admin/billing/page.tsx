@@ -3,13 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-
 import { BillingTable } from "@/components/admincomps/billing/datatable/BillingTable";
 import { billingcolumns } from "@/components/admincomps/billing/datatable/columns";
 import { Billing } from "@/components/admincomps/billing/datatable/colsdata";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
+import { toast, useToast } from "@/hooks/use-toast";
+
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 function BillingPage() {
   const [data, setData] = useState<Billing[]>([]);
@@ -25,12 +27,34 @@ function BillingPage() {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
       };
-      const result = await axios.request(config);
+      try {
+        const result = await axios.request(config);
 
-      setData(result.data);
+        setData(result.data);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            await handleUnauthorizedRequest(config, router, setData);
+          } else {
+            toast({
+              title: "Error",
+              description: "Failed to fetch billing data.",
+              variant: "destructive",
+            });
+          }
+        } else {
+          // Handle unexpected errors
+
+          toast({
+            title: "Error",
+            description: "An unexpected error occurred.",
+            variant: "destructive",
+          });
+        }
+      }
     }
     fetchData();
-  }, []);
+  }, [router]);
 
   return (
     <div className="rounded-3xl p-6">

@@ -21,10 +21,12 @@ interface RolemanagerProps {
 interface FormData {
   name: string;
   permissions: string[];
-}
+  description: string;
+  }
 const initialFormData: FormData = {
   name: "",
   permissions: [],
+  description: "",
 };
 
 function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
@@ -273,32 +275,26 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
       };
       const response = await axios.request(config);
 
-      if (response.status === 200) {
-        // Show success message
+      // Show success message
 
-        // Reset form and close modal
-        setFormData(initialFormData);
-        setPermissions([]);
-        setShowModal(false);
+      // Reset form and close modal
+      setFormData(initialFormData);
+      setPermissions([]);
+      setShowModal(false);
 
-        toast({
-          title: "Role Created",
-          description: "The role  has been successfully created.",
-          variant: "default",
-        });
-      } else {
-        // Show error message
-        toast({
-          title: "Error",
-          description: "There was an error creating the role.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Role Created",
+        description: "The role  has been successfully created.",
+        variant: "default",
+      });
     } catch (error) {
       console.error("Error creating role:", error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
+        description:
+          axios.isAxiosError(error) && error.response?.data?.message
+            ? error.response.data.message
+            : "An error occurred while creating the role",
         variant: "destructive",
       });
     }
@@ -324,6 +320,15 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
             id="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+          <InputEle
+            label="Description"
+            type="text"
+            id="description"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
           />
           <p className="text-primary">
             Number of selected roles: {permissions.length}

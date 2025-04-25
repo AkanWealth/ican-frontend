@@ -9,7 +9,7 @@ import { BASE_API_URL } from "@/utils/setter";
 
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { dashPaymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
-import { PaymentDets } from "@/libs/types";
+import { OverdueBills } from "@/libs/types";
 import { TrendingUp } from "lucide-react";
 import {
   Area,
@@ -61,7 +61,7 @@ function PaymentActivities() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [paymentData, setPaymentData] = useState<PaymentDets[]>([]);
+  const [paymentData, setPaymentData] = useState<OverdueBills[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -123,13 +123,21 @@ function PaymentActivities() {
         const response = await axios.request(config);
         const result = response.data;
         setPaymentData(result);
-        console.log(result);
+        toast({
+          title: "Overdue Payments",
+          description: "Overdue payments fetched successfully",
+          variant: "default",
+        });
       } catch (error) {
-        console.error("Error fetching overdue payments:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch overdue payments.",
+          variant: "destructive",
+        });
       }
     }
     fetchPaymentData();
-  }, []);
+  }, [toast]);
   return (
     <div className=" flex flex-col gap-4 items-start ">
       <div className="flex flex-row gap-2 items-center justify-start w-full">

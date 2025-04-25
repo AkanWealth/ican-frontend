@@ -7,6 +7,7 @@ import { Event } from "./colsdata";
 import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/event/actions/CellActions";
+import { DashEventReg } from "@/libs/types";
 
 export const allcolumns: ColumnDef<Event>[] = [
   {
@@ -260,4 +261,16 @@ export const noncolumns: ColumnDef<Event>[] = [
       return <CellActions row={row} />;
     },
   },
+];
+
+export const dashEventRegColumns: ColumnDef<DashEventReg>[] = [
+  {
+    accessorKey: "name",
+    header: "Event Name"
+  },
+  {
+    accessorKey: "_count.registrations",
+    header: "Registrations"
+  },
+  // Add other columns for DashEventReg properties
 ];

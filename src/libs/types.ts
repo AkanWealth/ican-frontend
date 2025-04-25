@@ -126,6 +126,19 @@ type PaymentDets = {
   };
 };
 
+type OverdueBills = {
+  user: {
+    firstname: string;
+    surname: string;
+  };
+  billing: {
+    name: string;
+    type: string;
+    createdAt: string;
+    amount: number;
+  };
+};
+
 /**
  * Represents a payment transaction with details about the payment and associated user
  */
@@ -188,6 +201,17 @@ export interface PaymentBasic {
   subscriptionId: string | null;
 }
 
+type DashEventReg = {
+  id: string;
+  name: string;
+  _count: {
+    registrations: number;
+  };
+  registrations: {
+    status: "REGISTERED" | "CANCELLED" | "PENDING";
+  }[];
+};
+
 export type {
   User,
   RolesData,
@@ -195,7 +219,9 @@ export type {
   CreateContentProps,
   FaqData,
   BillingDetails,
+  OverdueBills,
   PaymentDets,
   PaymentDetails,
   EventDetails,
+  DashEventReg,
 };

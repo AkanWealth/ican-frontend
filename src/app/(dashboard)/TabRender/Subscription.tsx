@@ -12,6 +12,8 @@ import CalendarFilter from "@/components/homecomps/CalendarFilter";
 import TablePagination from "@/components/Pagenation";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 
 const Subscription = () => {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -26,21 +28,16 @@ const Subscription = () => {
   useEffect(() => {
     const fetchSubscriptionData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        // const token = localStorage.getItem("token");
 
-        if (!token) {
-          console.error("User is not authenticated. Please log in again.");
-          return;
-        }
+        // if (!token) {
+        //   console.error("User is not authenticated. Please log in again.");
+        //   return;
+        // }
 
-        const response = await axios.get(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/outstanding-breakdown",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await apiClient.get("/payments/outstanding-breakdown");
 
-        setSubscriptions(response.data || []);
+        setSubscriptions(response || []);
         setLoading(false);
       } catch (error) {
         console.error("Failed to fetch subscription data:", error);
@@ -79,21 +76,15 @@ const Subscription = () => {
     setLoading(true);
     const fetchSubscriptionData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        // const token = localStorage.getItem("token");
 
-        if (!token) {
-          console.error("User is not authenticated. Please log in again.");
-          return;
-        }
+        // if (!token) {
+        //   console.error("User is not authenticated. Please log in again.");
+        //   return;
+        // }
 
-        const response = await axios.get(
-          'https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/outstanding-breakdown',
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        setSubscriptions(response.data || []);
+        const response = await apiClient.get("/payments/outstanding-breakdown");
+        setSubscriptions(response|| []);
         setLoading(false);
       } catch (error) {
         console.error("Failed to reset subscriptions:", error);

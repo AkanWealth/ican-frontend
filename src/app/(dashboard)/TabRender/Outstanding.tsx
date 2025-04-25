@@ -16,6 +16,9 @@ import {
   Circle,
 } from "lucide-react";
 
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -81,32 +84,22 @@ const Outstanding = () => {
   useEffect(() => {
     const fetchOutstandingData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        // const token = localStorage.getItem("token");
 
-        if (!token) {
-          console.error("User is not authenticated. Please log in again.");
-          setLoading(false);
-          return;
-        }
-
+        // if (!token) {
+        //   console.error("User is not authenticated. Please log in again.");
+        //   setLoading(false);
+        //   return;
+        // }
+        
         // Fetch total outstanding payment
-        const response = await axios.get(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/outstanding-breakdown",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        const totalOutstanding = response.data?.totalOutstanding || 0;
+        const response = await apiClient.get("/payments/total-outstanding");
+        const totalOutstanding = response.totalOutstanding || 0;
 
         // Fetch outstanding breakdown
-        const outstandingBreakdownResponse = await axios.get(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/outstanding-breakdown",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const outstandingBreakdownResponse = await apiClient.get("/payments/outstanding-breakdown");
         const outstandingBreakdown =
-          outstandingBreakdownResponse.data?.breakdown || [];
+          outstandingBreakdownResponse.breakdown || [];
 
         // Update state with API data
         setTotalOutstanding(totalOutstanding);

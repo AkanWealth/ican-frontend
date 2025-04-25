@@ -12,13 +12,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { parseCookies, destroyCookie } from "nookies";
+import apiClient from "@/services/apiClient";
+
+
+
+
+interface UserData {
+  id: string;
+  firstname: string;
+  surname: string;
+  email: string;
+  profilePicture?: string;
+
+}
 
 export const Header = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  const [profilePicture, setProfilePicture] = useState<string | null>(null); // State for profile picture
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const notificationRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
@@ -56,28 +69,28 @@ export const Header = () => {
     };
   }, [isNotificationOpen, isMobile]);
 
-  // Fetch the user's profile picture
+  // Fetch the user's profile picture using cookies
   useEffect(() => {
     const fetchProfilePicture = async () => {
       try {
-        const user = localStorage.getItem("user");
-        const userId = user ? JSON.parse(user)?.id : null;
-
+        if (typeof window === "undefined") return; // Ensure code runs only on the client side
+        
+        const cookies = parseCookies();
+        const userDataCookie = cookies['user_data'];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const userId = userData?.id;
+        
         if (!userId) {
-          console.error("User ID not found in local storage");
+          console.error("User ID not found in cookies");
           return;
         }
 
-        const response = await axios.get(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/users/${userId}`,{
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        const profilePictureUrl = response.data?.profilePicture;
+        // Use apiClient instead of direct axios call
+        const userDetails = await apiClient.get<UserData>(`/users/${userId}`);
+        
+        const profilePictureUrl = userDetails.profilePicture;
         console.log("Profile Picture URL:", profilePictureUrl); // Log the URL for debugging
+        
         if (profilePictureUrl) {
           setProfilePicture(profilePictureUrl); // Update the profile picture state
         } else {
@@ -92,8 +105,11 @@ export const Header = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    // Remove cookies instead of localStorage
+    destroyCookie(null, 'access_token');
+    destroyCookie(null, 'refresh_token');
+    destroyCookie(null, 'user_data');
+    
     router.push("/login");
   };
 

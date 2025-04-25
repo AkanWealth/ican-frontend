@@ -12,6 +12,8 @@ import CalendarFilter from "@/components/homecomps/CalendarFilter";
 import TablePagination from "@/components/Pagenation";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 
 interface ModalProps {
   isOpen: boolean;
@@ -63,23 +65,18 @@ const PaymentHistory = () => {
   useEffect(() => {
     const fetchPaymentHistory = async () => {
       try {
-        const token = localStorage.getItem("token");
+        // const token = localStorage.getItem("token");
 
-        if (!token) {
-          console.error("User is not authenticated. Please log in again.");
-          setLoading(false);
-          return;
-        }
+        // if (!token) {
+        //   console.error("User is not authenticated. Please log in again.");
+        //   setLoading(false);
+        //   return;
+        // }
 
-        const response = await axios.get(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/total-outstanding",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await apiClient.get("/payments/history");
 
         // Make sure we're dealing with an array
-        const data = Array.isArray(response.data) ? response.data : [];
+        const data = Array.isArray(response) ? response : [];
         setPaymentHistoryData(data);
         setOriginalData(data);
         setLoading(false);

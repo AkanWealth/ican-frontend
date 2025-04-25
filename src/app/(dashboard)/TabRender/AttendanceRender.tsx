@@ -16,6 +16,8 @@ import {
 import CalendarFilter from "@/components/homecomps/CalendarFilter";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 import { Checkbox } from "@mui/material";
 
 
@@ -73,21 +75,15 @@ function AttendanceRender() {
     const fetchMeetingsMetrics = async () => {
       setIsLoadingMetrics(true);
       try {
-        const response = await axios.get(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/meetings",{
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await apiClient.get("/meetings");
         console.log("Meetings response", response);
 
         // Check if the response status is not 200 (OK)
-        if (response.status !== 200) {
-          throw new Error(`API request failed with status ${response.status}`);
-        }
+        // if (response.status !== 200) {
+        //   throw new Error(`API request failed with status ${response.status}`);
+        // }
         
-        const data = response.data;
+        const data = response;
         
         // Transform API data for metrics calculation
         const formattedMeetingsData = data.map((meeting: any) => {
@@ -134,7 +130,8 @@ function AttendanceRender() {
       setIsLoadingRegistrations(true);
       try {
         // Get user info from local storage
-        const userInfo = localStorage.getItem('user');
+        const cookies = parseCookies();
+        const userInfo = cookies.user_data;
         if (!userInfo) {
           console.error("User info not found in localStorage");
           setIsLoadingRegistrations(false);
@@ -142,29 +139,21 @@ function AttendanceRender() {
         }
         
         const parsedUserInfo = JSON.parse(userInfo);
-        const email = parsedUserInfo.email;
+        const id = parsedUserInfo.id;
         
-        if (!email) {
+        if (!id) {
           console.error("User email not found in userInfo");
           setIsLoadingRegistrations(false);
           return;
         }
 
-        const registrationsResponse = await axios.get(
-          `${BASE_API_URL}/events/registrations/user/${email}`, 
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const registrationsResponse = await apiClient.get(`/events/registrations/user-events/${id}`);
         
         console.log("User registrations:", registrationsResponse.data);
         
         // Check if the response is an array or a single object
         let registrations = Array.isArray(registrationsResponse.data) 
-          ? registrationsResponse.data 
+          ? registrationsResponse.data
           : [registrationsResponse.data];
         
         setUserRegistrations(registrations);
@@ -195,7 +184,8 @@ function AttendanceRender() {
       setIsLoadingAttendance(true);
       try {
         // Get user ID from local storage
-        const userInfo = localStorage.getItem('user');
+        const cookies = parseCookies();
+        const userInfo = cookies.user_data;
         if (!userInfo) {
           console.error("User info not found");
           setIsLoadingAttendance(false);
@@ -212,22 +202,14 @@ function AttendanceRender() {
         }
 
         try {
-          const attendanceResponse = await axios.get(
-            `${BASE_API_URL}/events/registrations/attendance/${userId}`, 
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
+          const attendanceResponse = await apiClient.get(`/events/registrations/attendance/${userId}`);
           
-          console.log("User attendance:", attendanceResponse.data);
+          console.log("User attendance:", attendanceResponse);
           
           // Check if the response is an array or a single object
-          let attendanceData = Array.isArray(attendanceResponse.data)
-            ? attendanceResponse.data
-            : [attendanceResponse.data];
+          let attendanceData = Array.isArray(attendanceResponse)
+            ? attendanceResponse
+            : [attendanceResponse];
           
           setUserAttendance(attendanceData);
           

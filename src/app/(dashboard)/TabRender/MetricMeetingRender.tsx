@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ChevronDown, Video, Mic, Files, Calendar } from "lucide-react";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 
 
 
@@ -101,21 +103,15 @@ function MetricMeetingRender() {
     const fetchMeetingsMetrics = async () => {
       setIsLoadingMetrics(true);
       try {
-        const response = await axios.get(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/meetings",{
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await apiClient.get("/meetings");
         console.log("Meetings response", response);
 
         // Check if the response status is not 200 (OK)
-        if (response.status !== 200) {
-          throw new Error(`API request failed with status ${response.status}`);
-        }
+        // if (response.status !== 200) {
+        //   throw new Error(`API request failed with status ${response.status}`);
+        // }
         
-        const data = response.data;
+        const data = response;
         
         // Transform API data for metrics calculation
         const formattedMeetingsData = data.map((meeting: any) => {
@@ -162,7 +158,8 @@ function MetricMeetingRender() {
       setIsLoadingRegistrations(true);
       try {
         // Get user info from local storage
-        const userInfo = localStorage.getItem('user');
+        const cookies = parseCookies();
+        const userInfo = cookies.user_data;
         if (!userInfo) {
           console.error("User info not found in localStorage");
           setIsLoadingRegistrations(false);
@@ -170,30 +167,24 @@ function MetricMeetingRender() {
         }
         
         const parsedUserInfo = JSON.parse(userInfo);
-        const email = parsedUserInfo.email;
+        const id = parsedUserInfo.id;
         
-        if (!email) {
+        if (!id) {
           console.error("User email not found in userInfo");
           setIsLoadingRegistrations(false);
           return;
         }
 
-        const registrationsResponse = await axios.get(
-          `${BASE_API_URL}/events/registrations/user/${email}`, 
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const registrationsResponse = await apiClient.get(`/events/registrations/user-events/${id}`);
         
         console.log("User registrations:", registrationsResponse.data);
         
         // Check if the response is an array or a single object
         let registrations = Array.isArray(registrationsResponse.data) 
-          ? registrationsResponse.data 
+          ? registrationsResponse.data
           : [registrationsResponse.data];
+
+        console.log('registration', registrations)
         
         setUserRegistrations(registrations);
         
@@ -223,7 +214,8 @@ function MetricMeetingRender() {
       setIsLoadingAttendance(true);
       try {
         // Get user ID from local storage
-        const userInfo = localStorage.getItem('user');
+        const cookies = parseCookies();
+        const userInfo = cookies.user_data;
         if (!userInfo) {
           console.error("User info not found");
           setIsLoadingAttendance(false);
@@ -240,16 +232,7 @@ function MetricMeetingRender() {
         }
 
         try {
-          const attendanceResponse = await axios.get(
-            `${BASE_API_URL}/events/registrations/attendance/${userId}`, 
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-          
+          const attendanceResponse = await apiClient.get(`/events/registrations/attendance/${userId}`);
           console.log("User attendance:", attendanceResponse.data);
           
           // Check if the response is an array or a single object
@@ -480,7 +463,7 @@ useEffect(() => {
               </div>
               
               <div className="items-center justify-between">
-                <div className="lg:w-3/4 md:w-full grid lg:grid-cols-3 md:grid-row rounded-lg gap-4">
+                <div className="w-full grid lg:grid-cols-3 md:grid-row rounded-lg gap-4">
                   <div className="border border-gray-300 rounded-lg p-4 gap-4">
                     <div className="flex item-center mb-4">
                       <div className="flex bg-green-300 w-8 h-8 p-2 rounded-lg item-center justify-center mr-2">
@@ -499,7 +482,7 @@ useEffect(() => {
                       <div className="flex bg-green-300 w-8 h-8 p-2 rounded-lg item-center justify-center mr-2">
                         <Files className="h-4 w-4 text-green-600" />
                       </div>
-                      <p className="text-sm text-center p-2">Number registered</p>
+                      <p className="text-sm text-center p-2">Number of Registrations</p>
                     </div>
                     {isLoadingRegistrations ? (
                       <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>
@@ -512,7 +495,7 @@ useEffect(() => {
                       <div className="flex bg-green-300 w-8 h-8 p-2 rounded-lg item-center justify-center mr-2">
                         <Mic className="h-4 w-4 text-green-600" />
                       </div>
-                      <p className="text-sm text-center p-2">Number Attended</p>
+                      <p className="text-sm text-center p-2">Number of Attendees</p>
                     </div>
                     {isLoadingAttendance ? (
                       <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>

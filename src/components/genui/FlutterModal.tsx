@@ -143,6 +143,7 @@ function FlutterModal({
             paymentType: paymentType,
             amount: amount,
             transactionId: response.transaction_id,
+            status: "SUCCESS"
           };
           
           // Record the payment in your system

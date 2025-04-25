@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import PaymentHistory from "../TabRender/PaymentHistory";
 import Outstanding from "../TabRender/Outstanding";
+import apiClient from "@/services/apiClient";
 import Subscription from "../TabRender/Subscription";
 
 interface ModalProps {
@@ -1417,32 +1418,13 @@ const PaymentPage = () => {
   useEffect(() => {
     const fetchOutstandingData = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          console.error("User is not authenticated. Please log in again.");
-          return;
-        }
-
-        // Fetch total outstanding payment
-        const totalOutstandingResponse = await axios.get(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/total-outstanding",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        const totalOutstanding =
-          totalOutstandingResponse.data?.totalOutstanding || 0;
+        const response = await apiClient.get("/payments/total-outstanding");
+        const totalOutstanding = response.totalOutstanding || 0;
 
         // Fetch outstanding breakdown
-        const outstandingBreakdownResponse = await axios.get(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/outstanding-breakdown",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const outstandingBreakdownResponse = await apiClient.get("/payments/outstanding-breakdown");
         const outstandingBreakdown =
-          outstandingBreakdownResponse.data?.breakdown || [];
+          outstandingBreakdownResponse.breakdown || [];
 
         // Update state with API data
         setTotalOutstanding(totalOutstanding);

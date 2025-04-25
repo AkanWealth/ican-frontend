@@ -8,6 +8,9 @@ import FeedbackModal from '../ui/FeedbackModal';
 import CertificateGenerator from '@/components/homecomps/CertificateGenerator';
 import axios from 'axios';
 import { BASE_API_URL } from "@/utils/setter";
+import apiClient from '@/services/apiClient';
+import { parseCookies } from "nookies";
+
 
 interface Event {
     id: string;
@@ -27,6 +30,21 @@ interface Registration {
     status: string;
     proofOfPayment: string;
     createdAt: string;
+    userId: string | null;
+    event: {
+        id: string;
+        name: string;
+        venue: string;
+        description: string;
+        date: string;
+        time: string;
+        fee: number;
+        mcpd_credit: number;
+        flyer: string | null;
+        meeting_link: string | null;
+        status: string;
+        createdAt: string;
+    };
 }
 
 const RegisteredEventsTab: React.FC = () => {
@@ -46,108 +64,69 @@ const RegisteredEventsTab: React.FC = () => {
             setLoading(true);
             try {
                 // Get authentication details
-                const token = localStorage.getItem('token');
-                const userJson = localStorage.getItem('user');
                 
-                if (!token || !userJson) {
-                    console.log('Missing authentication data');
-                    setError('User is not authenticated. Please log in again.');
-                    setLoading(false);
-                    return;
-                }
+                        const cookies = parseCookies();
+                        const userDataCookie = cookies['user_data'];
+                        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+                        const userId = userData?.id;
+                        console.log("userId", userId);
                 
-                // Parse user data with error handling
-                let user;
-                try {
-                    user = JSON.parse(userJson);
-                } catch (parseError) {
-                    console.error('Failed to parse user data:', parseError);
-                    setError('Invalid user data. Please log in again.');
-                    setLoading(false);
-                    return;
-                }
-                
-                const email = user?.email;
-                
-                if (!email) {
-                    console.log('No email found in user data');
-                    setError('User email not found. Please log in again.');
-                    setLoading(false);
-                    return;
-                }
-        
-                console.log('Fetching registrations for:', email);
-                
+                        if (!userId) throw new Error("User ID not found in cookies");
+                        
                 // Fetch user registrations
-                const registrationsResponse = await axios.get(
-                    `${BASE_API_URL}/events/registrations/user/${email}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('token')}`, 
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                );
+                const registrationsResponse = await apiClient.get(`/events/registrations/user-events/${userId}`);
+                console.log("registration", registrationsResponse?.data)
                 
-                console.log('Registration response:', registrationsResponse);
-        
-                // Check if response exists and contains data
-                if (!registrationsResponse?.data) {
-                    console.log('No data in registration response');
+                // Check if the response has data and access the array properly
+                if (!registrationsResponse?.data || !Array.isArray(registrationsResponse.data)) {
+                    console.log('No valid registration data in response');
+                    setRegisteredEvents([]);
+                    setLoading(false);
+                    return;
+                }
+                
+                // Get the array of registrations
+                const registrationsArray = registrationsResponse.data as Registration[];
+                console.log('Registrations array:', registrationsArray);
+                
+                if (registrationsArray.length === 0) {
                     setRegisteredEvents([]);
                     setLoading(false);
                     return;
                 }
         
-                // Looking at your console log, the registration data is directly in response.data
-                // and it appears to be a single object, not an array
-                const registrationData = registrationsResponse.data;
-                
-                // Convert the single registration object to an array with one item
-                const registrationsData = [registrationData];
-                
-                console.log('Processed registrations data:', registrationsData);
-        
-                if (!registrationData || !registrationData.eventId) {
-                    console.log('No registered events found or missing eventId');
-                    setRegisteredEvents([]);
-                    setLoading(false);
-                    return;
-                }
-        
-                // Map to store registrations by event ID
+                // Create map of registrations by event ID
                 const registrationsMap: Record<string, Registration[]> = {};
-                if (!registrationsMap[registrationData.eventId]) {
-                    registrationsMap[registrationData.eventId] = [];
-                }
-                registrationsMap[registrationData.eventId].push(registrationData);
                 
-                console.log('Registrations map created:', Object.keys(registrationsMap).length);
-        
-                // Fetch event details for the registration
-                const eventsData: Event[] = [];
-                
-                try {
-                    const eventResponse = await axios.get(
-                        `${BASE_API_URL}/events/${registrationData.eventId}`,
-                        {
-                            headers: { Authorization: `Bearer ${token}` },
+                // Process each registration
+                registrationsArray.forEach((registration: Registration) => {
+                    if (registration.eventId) {
+                        if (!registrationsMap[registration.eventId]) {
+                            registrationsMap[registration.eventId] = [];
                         }
-                    );
-                    console.log('Event response:', eventResponse);
-                    
-                    if (eventResponse?.data) {
-                        // Extract event data depending on response structure
-                        const eventData = eventResponse.data.data || eventResponse.data;
-                        eventsData.push(eventData);
-                        console.log('Event data fetched:', eventData);
+                        registrationsMap[registration.eventId].push(registration);
                     }
-                } catch (eventError) {
-                    console.error(`Failed to fetch event ${registrationData.eventId}:`, eventError);
-                }
+                });
                 
-                console.log('Events data fetched:', eventsData.length);
-        
+                // Extract event data from the registrations
+                const eventsData: Event[] = registrationsArray
+                    .filter((registration: Registration) => registration.event) // Ensure event exists
+                    .map((registration: Registration) => {
+                        // Format the event data to match our Event interface
+                        return {
+                            id: registration.event.id,
+                            name: registration.event.name,
+                            description: registration.event.description,
+                            date: new Date(registration.event.date).toLocaleDateString() + " " + registration.event.time,
+                            venue: registration.event.venue,
+                            IsAttended: false, // You may want to set this based on your data
+                        };
+                    })
+                    .filter((event: Event, index: number, self: Event[]) => 
+                        // Remove duplicates based on event ID
+                        index === self.findIndex((e: Event) => e.id === event.id)
+                    );
+                
                 setEvents(eventsData);
                 setRegisteredEvents(eventsData);
                 setRegistrationsMap(registrationsMap);
@@ -156,7 +135,6 @@ const RegisteredEventsTab: React.FC = () => {
                 
                 if (axios.isAxiosError(err)) {
                     const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch registered events';
-                    console.error('Axios error details:', err.response?.data);
                     setError(`${errorMessage}. Please try again later.`);
                 } else {
                     setError('An unexpected error occurred. Please try again later.');

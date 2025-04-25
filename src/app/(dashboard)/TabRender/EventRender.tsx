@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import CalendarFilter from "@/components/homecomps/CalendarFilter";
+import apiClient from "@/services/apiClient";
 
 interface Event {
   id: string;
@@ -46,24 +47,15 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
     const Token = localStorage.getItem("token");
     const fetchEvents = async () => {
       try {
-        const response = await fetch(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/events",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${Token}`,
-              "Content-Type": "application/json",
-              // Add any additional headers like authorization if required
-            },
-          }
-        );
+        
+        const response = await apiClient.get("/events");
         console.log("Response:", response);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch events");
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch events");
+        // }
 
-        const data = await response.json();
+        const data = await response;
         setEvents(data.data);
         setIsLoading(false);
       } catch (err) {

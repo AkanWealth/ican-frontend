@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/app/(dashboard)/LoginAuthentication/AuthContext";
-import { AuthProvider } from "@/app/(dashboard)/LoginAuthentication/AuthContext";
+import { AuthProvider } from "@/app/(dashboard)/LoginAuthentication/AuthContext"
+import { PublicRoute } from "@/components/PublicRoute";
 import { Eye, EyeOff } from "lucide-react"; // Import the eye icons
 
 function Login() {
@@ -207,7 +208,9 @@ function Login() {
 export default function LoginPage() {
   return (
     <AuthProvider>
-      <Login />
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
     </AuthProvider>
   );
 }

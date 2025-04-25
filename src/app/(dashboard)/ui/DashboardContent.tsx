@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Clock, Info } from "lucide-react";
 import Attendance from "../ui/Attendance";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 
 function DashboardContent() {
   const [userName, setUserName] = useState("User");
@@ -15,25 +16,21 @@ function DashboardContent() {
       try {
         if (typeof window === "undefined") return; // Ensure code runs only on the client side
 
-        const user = localStorage.getItem("user");
-        const userId = user ? JSON.parse(user)?.id : null;
-        const token = localStorage.getItem("token"); 
-        console.log(userId, token);
-// console.log(userId, token);
-        if (!userId || !token) throw new Error("User ID or token not found in localStorage");
+        const cookies = parseCookies();
+        const userDataCookie = cookies['user_data'];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const userId = userData?.id;
+        console.log("userId", userId);
 
-        const response = await axios.get(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/users/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-// console.log(response);
-        const data = response.data;
-        setUserName(data.firstname || "User");
-        setAccountStatus(data.isVerified ? "approved" : "pending");
+        if (!userId) throw new Error("User ID not found in cookies");
+
+        // Specify the return type with UserResponse interface
+        const response = await apiClient.get(`/users/${userId}`);
+        
+
+
+        setUserName(response.firstname || "User");
+        setAccountStatus(response.isVerified ? "approved" : "pending");
       } catch (error) {
         console.error("Error fetching user data:", error);
         setUserName("User");

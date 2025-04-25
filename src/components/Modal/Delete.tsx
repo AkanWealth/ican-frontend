@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { X, Trash2, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
+import apiClient from "@/services/apiClient";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -60,22 +61,11 @@ const DeleteAccountModal = ({
       setIsLoading(true);
       setError(null);
 
-      // Get the authentication token from localStorage or your auth context
-      const token = localStorage.getItem("token");
+      // Use apiClient instead of raw axios
+    await apiClient.post("/users/delete-request", {
+      password: currentPassword,
+    });
 
-      // Make the API call to delete the account
-      await axios.post(
-        "https://ican-api-6000e8d06d3a.herokuapp.com/api/users/delete-request",
-        {
-          password: currentPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
 
       // If successful, run the onConfirm callback if provided
       if (onConfirm) {

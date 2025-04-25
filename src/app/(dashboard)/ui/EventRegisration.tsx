@@ -17,6 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { FlutterWaveButton } from "flutterwave-react-v3";
 import { BASE_API_URL } from "@/utils/setter";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 // import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
@@ -74,19 +76,19 @@ const EventRegistration = () => {
     // Look for the checkUserRegistration function and update it:
     const checkUserRegistration = async () => {
       try {
-        const user = localStorage.getItem("user");
-        const email = user ? JSON.parse(user)?.email : null; 
-        if (!email) return;
+
+        const cookies = parseCookies();
+        const userDataCookie = cookies['user_data'];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const userId = userData?.id;
+        console.log("userId", userId);
+
+        if (!userId) throw new Error("User ID not found in cookies");
+
+        // Specify the return type with UserResponse interface
+       
     
-        const response = await axios.get(
-          `${BASE_API_URL}/events/registrations/user/${email}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`, 
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const response =  await apiClient.get(`/events/registrations/user-events/${userId}`);
     
         console.log("Registration response data:", response.data);
         
@@ -94,12 +96,12 @@ const EventRegistration = () => {
         if (Array.isArray(response.data)) {
           // Handle array response
           const isUserRegistered = response.data.some(
-            (event) => event.eventId === eventDetails.id
+            (event:any) => event.eventId === eventDetails.id
           );
           setIsRegistered(isUserRegistered);
-        } else if (response.data && typeof response.data === 'object') {
+        } else if (response && typeof response === 'object') {
           // Handle single object response
-          const isUserRegistered = response.data.eventId === eventDetails.id;
+          const isUserRegistered = response.eventId === eventDetails.id;
           setIsRegistered(isUserRegistered);
         } else {
           // No valid registration data
@@ -340,43 +342,30 @@ if (!isValid) {
       };
   
       console.log("Registration payload:", registrationPayload); // Debugging log
-  
-      // Send the payload to the endpoint
-      const response = await axios.post(
-        `${BASE_API_URL}/events/registrations/${eventId}/register`,
-        registrationPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Ensure the token is stored in localStorage
-            'Content-Type': 'application/json',
-          },
-        }
+      
+      // Use the apiClient instead of direct axios call
+      const response = await apiClient.post<any>(
+        `/events/registrations/${eventId}/register/member`,
+        registrationPayload
       );
   
-      console.log("Registration response:", response.data); // Debugging log
+      console.log("Registration response:", response); // Debugging log
   
-      // Only show the success modal if the response status is 200 or 201
-      if (response.status === 200 || response.status === 201) {
-        setIsModalOpen(true); // Open the success modal
-      } else {
-        console.error("Unexpected response status:", response.status);
-        toast({
-          title: "Registration Failed",
-          description: "Unexpected response from the server. Please try again.",
-          variant: "destructive",
-          duration: 3000,
-        });
-      }
+      // Only show the success modal if we get a successful response
+      setIsModalOpen(true); // Open the success modal
+      
+      return response;
     } catch (error) {
       console.error("Registration failed:", error);
-      console.error("Registration failed:", error);
-  
+      
       toast({
         title: "Registration Failed",
         description: "Unable to complete registration. Please try again.",
         variant: "destructive",
         duration: 3000,
       });
+      
+      throw error;
     }
   };
 

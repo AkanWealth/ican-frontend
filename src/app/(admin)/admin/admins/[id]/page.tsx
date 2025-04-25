@@ -118,10 +118,10 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
         <p className=" text-sm text-neutral-600 flex flex-col gap-1">
           Permissions
         </p>
-        <div className="grid grid-cols-6 gap-2 mt-2">
+        <div className="flex flex-row w-fit flex-wrap gap-1 mt-2">
           {permissions.map((permission: string, index: string) => (
-            <div key={index} className="p-3 bg-gray-50 rounded-lg">
-              <span className="text-base text-black font-medium">
+            <div key={index} className="p-1 w-fit bg-gray-50 rounded-lg">
+              <span className="text-xs text-black font-medium">
                 {permission}
               </span>
             </div>

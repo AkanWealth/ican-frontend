@@ -146,14 +146,20 @@ function AdminLogin() {
           description: "You have successfully logged in.",
           variant: "default",
         });
-      } catch (error) {
-        // Display a popup for the error
-        toast({
-          title: "Login Failed",
-          description: "Invalid email or password.",
-          variant: "destructive",
-        });
-        alert("An error occurred during login. Please try again.");
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response) {
+          toast({
+            title: "Login Failed",
+            description: error.response.data.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login Failed",
+            description: "An error occurred during login. Please try again.",
+            variant: "destructive",
+          });
+        }
 
         // Reset the form
         setFormData({

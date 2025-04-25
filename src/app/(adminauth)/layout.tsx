@@ -1,6 +1,7 @@
 import "../globals.css";
 import Image from "next/image";
 import type { Metadata } from "next";
+import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: "ICAN Surulere",
   description: "Empowering Professionals, Building Futures",
@@ -29,7 +30,10 @@ export default function AdminAuthLayout({
             className="w-full max-w-[450px] mx-auto h-auto"
           />
         </div>
-        <div className=" mx-auto">{children}</div>
+        <div className=" mx-auto">
+          {children}
+          <Toaster />
+        </div>
       </body>
     </html>
   );

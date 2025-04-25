@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { hasRole } from "@/lib/auth";
+import { Toaster } from "@/components/ui/toaster";
 
 import "../globals.css";
 import Sidebar from "@/components/admincomps/Sidebar";
@@ -19,7 +20,10 @@ export default function AdminLayout({
         <Sidebar />
         <div className=" w-full overflow-auto bg-neutral-100">
           <Header />
-          <main className="p-6">{children}</main>
+          <main className="p-6">
+            {children}
+            <Toaster />
+          </main>
         </div>
       </body>
     </html>

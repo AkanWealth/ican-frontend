@@ -13,6 +13,7 @@ function AdminPasswordRequest() {
   const [formData, setFormData] = useState({
     email: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const { toast } = useToast();
 
@@ -34,9 +35,14 @@ function AdminPasswordRequest() {
     if (name === "email") {
       validateEmail(value);
     }
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
   const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     let data = JSON.stringify({
       email: formData.email,
     });
@@ -60,12 +66,22 @@ function AdminPasswordRequest() {
         description: "Password reset link sent to your email.",
         variant: "default",
       });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send password reset link.",
-        variant: "destructive",
-      });
+      setLoading(false);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast({
+          title: "Error",
+          description: error.response.data.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to send password reset link.",
+          variant: "destructive",
+        });
+      }
+      setLoading(false);
     }
   };
 
@@ -84,13 +100,15 @@ function AdminPasswordRequest() {
             label="Email Address"
             value={formData.email}
             onChange={handleChange}
+            disabled={loading}
+            required={true}
           />{" "}
           <button
             className=" w-full px-8 py-4 bg-primary  rounded-full text-white text-base font-semibold "
             type="submit"
-            disabled={!evalid}
+            disabled={!evalid || loading}
           >
-            Request reset
+            {loading ? "Requesting..." : "Request reset"}
           </button>
         </form>
 

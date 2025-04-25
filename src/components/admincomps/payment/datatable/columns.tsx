@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
-import { PaymentDets, PaymentDetails } from "@/libs/types";
+import { PaymentDets, PaymentDetails, BillingDetails, PaymentBasic } from "@/libs/types";
 
 import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
@@ -241,4 +241,42 @@ export const paymentdetailscoloumns: ColumnDef<PaymentDetails>[] = [
   //     return <CellActions row={row} />;
   //   },
   // },
+];
+
+export const billingdetailscoloumns: ColumnDef<PaymentBasic>[] = [
+  {
+    accessorKey: "paymentType",
+    header: "Payment Type",
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+  },
+  {
+    accessorKey: "datePaid",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date Paid
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>{new Date(row.original.datePaid).toLocaleDateString("en-GB")}</div>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      return <Statbtn status={row.original.status} />;
+    },
+  },
 ];

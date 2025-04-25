@@ -16,7 +16,17 @@ type BillingDetails = {
   status: string;
   createdAt: string;
   createdByUser: User;
-  payments: any[];
+  payments: {
+    id: string;
+    userId: string;
+    billingId: string;
+    paymentType: string;
+    amount: number;
+    datePaid: string;
+    status: string;
+    transactionId: string | null;
+    subscriptionId: string | null;
+  }[];
   affectedUsers: {
     id: string;
     billingId: string;
@@ -165,6 +175,18 @@ type EventDetails = {
   status: "DRAFT" | "ONGOING" | "CANCELLED" | "COMPLETED";
   createdAt: string;
 };
+
+export interface PaymentBasic {
+  id: string;
+  userId: string;
+  billingId: string;
+  paymentType: string;
+  amount: number;
+  datePaid: string;
+  status: string;
+  transactionId: string | null;
+  subscriptionId: string | null;
+}
 
 export type {
   User,

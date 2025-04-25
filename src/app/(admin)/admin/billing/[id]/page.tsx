@@ -4,11 +4,14 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
-import { paymentdetailscoloumns } from "@/components/admincomps/payment/datatable/columns";
+import {
+  paymentdetailscoloumns,
+  billingdetailscoloumns,
+} from "@/components/admincomps/payment/datatable/columns";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
-import { BillingDetails } from "@/libs/types";
+import { BillingDetails, PaymentBasic } from "@/libs/types";
 
 import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useToast } from "@/hooks/use-toast";
@@ -117,8 +120,8 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         <h2 className="text-xl font-semibold text-left">Payment Details</h2>
         <hr />
         <PaymentTable
-          data={data?.payments || []}
-          columns={paymentdetailscoloumns}
+          data={(data?.payments as PaymentBasic[]) || []}
+          columns={billingdetailscoloumns}
         />
       </div>
     </div>

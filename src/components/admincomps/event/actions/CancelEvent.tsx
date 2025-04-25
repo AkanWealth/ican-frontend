@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState }   from "react";
 import { MdSubtitles, MdDeleteOutline } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 
@@ -16,9 +16,9 @@ interface CancelEventProps {
 
 function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const handleDelete = () => {
-  
-
+    setIsLoading(true);
     let config = {
       method: "delete",
       maxBodyLength: Infinity,
@@ -41,6 +41,7 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
         });
 
         onClose(); // Close the modal after successful update
+        setIsLoading(false);
       })
       .catch((error) => {
         toast({
@@ -48,6 +49,7 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
           description: error.response.data.message,
           variant: "destructive",
         });
+        setIsLoading(false);
       });
     window.location.reload();
   };
@@ -89,13 +91,14 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
         <div className="flex w-fit justify-between">
           <button
             onClick={handleDelete}
-            className="flex items-center w-2/5 text-center justify-center bg-red-600 font-semibold text-base text-white rounded-full py-3 px-4 h-10"
+            disabled={isLoading}
+            className="flex items-center w-fit  text-nowrap text-center justify-center bg-red-600 font-semibold text-base text-white rounded-full py-3 px-4 h-10"
           >
             Cancel Event
           </button>
           <button
             onClick={onClose}
-            className="flex items-center w-2/5 text-center justify-center bg-transparent font-semibold text-base text-neutral-700 border border-primary rounded-full py-3 px-4 h-10"
+            className="flex items-center w-fit  text-nowrap text-center justify-center bg-transparent font-semibold text-base text-neutral-700 border border-primary rounded-full py-3 px-4 h-10"
           >
             Cancel
           </button>

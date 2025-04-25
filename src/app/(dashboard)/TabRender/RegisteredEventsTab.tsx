@@ -11,7 +11,6 @@ import { BASE_API_URL } from "@/utils/setter";
 import apiClient from '@/services/apiClient';
 import { parseCookies } from "nookies";
 
-
 interface Event {
     id: string;
     name: string;
@@ -19,6 +18,7 @@ interface Event {
     date: string;
     venue: string;
     IsAttended: boolean;
+    status: string; // Added status field
 }
 
 interface Registration {
@@ -58,95 +58,102 @@ const RegisteredEventsTab: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchUserRegistrations = async () => {
-            setLoading(true);
-            try {
-                // Get authentication details
-                
-                        const cookies = parseCookies();
-                        const userDataCookie = cookies['user_data'];
-                        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
-                        const userId = userData?.id;
-                        console.log("userId", userId);
-                
-                        if (!userId) throw new Error("User ID not found in cookies");
-                        
-                // Fetch user registrations
-                const registrationsResponse = await apiClient.get(`/events/registrations/user-events/${userId}`);
-                console.log("registration", registrationsResponse?.data)
-                
-                // Check if the response has data and access the array properly
-                if (!registrationsResponse?.data || !Array.isArray(registrationsResponse.data)) {
-                    console.log('No valid registration data in response');
-                    setRegisteredEvents([]);
-                    setLoading(false);
-                    return;
-                }
-                
-                // Get the array of registrations
-                const registrationsArray = registrationsResponse.data as Registration[];
-                console.log('Registrations array:', registrationsArray);
-                
-                if (registrationsArray.length === 0) {
-                    setRegisteredEvents([]);
-                    setLoading(false);
-                    return;
-                }
-        
-                // Create map of registrations by event ID
-                const registrationsMap: Record<string, Registration[]> = {};
-                
-                // Process each registration
-                registrationsArray.forEach((registration: Registration) => {
-                    if (registration.eventId) {
-                        if (!registrationsMap[registration.eventId]) {
-                            registrationsMap[registration.eventId] = [];
-                        }
-                        registrationsMap[registration.eventId].push(registration);
-                    }
-                });
-                
-                // Extract event data from the registrations
-                const eventsData: Event[] = registrationsArray
-                    .filter((registration: Registration) => registration.event) // Ensure event exists
-                    .map((registration: Registration) => {
-                        // Format the event data to match our Event interface
-                        return {
-                            id: registration.event.id,
-                            name: registration.event.name,
-                            description: registration.event.description,
-                            date: new Date(registration.event.date).toLocaleDateString() + " " + registration.event.time,
-                            venue: registration.event.venue,
-                            IsAttended: false, // You may want to set this based on your data
-                        };
-                    })
-                    .filter((event: Event, index: number, self: Event[]) => 
-                        // Remove duplicates based on event ID
-                        index === self.findIndex((e: Event) => e.id === event.id)
-                    );
-                
-                setEvents(eventsData);
-                setRegisteredEvents(eventsData);
-                setRegistrationsMap(registrationsMap);
-            } catch (err) {
-                console.error('Error in fetchUserRegistrations:', err);
-                
-                if (axios.isAxiosError(err)) {
-                    const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch registered events';
-                    setError(`${errorMessage}. Please try again later.`);
-                } else {
-                    setError('An unexpected error occurred. Please try again later.');
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
+        // Get user ID from cookies
         if (typeof window !== 'undefined') {
-            fetchUserRegistrations();
+            const cookies = parseCookies();
+            const userDataCookie = cookies['user_data'];
+            const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+            const currentUserId = userData?.id;
+            setUserId(currentUserId);
+            
+            if (currentUserId) {
+                fetchUserRegistrations(currentUserId);
+            } else {
+                setLoading(false);
+                setError("User ID not found in cookies");
+            }
         }
     }, []);
+
+    const fetchUserRegistrations = async (currentUserId: string) => {
+        setLoading(true);
+        try {
+            // Fetch user registrations
+            const registrationsResponse = await apiClient.get(`/events/registrations/user-events/${currentUserId}`);
+            console.log("registration", registrationsResponse?.data);
+            
+            // Check if the response has data and access the array properly
+            if (!registrationsResponse?.data || !Array.isArray(registrationsResponse.data)) {
+                console.log('No valid registration data in response');
+                setRegisteredEvents([]);
+                setLoading(false);
+                return;
+            }
+            
+            // Get the array of registrations
+            const registrationsArray = registrationsResponse.data as Registration[];
+            console.log('Registrations array:', registrationsArray);
+            
+            if (registrationsArray.length === 0) {
+                setRegisteredEvents([]);
+                setLoading(false);
+                return;
+            }
+    
+            // Create map of registrations by event ID
+            const registrationsMap: Record<string, Registration[]> = {};
+            
+            // Process each registration
+            registrationsArray.forEach((registration: Registration) => {
+                if (registration.eventId && registration.userId === currentUserId) {
+                    if (!registrationsMap[registration.eventId]) {
+                        registrationsMap[registration.eventId] = [];
+                    }
+                    registrationsMap[registration.eventId].push(registration);
+                }
+            });
+            
+            // Extract event data from the registrations
+            const eventsData: Event[] = registrationsArray
+                .filter((registration: Registration) => 
+                    registration.event && registration.userId === currentUserId
+                )
+                .map((registration: Registration) => {
+                    // Format the event data to match our Event interface
+                    return {
+                        id: registration.event.id,
+                        name: registration.event.name,
+                        description: registration.event.description,
+                        date: new Date(registration.event.date).toLocaleDateString() + " " + registration.event.time,
+                        venue: registration.event.venue,
+                        IsAttended: registration.status === "ATTENDED", // Set IsAttended based on status
+                        status: registration.status // Add status field
+                    };
+                })
+                .filter((event: Event, index: number, self: Event[]) => 
+                    // Remove duplicates based on event ID
+                    index === self.findIndex((e: Event) => e.id === event.id)
+                );
+            
+            setEvents(eventsData);
+            setRegisteredEvents(eventsData);
+            setRegistrationsMap(registrationsMap);
+        } catch (err) {
+            console.error('Error in fetchUserRegistrations:', err);
+            
+            if (axios.isAxiosError(err)) {
+                const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch registered events';
+                setError(`${errorMessage}. Please try again later.`);
+            } else {
+                setError('An unexpected error occurred. Please try again later.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleOpenFeedbackModal = (event: Event) => {
         setSelectedEvent(event);
@@ -210,7 +217,7 @@ const RegisteredEventsTab: React.FC = () => {
         <div className="flex-grow flex items-center justify-center mt-40">
             <div className="text-center p-16">
                 <div className="flex justify-center">
-                    <Image src="/calendar.png" width={150} height={50} alt="calendar-image" />
+                    <Image src="/calendar.png" width={150} height={150} alt="calendar-image" />
                 </div>
                 <h2 className="mt-10 text-xl font-bold text-gray-800">No Registered Events</h2>
                 <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
@@ -277,13 +284,9 @@ const RegisteredEventsTab: React.FC = () => {
                                     {event.venue}
                                 </div>
                             </div>
-{/* 
-                            <div className="text-sm text-gray-500 mb-4">
-                                Registrations: {registrationsMap[event.id]?.length || 0}
-                            </div> */}
 
                             <div className="flex items-center justify-end gap-2 ml-4">
-                                {event.IsAttended && (
+                                {event.IsAttended && event.status === "ATTENDED" && (
                                     <CertificateGenerator
                                         eventId={event.id}
                                         eventTitle={event.name}

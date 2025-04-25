@@ -2,7 +2,12 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
-import { PaymentDets, PaymentDetails, BillingDetails, PaymentBasic } from "@/libs/types";
+import {
+  PaymentDets,
+  PaymentDetails,
+  BillingDetails,
+  PaymentBasic,
+} from "@/libs/types";
 
 import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";

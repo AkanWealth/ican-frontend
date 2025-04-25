@@ -266,11 +266,11 @@ export const noncolumns: ColumnDef<Event>[] = [
 export const dashEventRegColumns: ColumnDef<DashEventReg>[] = [
   {
     accessorKey: "name",
-    header: "Event Name"
+    header: "Event Name",
   },
   {
     accessorKey: "_count.registrations",
-    header: "Registrations"
+    header: "Registrations",
   },
   // Add other columns for DashEventReg properties
 ];

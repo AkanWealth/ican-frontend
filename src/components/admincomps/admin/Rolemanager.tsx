@@ -22,7 +22,7 @@ interface FormData {
   name: string;
   permissions: string[];
   description: string;
-  }
+}
 const initialFormData: FormData = {
   name: "",
   permissions: [],
@@ -257,6 +257,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
     const submitData = JSON.stringify({
       name: formData.name.replace(/[^a-zA-Z]/g, "_"),
       permissions: selectedPermissionValues,
+      description: formData.description,
     });
 
     try {
@@ -284,7 +285,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
 
       toast({
         title: "Role Created",
-        description: "The role  has been successfully created.",
+        description: response.data.message,
         variant: "default",
       });
     } catch (error) {

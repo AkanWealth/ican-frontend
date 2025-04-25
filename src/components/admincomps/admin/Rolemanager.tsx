@@ -21,12 +21,10 @@ interface RolemanagerProps {
 interface FormData {
   name: string;
   permissions: string[];
-  description: string;
 }
 const initialFormData: FormData = {
   name: "",
   permissions: [],
-  description: "",
 };
 
 function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
@@ -258,7 +256,6 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
     const submitData = JSON.stringify({
       name: formData.name.replace(/[^a-zA-Z]/g, "_"),
       permissions: selectedPermissionValues,
-      description: formData.description,
     });
 
     try {
@@ -325,15 +322,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
-          <InputEle
-            label="Description"
-            type="text"
-            id="description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-          />
+
           <p className="text-primary">
             Number of selected roles: {permissions.length}
           </p>

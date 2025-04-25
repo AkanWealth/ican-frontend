@@ -14,7 +14,6 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { toast } = useToast();
   const [adminData, setAdminData] = useState<User>();
-  const [permissions, setPermissions] = useState<any>([]);
 
   useEffect(() => {
     async function fetchAdminData() {
@@ -30,27 +29,14 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
       };
       try {
         const result = await axios.request(config);
-        if (result.status === 200) {
-          setAdminData(result.data);
 
-          const getPermissions = async () => {
-            if (result.data.role) {
-              const permissionsConfig = {
-                method: "get",
-                maxBodyLength: Infinity,
-                url: `${BASE_API_URL}/roles/${result.data.role.id}/permissions`,
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem(
-                    "access_token"
-                  )}`,
-                },
-              };
-              const permissionsResult = await axios.request(permissionsConfig);
-              setPermissions(permissionsResult.data.permissions);
-            }
-          };
-          getPermissions();
-        }
+        setAdminData(result.data);
+
+        toast({
+          title: "Success",
+          description: "User details fetched successfully",
+          variant: "default",
+        });
       } catch (error) {
         if (
           axios.isAxiosError(error) &&
@@ -71,7 +57,7 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
     }
 
     fetchAdminData();
-  }, []); // Add missing dependency array
+  }, [params, router, toast]);
 
   return (
     <div className="rounded-3xl p-6">
@@ -102,30 +88,37 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
         <div className="grid grid-cols-2 gap-6">
-          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-            Role Name
-            <span className="text-base text-black font-medium">
-              {adminData?.role?.name || "N/A"}
-            </span>
-          </p>
-          <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-            Role Description
-            <span className="text-base text-black font-medium">
-              {adminData?.role?.description || "N/A"}
-            </span>
-          </p>
-        </div>
-        <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-          Permissions
-        </p>
-        <div className="flex flex-row w-fit flex-wrap gap-1 mt-2">
-          {permissions.map((permission: string, index: string) => (
-            <div key={index} className="p-1 w-fit bg-gray-50 rounded-lg">
-              <span className="text-xs text-black font-medium">
-                {permission}
+          <div className="grid grid-cols-2 gap-6">
+            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+              <span className="text-base text-black font-medium">
+                User Name
               </span>
-            </div>
-          ))}
+              <span className="text-base text-black font-medium">
+                {adminData?.firstname || "N/A"}
+              </span>
+            </p>
+
+            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+              <span className="text-base text-black font-medium">Email</span>
+              <span className="text-base text-black font-medium">
+                {adminData?.email || "N/A"}
+              </span>
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+              Role Name
+              <span className="text-base text-black font-medium">
+                {adminData?.role?.name || "N/A"}
+              </span>
+            </p>
+            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
+              Role Description
+              <span className="text-base text-black font-medium">
+                {adminData?.role?.description || "N/A"}
+              </span>
+            </p>
+          </div>
         </div>
       </div>
     </div>

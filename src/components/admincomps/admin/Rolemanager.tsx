@@ -33,6 +33,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [permissions, setPermissions] = useState<Option[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const OPTIONS: Option[] = [
     { label: "ADD_CONTENT", value: "ADD_CONTENT", group: "Content" },
@@ -288,6 +289,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
         description: response.data.message,
         variant: "default",
       });
+      setIsLoading(false);
     } catch (error) {
       console.error("Error creating role:", error);
       toast({
@@ -299,6 +301,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
         variant: "destructive",
       });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -359,9 +362,10 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
             </button>
             <button
               type="submit"
+              disabled={isLoading}
               className="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600"
             >
-              Create Role
+              {isLoading ? "Creating..." : "Create Role"}
             </button>
           </div>
         </form>

@@ -212,6 +212,23 @@ type DashEventReg = {
   }[];
 };
 
+
+type DashUserLogin = {
+  weeklyLogins: {
+    day: string;
+    count: number;
+  }[];
+  monthlyLogins: {
+    week: string;
+    count: number;
+  }[];
+  yearlyLogins: {
+    month: string;
+    count: number;
+  }[];
+};
+
+
 export type {
   User,
   RolesData,
@@ -224,4 +241,5 @@ export type {
   PaymentDetails,
   EventDetails,
   DashEventReg,
+  DashUserLogin,
 };

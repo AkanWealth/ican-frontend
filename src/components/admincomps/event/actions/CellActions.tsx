@@ -13,6 +13,7 @@ import { MdEdit, MdOutlineDelete, MdOutlineRemoveRedEye } from "react-icons/md";
 
 import { MoreHorizontal } from "lucide-react";
 import CancelEvent from "./CancelEvent";
+import DeleteEvent from "./DeleteEvent";
 import NewEvent from "../create/NewEvent";
 import { useRouter } from "next/navigation";
 
@@ -22,6 +23,7 @@ interface CellProps {
 
 const ActionsCell: React.FC<CellProps> = ({ row }) => {
   const [showEditModal, setshowEditModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const router = useRouter(); // Hook to navigate programmatically
@@ -54,10 +56,18 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="hover:bg-red-600 hover:text-white text-red-600 flex flex-row items-center fill-red-600 "
-            onClick={() => setShowDeleteModal(true)}
+            onClick={() => setShowCancelModal(true)}
           >
             <MdOutlineDelete className="w-4 h-4" />
             Cancel Event
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="hover:bg-red-600 hover:text-white text-red-600 flex flex-row items-center fill-red-600 "
+            onClick={() => setShowDeleteModal(true)}
+          >
+            <MdOutlineDelete className="w-4 h-4" />
+            Delete Event
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -70,12 +80,28 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         />
       )}
 
-      {showDeleteModal && (
+      {showCancelModal && (
         <CancelEvent
           id={row.original.id}
           eventName={row.original.name}
           date={row.original.date}
+          onClose={() => setShowCancelModal(false)}
+        />
+      )}
+      {showDeleteModal && (
+        <DeleteEvent
+          id={row.original.id}
+          eventName={row.original.name}
+          date={row.original.date}
           onClose={() => setShowDeleteModal(false)}
+        />
+      )}
+      {showCancelModal && (
+        <CancelEvent
+          id={row.original.id}
+          eventName={row.original.name}
+          date={row.original.date}
+          onClose={() => setShowCancelModal(false)}
         />
       )}
     </>

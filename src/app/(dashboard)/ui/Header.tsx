@@ -28,6 +28,7 @@ interface UserData {
 }
 
 export const Header = () => {
+  const cookies = new Cookies();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -48,7 +49,7 @@ export const Header = () => {
     return () => {
       window.removeEventListener("resize", checkScreenSize);
     };
-  }, []);
+  }, [cookies]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -200,10 +201,7 @@ export const Header = () => {
               <DropdownMenuItem onClick={() => router.push("/Setting")}>
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-red-600"
-              >
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

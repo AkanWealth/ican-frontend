@@ -1,7 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
+
+import { useRouter } from "next/navigation";
+import Cookies from "universal-cookie";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
@@ -10,9 +13,42 @@ import { CreateContentProps } from "@/libs/types";
 import Toast from "@/components/genui/Toast";
 
 function PublicationEdit({ mode, id }: CreateContentProps) {
+  const router = useRouter();
+  const cookies = new Cookies();
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [publication, setPublication] = useState("");
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const response = await axios.get(`${BASE_API_URL}/publications/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          withCredentials: true,
+        });
+        console.log("Publication details fetched:", response.data);
+        setPublication(response.data.name || "");
+        setEditDataFetched(true);
+      } catch (error) {
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 404
+        ) {
+          setEditDataFetched(true);
+          console.error(
+            "Publication not found (404). Stopping further fetch attempts."
+          );
+        } else {
+          console.error("Error fetching Publication:", error);
+        }
+      }
+    };
+  });
 
   return (
     <div>

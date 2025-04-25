@@ -9,7 +9,10 @@ import {
 } from "@/components/ui/accordion";
 
 import RoleManager from "@/components/admincomps/admin/Rolemanager";
-import Toast from "@/components/genui/Toast";
+
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
@@ -27,6 +30,9 @@ function RolesPage() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [roles, setRoles] = useState<RolesData[]>([]); // Update state type to RolesData[]
   const [isLoading, setIsLoading] = useState(false); // Loading state
+
+  const { toast } = useToast();
+  const router = useRouter(); // Router instance
 
   // Fetch roles and parse permissions on component mount
   useEffect(() => {
@@ -48,16 +54,29 @@ function RolesPage() {
           setRoles(response.data);
         }
       } catch (error) {
-        console.error("Failed to fetch roles:", error);
-        Toast({
-          type: "error",
-          message: "Failed to fetch roles",
-        });
+        // Handle error
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            await handleUnauthorizedRequest(config, router, setRoles);
+          } else {
+            toast({
+              title: "Error",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
+        } else {
+          toast({
+            title: "Error",
+            description: "An unexpected error occurred.",
+            variant: "destructive",
+          });
+        }
       }
     };
 
     fetchRolesAndPermissions();
-  }, []); // Only run once on mount
+  }, [router, toast]); // Include router and toast as dependencies
 
   // Parse roles data to extract required fields
 

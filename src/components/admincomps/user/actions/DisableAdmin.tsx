@@ -7,7 +7,7 @@ import {
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
 import axios from "axios";
-import Toast from "@/components/genui/Toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface DisableAdminProps {
   id: string;
@@ -17,6 +17,7 @@ interface DisableAdminProps {
 }
 
 function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
+  const { toast } = useToast();
   const handleConfirm = () => {
     console.log({ id, fullName, role });
     async function fetchData() {
@@ -38,16 +39,20 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
       try {
         const results = await axios.request(config);
         console.log(results.data);
-        onClose();
-        return <Toast type="success" message={results.data.message} />;
+
+        toast({
+          title: "User Disabled",
+          description: results.data.message,
+          variant: "default",
+        });
+        onClose(); // Close the modal after successful update
       } catch (error: any) {
         console.error(error);
-        return (
-          <Toast
-            type="error"
-            message={error.response?.data?.message || "An error occurred"}
-          />
-        );
+        toast({
+          title: "Error",
+          description: error.response?.data?.message || "An error occurred",
+          variant: "destructive",
+        });
       }
     }
     fetchData();

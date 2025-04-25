@@ -15,6 +15,13 @@ function Statbtn({ status }) {
       icon: <MdCheckCircleOutline className="w-4 h-4" />,
       label: "Published",
     },
+    success: {
+      bg: "bg-green-100",
+      text: "text-green-600",
+      fill: "fill-green-600",
+      icon: <MdCheckCircleOutline className="w-4 h-4" />,
+      label: "Success",
+    },
     active: {
       bg: "bg-green-100",
       text: "text-green-600",
@@ -115,7 +122,7 @@ function Statbtn({ status }) {
     },
   };
 
-  const style = statusStyles[status.toLowerCase()];
+  const style = status ? statusStyles[status.toLowerCase()] : null;
 
   if (!style) return null;
 

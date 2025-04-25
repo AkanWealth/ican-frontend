@@ -21,6 +21,8 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
     coverImg: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -88,14 +90,11 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("Technical Sessions submitted successfully:", response.data);
-      return (
-        <Toast
-          type="success"
-          message="Technical Sessions submitted successfully!"
-        />
-      );
+      setIsSubmitting(false);
+      alert("Technical Sessions submitted successfully!");
     } catch (error) {
-      console.error("Error submitting Technical Sessions:", error);
+      setIsSubmitting(false);
+      alert("Error submitting Technical Sessions: " + error);
     }
   };
   return (
@@ -132,6 +131,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         <button
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("published");
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
@@ -141,6 +141,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         <button
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("draft");
           }}
           className=" py-2 text-primary border border-primary text-base rounded-full w-full"

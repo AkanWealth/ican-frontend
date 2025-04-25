@@ -7,7 +7,9 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
-import Toast from "@/components/genui/Toast";
+import { useRouter } from "next/navigation";
+
+import { useToast } from "@/hooks/use-toast";
 
 type Faq = {
   question: string;
@@ -15,6 +17,10 @@ type Faq = {
 };
 
 function FaqEdit({ mode, id }: CreateContentProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
 
   const [faq, setFaq] = useState<Faq>({ question: "", answer: "" });
@@ -35,6 +41,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           answer: response.data.amswer || "",
         });
         setEditDataFetched(true);
+        setIsSubmitting(false);
       } catch (error) {
         if (
           axios.isAxiosError(error) &&
@@ -45,8 +52,19 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           console.error(
             "Faq not found (404). Stopping further fetch attempts."
           );
+          toast({
+            title: "Error",
+            description:
+              "Faq not found (404). Stopping further fetch attempts.",
+            variant: "destructive",
+          });
         } else {
           console.error("Error fetching Faq:", error);
+          toast({
+            title: "Error",
+            description: "An error occurred while fetching the Faq.",
+            variant: "destructive",
+          });
         }
       }
     };
@@ -55,13 +73,12 @@ function FaqEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching FAQ details for edit mode");
       fetchDetails();
     }
-  }, [editDataFetched, id, mode]);
+  }, [editDataFetched, id, mode, toast]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({
       name: faq.question,
       answer: faq.answer,
-
     });
 
     const config = {
@@ -79,9 +96,21 @@ function FaqEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("FAQ submitted successfully:", response.data);
-      return <Toast type="success" message="FAQ submitted successfully!" />;
+      toast({
+        title: "Success",
+        description: `FAQ ${
+          mode === "edit" ? "edited" : "created"
+        } successfully.`,
+        variant: "default",
+      });
+      router.refresh();
     } catch (error) {
-      console.error("Error submitting FAQ:", error);
+      toast({
+        title: "Error",
+        description: `An error occurred while submitting the FAQ.`,
+        variant: "destructive",
+      });
+
     }
   };
 
@@ -107,8 +136,10 @@ function FaqEdit({ mode, id }: CreateContentProps) {
       </div>
       <div className="flex flex-col gap-2">
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("published");
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
@@ -116,8 +147,10 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           {mode === "edit" ? "Publish Edit" : "Publish FAQ"}
         </button>
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("draft");
           }}
           className=" py-2 text-primary border border-primary text-base rounded-full w-full"

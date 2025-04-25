@@ -7,15 +7,18 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
 import { User } from "@/libs/types";
+import { useToast } from "@/hooks/use-toast";
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [adminData, setAdminData] = useState<User>();
   const [permissions, setPermissions] = useState<any>([]);
 
   useEffect(() => {
     async function fetchAdminData() {
-      const id = params;
+      const id = (await params).id;
 
       const config = {
         method: "get",
@@ -31,29 +34,44 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
           setAdminData(result.data);
 
           const getPermissions = async () => {
-            const permissionsConfig = {
-              method: "get",
-              maxBodyLength: Infinity,
-              url: `${BASE_API_URL}/roles/${result.data.role.id}/permissions`,
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-              },
-            };
-            const permissionsResult = await axios.request(permissionsConfig);
-            setPermissions(permissionsResult.data.permissions);
+            if (result.data.role) {
+              const permissionsConfig = {
+                method: "get",
+                maxBodyLength: Infinity,
+                url: `${BASE_API_URL}/roles/${result.data.role.id}/permissions`,
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "access_token"
+                  )}`,
+                },
+              };
+              const permissionsResult = await axios.request(permissionsConfig);
+              setPermissions(permissionsResult.data.permissions);
+            }
           };
           getPermissions();
         }
       } catch (error) {
-        console.error("Error fetching admin data:", error);
-        // Handle error appropriately, e.g. show error message to user
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 401
+        ) {
+          await handleUnauthorizedRequest(config, router, setAdminData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch user activities data.",
+            variant: "destructive",
+          });
+        }
       } finally {
         // Any cleanup code if needed
       }
     }
 
     fetchAdminData();
-  });
+  }, []); // Add missing dependency array
 
   return (
     <div className="rounded-3xl p-6">
@@ -87,21 +105,23 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Role Name
             <span className="text-base text-black font-medium">
-              {adminData?.role?.name}
+              {adminData?.role?.name || "N/A"}
             </span>
           </p>
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Role Description
-            <span className="text-base text-black font-medium">Admin</span>
+            <span className="text-base text-black font-medium">
+              {adminData?.role?.description || "N/A"}
+            </span>
           </p>
         </div>
         <p className=" text-sm text-neutral-600 flex flex-col gap-1">
           Permissions
         </p>
-        <div className="grid grid-cols-6 gap-2 mt-2">
+        <div className="flex flex-row w-fit flex-wrap gap-1 mt-2">
           {permissions.map((permission: string, index: string) => (
-            <div key={index} className="p-3 bg-gray-50 rounded-lg">
-              <span className="text-base text-black font-medium">
+            <div key={index} className="p-1 w-fit bg-gray-50 rounded-lg">
+              <span className="text-xs text-black font-medium">
                 {permission}
               </span>
             </div>

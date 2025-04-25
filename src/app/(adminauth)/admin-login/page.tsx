@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import Toast from "@/components/genui/Toast";
 
+import { useToast } from "@/hooks/use-toast";
 import InputEle from "@/components/genui/InputEle";
 import {
   InputOTP,
@@ -17,6 +17,7 @@ import { BASE_API_URL } from "@/utils/setter";
 
 function AdminLogin() {
   const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [complete, setComplete] = useState(false);
   const [isSwitchOn, setIsSwitchOn] = useState(false);
@@ -118,26 +119,47 @@ function AdminLogin() {
     if (Object.values(errors).every((error) => error === "")) {
       try {
         const response = await axios.request(config);
+        console.log("Response:", response);
+        localStorage.setItem("loginResponse", JSON.stringify(response));
+
         const { user, access_token } = response.data;
+
+        // Set secure cookies with expiration time of 1 hour
+        const expiryTime = new Date(Date.now() + 60 * 60 * 1000).toUTCString(); // 1 hour from now
+
+        document.cookie = `user=${encodeURIComponent(
+          JSON.stringify(user)
+        )}; path=/; secure; samesite=strict; expires=${expiryTime}`;
+        document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict; expires=${expiryTime}`;
+        document.cookie = `refresh_token=${response.data.refresh_token}`;
 
         // Set secure cookies instead of localStorage
         localStorage.setItem("user", JSON.stringify(user));
-        document.cookie = `user=${encodeURIComponent(JSON.stringify(user))}; path=/; secure; samesite=strict`;
-
         localStorage.setItem("access_token", access_token);
-        document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
-
-        console.log("User data:", user);
-        console.log("Access token:", access_token);
 
         setTimeout(() => {
           router.push("/admin");
         }, 1000);
 
-        return <Toast type="success" message="Login successful" />;
-      } catch (error) {
-        // Display a popup for the error
-        alert("An error occurred during login. Please try again.");
+        toast({
+          title: "Login Successful",
+          description: "You have successfully logged in.",
+          variant: "default",
+        });
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response) {
+          toast({
+            title: "Login Failed",
+            description: error.response.data.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login Failed",
+            description: "An error occurred during login. Please try again.",
+            variant: "destructive",
+          });
+        }
 
         // Reset the form
         setFormData({
@@ -252,9 +274,9 @@ function AdminLogin() {
               disabled={loading}
             >
               {loading ? (
-              <span className="loader border-white border-2 rounded-full w-5 h-5 animate-spin"></span>
+                <span className="loader border-white border-2 rounded-full w-5 h-5 animate-spin"></span>
               ) : (
-              "Log In"
+                "Log In"
               )}
             </button>
             <div className=" flex flex-row justify-between  ">

@@ -16,7 +16,17 @@ type BillingDetails = {
   status: string;
   createdAt: string;
   createdByUser: User;
-  payments: any[];
+  payments: {
+    id: string;
+    userId: string;
+    billingId: string;
+    paymentType: string;
+    amount: number;
+    datePaid: string;
+    status: string;
+    transactionId: string | null;
+    subscriptionId: string | null;
+  }[];
   affectedUsers: {
     id: string;
     billingId: string;
@@ -151,13 +161,41 @@ type PaymentDetails = {
   user: User;
 };
 
+type EventDetails = {
+  id: string;
+  name: string;
+  venue: string;
+  description: string;
+  date: string;
+  time: string;
+  fee: number;
+  mcpd_credit: number;
+  flyer: string | null;
+  meeting_link: string | null;
+  status: "DRAFT" | "ONGOING" | "CANCELLED" | "COMPLETED";
+  createdAt: string;
+};
+
+export interface PaymentBasic {
+  id: string;
+  userId: string;
+  billingId: string;
+  paymentType: string;
+  amount: number;
+  datePaid: string;
+  status: string;
+  transactionId: string | null;
+  subscriptionId: string | null;
+}
+
 export type {
   User,
+  RolesData,
   StatCardProps,
   CreateContentProps,
-  BillingDetails,
-  RolesData,
   FaqData,
-  PaymentDetails,
+  BillingDetails,
   PaymentDets,
+  PaymentDetails,
+  EventDetails,
 };

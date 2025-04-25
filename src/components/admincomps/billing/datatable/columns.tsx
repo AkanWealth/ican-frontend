@@ -80,7 +80,7 @@ export const billingcolumns: ColumnDef<Billing>[] = [
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status.toLowerCase} />;
+      return <Statbtn status={row.original.status} />;
     },
   },
   {
@@ -90,3 +90,5 @@ export const billingcolumns: ColumnDef<Billing>[] = [
     },
   },
 ];
+
+

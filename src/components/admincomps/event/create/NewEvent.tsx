@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 import { MdClose } from "react-icons/md";
+
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
-import Toast from "@/components/genui/Toast";
+import { uploadImageToCloud } from "@/lib/uploadImage";
+import { useToast } from "@/hooks/use-toast";
 
 function NewEvent({
   id,
@@ -22,6 +24,10 @@ function NewEvent({
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+
+  const { toast } = useToast();
+
+  const [eventPhoto, setEventPhoto] = useState<File | string | null>(null);
   const [formData, setFormData] = useState({
     event_id: "",
     eventName: "",
@@ -31,7 +37,7 @@ function NewEvent({
     eventTime: "",
     eventFee: "",
     mcpdCredit: "",
-    eventPhoto: null,
+    eventPhoto: "",
   });
   // State to handle form validation errors
   const [formErrors, setFormErrors] = useState({
@@ -101,8 +107,10 @@ function NewEvent({
 
     if (!formData.eventDate) {
       errors.eventDate = "Event date is required";
+      isValid = false;
     } else if (new Date(formData.eventDate) < tomorrow) {
       errors.eventDate = "Event date must be at least tomorrow";
+      isValid = false;
     }
     setFormErrors(errors);
     return isValid;
@@ -161,6 +169,56 @@ function NewEvent({
     }
   };
 
+  const handlePhotoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size <= 5 * 1024 * 1024) {
+      try {
+        // Show loading state
+        // You might want to add a loading state to your component
+
+        // Upload the file to cloud storage
+        const imageUrl = await uploadImageToCloud(file);
+
+        console.log("Uploaded image URL:", imageUrl);
+        // Update state with the new URL
+        setEventPhoto(imageUrl);
+        setFormData((prev) => ({
+          ...prev,
+          eventPhoto: imageUrl,
+        }));
+      } catch (error) {
+        console.error("Error uploading photo:", error);
+        // alert("Failed to upload photo. Please try again.");
+        toast({
+          title: "Failed to upload photo",
+          description: "Please try again. ",
+          variant: "destructive",
+          duration: 2000,
+        });
+      }
+    } else {
+      // alert("Please select an image under 5MB");
+      toast({
+        title: "Failed to upload photo",
+        description: "Please select an image under 5MB",
+        variant: "destructive",
+        duration: 2000,
+      });
+    }
+  };
+
+  const handleDeletePhoto = () => {
+    setEventPhoto(null);
+    setFormData((prev) => ({
+      ...prev,
+      eventPhoto: "",
+    }));
+  };
+
   const handleCancel = () => {
     // Reset form data to initial state
     setFormData({
@@ -172,7 +230,7 @@ function NewEvent({
       eventTime: "",
       eventFee: "",
       mcpdCredit: "",
-      eventPhoto: null,
+      eventPhoto: "",
     });
     // Reset form errors to initial state
     setFormErrors({
@@ -225,11 +283,15 @@ function NewEvent({
         console.log("Event added to drafts successfully:", response.data);
         handleCancel(); // Close the modal after successful draft
         alert("Event added to drafts successfully!");
+        setIsPublishing(false);
+        setIsSavingDraft(false);
       } catch (error) {
         console.error("Error adding the event to draft:", error);
         setTimeout(() => {
           handleCancel(); // Close the modal after 3 seconds
         }, 3000); // Add a 3-second delay
+        setIsPublishing(false);
+        setIsSavingDraft(false);
 
         return (
           <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50">
@@ -381,12 +443,26 @@ function NewEvent({
             errorMsg={formErrors.eventFee}
           />
         </div>
-        <InputEle
-          type="images"
-          id="eventPhoto"
-          label="Upload Event Photo/Flyer"
-          onChange={handleChange}
-        />
+        <div className="flex flex-col gap-4">
+          <span className="text-sm text-gray-500">(JPG or PNG, 100KB Max)</span>
+          <div className="flex flex-wrap gap-4">
+            <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
+              Update Event Image
+              <input
+                type="file"
+                accept="image/jpeg,image/png"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+            </label>
+            <button
+              onClick={handleDeletePhoto}
+              className="bg-[#E7EAFF] text-[#27378C] px-6 py-2 rounded-full hover:bg-gray-200 text-sm whitespace-nowrap"
+            >
+              Delete photo
+            </button>
+          </div>
+        </div>
         <div className="flex justify-between mt-4">
           <button
             className="bg-gray-500 w-full  text-white px-4 py-2 rounded mr-2"

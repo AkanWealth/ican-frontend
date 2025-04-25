@@ -61,10 +61,20 @@ export function ContentTable<TData, TValue>({
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter by titles..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+          value={
+        (table.getColumn("name")?.getFilterValue() as string) ??
+        (table.getColumn("title")?.getFilterValue() as string) ??
+        ""
           }
+          onChange={(event) => {
+        const nameColumn = table.getColumn("name");
+        const titleColumn = table.getColumn("title");
+        if (nameColumn) {
+          nameColumn.setFilterValue(event.target.value);
+        } else if (titleColumn) {
+          titleColumn.setFilterValue(event.target.value);
+        }
+          }}
           className="max-w-sm"
         />
       </div>

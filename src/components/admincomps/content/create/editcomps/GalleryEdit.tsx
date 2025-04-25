@@ -3,11 +3,16 @@
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 
+import { useRouter } from "next/navigation";
+import Cookies from "universal-cookie";
+
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
-import Toast from "@/components/genui/Toast";
+import { useToast } from "@/hooks/use-toast";
+
+import { Router } from "lucide-react";
 
 interface GalleryProps {
   name: string;
@@ -16,6 +21,12 @@ interface GalleryProps {
 }
 
 function GalleryEdit({ mode, id }: CreateContentProps) {
+  const router = useRouter();
+  const cookies = new Cookies();
+  const { toast } = useToast();
+
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const [gallery, setGallery] = useState<GalleryProps>({
     name: "",
     images: [""],
@@ -50,8 +61,20 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           console.error(
             "Gallery not found (404). Stopping further fetch attempts."
           );
+
+          toast({
+            title: "Error",
+            variant: "destructive",
+            description: "Gallery not found.",
+          });
         } else {
           console.error("Error fetching Gallery:", error);
+          toast({
+            title: "Error",
+            variant: "destructive",
+            description:
+              "An unexpected error occurred while fetching the gallery.",
+          });
         }
       }
     };
@@ -60,7 +83,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching Gallery details for edit mode");
       fetchDetails();
     }
-  }, [editDataFetched, id, mode]);
+  }, [editDataFetched, id, mode, toast]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({
@@ -87,10 +110,34 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("Gallery submitted successfully:", response.data);
-      return <Toast type="success" message="Gallery submitted successfully!" />;
+      router.refresh();
+      setIsSubmitting(false);
+      toast({
+        title: "Success",
+        description: `Gallery ${
+          status === "published" ? "published" : "saved as draft"
+        } successfully.`,
+        variant: "default",
+      });
     } catch (error) {
+      setIsSubmitting(false);
       console.error("Error submitting gallery:", error);
+
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "An error occurred while submitting the gallery.",
+      });
     }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { id, value } = e.target;
+    setGallery((prev) => ({ ...prev, [id]: value }));
   };
 
   return (
@@ -100,19 +147,21 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           label="Gallery Title"
           type="text"
           id="title"
-          onChange={() => {}}
+          onChange={handleChange}
         />
         <InputEle
           label="Upload Images"
           type="images"
           id="images"
-          onChange={() => {}}
+          onChange={handleChange}
         />
       </div>
       <div className="flex flex-col gap-2">
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("published");
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
@@ -120,8 +169,11 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           {mode === "edit" ? "Publish Edit" : "Publish Gallery"}
         </button>
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
+
             handleSubmit("draft");
           }}
           className=" py-2 text-primary border border-primary text-base rounded-full w-full"

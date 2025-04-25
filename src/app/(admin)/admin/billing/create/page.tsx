@@ -6,14 +6,12 @@ import { MdArrowBack, MdDelete } from "react-icons/md";
 import InputEle from "@/components/genui/InputEle";
 import { BillUserTable } from "@/components/admincomps/billing/create/BillUserTable";
 import { userbillingcolumns } from "@/components/admincomps/billing/create/columns";
-import {
-  BillUser,
-  billings,
-} from "@/components/admincomps/billing/create/colsdata";
+import { billings } from "@/components/admincomps/billing/create/colsdata";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
-import Toast from "@/components/genui/Toast";
+import { toast, useToast } from "@/hooks/use-toast";
+import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 interface IBilling {
   billing_name: string;
@@ -70,16 +68,25 @@ function CreateBillingPage() {
       const response = await axios.request(config);
 
       if (response.status === 200) {
-        Toast({
-          type: "success",
-          message: "Bill created successfully",
+        toast({
+          title: "Success",
+          description: "Bill created successfully.",
+          variant: "default",
         });
       }
     } catch (error) {
-      Toast({
-        type: "error",
-        message: "Failed to create bill",
-      });
+      console.error("Error creating bill:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.status === 401) {
+          await handleUnauthorizedRequest(config, router, setNewBill);
+        }
+      } else {
+        toast({
+          title: "Error",
+          description: "An error occurred while creating the bill.",
+          variant: "destructive",
+        });
+      }
     }
   };
   return (

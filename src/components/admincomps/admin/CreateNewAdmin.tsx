@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
-import Toast from "@/components/genui/Toast";
+import { useToast } from "@/hooks/use-toast";
+
 import InputEle from "@/components/genui/InputEle";
 
 import { User } from "@/libs/types";
@@ -44,6 +45,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
   // Component implementation
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   // State to store roles
   const [roles, setRoles] = useState<RolesData[]>([]);
   // State to store users
@@ -83,22 +85,27 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
 
       try {
         const response = await axios.request(config);
+        setRoles(response.data);
 
-        if (response.status === 200) {
-          // Update roles state with fetched data
-          setRoles(response.data);
-        }
+        toast({
+          title: "Success",
+          description: "Roles fetched successfully",
+          variant: "default",
+        });
+        setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch roles:", error);
-        Toast({
-          type: "error",
-          message: "Failed to fetch roles",
+        toast({
+          title: "Error",
+          description: "Failed to fetch roles",
+          variant: "destructive",
         });
+        setIsLoading(false);
       }
     };
 
     fetchRoles();
-  }, []); // Empty dependency array means this runs once on mount
+  }, [toast]); // Empty dependency array means this runs once on mount
   useEffect(() => {
     const fetchUsers = async () => {
       const config = {
@@ -113,22 +120,28 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
       try {
         const response = await axios.request(config);
 
-        if (response.status === 200) {
-          // Update roles state with fetched data
-          setUsers(response.data.data);
-          console.log(response.data.data);
-        }
+        // Update roles state with fetched data
+        setUsers(response.data.data);
+        console.log(response.data.data);
+        toast({
+          title: "Success",
+          description: "Users fetched successfully",
+          variant: "default",
+        });
+        setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch roles:", error);
-        Toast({
-          type: "error",
-          message: "Failed to fetch roles",
+        toast({
+          title: "Error",
+          description: "Failed to fetch roles",
+          variant: "destructive",
         });
+        setIsLoading(false);
       }
     };
 
     fetchUsers();
-  }, []); // Empty dependency array means this runs once on mount
+  }, [toast ]); // Empty dependency array means this runs once on mount
 
   const selectedUser = Array.isArray(users)
     ? users.find((user) => user.id === formData.userId)
@@ -157,10 +170,10 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         throw new Error("Failed to create admin");
       }
 
-      // Show success message
-      Toast({
-        type: "success",
-        message: "Administrator created successfully",
+      toast({
+        title: "Success",
+        description: "Administrator created successfully",
+        variant: "default",
       });
 
       // Close modal and reset form
@@ -168,9 +181,10 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
       setFormData(initialFormData);
     } catch (error) {
       // Show error message
-      Toast({
-        type: "error",
-        message: "Failed to create administrator",
+      toast({
+        title: "Error",
+        description: "Failed to create administrator",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -250,9 +264,10 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
             </button>
             <button
               type="submit"
+              disabled={isLoading}
               className="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600"
             >
-              Save
+              {isLoading ? "Saving..." : "Save"}
             </button>
           </div>
         </form>

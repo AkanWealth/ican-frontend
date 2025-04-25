@@ -5,7 +5,7 @@ import StatCard from "@/components/genui/StatCard";
 import { MdVerifiedUser } from "react-icons/md";
 
 import { EventTable } from "@/components/admincomps/event/datatable/EventTable";
-import { allcolumns } from "@/components/admincomps/event/datatable/columns";
+import { allcolumns, dashEventRegColumns } from "@/components/admincomps/event/datatable/columns";
 import { Event } from "../event/datatable/colsdata";
 
 import axios from "axios";
@@ -36,7 +36,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
+import { DashEventReg } from "@/libs/types";
 const chartData = [
   { month: "January", people: 186 },
   { month: "February", people: 305 },
@@ -56,7 +56,7 @@ function EventActivities() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const [eventData, setEventData] = useState<Event[]>([]);
+  const [eventData, setEventData] = useState<DashEventReg[]>([]);
   const [data, setData] = useState({
     totalPayments: 0,
     pendingPayments: 0,
@@ -206,7 +206,7 @@ function EventActivities() {
         <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
           <h2 className="text-xl font-semibold text-left">All Events</h2>
           <div>
-            <EventTable columns={allcolumns} data={eventData} />
+            <EventTable columns={dashEventRegColumns} data={eventData} />
           </div>
         </div>{" "}
       </div>

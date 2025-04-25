@@ -17,21 +17,18 @@ interface CancelEventProps {
 function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
   const { toast } = useToast();
   const handleDelete = () => {
-    let data = JSON.stringify({
-      status: "CANCELLED",
-    });
+  
 
     let config = {
-      method: "patch",
+      method: "delete",
       maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/events/${id}/status`,
+      url: `${BASE_API_URL}/events/${id}?forceDelete=true`,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
       withCredentials: true,
       // credentials: "include",
-      data: data,
     };
 
     axios
@@ -48,8 +45,7 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
       .catch((error) => {
         toast({
           title: "Error",
-          description:
-            "There was an error cancelling the event. Please try again.",
+          description: error.response.data.message,
           variant: "destructive",
         });
       });

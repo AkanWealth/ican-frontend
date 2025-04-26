@@ -107,7 +107,7 @@ function RolesPage() {
             <AccordionContent className="flex flex-row justify-between items-start">
               <div>
                 <p>Description: {role.description}</p>
-                <p>Is Super Admin: {role.isSuperAdmin ? "Yes" : "No"}</p>
+                <p>Super Admin: {role.isSuperAdmin ? "Yes" : "No"}</p>
               </div>
               <button
                 onClick={() => {

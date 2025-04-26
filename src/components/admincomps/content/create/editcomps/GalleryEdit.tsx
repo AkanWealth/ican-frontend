@@ -13,6 +13,7 @@ import { CreateContentProps } from "@/libs/types";
 import { useToast } from "@/hooks/use-toast";
 
 import { Router } from "lucide-react";
+import PreviewGallery from "../previewcomps/PreviewGallery";
 
 interface GalleryProps {
   name: string;
@@ -24,6 +25,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
   const cookies = new Cookies();
   const { toast } = useToast();
+  const [showPreview, setShowPreview] = useState<boolean>(false); 
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -184,6 +186,15 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           Preview
         </button>
       </div>
+      {showPreview && (
+        <PreviewGallery
+          name={gallery.name}
+          images={gallery.images}
+          videos={gallery.videos}
+          showPreview={showPreview}
+          setShowPreview={setShowPreview}
+        />
+      )}  
     </div>
   );
 }

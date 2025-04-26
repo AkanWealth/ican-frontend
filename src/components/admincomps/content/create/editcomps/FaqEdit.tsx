@@ -15,11 +15,13 @@ type Faq = {
   question: string;
   answer: string;
 };
+import PreviewFaq from "../previewcomps/PreviewFaq";
 
 function FaqEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
 
@@ -110,7 +112,6 @@ function FaqEdit({ mode, id }: CreateContentProps) {
         description: `An error occurred while submitting the FAQ.`,
         variant: "destructive",
       });
-
     }
   };
 
@@ -161,6 +162,14 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           Preview
         </button>
       </div>
+      {showPreview && (
+        <PreviewFaq
+          question={faq.question}
+          answer={faq.answer}
+          showPreview={showPreview}
+          setShowPreview={setShowPreview}
+        />
+      )}
     </div>
   );
 }

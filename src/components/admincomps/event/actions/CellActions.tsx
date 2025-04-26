@@ -9,7 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { MdEdit, MdOutlineDelete, MdOutlineRemoveRedEye } from "react-icons/md";
+import {
+  MdEdit,
+  MdOutlineCancel,
+  MdOutlineDelete,
+  MdOutlineRemoveRedEye,
+} from "react-icons/md";
 
 import { MoreHorizontal } from "lucide-react";
 import CancelEvent from "./CancelEvent";
@@ -58,7 +63,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
             className="hover:bg-red-600 hover:text-white text-red-600 flex flex-row items-center fill-red-600 "
             onClick={() => setShowCancelModal(true)}
           >
-            <MdOutlineDelete className="w-4 h-4" />
+            <MdOutlineCancel className="w-4 h-4" />
             Cancel Event
           </DropdownMenuItem>
           <DropdownMenuSeparator />

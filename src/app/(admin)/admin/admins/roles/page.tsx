@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion";
 
 import RoleManager from "@/components/admincomps/admin/Rolemanager";
+import EditRole from "@/components/admincomps/admin/EditRole";
 
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,8 @@ import { BASE_API_URL } from "@/utils/setter";
 
 import { RolesData } from "@/libs/types";
 
+import { Pencil } from "lucide-react";
+
 type parsedRolesType = {
   id: string;
   name: string;
@@ -28,6 +31,7 @@ type parsedRolesType = {
 
 function RolesPage() {
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [editRole, setEditRole] = useState<RolesData | null>(null);
   const [roles, setRoles] = useState<RolesData[]>([]); // Update state type to RolesData[]
   const [isLoading, setIsLoading] = useState(false); // Loading state
 
@@ -100,9 +104,20 @@ function RolesPage() {
             <AccordionTrigger>
               {role.name.replace(/[_-]/g, " ")}
             </AccordionTrigger>
-            <AccordionContent>
-              <p>Description: {role.description}</p>
-              <p>Is Super Admin: {role.isSuperAdmin ? "Yes" : "No"}</p>
+            <AccordionContent className="flex flex-row justify-between items-start">
+              <div>
+                <p>Description: {role.description}</p>
+                <p>Super Admin: {role.isSuperAdmin ? "Yes" : "No"}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setEditRole(role);
+                  setShowModal(true);
+                }}
+                className="bg-blue-600 text-white rounded-md px-4 py-2"
+              >
+                <Pencil /> Edit
+              </button>
             </AccordionContent>
           </AccordionItem>
         ))}

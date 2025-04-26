@@ -17,18 +17,22 @@ interface CancelEventProps {
 function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const handleDelete = () => {
+  const handleCancel = () => {
+    let data = JSON.stringify({
+      status: "CANCELLED",
+    });
+
     setIsLoading(true);
     let config = {
-      method: "delete",
+      method: "patch",
       maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/events/${id}?forceDelete=true`,
+      url: `${BASE_API_URL}/events/${id}/status`,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
       withCredentials: true,
-      // credentials: "include",
+      data: data,
     };
 
     axios
@@ -52,9 +56,6 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
         setIsLoading(false);
       });
     window.location.reload();
-  };
-  const handleCancel = () => {
-    onClose();
   };
 
   return (
@@ -93,7 +94,7 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
         </div>
         <div className="flex w-fit justify-between">
           <button
-            onClick={handleDelete}
+            onClick={handleCancel}
             disabled={isLoading}
             className="flex items-center w-fit  text-nowrap text-center justify-center bg-red-600 font-semibold text-base text-white rounded-full py-3 px-4 h-10"
           >

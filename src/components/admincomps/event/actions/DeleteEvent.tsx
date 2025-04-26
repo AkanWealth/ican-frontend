@@ -35,7 +35,7 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
       .request(config)
       .then((response) => {
         toast({
-          title: "Event Cancelled",
+          title: "Event Deleted",
           description: response.data.message,
           variant: "default",
         });
@@ -66,9 +66,9 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
           </div>
           <div>
             <div className="flex flex-col w-fit gap-2">
-              <h5 className="font-semibold text-xl text-black">Cancel Event</h5>
+              <h5 className="font-semibold text-xl text-black">Delete Event</h5>
               <p className="text-sm text-neutral-600 text-wrap">
-                If you cancel this event, the event will no longer take place
+                If you delete this event, the event will no longer take place
                 and members will be notified via email. Are you sure you want to
                 proceed?{" "}
               </p>
@@ -97,7 +97,7 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
             disabled={isLoading}
             className="flex items-center w-fit  text-nowrap text-center justify-center bg-red-600 font-semibold text-base text-white rounded-full py-3 px-4 h-10"
           >
-            Cancel Event
+            Delete Event
           </button>
           <button
             onClick={onClose}

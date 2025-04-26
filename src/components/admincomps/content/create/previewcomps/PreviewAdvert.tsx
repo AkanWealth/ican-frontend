@@ -34,15 +34,15 @@ function PreviewAdvert({
           <h2 className="text-2xl font-bold">{name}</h2>
           <p className="text-gray-600">{advertiser}</p>
           <div className="relative w-full h-64">
-            <Image 
-              src={image} 
-              alt={name} 
+            <Image
+              src={image}
+              alt={name}
               fill
               style={{ objectFit: "contain" }}
               priority
             />
           </div>
-          <div dangerouslySetInnerHTML={{ __html: textBody }} />
+          <p className="text-gray-700">{textBody}</p>
           <p className="text-gray-600">{startDate}</p>
           <p className="text-gray-600">{endDate}</p>
         </div>

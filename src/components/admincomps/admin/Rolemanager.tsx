@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import InputEle from "@/components/genui/InputEle";
 
 import { User } from "@/libs/types";
-
+import { useRouter } from "next/navigation";
 import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 
 // Props interface for role manager component
@@ -32,7 +32,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [permissions, setPermissions] = useState<Option[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const router = useRouter();
   const OPTIONS: Option[] = [
     { label: "ADD_CONTENT", value: "ADD_CONTENT", group: "Content" },
     { label: "ADD_FAQ", value: "ADD_FAQ", group: "Content" },
@@ -287,6 +287,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
         variant: "default",
       });
       setIsLoading(false);
+      router.refresh();
     } catch (error) {
       console.error("Error creating role:", error);
       toast({
@@ -299,6 +300,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
       });
     }
     setIsLoading(false);
+    router.refresh();
   };
 
   return (

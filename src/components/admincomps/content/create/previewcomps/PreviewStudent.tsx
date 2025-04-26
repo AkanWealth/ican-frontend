@@ -1,17 +1,15 @@
 import React from "react";
 
-import TechnicalTile from "@/components/pubntech/TechnicalTile";
+import Studenttile from "@/components/genui/Studenttile";
 
-function PreviewTechnical({
+function PreviewStudent({
   name,
   document,
-  coverImg,
   showPreview,
   setShowPreview,
 }: {
   name: string;
   document: string;
-  coverImg: string;
   showPreview: boolean;
   setShowPreview: (show: boolean) => void;
 }) {
@@ -26,15 +24,11 @@ function PreviewTechnical({
         </button>
 
         <div className="flex flex-col gap-4">
-          <TechnicalTile
-            post={{
-              title: name,
-              document: document,
-              coverImg: coverImg,
-              date: new Date().toISOString(),
-              category: "Technical Session",
-              downloadLink: document,
-            }}
+          <Studenttile
+            imageUrl="/studenthero.png"
+            title={name}
+            fileType="PDF"
+            downloadLink={document}
           />
         </div>
       </div>
@@ -42,4 +36,4 @@ function PreviewTechnical({
   );
 }
 
-export default PreviewTechnical;
+export default PreviewStudent;

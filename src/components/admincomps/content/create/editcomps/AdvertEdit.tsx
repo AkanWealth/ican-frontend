@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { uploadImageToCloud } from "@/lib/uploadImage";
 
+import PreviewAdvert from "../previewcomps/PreviewAdvert";
 type Advert = {
   name: string;
   advertiser: string;
@@ -29,6 +30,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
   const [advertImage, setAdvertImage] = useState<string | null | File>(null);
   const [advert, setAdvert] = useState<Advert>({
@@ -283,10 +285,25 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
         >
           {mode === "edit" ? "Save Edit" : "Save as Draft"}
         </button>
-        <button className=" py-1 text-primary text-base rounded-full w-full">
+        <button
+          onClick={() => setShowPreview(true)}
+          className=" py-1 text-primary text-base rounded-full w-full"
+        >
           Preview
         </button>
       </div>
+      {showPreview && (
+        <PreviewAdvert
+          name={advert.name}
+          advertiser={advert.advertiser}
+          image={advert.image}
+          textBody={advert.textBody}
+          startDate={advert.startDate.toISOString().split("T")[0]}
+          endDate={advert.endDate.toISOString().split("T")[0]}
+          showPreview={showPreview}
+          setShowPreview={setShowPreview}
+        />
+      )}
     </form>
   );
 }

@@ -5,7 +5,9 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
-import Toast from "@/components/genui/Toast";
+import { useToast } from "@/hooks/use-toast";
+
+import PreviewTechnical from "../previewcomps/PreviewTechnical";
 
 type TechnicalSession = {
   name: string;
@@ -22,6 +24,8 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
   });
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -50,10 +54,21 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
           error.response.status === 404
         ) {
           setEditDataFetched(true);
-          console.error(
-            "Technical Sessions not found (404). Stopping further fetch attempts."
-          );
+
+          toast({
+            title: "Technical Sessions not found",
+            description: error.response.data.message,
+            variant: "destructive",
+          });
         } else {
+          toast({
+            title: "Error fetching Technical Sessions",
+            description:
+              axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : "An unknown error occurred",
+            variant: "destructive",
+          });
           console.error("Error fetching Technical Sessions:", error);
         }
       }
@@ -63,7 +78,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching Technical Sessions details for edit mode");
       fetchDetails();
     }
-  }, [editDataFetched, id, mode]);
+  }, [editDataFetched, id, toast, mode]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({
@@ -91,10 +106,21 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
       const response = await axios.request(config);
       console.log("Technical Sessions submitted successfully:", response.data);
       setIsSubmitting(false);
-      alert("Technical Sessions submitted successfully!");
+      toast({
+        title: "Technical Sessions submitted successfully!",
+        description: response.data.message,
+        variant: "default",
+      });
     } catch (error) {
       setIsSubmitting(false);
-      alert("Error submitting Technical Sessions: " + error);
+      toast({
+        title: "Error submitting Technical Sessions",
+        description:
+          axios.isAxiosError(error) && error.response?.data?.message
+            ? error.response.data.message
+            : "An unknown error occurred",
+        variant: "destructive",
+      });
     }
   };
   return (
@@ -148,10 +174,22 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         >
           {mode === "edit" ? "Save Edit" : "Save as Draft"}
         </button>
-        <button className=" py-1 text-primary text-base rounded-full w-full">
+        <button
+          onClick={() => setShowPreview(true)}
+          className=" py-1 text-primary text-base rounded-full w-full"
+        >
           Preview
         </button>
       </div>
+      {showPreview && (
+        <PreviewTechnical
+          showPreview={showPreview}
+          setShowPreview={setShowPreview}
+          name={techSesh.name}
+          document={techSesh.document}
+          coverImg={techSesh.coverImg}
+        />
+      )}
     </div>
   );
 }

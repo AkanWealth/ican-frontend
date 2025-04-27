@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 
 const API_BASE_URL = "https://ican-api-6000e8d06d3a.herokuapp.com/api";
 const ACCESS_TOKEN_COOKIE = 'accessToken';
+const REFRESH_TOKEN_COOKIE = 'refreshToken'; // Added cookie name for refresh token
 const USER_DATA_COOKIE = 'user_data';
 const DEBUG = true;
 
@@ -13,6 +14,7 @@ export interface User {
     surname: string;
     email: string;
     role?: string;
+    phone?: string;
     membershipId?: string;
 }
 
@@ -22,20 +24,29 @@ interface JwtPayload {
     firstname: string;
     surname: string;
     role: string;
+    phone: string;
     exp: number;
 }
 
-// Access token cookie should live longer than the token itself
-// to retain the expired token for refresh purposes
+// Access token cookie settings
 const tokenCookieOptions = {
-    maxAge: 30 * 60, // 30 minutes - longer than token lifespan
+    maxAge: 30 * 60, // 30 minutes
     path: '/',
     secure: process.env.NODE_ENV === 'production',
     httpOnly: false,
     sameSite: 'lax' as const
 };
 
-// User data can live much longer
+// Refresh token should live longer
+const refreshTokenCookieOptions = {
+    maxAge: 7 * 24 * 60 * 60, // 7 days
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: false, // Set to false so JS can access it
+    sameSite: 'lax' as const
+};
+
+// User data cookie settings
 const userDataCookieOptions = {
     maxAge: 24 * 60 * 60, // 1 day
     path: '/',
@@ -51,13 +62,10 @@ export const debug = (message: string, data?: any) => {
             message: `[AuthService] ${message}`,
             data: data || '',
         };
-
-        // Log to the console instead of storing in localStorage
         console.log(logEntry.message, logEntry.data);
     }
 };
 
-// Remove functions that interact with localStorage
 export const getDebugLogs = () => {
     console.warn("Debug logs retrieval is disabled because localStorage is not used.");
     return [];
@@ -95,6 +103,11 @@ export const getToken = (): string | null => {
     return cookies[ACCESS_TOKEN_COOKIE] || null;
 };
 
+export const getRefreshToken = (): string | null => {
+    const cookies = parseCookies();
+    return cookies[REFRESH_TOKEN_COOKIE] || null;
+};
+
 export const getCurrentUser = (): User | null => {
     try {
         const cookies = parseCookies();
@@ -106,9 +119,15 @@ export const getCurrentUser = (): User | null => {
     }
 };
 
-const updateAuthCookies = (accessToken: string): void => {
+const updateAuthCookies = (accessToken: string, refreshToken?: string): void => {
     try {
         setCookie(null, ACCESS_TOKEN_COOKIE, accessToken, tokenCookieOptions);
+
+        // Only update refresh token if provided
+        if (refreshToken) {
+            setCookie(null, REFRESH_TOKEN_COOKIE, refreshToken, refreshTokenCookieOptions);
+            debug('Refresh token updated');
+        }
 
         const decoded = jwtDecode<JwtPayload>(accessToken);
         const userData: User = {
@@ -116,84 +135,43 @@ const updateAuthCookies = (accessToken: string): void => {
             email: decoded.email,
             firstname: decoded.firstname,
             surname: decoded.surname,
-            role: decoded.role
+            phone: decoded.phone,
+            role: decoded.role,
         };
 
-        // Use longer-lived cookie for user data
         setCookie(null, USER_DATA_COOKIE, JSON.stringify(userData), userDataCookieOptions);
-        debug('Auth cookies updated successfully', { 
-            tokenExpiry: new Date((decoded.exp * 1000)).toLocaleString() 
+        debug('Auth cookies updated successfully', {
+            tokenExpiry: new Date(decoded.exp * 1000).toLocaleString(),
+            hasRefreshToken: !!refreshToken,
         });
     } catch (error) {
-        debug("Failed to update auth cookies:", error);
+        debug('Failed to update auth cookies:', error);
         throw error;
     }
 };
 
-// Modified to handle token refresh more robustly
 export const refreshTokens = async (): Promise<boolean> => {
-    debug('Refresh tokens requested');
+    debug('Refreshing tokens using refresh token from cookies');
 
-    if (refreshPromise) {
-        debug('Using existing refresh promise');
-        return refreshPromise;
-    }
+    try {
+        const refreshToken = getRefreshToken();
 
-    refreshPromise = (async () => {
-        try {
-            debug('Starting token refresh');
-            
-            // Log cookie state for debugging
-            debug('Cookies before refresh:', parseCookies());
-            
-            const response = await axios({
-                method: 'PATCH',  // Keep this as PATCH if that's what your API expects
-                url: `${API_BASE_URL}/auth/refresh`,
-                withCredentials: true, // Crucial for sending cookies with the request
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            debug('Refresh response received', {
-                status: response.status,
-                hasAccessToken: !!response.data.accessToken || !!response.data.access_token
-            });
-
-            const accessToken = response.data.accessToken || response.data.access_token;
-
-            if (!accessToken) {
-                debug('No access token in refresh response');
-                return false;
-            }
-
-            updateAuthCookies(accessToken);
-            return true;
-        } catch (error:any) {
-            debug('Token refresh failed:', error);
-            
-            // Log more details about the error for debugging
-            if (error.response) {
-                debug('Error response data:', error.response.data);
-                debug('Error response status:', error.response.status);
-                debug('Error response headers:', error.response.headers);
-            } else if (error.request) {
-                debug('No response received:', error.request);
-            }
-            
-            if (error.message && error.message.includes('ERR_NETWORK_CHANGED')) {
-                alert("Network connection was lost. Please check your internet and log in again.");
-            }
+        if (!refreshToken) {
+            debug('No refresh token available');
             return false;
-        } finally {
-            refreshPromise = null;
         }
-    })();
 
-    return refreshPromise;
+        // Replace the access token with the refresh token
+        updateAuthCookies(refreshToken);
+
+        debug('Access token replaced with refresh token');
+        return true;
+    } catch (error) {
+        debug('Failed to refresh tokens:', error);
+        return false;
+    }
 };
 
-// Modified to get a fresh token immediately after login
 export const login = async (email: string, password: string): Promise<User> => {
     try {
         debug('Login attempt for:', email);
@@ -205,58 +183,51 @@ export const login = async (email: string, password: string): Promise<User> => {
 
         debug('Login response received', {
             status: response.status,
-            hasToken: !!response.data.access_token || !!response.data.accessToken
+            hasAccessToken: !!response.data.access_token,
+            hasRefreshToken: !!response.data.refresh_token,
         });
 
-        const accessToken = response.data.accessToken || response.data.access_token;
+        const accessToken = response.data.access_token;
+        const refreshToken = response.data.refresh_token;
 
-        if (!accessToken) {
-            throw new Error("No access token received");
+        if (!accessToken || !refreshToken) {
+            throw new Error("Access token or refresh token missing in login response");
         }
 
-        // Store the initial access token
-        updateAuthCookies(accessToken);
-        
-        // Immediately refresh to get a fresh token with full lifespan
-        debug('Immediately refreshing token after login for maximum lifespan');
-        const refreshed = await refreshTokens();
-        
-        if (!refreshed) {
-            debug('Initial token refresh failed, but continuing with original token');
-        } else {
-            debug('Successfully obtained fresh token after login');
-        }
-        
-        return getCurrentUser() as User;
+        // Store both access and refresh tokens
+        updateAuthCookies(accessToken, refreshToken);
+
+        // Merge user data from token and response
+        const decoded = jwtDecode<JwtPayload>(accessToken);
+        const userData: User = {
+            id: decoded.sub,
+            email: decoded.email,
+            firstname: decoded.firstname,
+            surname: decoded.surname,
+            role: decoded.role,
+            phone: decoded.phone,
+            membershipId: response.data.user?.membershipId,
+        };
+
+        setCookie(null, USER_DATA_COOKIE, JSON.stringify(userData), userDataCookieOptions);
+
+        return userData;
     } catch (error) {
         debug('Login failed:', error);
         throw error;
     }
 };
 
-// Try to get a completely fresh token regardless of current state
 export const getFreshAccessToken = async (): Promise<string | null> => {
     try {
         debug('Explicitly requesting fresh access token');
-        const response = await axios({
-            method: 'PATCH',
-            url: `${API_BASE_URL}/auth/refresh`,
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-
-        const accessToken = response.data.accessToken || response.data.access_token;
-
-        if (!accessToken) {
-            debug('No fresh access token received');
-            return null;
+        const refreshed = await refreshTokens();
+        if (refreshed) {
+            const token = getToken();
+            debug('Fresh access token obtained successfully');
+            return token;
         }
-
-        updateAuthCookies(accessToken);
-        debug('Fresh access token obtained successfully');
-        return accessToken;
+        return null;
     } catch (error) {
         debug('Failed to get fresh access token:', error);
         return null;
@@ -276,6 +247,7 @@ export const logout = async (): Promise<void> => {
         debug('Logout API call failed:', error);
     } finally {
         destroyCookie(null, ACCESS_TOKEN_COOKIE, { path: '/' });
+        destroyCookie(null, REFRESH_TOKEN_COOKIE, { path: '/' });
         destroyCookie(null, USER_DATA_COOKIE, { path: '/' });
         debug('Local auth cookies cleared');
     }
@@ -284,25 +256,26 @@ export const logout = async (): Promise<void> => {
 export const createAuthenticatedAxios = () => {
     const instance = axios.create({
         baseURL: API_BASE_URL,
-        withCredentials: true, // Always send cookies with requests
+        withCredentials: true,
     });
 
+    // Request interceptor to add the access token to headers
     instance.interceptors.request.use(
         async (config) => {
             let token = getToken();
-            
-            // Proactively check if token will expire soon and refresh if needed
+
+            // Check if the token is expired and replace it with the refresh token
             if (token && isTokenExpired(token)) {
-                debug('Token expired or expiring soon, refreshing before request');
+                debug('Access token expired, replacing with refresh token');
                 const refreshed = await refreshTokens();
                 if (refreshed) {
-                    token = getToken(); 
-                    debug('Successfully refreshed token for request');
+                    token = getToken(); // Get the new token (refresh token)
+                    debug('Successfully replaced access token with refresh token');
                 } else {
-                    debug('Failed to refresh token for request');
+                    debug('Failed to replace access token with refresh token');
                 }
             }
-            
+
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
                 debug('Added token to request headers');
@@ -317,64 +290,11 @@ export const createAuthenticatedAxios = () => {
         }
     );
 
-    instance.interceptors.response.use(
-        (response) => response,
-        async (error) => {
-            const originalRequest = error.config;
-            debug('Response error intercepted', { 
-                status: error.response?.status,
-                url: originalRequest?.url
-            });
-
-            // Handle 401 errors by refreshing the token
-            if (error.response?.status === 401 && !originalRequest._retry) {
-                originalRequest._retry = true;
-                debug('Received 401, attempting token refresh');
-
-                try {
-                    const refreshed = await refreshTokens();
-
-                    if (refreshed) {
-                        const newToken = getToken();
-                        if (newToken) {
-                            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-                            debug('Retrying original request with new token');
-                            return instance(originalRequest);
-                        }
-                    } else {
-                        // If refresh failed, clear cookies and force logout
-                        debug('Refresh failed after 401, forcing logout');
-                        destroyCookie(null, ACCESS_TOKEN_COOKIE, { path: '/' });
-                        destroyCookie(null, USER_DATA_COOKIE, { path: '/' });
-                        
-                        // Store a flag in localStorage before redirecting
-                        localStorage.setItem('auth_failed', 'true');
-                        localStorage.setItem('last_auth_error_time', new Date().toISOString());
-                        
-                        // Optionally redirect to login page
-                        if (typeof window !== 'undefined') {
-                            // Allow user to view logs before redirect if needed
-                            const shouldRedirect = confirm('Authentication failed. Would you like to go to the login page now?');
-                            if (shouldRedirect) {
-                                window.location.href = '/login';
-                            }
-                        }
-                    }
-                } catch (refreshError) {
-                    debug("Error during token refresh:", refreshError);
-                }
-            }
-
-            return Promise.reject(error);
-        }
-    );
-
     return instance;
 };
 
 export const authAxios = createAuthenticatedAxios();
 
-// Modified to always attempt a refresh when checking auth status
 export const checkAuthStatus = async (): Promise<boolean> => {
     const token = getToken();
     debug('Checking auth status', { hasToken: !!token });
@@ -385,7 +305,6 @@ export const checkAuthStatus = async (): Promise<boolean> => {
     return await refreshTokens();
 };
 
-// Remove localStorage usage in showDebugLogsModal
 export const showDebugLogsModal = () => {
     console.warn("Debug logs modal is disabled because localStorage is not used.");
 };
@@ -395,6 +314,7 @@ const authService = {
     logout,
     refreshTokens,
     getToken,
+    getRefreshToken,
     getCurrentUser,
     isTokenExpired,
     authAxios,

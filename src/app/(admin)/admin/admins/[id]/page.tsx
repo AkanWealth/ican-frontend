@@ -65,13 +65,11 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
             variant: "destructive",
           });
         }
-      } finally {
-        // Any cleanup code if needed
       }
     }
 
     fetchAdminData();
-  }, []); // Add missing dependency array
+  }, [params, router, toast]); // Include missing dependencies
 
   return (
     <div className="rounded-3xl p-6">

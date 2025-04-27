@@ -109,7 +109,7 @@ function FlutterModal({
   onFailure,
   onClose,
   buttonText = "Pay Now",
-  buttonClassName = "w-full py-2 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition duration-300",
+  buttonClassName = "w-full py-2 px-4 rounded-full bg-primary hover:bg-blue-700 text-white transition duration-300",
   disabled = false
 }: FlutterModalProps) {
   const { toast } = useToast();

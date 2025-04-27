@@ -219,8 +219,8 @@ function Payment({ formData, updateFormData }: PaymentProps) {
       {/* Payment button using reusable FlutterModal component */}
       <FlutterModal
         amount={paymentAmount}
-        // email={userEmail}
-        email="adesewaa@gmail.com"
+        email={userEmail}
+        // email="adesewaa@gmail.com"
         phoneNumber={userPhone}
         name={userName}
         title="Registration Payment"

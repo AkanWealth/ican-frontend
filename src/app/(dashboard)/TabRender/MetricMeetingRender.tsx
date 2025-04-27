@@ -27,7 +27,16 @@ function MetricMeetingRender() {
   const [selectedDateRange, setSelectedDateRange] = useState("jan-jul");
   const [timeFilter, setTimeFilter] = useState("This month");
   const [isTimeFilterOpen, setIsTimeFilterOpen] = useState(false);
-  
+
+
+  interface GraphSummaryItem {
+    date: string;
+    totalRegistrations: number;
+    attended: number;
+  }
+
+  const [graphSummaryData, setGraphSummaryData] = useState<GraphSummaryItem[]>([]);
+  const [isLoadingGraphData, setIsLoadingGraphData] = useState(true);
   // Added from AttendanceRender
   const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
   const [apiMeetingsData, setApiMeetingsData] = useState<any[]>([]);
@@ -55,7 +64,14 @@ function MetricMeetingRender() {
   ]);
 
   // Data for the donut chart
-  const [attendanceData, setAttendanceData] = useState({
+  const [attendanceData, setAttendanceData] = useState<{
+    registered: number;
+    attended: number;
+    notAttended: number;
+    rawRegistered?: number;
+    rawAttended?: number;
+    rawNotAttended?: number;
+  }>({
     registered: 100,
     attended: 70,
     notAttended: 30
@@ -97,6 +113,23 @@ function MetricMeetingRender() {
     "Last 6 months",
     "This year"
   ];
+
+  useEffect(() => {
+    const fetchGraphSummaryData = async () => {
+      setIsLoadingGraphData(true);
+      try {
+        const response = await apiClient.get('/meetings/graph-summary');
+        console.log('Graph summary data:', response);
+        setGraphSummaryData(response);
+      } catch (err) {
+        console.error('Error fetching graph summary data:', err);
+      } finally {
+        setIsLoadingGraphData(false);
+      }
+    };
+
+    fetchGraphSummaryData();
+  }, []);
 
   // Fetch meetings data from API for metrics only (from AttendanceRender)
   useEffect(() => {
@@ -154,56 +187,85 @@ function MetricMeetingRender() {
 
   // Fetch user registrations for metrics only (from AttendanceRender)
   useEffect(() => {
-    const fetchUserRegistrations = async () => {
-      setIsLoadingRegistrations(true);
-      try {
-        // Get user info from local storage
-        const cookies = parseCookies();
-        const userInfo = cookies.user_data;
-        if (!userInfo) {
-          console.error("User info not found in localStorage");
-          setIsLoadingRegistrations(false);
-          return;
-        }
+     const fetchUserRegistrations = async () => {
+          setIsLoadingRegistrations(true);
+          try {
+            // Get user info from local storage
+            const cookies = parseCookies();
+            const userInfo = cookies.user_data;
+            if (!userInfo) {
+              console.error("User info not found in localStorage");
+              setIsLoadingRegistrations(false);
+              return;
+            }
+            
+            const parsedUserInfo = JSON.parse(userInfo);
+            const userId = parsedUserInfo.id;
+            
+            if (!userId) {
+              console.error("User ID not found in userInfo");
+              setIsLoadingRegistrations(false);
+              return;
+            }
         
-        const parsedUserInfo = JSON.parse(userInfo);
-        const id = parsedUserInfo.id;
+            console.log("Fetching for user ID:", userId);
         
-        if (!id) {
-          console.error("User email not found in userInfo");
-          setIsLoadingRegistrations(false);
-          return;
-        }
-
-        const registrationsResponse = await apiClient.get(`/events/registrations/user-events/${id}`);
-        
-        console.log("User registrations:", registrationsResponse.data);
-        
-        // Check if the response is an array or a single object
-        let registrations = Array.isArray(registrationsResponse.data) 
-          ? registrationsResponse.data
-          : [registrationsResponse.data];
-
-        console.log('registration', registrations)
-        
-        setUserRegistrations(registrations);
-        
-        // Get total number of registrations
-        const totalRegistrations = registrations.length;
-        
-        // Update metrics with registration count
-        setMetrics(prev => ({
-          ...prev,
-          numberRegistered: totalRegistrations
-        }));
-        
-        setIsLoadingRegistrations(false);
-      } catch (err) {
-        console.error("Error fetching user registrations:", err);
-        setUserRegistrations([]);
-        setIsLoadingRegistrations(false);
-      }
-    };
+            // Fetch registrations for the user
+            const response = await apiClient.get(`/events/registrations/user-events/${userId}`);
+            
+            // Log the raw response to see its structure
+            console.log("Raw API response:", response);
+            
+            // Handle different possible response formats
+            let registrations = [];
+            
+            if (response && response.data) {
+              // If response.data is an array
+              if (Array.isArray(response.data)) {
+                registrations = response.data;
+              } 
+              // If response.data is a single object with userId that matches
+              else if (response.data.userId === userId) {
+                registrations = [response.data];
+              }
+              // If response itself is the data (no .data property)
+            } else if (Array.isArray(response)) {
+              registrations = response;
+            } else if (response && response.userId === userId) {
+              registrations = [response];
+            }
+            
+            console.log("Processed registrations:", registrations);
+            console.log("Registration count:", registrations.length);
+            
+            // Filter to ensure all have the correct userId (extra safeguard)
+            const validRegistrations = registrations.filter((reg: any) => 
+              reg && reg.userId === userId
+            );
+            
+            console.log("Valid registrations for this user:", validRegistrations);
+            console.log("Valid registration count:", validRegistrations.length);
+            
+            setUserRegistrations(validRegistrations);
+            
+            // Update metrics
+            setMetrics(prev => ({
+              ...prev,
+              numberRegistered: validRegistrations.length
+            }));
+            
+            setIsLoadingRegistrations(false);
+          } catch (err) {
+            console.error("Error fetching user registrations:", err);
+            console.error("Error details:", "No response data");
+            setUserRegistrations([]);
+            setMetrics(prev => ({
+              ...prev,
+              numberRegistered: 0
+            }));
+            setIsLoadingRegistrations(false);
+          }
+        };
 
     fetchUserRegistrations();
   }, []);
@@ -337,6 +399,140 @@ useEffect(() => {
   months,
   shortMonths
 ]);
+const processBarChartData = useCallback(() => {
+  if (!graphSummaryData || graphSummaryData.length === 0) {
+    return monthlyData; // Return default data if API data is not available
+  }
+
+  // Group data by month
+  const groupedByMonth = graphSummaryData.reduce((acc: Record<string, { registered: number; attended: number }>, item) => {
+    const date = new Date(item.date);
+    const month = date.getMonth(); // 0-11
+    const monthName = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][month];
+    
+    if (!acc[monthName]) {
+      acc[monthName] = {
+        registered: 0,
+        attended: 0
+      };
+    }
+    
+    acc[monthName].registered += item.totalRegistrations;
+    acc[monthName].attended += item.attended;
+    
+    return acc;
+  }, {});
+  
+  // Convert to array format expected by the chart
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  // Filter months based on selected date range
+  let filteredMonths = [...monthNames];
+  if (selectedDateRange === "jan-jul") {
+    filteredMonths = monthNames.slice(0, 7); // Jan to Jul
+  } else if (selectedDateRange === "aug-dec") {
+    filteredMonths = monthNames.slice(7); // Aug to Dec
+  }
+  
+  return filteredMonths.map(month => {
+    const monthData = groupedByMonth[month] || { registered: 0, attended: 0 };
+    const notAttended = Math.max(0, monthData.registered - monthData.attended);
+    
+    // Calculate percentages for visualization
+    // If registered is 0, use defaults to avoid division by zero
+    let attendedPercentage = 0;
+    let notAttendedPercentage = 0;
+    
+    if (monthData.registered > 0) {
+      attendedPercentage = Math.round((monthData.attended / monthData.registered) * 100);
+      notAttendedPercentage = 100 - attendedPercentage;
+    }
+    
+    return {
+      month,
+      registered: monthData.registered,
+      attended: attendedPercentage,
+      notAttended: notAttendedPercentage,
+      // Keep the raw counts for tooltips or other displays
+      rawAttended: monthData.attended,
+      rawNotAttended: notAttended
+    };
+  });
+}, [graphSummaryData, selectedDateRange, monthlyData]);
+
+// NEW: Update donut chart data based on API data and time filter
+useEffect(() => {
+  if (graphSummaryData && graphSummaryData.length > 0) {
+    // Apply time filter if selected
+    let filteredData = [...graphSummaryData];
+    const currentDate = new Date();
+    
+    if (timeFilter === "This month") {
+      const currentMonth = currentDate.getMonth();
+      const currentYear = currentDate.getFullYear();
+      filteredData = graphSummaryData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+      });
+    } else if (timeFilter === "Last month") {
+      const lastMonth = currentDate.getMonth() === 0 ? 11 : currentDate.getMonth() - 1;
+      const year = currentDate.getMonth() === 0 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
+      filteredData = graphSummaryData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate.getMonth() === lastMonth && itemDate.getFullYear() === year;
+      });
+    } else if (timeFilter === "Last 3 months") {
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
+      filteredData = graphSummaryData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= threeMonthsAgo;
+      });
+    } else if (timeFilter === "Last 6 months") {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(currentDate.getMonth() - 6);
+      filteredData = graphSummaryData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= sixMonthsAgo;
+      });
+    } else if (timeFilter === "This year") {
+      const currentYear = currentDate.getFullYear();
+      filteredData = graphSummaryData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate.getFullYear() === currentYear;
+      });
+    }
+    
+    // Calculate totals for filtered data
+    const filteredTotalRegistered = filteredData.reduce((sum, item) => sum + item.totalRegistrations, 0);
+    const filteredTotalAttended = filteredData.reduce((sum, item) => sum + item.attended, 0);
+    
+    if (filteredTotalRegistered > 0) {
+      const attendedPercentage = Math.round((filteredTotalAttended / filteredTotalRegistered) * 100);
+      const notAttendedPercentage = 100 - attendedPercentage;
+      
+      setAttendanceData({
+        registered: 100, // Always 100% for the full circle
+        attended: attendedPercentage,
+        notAttended: notAttendedPercentage,
+        // Keep raw numbers for tooltips or labels
+        rawRegistered: filteredTotalRegistered,
+        rawAttended: filteredTotalAttended,
+        rawNotAttended: filteredTotalRegistered - filteredTotalAttended
+      });
+    } else {
+      // Default values when no registrations
+      setAttendanceData({
+        registered: 100,
+        attended: 0,
+        notAttended: 0,
+        rawRegistered: 0,
+        rawAttended: 0,
+        rawNotAttended: 0
+      });
+    }
+  }
+}, [graphSummaryData, timeFilter])
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -368,23 +564,33 @@ useEffect(() => {
   // Function to render the bar chart
   const renderBarChart = () => {
     const maxBarHeight = 100; // Maximum height for the bars
+    const chartData = processBarChartData();
     
     return (
       <div className="flex items-end h-48 mt-4 space-x-6 mb-2">
-        {monthlyData.map((data, index) => (
-          <div key={index} className="flex flex-col items-center">
-            <div className="relative w-8 bg-blue-100 rounded-t-sm" style={{ height: `${maxBarHeight}px` }}>
-              <div 
-                className="absolute bottom-0 w-full bg-blue-600 rounded-t-sm"
-                style={{ height: `${data.attended}%` }}
-              ></div>
-            </div>
-            <div className="mt-2 text-xs text-gray-500">{data.month}</div>
+        {isLoadingGraphData ? (
+          <div className="flex items-center justify-center w-full">
+            <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin"></div>
           </div>
-        ))}
+        ) : (
+          chartData.map((data, index) => (
+            <div key={index} className="flex flex-col items-center">
+              <div className="relative w-8 bg-blue-100 rounded-t-sm" style={{ height: `${maxBarHeight}px` }}>
+                <div 
+                  className="absolute bottom-0 w-full bg-blue-600 rounded-t-sm"
+                  style={{ height: `${data.attended}%` }}
+                  title={`Attended: ${data.attended} (${data.attended}%)`}
+                ></div>
+              </div>
+              <div className="mt-2 text-xs text-gray-500">{data.month}</div>
+              <div className="mt-1 text-xs text-blue-600">{data.registered}</div>
+            </div>
+          ))
+        )}
       </div>
     );
   };
+
 
   // Function to render the donut chart
   const renderDonutChart = () => {

@@ -139,38 +139,69 @@ function AttendanceRender() {
         }
         
         const parsedUserInfo = JSON.parse(userInfo);
-        const id = parsedUserInfo.id;
+        const userId = parsedUserInfo.id;
         
-        if (!id) {
-          console.error("User email not found in userInfo");
+        if (!userId) {
+          console.error("User ID not found in userInfo");
           setIsLoadingRegistrations(false);
           return;
         }
-
-        const registrationsResponse = await apiClient.get(`/events/registrations/user-events/${id}`);
+    
+        console.log("Fetching for user ID:", userId);
+    
+        // Fetch registrations for the user
+        const response = await apiClient.get(`/events/registrations/user-events/${userId}`);
         
-        console.log("User registrations:", registrationsResponse.data);
+        // Log the raw response to see its structure
+        console.log("Raw API response:", response);
         
-        // Check if the response is an array or a single object
-        let registrations = Array.isArray(registrationsResponse.data) 
-          ? registrationsResponse.data
-          : [registrationsResponse.data];
+        // Handle different possible response formats
+        let registrations = [];
         
-        setUserRegistrations(registrations);
+        if (response && response.data) {
+          // If response.data is an array
+          if (Array.isArray(response.data)) {
+            registrations = response.data;
+          } 
+          // If response.data is a single object with userId that matches
+          else if (response.data.userId === userId) {
+            registrations = [response.data];
+          }
+          // If response itself is the data (no .data property)
+        } else if (Array.isArray(response)) {
+          registrations = response;
+        } else if (response && response.userId === userId) {
+          registrations = [response];
+        }
         
-        // Get total number of registrations
-        const totalRegistrations = registrations.length;
+        console.log("Processed registrations:", registrations);
+        console.log("Registration count:", registrations.length);
         
-        // Update metrics with registration count
+        // Filter to ensure all have the correct userId (extra safeguard)
+        const validRegistrations = registrations.filter((reg: any) => 
+          reg && reg.userId === userId
+        );
+        
+        console.log("Valid registrations for this user:", validRegistrations);
+        console.log("Valid registration count:", validRegistrations.length);
+        
+        setUserRegistrations(validRegistrations);
+        
+        // Update metrics
         setMetrics(prev => ({
           ...prev,
-          numberRegistered: totalRegistrations
+          numberRegistered: validRegistrations.length
         }));
         
         setIsLoadingRegistrations(false);
       } catch (err) {
         console.error("Error fetching user registrations:", err);
+        console.error("Error details:", "No response data");
         setUserRegistrations([]);
+        setMetrics(prev => ({
+          ...prev,
+          numberRegistered: 0
+        }));
         setIsLoadingRegistrations(false);
       }
     };

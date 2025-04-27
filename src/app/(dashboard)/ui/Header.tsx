@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Search, BellIcon, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Notification from "@/components/membercomps/Notification";
@@ -29,7 +29,7 @@ interface UserData {
 }
 
 export const Header = () => {
-  const cookies = new Cookies();
+  const cookies = useMemo(() => new Cookies(), []); // Wrap cookies in useMemo
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -77,8 +77,7 @@ export const Header = () => {
       try {
         if (typeof window === "undefined") return; // Ensure code runs only on the client side
         
-        const cookies = parseCookies();
-        const userDataCookie = cookies['user_data'];
+        const userDataCookie = cookies.get("user_data");
         const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
         const userId = userData?.id;
         
@@ -104,7 +103,7 @@ export const Header = () => {
     };
 
     fetchProfilePicture();
-  }, []);
+  }, [cookies]); // Include cookies in the dependency array
 
   const handleLogout = () => {
     // Remove cookies instead of localStorage

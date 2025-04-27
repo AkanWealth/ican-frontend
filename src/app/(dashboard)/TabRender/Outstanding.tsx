@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Checkbox } from "@mui/material";
 import CalendarFilter from "@/components/homecomps/CalendarFilter";
 import TablePagination from "@/components/Pagenation";
-import axios from "axios";
+
 import { useToast } from "@/hooks/use-toast";
 import {
   X,
@@ -13,54 +13,25 @@ import {
   XCircle,
   TriangleAlert,
   CheckCircle,
-  Circle,
 } from "lucide-react";
 
 import apiClient from "@/services/apiClient";
 import { parseCookies } from "nookies";
+import PaymentModal from "@/components/Modal/PaymentModal";
+import paymentService from "@/services/PaymentService";
 
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: ReactNode;
-}
-
-interface PaymentDetails {
-  paymentType: string;
-  amountDue: string;
-  dueDate: string;
-}
 interface Activity {
   amountLeft?: string;
   AmountDue: string;
   date: string;
   PaymentType: string;
   status: string;
+  id: string;
 }
-
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl lg:p-12 md:p-8 w-full lg:max-w-2xl md:w-2xl relative">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
-        >
-          <X className="h-5 w-5" />
-        </button>
-        {children}
-      </div>
-    </div>
-  );
-};
 
 const Outstanding = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [originalActivities, setOriginalActivities] = useState<Activity[]>([]); // Store original data
-  const [selectedPayment, setSelectedPayment] = useState<PaymentDetails | null>(
-    null
-  );
   const [totalOutstanding, setTotalOutstanding] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -68,7 +39,6 @@ const Outstanding = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [isTotalModalOpen, setIsTotalModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [selectedActivity, setSelectedActivity] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [partialAmount, setPartialAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -77,54 +47,171 @@ const Outstanding = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isFiltered, setIsFiltered] = useState(false); // Add this to track when filters are applied
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [selectedBillingId, setSelectedBillingId] = useState("");
+  const [userData, setUserData] = useState({
+    email: "",
+    phoneNumber: "",
+    fullName: ""
+  });
   const { toast } = useToast();
 
-  // Fetch outstanding data from the API
+  // Function to fetch user data
   useEffect(() => {
-    const fetchOutstandingData = async () => {
+    const fetchUserData = async () => {
       try {
-        // const token = localStorage.getItem("token");
-
-        // if (!token) {
-        //   console.error("User is not authenticated. Please log in again.");
-        //   setLoading(false);
-        //   return;
-        // }
-        
-        // Fetch total outstanding payment
-        const response = await apiClient.get("/payments/total-outstanding");
-        const totalOutstanding = response.totalOutstanding || 0;
-
-        // Fetch outstanding breakdown
-        const outstandingBreakdownResponse = await apiClient.get("/payments/outstanding-breakdown");
-        const outstandingBreakdown =
-          outstandingBreakdownResponse.breakdown || [];
-
-        // Update state with API data
-        setTotalOutstanding(totalOutstanding);
-        setActivities(outstandingBreakdown);
-        setOriginalActivities(outstandingBreakdown); // Store original data
-
-        // Calculate total pages
-        setTotalPages(Math.ceil(outstandingBreakdown.length / itemsPerPage));
-        setLoading(false);
+        const cookies = parseCookies();
+        const userId = cookies.userId;
+        if (userId) {
+          const userResponse = await apiClient.get(`/users/${userId}`);
+          setUserData({
+            email: userResponse.email || "",
+            phoneNumber: userResponse.phoneNumber || "",
+            fullName: userResponse.fullName || ""
+          });
+        }
       } catch (error) {
-        console.error("Failed to fetch outstanding data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch outstanding data.",
-          variant: "destructive",
-        });
-        setLoading(false);
+        console.error("Failed to fetch user data:", error);
       }
     };
+    
+    fetchUserData();
+  }, []);
 
+  // Function to fetch outstanding data
+  const fetchOutstandingData = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      // Fetch total outstanding payment
+      const response = await apiClient.get("/payments/total-outstanding");
+      const totalOutstanding = response.totalOutstanding || 0;
+
+      // Fetch outstanding breakdown
+      const outstandingBreakdownResponse = await apiClient.get(
+        "/payments/outstanding-breakdown"
+      );
+
+      // Transform the data to match your component's expected structure
+      const transformedData = Array.isArray(outstandingBreakdownResponse)
+        ? outstandingBreakdownResponse.map((item) => ({
+            PaymentType: item.paymentType,
+            AmountDue: item.amount.toString(),
+            date: new Date(item.datePaid).toLocaleDateString(),
+            status: item.status,
+            id: item.id,
+          }))
+        : [];
+
+      // Update state with transformed API data
+      setTotalOutstanding(totalOutstanding);
+      setActivities(transformedData);
+      setOriginalActivities(transformedData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch outstanding data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch outstanding data.",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
     fetchOutstandingData();
-  }, [itemsPerPage, toast]); // Add missing dependencies here
+  }, [itemsPerPage, toast, fetchOutstandingData]);
+
+  // Handle payment success
+  const handlePaymentSuccess = async (paymentData: {
+    billingId: string;
+    paymentType: string;
+    amount: number;
+    transactionId: string;
+    status: string;
+  }) => {
+    try {
+      const cookies = parseCookies();
+      const userId = cookies.userId;
+      
+      await paymentService.processPayment(userId, paymentData.billingId, {
+        amount: paymentData.amount,
+        paymentType: paymentData.paymentType,
+        transactionId: paymentData.transactionId
+      });
+      
+      toast({
+        title: "Payment Successful",
+        description: `Your payment of ₦${paymentData.amount.toLocaleString()} has been processed successfully.`,
+        variant: "default",
+        duration: 3000,
+      });
+      
+      // Refresh the data
+      fetchOutstandingData();
+      setIsPaymentModalOpen(false);
+    } catch (error) {
+      console.error("Payment processing failed:", error);
+      toast({
+        title: "Payment Failed",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
+  // Handle settle all payments
+  const handleSettleAllPayments = async (paymentData: {
+    paymentType: string;
+    amount: number;
+    transactionId: string;
+    status: string;
+  }) => {
+    try {
+      const cookies = parseCookies();
+      const userId = cookies.userId;
+      
+      // Get all selected billing IDs
+      const selectedBillingIds = selectedItems.map(index => {
+        const realIndex = (currentPage - 1) * itemsPerPage + index;
+        return activities[realIndex].id;
+      });
+      
+      await paymentService.processSettleAllPayment({
+        userId,
+        amount: paymentData.amount,
+        paymentType: paymentData.paymentType,
+        transactionId: paymentData.transactionId,
+        billingIds: selectedBillingIds
+      });
+      
+      toast({
+        title: "Payments Successful",
+        description: `Your payments totaling ₦${paymentData.amount.toLocaleString()} have been processed successfully.`,
+        variant: "default",
+        duration: 3000,
+      });
+      
+      // Refresh the data
+      fetchOutstandingData();
+      setIsTotalModalOpen(false);
+      setSelectedItems([]);
+      setSelectAll(false);
+    } catch (error) {
+      console.error("Bulk payment processing failed:", error);
+      toast({
+        title: "Payments Failed",
+        description: "There was an error processing your payments. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
 
   const renderStatusBadge = (status: string, amountLeft?: string) => {
-    if (status === "unpaid") {
+    if (status === "UNPAID" || status === "unpaid") {
       return (
         <div className="flex items-center">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600">
@@ -133,7 +220,21 @@ const Outstanding = () => {
           </span>
         </div>
       );
-    } else if (status === "partially paid") {
+    } else if (status === "PENDING" || status === "pending") {
+      return (
+        <div className="flex flex-col">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-600">
+            <TriangleAlert className="mr-1 h-3 w-3 rounded-full " />
+            Pending
+          </span>
+          {amountLeft && (
+            <span className="text-xs text-gray-500 mt-1">
+              {amountLeft} left
+            </span>
+          )}
+        </div>
+      );
+    } else if (status === "PARTIALLY_PAID" || status === "partially paid") {
       return (
         <div className="flex flex-col">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-600">
@@ -147,7 +248,7 @@ const Outstanding = () => {
           )}
         </div>
       );
-    } else if (status === "paid") {
+    } else if (status === "FULLY_PAID" || status === "paid") {
       return (
         <div className="flex items-center">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600">
@@ -160,57 +261,8 @@ const Outstanding = () => {
     return null;
   };
 
-  const handlePaymentSubmit = () => {
-    if (!selectedPayment) {
-      toast({
-        title: "Error",
-        description: "Payment details not found",
-        variant: "destructive",
-        duration: 3000,
-      });
-      return;
-    }
-
-    let amountPaid = "";
-
-    if (paymentMethod === "full") {
-      amountPaid = selectedPayment.amountDue;
-    } else {
-      if (!partialAmount || partialAmount.trim() === "") {
-        toast({
-          title: "Error",
-          description: "Please enter a valid amount for partial payment",
-          variant: "destructive",
-          duration: 3000,
-        });
-        return;
-      }
-      amountPaid = partialAmount;
-    }
-
-    toast({
-      title: "Payment Successful",
-      description: `You have successfully paid ₦${amountPaid} for ${selectedPayment.paymentType}`,
-      variant: "default",
-      duration: 3000,
-    });
-
-    // Close the modal
-    setIsPaymentModalOpen(false);
-    setSelectedPayment(null);
-    setPartialAmount("");
-  };
-
   const handleOpenPaymentModal = (payment: any) => {
-    const paymentDetails: PaymentDetails = {
-      paymentType: payment.PaymentType,
-      amountDue:
-        payment.status === "partially paid"
-          ? payment.amountLeft
-          : payment.AmountDue,
-      dueDate: payment.date,
-    };
-    setSelectedPayment(paymentDetails);
+    setSelectedBillingId(payment.id);
     setIsPaymentModalOpen(true);
   };
 
@@ -219,9 +271,16 @@ const Outstanding = () => {
     setSelectAll(checked);
 
     if (checked) {
-      // Select all items
-      const allIndexes = activities.map((_, index) => index);
-      setSelectedItems(allIndexes);
+      // Select all items on current page
+      const currentIndices = [];
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = Math.min(startIndex + itemsPerPage, activities.length);
+
+      for (let i = 0; i < endIndex - startIndex; i++) {
+        currentIndices.push(i);
+      }
+
+      setSelectedItems(currentIndices);
     } else {
       // Deselect all items
       setSelectedItems([]);
@@ -253,9 +312,15 @@ const Outstanding = () => {
 
   const calculateTotalAmount = (selectedIndices: any[]) => {
     return selectedIndices.reduce((total, index) => {
-      const amount = activities[index].amountLeft
-        ? parseFloat(activities[index].amountLeft.replace(/,/g, ""))
-        : parseFloat(activities[index].AmountDue.replace(/,/g, ""));
+      // Get real index considering pagination
+      const realIndex = (currentPage - 1) * itemsPerPage + index;
+      const activity = activities[realIndex];
+      
+      if (!activity) return total;
+      
+      const amount = activity.amountLeft
+        ? parseFloat(activity.amountLeft.replace(/,/g, ""))
+        : parseFloat(activity.AmountDue.replace(/,/g, ""));
       return total + amount;
     }, 0);
   };
@@ -288,28 +353,20 @@ const Outstanding = () => {
   };
 
   const handleSelectPaymentAll = () => {
-    const newSelectAll = !selectAll;
-    setSelectAll(newSelectAll);
-
-    if (newSelectAll) {
-      // Get indices of all current page items
-      const currentIndices = [];
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = Math.min(startIndex + itemsPerPage, activities.length);
-
-      for (let i = startIndex; i < endIndex; i++) {
-        currentIndices.push(i);
-      }
-
-      setSelectedItems(currentIndices);
-
-      // Calculate total and open modal
-      const total = calculateTotalAmount(currentIndices);
-      setTotalAmount(total);
-      setIsTotalModalOpen(true);
-    } else {
-      setSelectedItems([]);
+    if (selectedItems.length === 0) {
+      toast({
+        title: "No Items Selected",
+        description: "Please select at least one payment to proceed.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
     }
+    
+    // Calculate total for selected items
+    const total = calculateTotalAmount(selectedItems);
+    setTotalAmount(total);
+    setIsTotalModalOpen(true);
   };
 
   const resetFilters = () => {
@@ -318,213 +375,52 @@ const Outstanding = () => {
     setActivities(originalActivities);
     setCurrentPage(1);
     setIsFiltered(false);
-  };
-
-  const renderTotalModal = () => {
-    // Modal implementation remains the same
-    return (
-      <Modal
-        isOpen={isTotalModalOpen}
-        onClose={() => setIsTotalModalOpen(false)}
-      >
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Total Selected Payments</h2>
-
-          <div className="mb-4">
-            <p className="text-base text-gray-700">
-              Total Amount Due:{" "}
-              <span className="font-medium text-xl">
-                ₦{totalAmount.toLocaleString()}
-              </span>
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              You've selected {selectedItems.length} payment(s)
-            </p>
-          </div>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div
-                className={`border rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer ${
-                  paymentMethod === "full"
-                    ? "border-blue-500"
-                    : "border-gray-300"
-                }`}
-                onClick={() => setPaymentMethod("full")}
-              >
-                <div className="w-5 h-5 rounded-full border border-gray-300 mb-2 flex items-center justify-center">
-                  {paymentMethod === "full" && (
-                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                  )}
-                </div>
-                <p className="font-medium text-center">Full Payment</p>
-                <p className="font-medium text-center">
-                  ₦{totalAmount.toLocaleString()}
-                </p>
-              </div>
-
-              <div
-                className={`border rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer ${
-                  paymentMethod === "partial"
-                    ? "border-blue-500"
-                    : "border-gray-300"
-                }`}
-                onClick={() => setPaymentMethod("partial")}
-              >
-                <div className="w-5 h-5 rounded-full border border-gray-300 mb-2 flex items-center justify-center">
-                  {paymentMethod === "partial" && (
-                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                  )}
-                </div>
-                <p className="font-medium text-center">Partial Payment</p>
-                <div className="mt-1 flex items-center">
-                  <span className="text-gray-600 mr-1">₦</span>
-                  <input
-                    type="text"
-                    placeholder="Enter Amount"
-                    className="border-b border-gray-300 focus:outline-none focus:border-blue-500 w-24 text-center"
-                    disabled={paymentMethod !== "partial"}
-                    value={partialAmount}
-                    onChange={(e) => setPartialAmount(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 space-y-4">
-            <button
-              onClick={() => {
-                // Here you can add logic to handle settling all selected payments
-                setIsTotalModalOpen(false);
-              }}
-              className="w-full bg-primary text-white py-3 rounded-lg hover:bg-blue-700"
-            >
-              Proceed to pay ₦{totalAmount.toLocaleString()}
-            </button>
-            <button
-              onClick={() => setIsTotalModalOpen(false)}
-              className="w-full border border-primary text-primary py-3 rounded-lg hover:bg-primary hover:text-white"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </Modal>
-    );
+    setSelectAll(false);
   };
 
   const renderPaymentModal = () => {
+    if (!isPaymentModalOpen) return null;
+    
+    // Find the payment details from the selected billing ID
+    const selectedPayment = activities.find(act => act.id === selectedBillingId);
+    
     if (!selectedPayment) return null;
-
+    
     return (
-      <Modal
+      <PaymentModal
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
-      >
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Settle Payment</h2>
+        totalAmount={parseFloat(selectedPayment.AmountDue.replace(/,/g, ""))}
+        billingId={selectedBillingId}
+        title={selectedPayment.PaymentType}
+        userData={userData}
+        onPaymentSuccess={handlePaymentSuccess}
+      />
+    );
+  };
 
-          <div className="mb-4">
-            <div className="grid grid-cols-1 gap-2">
-              <div>
-                <p className="text-base text-gray-700">
-                  Payment For:{" "}
-                  <span className="font-medium">
-                    {selectedPayment.paymentType}
-                  </span>{" "}
-                </p>
-              </div>
-              <div>
-                <p className="text-base text-gray-700">
-                  Amount Due:{" "}
-                  <span className="font-medium">
-                    ₦{selectedPayment.amountDue}
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div
-                className={`border rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer ${
-                  paymentMethod === "full"
-                    ? "border-blue-500"
-                    : "border-gray-300"
-                }`}
-                onClick={() => setPaymentMethod("full")}
-              >
-                <div className="w-5 h-5 rounded-full border border-gray-300 mb-2 flex items-center justify-center">
-                  {paymentMethod === "full" && (
-                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                  )}
-                </div>
-                <p className="font-medium text-center">Full Payment</p>
-                <p className="font-medium text-center">
-                  ₦{selectedPayment?.amountDue || "0"}
-                </p>
-              </div>
-
-              <div
-                className={`border rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer ${
-                  paymentMethod === "partial"
-                    ? "border-blue-500"
-                    : "border-gray-300"
-                }`}
-                onClick={() => setPaymentMethod("partial")}
-              >
-                <div className="w-5 h-5 rounded-full border border-gray-300 mb-2 flex items-center justify-center">
-                  {paymentMethod === "partial" && (
-                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                  )}
-                </div>
-                <p className="font-medium text-center">Partial Payment</p>
-                <div className="mt-1 flex items-center">
-                  <span className="text-gray-600 mr-1">₦</span>
-                  <input
-                    type="text"
-                    placeholder="Enter Amount"
-                    className="border-b border-gray-300 focus:outline-none focus:border-blue-500 w-24 text-center"
-                    disabled={paymentMethod !== "partial"}
-                    value={partialAmount}
-                    onChange={(e) => setPartialAmount(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 space-y-4">
-            <button
-              onClick={handlePaymentSubmit}
-              className="w-full bg-primary text-white py-3 rounded-lg hover:bg-blue-700"
-              disabled={
-                paymentMethod === "partial" &&
-                (!partialAmount || partialAmount.trim() === "")
-              }
-            >
-              Proceed to pay ₦{selectedPayment.amountDue}
-            </button>
-            <button
-              onClick={() => {
-                setIsPaymentModalOpen(false);
-                setPartialAmount("");
-              }}
-              className="w-full border border-primary text-primary py-3 rounded-lg hover:bg-primary hover:text-white"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </Modal>
+  const renderTotalModal = () => {
+    if (!isTotalModalOpen) return null;
+    
+    return (
+      <PaymentModal 
+        isOpen={isTotalModalOpen}
+        onClose={() => setIsTotalModalOpen(false)}
+        totalAmount={totalAmount}
+        billingId="multiple" // Indicate it's a multiple payment
+        title="Multiple Payments"
+        userData={userData}
+        onPaymentSuccess={handleSettleAllPayments}
+      />
     );
   };
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
+    // Reset selections when changing pages
+    setSelectedItems([]);
+    setSelectAll(false);
   };
-
   const getCurrentItems = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return activities.slice(startIndex, startIndex + itemsPerPage);

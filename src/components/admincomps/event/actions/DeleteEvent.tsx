@@ -17,29 +17,25 @@ interface CancelEventProps {
 function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const handleCancel = () => {
-    let data = JSON.stringify({
-      status: "CANCELLED",
-    });
-
+  const handleDelete = () => {
     setIsLoading(true);
     let config = {
-      method: "patch",
+      method: "delete",
       maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/events/${id}/status`,
+      url: `${BASE_API_URL}/events/${id}?forceDelete=true`,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
       withCredentials: true,
-      data: data,
+      // credentials: "include",
     };
 
     axios
       .request(config)
       .then((response) => {
         toast({
-          title: "Event Cancelled",
+          title: "Event Deleted",
           description: response.data.message,
           variant: "default",
         });
@@ -57,6 +53,9 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
       });
     window.location.reload();
   };
+  const handleCancel = () => {
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
@@ -67,9 +66,9 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
           </div>
           <div>
             <div className="flex flex-col w-fit gap-2">
-              <h5 className="font-semibold text-xl text-black">Cancel Event</h5>
+              <h5 className="font-semibold text-xl text-black">Delete Event</h5>
               <p className="text-sm text-neutral-600 text-wrap">
-                If you cancel this event, the event will no longer take place
+                If you delete this event, the event will no longer take place
                 and members will be notified via email. Are you sure you want to
                 proceed?{" "}
               </p>
@@ -94,11 +93,11 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
         </div>
         <div className="flex w-fit justify-between">
           <button
-            onClick={handleCancel}
+            onClick={handleDelete}
             disabled={isLoading}
             className="flex items-center w-fit  text-nowrap text-center justify-center bg-red-600 font-semibold text-base text-white rounded-full py-3 px-4 h-10"
           >
-            Cancel Event
+            Delete Event
           </button>
           <button
             onClick={onClose}

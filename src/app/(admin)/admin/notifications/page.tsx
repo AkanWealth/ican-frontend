@@ -4,9 +4,14 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MdArrowBack, MdDelete } from "react-icons/md";
 import { BellIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
+
+
+import NewNotification from "@/components/admincomps/notifications/NewNotification";
 
 function NotificationPage() {
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);  
   const [notifications, setNotifications] = useState([
     {
       header: "Admin Created",
@@ -30,9 +35,15 @@ function NotificationPage() {
       </div>
       {/* Tab sections */}
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl w-full font-semibold text-left border-b border-gray-500 ">
-          Notifications
-        </h2>
+        <div className="flex flex-row justify-between items-center">
+          <h2 className="text-xl w-full font-semibold text-left border-b border-gray-500 ">
+            Notifications
+            </h2>
+            <button className="bg-blue-500 text-white rounded-md px-4 py-2" onClick={() => setIsOpen(true)}>
+            <PlusIcon className="w-4 h-4" />
+            New Notification
+          </button>
+        </div>
         <div>
           {notifications.length > 0
             ? notifications.slice(0, 4).map((notification, index) => (
@@ -70,6 +81,7 @@ function NotificationPage() {
             : "p0"}
         </div>
       </div>
+      {isOpen && <NewNotification />}
     </div>
   );
 }

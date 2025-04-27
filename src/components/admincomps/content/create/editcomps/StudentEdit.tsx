@@ -7,7 +7,8 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
-import Toast from "@/components/genui/Toast";
+import PreviewStudent from "../previewcomps/PreviewStudent";
+import { useToast } from "@/hooks/use-toast";
 
 type StudyPack = {
   name: string;
@@ -19,6 +20,8 @@ function StudentEdit({ mode, id }: CreateContentProps) {
   const [student, setStudent] = useState<StudyPack>({ name: "", document: "" });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -36,6 +39,11 @@ function StudentEdit({ mode, id }: CreateContentProps) {
           document: response.data.amswer || "",
         });
         setEditDataFetched(true);
+        toast({
+          title: "Study Pack details fetched successfully",
+          description: response.data.message,
+          variant: "default",
+        });
       } catch (error) {
         if (
           axios.isAxiosError(error) &&
@@ -46,7 +54,20 @@ function StudentEdit({ mode, id }: CreateContentProps) {
           console.error(
             "Study Pack not found (404). Stopping further fetch attempts."
           );
+          toast({
+            title: "Study Pack not found",
+            description: error.response.data.message,
+            variant: "destructive",
+          });
         } else {
+          toast({
+            title: "Error fetching Study Pack",
+            description:
+              axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : "An unknown error occurred",
+            variant: "destructive",
+          });
           console.error("Error fetching Study Pack:", error);
         }
       }
@@ -56,7 +77,7 @@ function StudentEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching Study Pack details for edit mode");
       fetchDetails();
     }
-  }, [editDataFetched, id, mode]);
+  }, [editDataFetched, id, mode, toast]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({
@@ -82,13 +103,25 @@ function StudentEdit({ mode, id }: CreateContentProps) {
     try {
       const response = await axios.request(config);
       console.log("Study Pack submitted successfully:", response.data);
-      alert("Study Pack submitted successfully!");
       setIsSubmitting(false);
       setIsLoading(false);
+      toast({
+        title: "Study Pack submitted successfully",
+        description: response.data.message,
+        variant: "default",
+      });
     } catch (error) {
-      alert("Error submitting Study Pack: " + error);
       setIsSubmitting(false);
       setIsLoading(false);
+      toast({
+        title: "Error submitting Study Pack",
+        description:
+          axios.isAxiosError(error) && error.response?.data?.message
+            ? error.response.data.message
+            : "An unknown error occurred",
+        variant: "destructive",
+      });
+      console.error("Error submitting Study Pack:", error);
     }
   };
 
@@ -133,10 +166,21 @@ function StudentEdit({ mode, id }: CreateContentProps) {
         >
           {mode === "edit" ? "Save Edit" : "Save as Draft"}
         </button>
-        <button className=" py-1 text-primary text-base rounded-full w-full">
+        <button
+          onClick={() => setShowPreview(true)}
+          className=" py-1 text-primary text-base rounded-full w-full"
+        >
           Preview
         </button>
       </div>
+      {showPreview && (
+        <PreviewStudent
+          name={student.name}
+          document={student.document}
+          showPreview={showPreview}
+          setShowPreview={setShowPreview}
+        />
+      )}
     </div>
   );
 }

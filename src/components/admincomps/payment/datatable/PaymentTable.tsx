@@ -64,10 +64,13 @@ export function PaymentTable<TData, TValue>({
         <Input
           placeholder="Filter by Name..."
           value={
-            (table.getColumn("member_name")?.getFilterValue() as string) ?? ""
+            (table.getColumn("user.firstname")?.getFilterValue() as string) ??
+            ""
           }
           onChange={(event) =>
-            table.getColumn("member_name")?.setFilterValue(event.target.value)
+            table
+              .getColumn("user.firstname")
+              ?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

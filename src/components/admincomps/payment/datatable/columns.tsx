@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import {
-  PaymentDets,
+  OverdueBills,
   PaymentDetails,
   BillingDetails,
   PaymentBasic,
@@ -90,7 +90,7 @@ export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
     },
   },
 ];
-export const dashPaymentcoloumns: ColumnDef<PaymentDets>[] = [
+export const dashPaymentcoloumns: ColumnDef<OverdueBills>[] = [
   {
     accessorKey: "user.firstname",
     header: ({ column }) => {
@@ -115,8 +115,12 @@ export const dashPaymentcoloumns: ColumnDef<PaymentDets>[] = [
   },
 
   {
+    accessorKey: "billing.name",
+    header: "Bill Name",
+  },
+  {
     accessorKey: "billing.type",
-    header: "Payment Type",
+    header: "Bill Type",
   },
   {
     accessorKey: "billing.amount",
@@ -142,31 +146,6 @@ export const dashPaymentcoloumns: ColumnDef<PaymentDets>[] = [
           {new Date(row.original.billing.createdAt).toLocaleDateString("en-GB")}
         </div>
       );
-    },
-  },
-
-  {
-    accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Invoice Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
-    },
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      return <CellActions row={row} />;
     },
   },
 ];

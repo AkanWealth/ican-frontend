@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import InputEle from "@/components/genui/InputEle";
 
 import { User } from "@/libs/types";
-
+import { useRouter } from "next/navigation";
 import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 
 // Props interface for role manager component
@@ -31,7 +31,8 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [permissions, setPermissions] = useState<Option[]>([]);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const OPTIONS: Option[] = [
     { label: "ADD_CONTENT", value: "ADD_CONTENT", group: "Content" },
     { label: "ADD_FAQ", value: "ADD_FAQ", group: "Content" },
@@ -273,35 +274,33 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
       };
       const response = await axios.request(config);
 
-      if (response.status === 200) {
-        // Show success message
+      // Show success message
 
-        // Reset form and close modal
-        setFormData(initialFormData);
-        setPermissions([]);
-        setShowModal(false);
+      // Reset form and close modal
+      setFormData(initialFormData);
+      setPermissions([]);
+      setShowModal(false);
 
-        toast({
-          title: "Role Created",
-          description: "The role  has been successfully created.",
-          variant: "default",
-        });
-      } else {
-        // Show error message
-        toast({
-          title: "Error",
-          description: "There was an error creating the role.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Role Created",
+        description: response.data.message,
+        variant: "default",
+      });
+      setIsLoading(false);
+      router.refresh();
     } catch (error) {
       console.error("Error creating role:", error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
+        description:
+          axios.isAxiosError(error) && error.response?.data?.message
+            ? error.response.data.message
+            : "An error occurred while creating the role",
         variant: "destructive",
       });
     }
+    setIsLoading(false);
+    router.refresh();
   };
 
   return (
@@ -325,6 +324,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
+
           <p className="text-primary">
             Number of selected roles: {permissions.length}
           </p>
@@ -353,9 +353,10 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
             </button>
             <button
               type="submit"
+              disabled={isLoading}
               className="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600"
             >
-              Create Role
+              {isLoading ? "Creating..." : "Create Role"}
             </button>
           </div>
         </form>

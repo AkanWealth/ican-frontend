@@ -10,7 +10,8 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
-import Toast from "@/components/genui/Toast";
+import PreviewBlog from "../previewcomps/PreviewBlog";
+import { useToast } from "@/hooks/use-toast";
 
 interface BlogProps {
   title: string;
@@ -25,6 +26,8 @@ function BlogEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const { toast } = useToast();
 
   const [blog, setBlog] = useState<BlogProps>({
     title: "",
@@ -65,11 +68,20 @@ function BlogEdit({ mode, id }: CreateContentProps) {
           error.response.status === 404
         ) {
           setEditDataFetched(true);
-          console.error(
-            "Blog not found (404). Stopping further fetch attempts."
-          );
+          toast({
+            title: "Blog not found",
+            description: error.response.data.message,
+            variant: "destructive",
+          });
         } else {
-          console.error("Error fetching Blog:", error);
+          toast({
+            title: "Error fetching Blog",
+            description:
+              axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : "An unknown error occurred",
+            variant: "destructive",
+          });
         }
       }
     };
@@ -78,7 +90,7 @@ function BlogEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching Blog details for edit mode");
       fetchDetails();
     }
-  }, [editDataFetched, id, mode]);
+  }, [editDataFetched, toast, id, mode]);
 
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({
@@ -109,9 +121,22 @@ function BlogEdit({ mode, id }: CreateContentProps) {
       setIsSubmitting(false);
       setIsLoading(false);
       router.refresh();
-      alert("Blog submitted successfully!");
+      toast({
+        title: "Blog submitted successfully!",
+        description: response.data.message,
+        variant: "default",
+      });
     } catch (error) {
-      alert("Error submitting blog: " + error);
+      setIsSubmitting(false);
+      setIsLoading(false);
+      toast({
+        title: "Error submitting blog",
+        description:
+          axios.isAxiosError(error) && error.response?.data?.message
+            ? error.response.data.message
+            : "An unknown error occurred",
+        variant: "destructive",
+      });
     }
   };
 
@@ -163,10 +188,22 @@ function BlogEdit({ mode, id }: CreateContentProps) {
         >
           {mode === "edit" ? "Save Edit" : "Save as Draft"}
         </button>
-        <button className=" py-1 text-primary text-base rounded-full w-full">
+        <button
+          onClick={() => setShowPreview(true)}
+          className=" py-1 text-primary text-base rounded-full w-full"
+        >
           Preview
         </button>
       </div>
+      {showPreview && (
+        <PreviewBlog
+          title={blog.title}
+          authorName={blog.authorName}
+          contentBody={post}
+          showPreview={showPreview}
+          setShowPreview={setShowPreview}
+        />
+      )}
     </form>
   );
 }

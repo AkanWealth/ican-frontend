@@ -30,14 +30,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { DashEventReg, DashEventAttendanceTrend } from "@/libs/types";
-const chartData = [
-  { month: "January", people: 186 },
-  { month: "February", people: 305 },
-  { month: "March", people: 237 },
-  { month: "April", people: 73 },
-  { month: "May", people: 209 },
-  { month: "June", people: 214 },
-];
+
+
 const chartConfig = {
   people: {
     label: "People",

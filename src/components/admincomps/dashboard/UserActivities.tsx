@@ -23,14 +23,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
+
 const chartConfig = {
   desktop: {
     label: "Users",
@@ -45,6 +38,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DashUserLogin } from "@/libs/types";
 
 import apiClient from "@/services-admin/apiClient";
+import { DashEventAttendanceTrend } from "@/libs/types";
 
 function UserActivities() {
   const { toast } = useToast();
@@ -67,6 +61,7 @@ function UserActivities() {
     totalMonthlyLogins: 0,
     totalYearlyLogins: 0,
   });
+  const [userActivityTrendData, setUserActivityTrendData] = useState<DashEventAttendanceTrend[]>([]);
 
   const [activeChart, setActiveChart] = useState<
     "weekly" | "monthly" | "yearly"
@@ -109,6 +104,48 @@ function UserActivities() {
 
     fetchData();
   }, [router, toast]);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
+
+          const config = {
+            method: "get",
+            maxBodyLength: Infinity,
+            url: `${BASE_API_URL}/dashboard/user-registration-trend`,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          };
+
+          const response = await apiClient.get(
+            "/dashboard/user-registration-trend",
+            config
+          );
+          const formattedData = response.map((item: any) => ({
+            month: item.month || item.date || item.period,
+            people: item.count || item.value || item.total || 0,
+          }));
+          setUserActivityTrendData(formattedData);
+          toast({
+            title: "User Activities",
+            description: "User activities data fetched successfully.",
+            variant: "default",
+          });
+        } catch (error) {
+          console.error(error);
+
+          toast({
+            title: "Error",
+            description: "Failed to fetch user activities data.",
+            variant: "destructive",
+          });
+        }
+      };
+
+      fetchData();
+    }, [router, toast]);
 
   useEffect(() => {
     const fetchLoginStats = async () => {
@@ -261,7 +298,7 @@ function UserActivities() {
         <ChartContainer className="max-h-96 w-full" config={chartConfig}>
           <LineChart
             accessibilityLayer
-            data={data.length > 0 ? data : chartData}
+            data={data.length > 0 ? data : userActivityTrendData}
             margin={{
               left: 12,
               right: 12,
@@ -313,14 +350,14 @@ function UserActivities() {
       <div className="flex w-full max-h-[700px] flex-col gap-10">
         <Card>
           <CardHeader>
-            <CardTitle>User Registration Trend</CardTitle>
+            <CardTitle>User Registration Trend for {new Date().getFullYear()}</CardTitle>
             <CardDescription>January - June 2024</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>
               <LineChart
                 accessibilityLayer
-                data={chartData}
+                data={userActivityTrendData}
                 margin={{
                   left: 12,
                   right: 12,

@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -38,7 +39,7 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
   useEffect(() => {
     const fetchRole = async () => {
       try {
-        const response = await axios.get(`${BASE_API_URL}/roles/${id}`);
+        const response = await apiClient.get(`${BASE_API_URL}/roles/${id}`);
         setFormData(response.data);
         toast({
           title: "Role Fetched",
@@ -48,10 +49,8 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
       } catch (error) {
         toast({
           title: "Error",
-          description:
-            axios.isAxiosError(error) && error.response?.data?.message
-              ? error.response.data.message
-              : "An error occurred while fetching the role",
+          description: "An error occurred while fetching the role",
+          variant: "destructive",
         });
       }
     };
@@ -79,11 +78,11 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
         headers: {
           "Content-Type": "application/json",
 
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         data: submitData,
       };
-      const response = await axios.request(config);
+      const response = await apiClient.request(config);
 
       // Show success message
 
@@ -103,10 +102,7 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
       console.error("Error creating role:", error);
       toast({
         title: "Error",
-        description:
-          axios.isAxiosError(error) && error.response?.data?.message
-            ? error.response.data.message
-            : "An error occurred while editing the role",
+        description:   "An error occurred while editing the role",
         variant: "destructive",
       });
     }

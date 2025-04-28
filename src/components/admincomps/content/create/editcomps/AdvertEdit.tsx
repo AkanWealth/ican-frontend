@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 import Cookies from "universal-cookie";
-import axios from "axios";
+
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 
 import { CreateContentProps } from "@/libs/types";
@@ -45,40 +47,27 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(`${BASE_API_URL}/adverts/${id}/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-          withCredentials: true,
-        });
+        const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}/`);
         console.log("Advert details fetched:", response.data);
         setAdvert({
-          name: response.data.name || advert.name,
-          advertiser: response.data.advertiser || advert.advertiser,
-          image: response.data.image || advert.image,
-          textBody: response.data.textBody || advert.textBody,
-          startDate: response.data.startDate
-            ? new Date(response.data.startDate)
+          name: response.name || advert.name,
+          advertiser: response.advertiser || advert.advertiser,
+          image: response.image || advert.image,
+          textBody: response.textBody || advert.textBody,
+          startDate: response.startDate
+            ? new Date(response.startDate)
             : advert.startDate,
-          endDate: response.data.endDate
-            ? new Date(response.data.endDate)
+          endDate: response.endDate
+            ? new Date(response.endDate)
             : advert.endDate,
         });
         setEditDataFetched(true);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setEditDataFetched(true);
-          console.error(
-            "Advert not found (404). Stopping further fetch attempts."
-          );
-        } else {
-          console.error("Error fetching Transactions:", error);
-        }
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -96,6 +85,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
     editDataFetched,
     id,
     mode,
+    toast,
   ]);
 
   const handlePhotoUpload = async (
@@ -172,13 +162,13 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           : `${BASE_API_URL}/adverts`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };
 
     try {
-      const response = await axios.request(config);
+      const response = await apiClient.request(config);
       setIsSubmitting(false);
       setIsLoading(false);
       toast({

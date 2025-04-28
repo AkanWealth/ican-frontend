@@ -9,7 +9,7 @@ export interface Event {
   mcpdCredit: "" | number;
   eventDescription?: string;
   eventImage?: string;
-  status: "completed" | "cancelled" | "draft" | "upcoming";
+  status: "completed" | "cancelled" | "draft" | "upcoming" | "pending" | "COMPLETED" | "CANCELLED" | "DRAFT" | "UPCOMING" | "PENDING";
 }
 
 

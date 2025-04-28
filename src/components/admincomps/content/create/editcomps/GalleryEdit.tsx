@@ -6,13 +6,12 @@ import InputEle from "@/components/genui/InputEle";
 import { useRouter } from "next/navigation";
 import Cookies from "universal-cookie";
 
-import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
 import { useToast } from "@/hooks/use-toast";
 
-import { Router } from "lucide-react";
+import apiClient from "@/services-admin/apiClient";
 import PreviewGallery from "../previewcomps/PreviewGallery";
 
 interface GalleryProps {
@@ -25,7 +24,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
   const cookies = new Cookies();
   const { toast } = useToast();
-  const [showPreview, setShowPreview] = useState<boolean>(false); 
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -39,45 +38,20 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(`${BASE_API_URL}/gallery/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-          withCredentials: true,
-        });
+        const response = await apiClient.get(`${BASE_API_URL}/gallery/${id}`);
         console.log("Gallery details fetched:", response.data);
         setGallery({
-          name: response.data.name,
-          images: response.data.images || [""],
-          videos: response.data.videos || [""],
+          name: response.name,
+          images: response.images || [""],
+          videos: response.videos || [""],
         });
         setEditDataFetched(true);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setEditDataFetched(true);
-          console.error(
-            "Gallery not found (404). Stopping further fetch attempts."
-          );
-
-          toast({
-            title: "Error",
-            variant: "destructive",
-            description: "Gallery not found.",
-          });
-        } else {
-          console.error("Error fetching Gallery:", error);
-          toast({
-            title: "Error",
-            variant: "destructive",
-            description:
-              "An unexpected error occurred while fetching the gallery.",
-          });
-        }
+        toast({
+          title: "Error",
+          variant: "destructive",
+          description: "Gallery not found.",
+        });
       }
     };
 
@@ -104,14 +78,14 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           : `${BASE_API_URL}/gallery`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };
 
     try {
-      const response = await axios.request(config);
-      console.log("Gallery submitted successfully:", response.data);
+        const response = await apiClient.request(config);
+      console.log("Gallery submitted successfully:", response);
       router.refresh();
       setIsSubmitting(false);
       toast({
@@ -194,7 +168,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           showPreview={showPreview}
           setShowPreview={setShowPreview}
         />
-      )}  
+      )}
     </div>
   );
 }

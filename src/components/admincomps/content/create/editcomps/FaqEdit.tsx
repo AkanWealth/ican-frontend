@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
+
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
@@ -30,37 +32,16 @@ function FaqEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(`${BASE_API_URL}/faqs/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-          withCredentials: true,
-        });
+        const response = await apiClient.get(`${BASE_API_URL}/faqs/${id}`);
         console.log("Faq details fetched:", response.data);
         setFaq({
-          question: response.data.name,
-          answer: response.data.amswer || "",
+          question: response.name,
+          answer: response.answer || "",
         });
         setEditDataFetched(true);
         setIsSubmitting(false);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setEditDataFetched(true);
-          console.error(
-            "Faq not found (404). Stopping further fetch attempts."
-          );
-          toast({
-            title: "Error",
-            description:
-              "Faq not found (404). Stopping further fetch attempts.",
-            variant: "destructive",
-          });
-        } else {
+  
           console.error("Error fetching Faq:", error);
           toast({
             title: "Error",
@@ -68,7 +49,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
             variant: "destructive",
           });
         }
-      }
+      
     };
 
     if (mode === "edit" && !editDataFetched) {
@@ -90,14 +71,14 @@ function FaqEdit({ mode, id }: CreateContentProps) {
         mode === "edit" ? `${BASE_API_URL}/faqs/${id}` : `${BASE_API_URL}/faqs`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };
 
     try {
-      const response = await axios.request(config);
-      console.log("FAQ submitted successfully:", response.data);
+      const response = await apiClient.request(config);
+      console.log("FAQ submitted successfully:", response);
       toast({
         title: "Success",
         description: `FAQ ${

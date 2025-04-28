@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -79,13 +80,13 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/roles`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
 
       try {
-        const response = await axios.request(config);
-        setRoles(response.data);
+        const response = await apiClient.get("/roles", config);
+        setRoles(response);
 
         toast({
           title: "Success",
@@ -113,12 +114,12 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/users/users`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
 
       try {
-        const response = await axios.request(config);
+        const response = await apiClient.get("/users/users", config);
 
         // Update roles state with fetched data
         setUsers(response.data.data);
@@ -141,7 +142,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
     };
 
     fetchUsers();
-  }, [toast ]); // Empty dependency array means this runs once on mount
+  }, [toast]); // Empty dependency array means this runs once on mount
 
   const selectedUser = Array.isArray(users)
     ? users.find((user) => user.id === formData.userId)
@@ -156,19 +157,12 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
+      const response = await apiClient.post(
         `${BASE_API_URL}/roles/assign`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }
+        formData
       );
 
-      if (response.status !== 200) {
-        throw new Error("Failed to create admin");
-      }
+        
 
       toast({
         title: "Success",
@@ -176,7 +170,6 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         variant: "default",
       });
 
-      // Close modal and reset form
       onClose();
       setFormData(initialFormData);
     } catch (error) {

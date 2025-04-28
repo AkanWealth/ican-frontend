@@ -7,14 +7,19 @@ import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { adminscolumns } from "@/components/admincomps/user/datatable/columns";
 import { User } from "@/libs/types";
 
-import axios from "axios";
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import apiClient from "@/services-admin/apiClient";
 import { BASE_API_URL } from "@/utils/setter";
-import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 import CreateNewAdmin from "@/components/admincomps/admin/CreateNewAdmin";
 
+import { useToast } from "@/hooks/use-toast";
+
 function AdminManagementPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [data, setData] = useState<User[]>([]);
   const [showModal, setShowModal] = useState(false);
 
@@ -24,20 +29,26 @@ function AdminManagementPage() {
         method: "get",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/users/admins`,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
       };
-      const result = await axios.request(config);
+      try {
+        const result = await apiClient.get("/users/admins", config);
 
-      if (result.status === 401) {
-        await handleUnauthorizedRequest(config, router, setData);
-      } else {
-        setData(result.data);
+        setData(result);
+        toast({
+          title: "Success",
+          description: "Admins fetched successfully.",
+          variant: "default",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
       }
     }
     fetchData();
-  }, [router]);
+  }, [router, toast]);
 
   return (
     <div className="rounded-3xl p-6">
@@ -76,4 +87,12 @@ function AdminManagementPage() {
   );
 }
 
-export default AdminManagementPage;
+export default function PackedAdminManagementPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <AdminManagementPage />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
@@ -30,47 +31,27 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(
+        const response = await apiClient.get(
           `${BASE_API_URL}/technical-sessions/${id}`,
           {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
             withCredentials: true,
           }
         );
         console.log("Technical Sessions details fetched:", response.data);
         setTechSesh({
-          name: response.data.name,
-          document: response.data.amswer || "",
-          coverImg: response.data.coverImg || "",
+          name: response.name,
+          document: response.document || "",
+          coverImg: response.coverImg || "",
         });
         setEditDataFetched(true);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setEditDataFetched(true);
+        setEditDataFetched(true);
 
-          toast({
-            title: "Technical Sessions not found",
-            description: error.response.data.message,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error fetching Technical Sessions",
-            description:
-              axios.isAxiosError(error) && error.response?.data?.message
-                ? error.response.data.message
-                : "An unknown error occurred",
-            variant: "destructive",
-          });
-          console.error("Error fetching Technical Sessions:", error);
-        }
+        toast({
+          title: "Technical Sessions not found",
+          description: "Technical Sessions not found",
+          variant: "destructive",
+        });
       }
     };
 
@@ -97,28 +78,25 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
           : `${BASE_API_URL}/technical-sessions`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };
 
     try {
-      const response = await axios.request(config);
-      console.log("Technical Sessions submitted successfully:", response.data);
+      const response = await apiClient.request(config);
+      console.log("Technical Sessions submitted successfully:", response);
       setIsSubmitting(false);
       toast({
         title: "Technical Sessions submitted successfully!",
-        description: response.data.message,
+        description: response.message,
         variant: "default",
       });
     } catch (error) {
       setIsSubmitting(false);
       toast({
         title: "Error submitting Technical Sessions",
-        description:
-          axios.isAxiosError(error) && error.response?.data?.message
-            ? error.response.data.message
-            : "An unknown error occurred",
+        description: "An unknown error occurred",
         variant: "destructive",
       });
     }

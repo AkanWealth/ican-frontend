@@ -4,14 +4,14 @@ import React, { useEffect, useState } from "react";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { faqcolumns } from "@/components/admincomps/content/datatable/columns";
 
-import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
-import { FaqData } from "@/libs/types";
+import apiClient from "@/services-admin/apiClient";
+import { useToast } from "@/hooks/use-toast";
 
 function Faq() {
   const [data, setData] = useState([]);
-
+  const { toast } = useToast();
   useEffect(() => {
     async function fetchFAQData() {
       const config = {
@@ -21,14 +21,18 @@ function Faq() {
         headers: {},
       };
       try {
-        const response = await axios.request(config);
-        setData(response.data.faqs);
+        const response = await apiClient.get("/faqs", config);
+        setData(response.faqs);
       } catch (error) {
-        console.error(error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
       }
     }
     fetchFAQData();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">

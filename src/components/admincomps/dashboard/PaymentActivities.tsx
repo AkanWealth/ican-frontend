@@ -4,13 +4,13 @@ import React, { useEffect, useState } from "react";
 import StatCard from "@/components/genui/StatCard";
 import { MdVerifiedUser } from "react-icons/md";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { dashPaymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
 import { OverdueBills } from "@/libs/types";
-import { TrendingUp } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -67,7 +67,7 @@ function PaymentActivities() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
 
         const config = {
           method: "get",
@@ -78,30 +78,14 @@ function PaymentActivities() {
           },
         };
 
-        const response = await axios.request(config);
-        setData(response.data);
+        const response = await apiClient.get("/dashboard/payment-data", config);
+        setData(response);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          const config = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: `${BASE_API_URL}/dashboard/payment-data`,
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
-          };
-          await handleUnauthorizedRequest(config, router, setData);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch payment data.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "Failed to fetch payment data.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -111,7 +95,7 @@ function PaymentActivities() {
   useEffect(() => {
     async function fetchPaymentData() {
       try {
-        const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem("accessToken");
         const config = {
           method: "get",
           maxBodyLength: Infinity,
@@ -120,9 +104,12 @@ function PaymentActivities() {
             Authorization: `Bearer ${token}`,
           },
         };
-        const response = await axios.request(config);
-        const result = response.data;
-        setPaymentData(result);
+        const response = await apiClient.get(
+          "/dashboard/overdue-payments",
+          config
+        );
+
+        setPaymentData(response);
         toast({
           title: "Overdue Payments",
           description: "Overdue payments fetched successfully",

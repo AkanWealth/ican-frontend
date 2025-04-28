@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/content/editActions/CellActions";
 
+import { Resource } from "@/libs/types";
+
 export const allcolumns: ColumnDef<Content>[] = [
   {
     accessorKey: "name",
@@ -208,7 +210,7 @@ export const blogscolumns: ColumnDef<Content>[] = [
   },
 ];
 
-export const publicationscolumns: ColumnDef<Content>[] = [
+export const resourcescolumns: ColumnDef<Resource>[] = [
   {
     accessorKey: "title",
     header: ({ column }) => {
@@ -225,7 +227,7 @@ export const publicationscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "author",
+    accessorKey: "description",
     header: ({ column }) => {
       return (
         <Button
@@ -240,7 +242,22 @@ export const publicationscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "date_created",
+    accessorKey: "type",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          File Category
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -253,47 +270,43 @@ export const publicationscolumns: ColumnDef<Content>[] = [
         </Button>
       );
     },
-  },
-  {
-    accessorKey: "materials",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Type
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString(); 
+    },
+  },
+  {
+    accessorKey: "fileUrl",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          File URL
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "access",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Access
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
     },
   },
 
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      return <CellActions contentCategory="publications" row={row} />;
-    },
-  },
+  
 ];
 export const galleriescolumns: ColumnDef<Content>[] = [
   {

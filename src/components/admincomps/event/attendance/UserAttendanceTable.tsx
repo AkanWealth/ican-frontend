@@ -33,7 +33,7 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  setter: React.Dispatch<React.SetStateAction<string[]>>;
+  setter: React.Dispatch<React.SetStateAction<string[]>> | undefined;
 }
 
 export function UserAttendanceTable<TData, TValue>({
@@ -45,6 +45,7 @@ export function UserAttendanceTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+
   const [rowSelection, setRowSelection] = React.useState({});
   const table = useReactTable({
     data,
@@ -64,23 +65,29 @@ export function UserAttendanceTable<TData, TValue>({
   });
 
   function onAccept(selectedRows: TData[]) {
-    setter(selectedRows.map((row) => String((row as any).id))); // Extract and convert the 'id' field to string
+    if (setter) {
+      setter(selectedRows.map((row) => String((row as any).id))); // Extract and convert the 'id' field to string
+    }
   }
 
   return (
     <div>
-      <div className="flex flex-row justify-between w-full  items-center py-4">
+      <div className="flex flex-row justify-between w-full items-center py-4">
         <Input
           placeholder="Filter by attendee name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn("fullName")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn("fullName")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
-        <button className=" bg-primary text-white rounded-full py-2 px-3 border border-white whitespace-nowrap ">
-          Mark as Present
-        </button>
+        {setter && (
+          <button className="bg-primary text-white rounded-full py-2 px-3 border border-white whitespace-nowrap">
+            Mark as Present
+          </button>
+        )}
       </div>
       <div className="">
         <Table>

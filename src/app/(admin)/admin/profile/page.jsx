@@ -4,7 +4,17 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import InputEle from "@/components/genui/InputEle";
 
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import { BASE_API_URL } from "@/utils/setter";
+
+import apiClient from "@/services-admin/apiClient";
+
+import { useToast } from "@/hooks/use-toast";
+
 function Profile() {
+  const { toast } = useToast();
   const [admin, setAdmin] = useState({
     firstname: "Admin",
     surname: "Admin",
@@ -32,9 +42,35 @@ function Profile() {
     }
   }, []);
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     // Implement save changes logic here
-    console.log("Admin details saved:", admin);
+
+    const config = {
+      method: "put",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/users/profile`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: admin,
+    };
+
+    try {
+      const result = await apiClient.request(config);
+      console.log(result);
+      toast({
+        title: "Admin details saved successfully",
+        description: "Admin details saved successfully",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error saving admin details:", error);
+      toast({
+        title: "Error saving admin details",
+        description: "Error saving admin details",
+        variant: "destructive",
+      });
+      }
   };
 
   return (
@@ -130,4 +166,12 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default function PackedProfile() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <Profile />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

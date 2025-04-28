@@ -6,12 +6,14 @@ import { MdArrowBack, MdDelete } from "react-icons/md";
 import { BellIcon } from "lucide-react";
 import { PlusIcon } from "lucide-react";
 
-
 import NewNotification from "@/components/admincomps/notifications/NewNotification";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
 function NotificationPage() {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);  
+  const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([
     {
       header: "Admin Created",
@@ -38,10 +40,13 @@ function NotificationPage() {
         <div className="flex flex-row justify-between items-center">
           <h2 className="text-xl w-full font-semibold text-left border-b border-gray-500 ">
             Notifications
-            </h2>
-            <button className="bg-blue-500 text-white rounded-md px-4 py-2" onClick={() => setIsOpen(true)}>
-            <PlusIcon className="w-4 h-4" />
-            New Notification
+          </h2>
+          <button
+            className="flex items-center gap-2 bg-primary hover:bg-primary/90 h-fit w-fit text-white rounded-full px-4 py-2 transition-colors duration-200"
+            onClick={() => setIsOpen(true)}
+          >
+            <PlusIcon className="w-5 h-5" />
+            <span className="font-medium">New Notification</span>
           </button>
         </div>
         <div>
@@ -86,4 +91,12 @@ function NotificationPage() {
   );
 }
 
-export default NotificationPage;
+export default function PackedNotificationPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <NotificationPage />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

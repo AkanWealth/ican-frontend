@@ -1,8 +1,9 @@
 "use client";
 
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
 import UserActivities from "@/components/admincomps/dashboard/UserActivities";
 import PaymentActivities from "@/components/admincomps/dashboard/PaymentActivities";
@@ -40,4 +41,12 @@ function AdminDashboard() {
   );
 }
 
-export default AdminDashboard;
+export default function AdminDashboardPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <AdminDashboard />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

@@ -6,7 +6,6 @@ import Link from "next/link";
 
 import { useToast } from "@/hooks/use-toast";
 
-
 import InputEle from "@/components/genui/InputEle";
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/utils/setter";
@@ -214,11 +213,11 @@ function AdminSignup() {
       // Submit form
       try {
         const response = await axios.request(config);
-        const { message, user, access_token } = response.data;
+        const { message, user, accessToken } = response.data;
 
         // Store the response data as needed
         console.log("User registered successfully:", user);
-        console.log("Access token:", access_token);
+        console.log("Access token:", accessToken);
 
         if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
           router.push("/admin-login/");
@@ -230,15 +229,14 @@ function AdminSignup() {
           title: "Success",
           description: message,
           variant: "default",
-        }); 
+        });
       } catch (error) {
-
         toast({
           title: "Error",
           description:
             "There was an error signing up. Please check your details and try again.",
-          variant: "destructive", 
-        })
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }

@@ -216,6 +216,10 @@ interface DashEventAttendanceTrend {
   month: string;
   count: number;
 }
+interface DashEventPaymentTrend {
+  month: string;
+  totalPaid: number;
+}
 
 type DashUserLogin = {
   weeklyLogins: {
@@ -269,4 +273,5 @@ export type {
   DashUserLogin,
   Resource,
   DashEventAttendanceTrend,
+  DashEventPaymentTrend,
 };

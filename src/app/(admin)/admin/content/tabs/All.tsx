@@ -21,8 +21,8 @@ function All() {
       };
       try {
         const response = await apiClient.get("/adverts", config);
-        setData((prevData) => [...prevData, ...response.data.data]);
-          console.log(response.data);
+        setData((prevData) => [...prevData, ...response.data]);
+        console.log(response.data);
       } catch (error) {
         console.error(error);
       }
@@ -37,7 +37,7 @@ function All() {
       try {
         const response = await apiClient.get("/blogs", config);
         setData((prevData) => [...prevData, ...response.data]);
-        
+
         console.log(response.data);
       } catch (error) {
         console.error(error);
@@ -52,7 +52,7 @@ function All() {
       };
       try {
         const response = await apiClient.get("/faqs", config);
-        setData((prevData) => [...prevData, ...response.data.faqs]);
+        setData((prevData) => [...prevData, ...response.faqs]);
         console.log(response.faqs);
       } catch (error) {
         console.error(error);
@@ -67,7 +67,7 @@ function All() {
       };
       try {
         const response = await apiClient.get("/gallery", config);
-        setData((prevData) => [...prevData, ...response.data.data]);
+        setData((prevData) => [...prevData, ...response.data]);
 
         console.log(response.data);
       } catch (error) {
@@ -83,9 +83,8 @@ function All() {
       };
       try {
         const response = await apiClient.get("/studypacks", config);
-        setData((prevData) => [...prevData, ...response.data.studyPacks]);
+        setData((prevData) => [...prevData, ...response.studyPacks]);
         console.log(response.studyPacks);
-        
       } catch (error) {
         console.error(error);
       }
@@ -99,13 +98,12 @@ function All() {
       };
       try {
         const response = await apiClient.get("/technical-sessions", config);
-        setData((prevData) => [...prevData, ...response.data.sessions]);
+        setData((prevData) => [...prevData, ...response.sessions]);
         console.log(response.sessions);
       } catch (error) {
         console.error(error);
       }
     }
-
 
     fetchTSData();
     fetchStudyData();

@@ -95,21 +95,21 @@ function PaymentActivities() {
         const config = {
           method: "get",
           maxBodyLength: Infinity,
-          url: `${BASE_API_URL}/dashboard/payment-trend`,
+          url: `${BASE_API_URL}/dashboard/paymenttrend`,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
 
         const response = await apiClient.get(
-          "/dashboard/payment-trend",
+          "/dashboard/paymenttrend",
           config
         );
         const formattedData = response.map((item: any) => ({
           month: item.month || item.date || item.period,
           totalPaid: item.totalPaid || 0,
         }));
-        setPaymentTrendData(formattedData);
+        setPaymentTrendData(response);
         toast({
           title: "Payment Activities",
           description: "Payment activities data fetched successfully.",

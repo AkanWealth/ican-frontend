@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
@@ -26,50 +26,26 @@ function StudentEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(`${BASE_API_URL}/studypacks/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          withCredentials: true,
-        });
-        console.log("Study Packs details fetched:", response.data);
+        const response = await apiClient.get(
+          `${BASE_API_URL}/studypacks/${id}`
+        );
+        console.log("Study Packs details fetched:", response);
         setStudent({
-          name: response.data.name,
-          document: response.data.amswer || "",
+          name: response.name,
+          document: response.document || "",
         });
         setEditDataFetched(true);
         toast({
           title: "Study Pack details fetched successfully",
-          description: response.data.message,
+          description: response.message,
           variant: "default",
         });
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setEditDataFetched(true);
-          console.error(
-            "Study Pack not found (404). Stopping further fetch attempts."
-          );
-          toast({
-            title: "Study Pack not found",
-            description: error.response.data.message,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error fetching Study Pack",
-            description:
-              axios.isAxiosError(error) && error.response?.data?.message
-                ? error.response.data.message
-                : "An unknown error occurred",
-            variant: "destructive",
-          });
-          console.error("Error fetching Study Pack:", error);
-        }
+        toast({
+          title: "Error fetching Study Pack",
+          description: "Study Pack not found.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -101,13 +77,13 @@ function StudentEdit({ mode, id }: CreateContentProps) {
     };
 
     try {
-      const response = await axios.request(config);
-      console.log("Study Pack submitted successfully:", response.data);
+      const response = await apiClient.request(config);
+      console.log("Study Pack submitted successfully:", response);
       setIsSubmitting(false);
       setIsLoading(false);
       toast({
         title: "Study Pack submitted successfully",
-        description: response.data.message,
+        description: response.message,
         variant: "default",
       });
     } catch (error) {
@@ -115,10 +91,7 @@ function StudentEdit({ mode, id }: CreateContentProps) {
       setIsLoading(false);
       toast({
         title: "Error submitting Study Pack",
-        description:
-          axios.isAxiosError(error) && error.response?.data?.message
-            ? error.response.data.message
-            : "An unknown error occurred",
+        description: "An unknown error occurred",
         variant: "destructive",
       });
       console.error("Error submitting Study Pack:", error);

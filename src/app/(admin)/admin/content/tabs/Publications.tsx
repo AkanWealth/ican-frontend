@@ -23,7 +23,7 @@ function Publicatioms() {
       };
       try {
         const response = await apiClient.get("/publications", config);
-        setData(response.data);
+        setData(response);
       } catch (error) {
         toast({
           title: "Error",

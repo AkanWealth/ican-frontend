@@ -6,12 +6,14 @@ import { RichTextEditor } from "@/registry/new-york/rich-text-editor/rich-text-e
 
 import { useRouter } from "next/navigation";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
 import PreviewBlog from "../previewcomps/PreviewBlog";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
 
 interface BlogProps {
   title: string;
@@ -43,46 +45,29 @@ function BlogEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(`${BASE_API_URL}/blogs/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
+        const response = await apiClient.get(`${BASE_API_URL}/blogs/${id}`, {
           withCredentials: true,
         });
         console.log("Advert details fetched:", response.data);
         setBlog({
-          title: response.data.title,
-          authorName: response.data.authorName || "",
-          contentBody: response.data.contentBody || "",
-          contentType: response.data.contentType || "",
-          coverImage: response.data.coverImage || "",
-          status: response.data.status || "",
+          title: response.title,
+          authorName: response.authorName || "",
+          contentBody: response.contentBody || "",
+          contentType: response.contentType || "",
+          coverImage: response.coverImage || "",
+          status: response.status || "",
         });
-        setPost(response.data.contentBody);
+        setPost(response.contentBody);
         setEditDataFetched(true);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setEditDataFetched(true);
-          toast({
-            title: "Blog not found",
-            description: error.response.data.message,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error fetching Blog",
-            description:
-              axios.isAxiosError(error) && error.response?.data?.message
-                ? error.response.data.message
-                : "An unknown error occurred",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error fetching Blog",
+          description:
+            axios.isAxiosError(error) && error.response?.data?.message
+              ? error.response.data.message
+              : "An unknown error occurred",
+          variant: "destructive",
+        });
       }
     };
 
@@ -116,14 +101,19 @@ function BlogEdit({ mode, id }: CreateContentProps) {
     };
 
     try {
-      const response = await axios.request(config);
-      console.log("Blog submitted successfully:", response.data);
+      const response = await apiClient.request(config);
+        console.log("Blog submitted successfully:", response);
+      toast({
+        title: "Blog submitted successfully!",
+        description: response.message,
+        variant: "default",
+      });
       setIsSubmitting(false);
       setIsLoading(false);
       router.refresh();
       toast({
         title: "Blog submitted successfully!",
-        description: response.data.message,
+        description: response.message,
         variant: "default",
       });
     } catch (error) {
@@ -131,10 +121,7 @@ function BlogEdit({ mode, id }: CreateContentProps) {
       setIsLoading(false);
       toast({
         title: "Error submitting blog",
-        description:
-          axios.isAxiosError(error) && error.response?.data?.message
-            ? error.response.data.message
-            : "An unknown error occurred",
+        description: "An unknown error occurred",
         variant: "destructive",
       });
     }

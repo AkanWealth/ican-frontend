@@ -23,7 +23,7 @@ function Blogs() {
       };
       try {
         const response = await apiClient.get("/blogs", config);
-        setData(response.data);
+        setData(response);
       } catch (error) {
         toast({
           title: "Error",

@@ -3,18 +3,16 @@
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 
-import { useRouter } from "next/navigation";
-import Cookies from "universal-cookie";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
-import Toast from "@/components/genui/Toast";
+import { useToast } from "@/hooks/use-toast";
 
 function PublicationEdit({ mode, id }: CreateContentProps) {
-  const router = useRouter();
-  const cookies = new Cookies();
+  const { toast } = useToast();
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -23,32 +21,24 @@ function PublicationEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(`${BASE_API_URL}/publications/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          withCredentials: true,
-        });
+        const response = await apiClient.get(`${BASE_API_URL}/publications/${id}`);
         console.log("Publication details fetched:", response.data);
-        setPublication(response.data.name || "");
+        setPublication(response.name || "");
         setEditDataFetched(true);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setEditDataFetched(true);
-          console.error(
-            "Publication not found (404). Stopping further fetch attempts."
-          );
-        } else {
-          console.error("Error fetching Publication:", error);
-        }
+        toast({
+          title: "Error",
+          variant: "destructive",
+          description: "Publication not found.",
+        });
       }
     };
-  });
+
+      if (mode === "edit" && !editDataFetched) {
+      console.log("Fetching Publication details for edit mode");
+      fetchDetails();
+    }
+  }, [editDataFetched, id, mode, toast]);
 
   return (
     <div>

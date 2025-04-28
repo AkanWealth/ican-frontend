@@ -23,7 +23,7 @@ function Adverts() {
       };
       try {
         const response = await apiClient.get("/adverts", config);
-        setData(response.data.data);
+        setData(response.data);
       } catch (error) {
         toast({
           title: "Error",

@@ -13,9 +13,7 @@ import apiClient from "@/services-admin/apiClient";
 import Cookies from "universal-cookie";
 
 import { EventDetails, RegisteredUsers } from "@/libs/types";
-
 import { useToast } from "@/hooks/use-toast";
-
 import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
 import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 

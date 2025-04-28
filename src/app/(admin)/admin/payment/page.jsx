@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
 
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
+import { useToast } from "@/hooks/use-toast";
 
 import { BASE_API_URL } from "@/utils/setter";
 
@@ -13,6 +16,7 @@ import apiClient from "@/services-admin/apiClient";
 
 function Payment() {
   const [data, setData] = useState([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchData() {
@@ -28,13 +32,22 @@ function Payment() {
       try {
         const response = await apiClient.request(config);
         setData(response);
-        console.log(response);
+        toast({
+          title: "Payments fetched successfully",
+          description: "Payments fetched successfully",
+          variant: "default",
+        });
       } catch (error) {
         console.error("Error fetching payments:", error);
+        toast({
+          title: "Error fetching payments",
+          description: "Error fetching payments",
+          variant: "destructive",
+        });
       }
     }
     fetchData();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="rounded-3xl p-6">
@@ -57,4 +70,12 @@ function Payment() {
   );
 }
 
-export default Payment;
+export default function PackedPayment() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <Payment />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

@@ -4,9 +4,13 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 import { PaymentDetails } from "@/libs/types";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
 function PaymentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -24,7 +28,7 @@ function PaymentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
-      const result = await axios.request(config);
+      const result = await apiClient.request(config);
 
       setData(result.data);
       console.log(result.data);
@@ -85,4 +89,16 @@ function PaymentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
-export default PaymentDetailsPage;
+export default function PackedPaymentDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <PaymentDetailsPage params={params} />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

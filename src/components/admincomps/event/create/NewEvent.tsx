@@ -12,6 +12,8 @@ import { uploadImageToCloud } from "@/lib/uploadImage";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 
+import { useRouter } from "next/navigation";
+
 function NewEvent({
   id,
   mode,
@@ -26,7 +28,7 @@ function NewEvent({
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-
+  const router = useRouter();
   const { toast } = useToast();
 
   const [eventPhoto, setEventPhoto] = useState<File | string | null>(null);
@@ -286,6 +288,7 @@ function NewEvent({
         });
         setIsPublishing(false);
         setIsSavingDraft(false);
+        router.refresh();
       } catch (error) {
         console.error("Error adding the event to draft:", error);
         toast({
@@ -296,6 +299,7 @@ function NewEvent({
         handleCancel(); // Close the modal after 3 seconds
         setIsPublishing(false);
         setIsSavingDraft(false);
+        router.refresh();
       }
     };
     draftEvent();
@@ -344,6 +348,7 @@ function NewEvent({
         });
         setIsPublishing(false);
         setIsSavingDraft(false);
+        router.refresh();
       } catch (error) {
         console.error("Error publishing event:", error);
         toast({
@@ -353,6 +358,7 @@ function NewEvent({
         });
         setIsPublishing(false);
         setIsSavingDraft(false);
+        router.refresh();
       }
     };
 

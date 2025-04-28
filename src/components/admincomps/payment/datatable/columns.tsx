@@ -82,12 +82,12 @@ export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
       return <Statbtn status={row.original.status} />;
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      return <CellActions row={row} />;
-    },
-  },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     return <CellActions row={row} />;
+  //   },
+  // },
 ];
 export const dashPaymentcoloumns: ColumnDef<OverdueBills>[] = [
   {

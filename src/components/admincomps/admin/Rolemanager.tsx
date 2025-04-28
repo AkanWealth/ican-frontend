@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 import { useToast } from "@/hooks/use-toast";
 
 import InputEle from "@/components/genui/InputEle";
 
-import { User } from "@/libs/types";
+
 import { useRouter } from "next/navigation";
 import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
+
+import apiClient from "@/services-admin/apiClient";
 
 // Props interface for role manager component
 interface RolemanagerProps {
@@ -272,7 +273,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
         },
         data: submitData,
       };
-      const response = await axios.request(config);
+      const response = await apiClient.post("/roles/create", submitData, config);
 
       // Show success message
 
@@ -292,10 +293,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
       console.error("Error creating role:", error);
       toast({
         title: "Error",
-        description:
-          axios.isAxiosError(error) && error.response?.data?.message
-            ? error.response.data.message
-            : "An error occurred while creating the role",
+        description:"An error occurred while creating the role",
         variant: "destructive",
       });
     }

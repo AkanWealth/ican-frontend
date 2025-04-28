@@ -3,12 +3,16 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import axios from "axios";
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import apiClient from "@/services-admin/apiClient";
+
+
 import { BASE_API_URL } from "@/utils/setter";
 
 import { User } from "@/libs/types";
 import { useToast } from "@/hooks/use-toast";
-import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -23,12 +27,10 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
         method: "get",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/users/${id}`,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
+    
       };
       try {
-        const result = await axios.request(config);
+        const result = await apiClient.get(`/users/${id}`, config);
 
         setAdminData(result.data);
 
@@ -38,19 +40,13 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
           variant: "default",
         });
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          await handleUnauthorizedRequest(config, router, setAdminData);
-        } else {
+       
           toast({
             title: "Error",
             description: "Failed to fetch user activities data.",
             variant: "destructive",
           });
-        }
+        
       }
     }
 
@@ -123,4 +119,12 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
-export default AdminDetails;
+export default function PackedAdminDetails({ params }: { params: Promise<{ id: string }> }) {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <AdminDetails params={params} />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

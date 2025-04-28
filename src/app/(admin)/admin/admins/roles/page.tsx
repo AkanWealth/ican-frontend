@@ -9,6 +9,12 @@ import {
 } from "@/components/ui/accordion";
 
 import RoleManager from "@/components/admincomps/admin/Rolemanager";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import apiClient from "@/services-admin/apiClient";
+
 import EditRole from "@/components/admincomps/admin/EditRole";
 
 import { useToast } from "@/hooks/use-toast";
@@ -52,30 +58,14 @@ function RolesPage() {
 
       try {
         // Fetch roles
-        const response = await axios.request(config);
-
-        if (response.status === 200) {
-          setRoles(response.data);
-        }
+        const response = await apiClient.get("/roles", config);
+        setRoles(response);
       } catch (error) {
-        // Handle error
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 401) {
-            await handleUnauthorizedRequest(config, router, setRoles);
-          } else {
-            toast({
-              title: "Error",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
-        } else {
-          toast({
-            title: "Error",
-            description: "An unexpected error occurred.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -130,4 +120,12 @@ function RolesPage() {
   );
 }
 
-export default RolesPage;
+export default function PackedRolesPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <RolesPage />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

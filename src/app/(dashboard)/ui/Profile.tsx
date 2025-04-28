@@ -8,6 +8,8 @@ import Image from "next/image";
 import axios from "axios";
 import { uploadImageToCloud } from "@/lib/uploadImage";
 import { useToast } from "@/hooks/use-toast";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 
 interface StateCityMap {
   [state: string]: string[];
@@ -97,19 +99,15 @@ function Profile() {
   useEffect(() => {
     if (typeof window === "undefined") return; // Ensure code runs only on the client side
   
-    const user = localStorage.getItem("user");
-    const userId = user ? JSON.parse(user)?.id : null;
-    const token = localStorage.getItem("token"); // Retrieve the token from localStorage
+ const cookies = parseCookies();
+        const userDataCookie = cookies['user_data'];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const userId = userData?.id;
+        console.log("userId", userId);
   
-    if (userId && token) {
-      axios
-        .get(`https://ican-api-6000e8d06d3a.herokuapp.com/api/users/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-          },
-        })
-        .then((response) => {
-          const data = response.data;
+    if (userId ) {
+      apiClient.get(`/users/${userId}`)
+        .then((data) => {
           console.log("API data:", data);
           
           // Set profile picture if available
@@ -233,6 +231,12 @@ function Profile() {
           ...prev,
           profilePictureUrl: imageUrl
         }));
+        toast({
+          title: "Photo uploaded successfully",
+          description: "Your profile photo has been updated",
+          variant: "default",
+          duration: 2000,
+        });
         
         setIsLoading(false);
       } catch (error) {
@@ -277,12 +281,28 @@ function Profile() {
   const handleUpdate = (tab: string) => {
     if (typeof window === "undefined") return; // Ensure code runs only on the client side
   
-    const user = localStorage.getItem("user");
-    const userId = user ? JSON.parse(user)?.id : null;
-    const userEmail = user ? JSON.parse(user)?.email : null;
-    const memberId = user ? JSON.parse(user)?.membershipId : null;
+    // const user = localStorage.getItem("user");
+    // const userId = user ? JSON.parse(user)?.id : null;
+    // const userEmail = user ? JSON.parse(user)?.email : null;
+    // const memberId = user ? JSON.parse(user)?.membershipId : null;
+    const cookies = parseCookies();
+    const userDataCookie = cookies['user_data'];
+    const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+    const userId = userData?.id;
+    const memberId = userData?.membershipId;
+    const userEmail = userData?.email;
+
+    console.log("userId", userId);
+    console.log("memberId", memberId);
+    console.log(userEmail)
+
+    if (!userId) throw new Error("User ID not found in cookies");
+    
+
+
+
   
-    if (!userId || !userEmail || !memberId) return;
+    // if (!userId || !userEmail || !memberId) return;
   
     if (tab === "biodata") {
       const payload = {
@@ -299,26 +319,15 @@ function Profile() {
         nationality: formData.nationality || "",
       };
   console.log("Biodata payload:", payload); // Log the payload for debugging
-      axios
-        .patch(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/users/profile`,
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-              "Content-Type": "application/json",
-            },
-          }
-        )
-        .then((response) => {
-          toast({
-            title: "Biodata updated successfully!",
-            description: "Refreach the page to see changes.",
-            variant: "default",
-            duration: 2000,
-          });
-          // alert("Biodata updated successfully!");
-        })
+  apiClient.patch('/users/profile', payload)
+  .then((response) => {
+    toast({
+      title: "Biodata updated successfully!",
+      description: "Refresh the page to see changes.",
+      variant: "default",
+      duration: 2000,
+    });
+  })
         .catch((error) => {
           console.error("Error updating biodata:", error);
           toast({
@@ -342,35 +351,22 @@ function Profile() {
         contactPhoneNumber: formData.phone || ""
       };
       
-      axios
-        .patch(
-          'https://ican-api-6000e8d06d3a.herokuapp.com/api/users/contact',
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-              "Content-Type": "application/json"
-            },
-          }
-        )
+      apiClient.patch('/users/contact', payload)
         .then((response) => {
-          // alert("Contact information updated successfully!");
           toast({
             title: "Contact information updated successfully!",
-            description: "Refreach the page to see changes.",
+            description: "Refresh the page to see changes.",
             variant: "default",
             duration: 2000,
           });
         })
         .catch((error) => {
-          // console.error("Error updating contact information:", error);
           toast({
             title: "Failed to update contact information",
             description: "Please try again.",
             variant: "destructive",
             duration: 2000,
           }); 
-          // alert("Failed to update contact information. Please try again.");
         });
     } else if (tab === "qualification") {
       const payload = {
@@ -385,17 +381,7 @@ function Profile() {
         // status: formData.status || ""
       };
       
-      axios
-        .patch(
-          'https://ican-api-6000e8d06d3a.herokuapp.com/api/users/qualification',
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-              "Content-Type": "application/json"
-            },
-          }
-        )
+     apiClient.patch('/users/qualification', payload)
         .then((response) => {
           toast({
             title: "Qualification information updated successfully!",
@@ -430,17 +416,7 @@ function Profile() {
           : null
       };
       
-      axios
-        .patch(
-          'https://ican-api-6000e8d06d3a.herokuapp.com/api/users/work-experience',
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-              "Content-Type": "application/json"
-            },
-          }
-        )
+      apiClient.patch('/users/work-experience', payload)
         .then((response) => {
           toast({
             title: "Work experience updated successfully!",
@@ -489,8 +465,9 @@ function Profile() {
                     <Image
                       src={URL.createObjectURL(profilePhoto)}
                       alt="Profile picture"
-                      fill={true}
-                      className="rounded-full object-cover"
+                      width={200}
+                      height={200}
+                      className="w-full rounded-full object-cover"
                     />
                   </div>
                 )}
@@ -511,13 +488,17 @@ function Profile() {
               (JPG or PNG, 100KB Max)
             </span>
             <div className="flex flex-wrap gap-4">
-              <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
-                Update photo
+            <label className={`
+                bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap
+                ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}
+              `}>
+                {isLoading ? "Updating..." : "Update photo"}
                 <input
                   type="file"
                   accept="image/jpeg,image/png"
                   onChange={handlePhotoUpload}
                   className="hidden"
+                  disabled={isLoading}
                 />
               </label>
               <button

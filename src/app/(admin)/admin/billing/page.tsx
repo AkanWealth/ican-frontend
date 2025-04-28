@@ -11,11 +11,10 @@ import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContex
 import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
 import apiClient from "@/services-admin/apiClient";
-import axios from "axios";
+
 import { BASE_API_URL } from "@/utils/setter";
 import { useToast } from "@/hooks/use-toast";
 
-import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 function BillingPage() {
   const { toast } = useToast();

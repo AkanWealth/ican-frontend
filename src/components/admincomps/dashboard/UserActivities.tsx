@@ -327,6 +327,7 @@ function UserActivities() {
   );
 
   return (
+
     <div className="flex flex-col gap-4 items-start">
       <div className="flex flex-row gap-2 items-center justify-start w-full">
         <StatCard

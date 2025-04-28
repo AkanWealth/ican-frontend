@@ -97,6 +97,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           placeholder="Enter your surname"
           type="text"
           label="Surname"
+          required={true}
         />
         <InputEle
           value={formData.personalData.firstName}
@@ -112,6 +113,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           placeholder="Enter your first name"
           type="text"
           label="First Name"
+          required={true}
         />
         <InputEle
           value={formData.personalData?.middleName}
@@ -127,6 +129,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           placeholder="Enter your middle name"
           type="text"
           label="Middle Name"
+          required={false}
         />
         <InputEle
           id="gender"
@@ -142,7 +145,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
             })
           }
           addStyle2="h-[50px]"
-          
+          required={true}
         />
         <InputEle
           id="dob"
@@ -161,6 +164,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
               },
             })
           }
+          required={true}
         />
         <InputEle
           id="maritalStatus"
@@ -176,6 +180,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
             })
           }
           addStyle2="h-[50px]"
+          required={true}
         />
         <InputEle
           value={formData.personalData?.state}
@@ -191,6 +196,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           type="text"
           label="State of origin"
           placeholder="Enter your state of origin"
+          required={true}
         />
         <InputEle
           id="nationality"
@@ -206,6 +212,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
             })
           }
           addStyle2="h-[50px]"
+          required={true}
         />
       </div>
     </div>

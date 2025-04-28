@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import axios from 'axios';
 import { Search, ChevronDown, ListFilter, ChevronUp, Bookmark, CircleDollarSign, SquareLibrary } from 'lucide-react';
 import { FaBookmark } from 'react-icons/fa6';
@@ -7,6 +7,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Modal } from '@mui/material';
 import Image from 'next/image';
 import ResourceDetailsModal from '../ModalPage/ResourceModalPage';
+import { BASE_API_URL } from "@/utils/setter";
+import apiClient from '@/services/apiClient';
+import { parseCookies } from 'nookies';
 
 interface Resource {
     id: number;
@@ -39,6 +42,9 @@ function ResourcePage() {
     const [loading, setLoading] = useState<boolean>(true);
     const [recommended, setRecommened] = useState<Resource[]>([]);
 
+    const [bookmarkedResources, setBookmarkedResources] = useState<Resource[]>([]);
+    const [bookmarksLoading, setBookmarksLoading] = useState<boolean>(false);
+
     // Fetch all resources
     useEffect(() => {
         const fetchResources = async () => {
@@ -49,7 +55,7 @@ function ResourcePage() {
             console.log('Token:', token);
     
             const response = await axios.get(
-              "https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/contents",
+              `${BASE_API_URL}/resources/contents`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`, 
@@ -78,19 +84,12 @@ function ResourcePage() {
         const fetchRecommendedResources = async () => {
           try {
             setLoading(true);
-            const token = localStorage.getItem("token");
+            // const token = localStorage.getItem("token");
+            //  const response = await apiClient.get(`/resources/recommended`);
+            const response = await apiClient.get(`/resources/recommended`);
             
-            const response = await axios.get(
-              "https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/recommended",
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            
-            setRecommened(response.data);
-            console.log('Recommended Resources:', response.data);
+            setRecommened(response);
+            console.log('Recommended Resources:', response);
           } catch (error) {
             console.error('Error fetching recommended resources:', error);
             toast({
@@ -106,49 +105,98 @@ function ResourcePage() {
         fetchRecommendedResources();
     }, [toast]);
 
+
+    const fetchBookmarkedResources = useCallback(async () => {
+      try {
+        setBookmarksLoading(true);
+        if (typeof window === "undefined") return;
+    
+    
+            const cookies = parseCookies();
+            const userDataCookie = cookies['user_data'];
+            const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+            const userId = userData?.id;
+            console.log("userId", userId);
+        await apiClient.get(`/resources/bookmarks`);
+        const response = await apiClient.get(`/resources/bookmarks`);
+        const filteredBookmarks = response.filter((item: any )=> 
+          item.userId === userId || 
+          (item.resource && item.userId === userId)
+        );
+        
+        const bookmarkedItems = filteredBookmarks.map((item:any) => ({
+          ...(item.resource || item), // Use the nested resource data if available
+          isBookmarked: true
+        }));
+        
+        // const bookmarkedItems = response.map((item: any) => ({
+        //   ...item,
+        //   isBookmarked: true
+        // }));
+        
+        setBookmarkedResources(bookmarkedItems);
+        console.log('Bookmarked Resources:', bookmarkedItems);
+      } catch (error) {
+        console.error('Error fetching bookmarked resources:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch bookmarked resources',
+          variant: 'destructive',
+        });
+      } finally {
+        setBookmarksLoading(false);
+      }
+    }, [toast]); // Dependencies for fetchBookmarkedResources
+    
+    // Then your original useEffect stays almost the same
+    useEffect(() => {
+      if (activeTab === 'bookmark') {
+        fetchBookmarkedResources();
+      }
+    }, [activeTab, fetchBookmarkedResources]);
+
+
     // Function to toggle bookmark via API
+    const handleBookmark = async (id: any) => {
+      console.log('Bookmark clicked for ID:', id);
+      await toggleBookmark(id);
+    };
+    
+    // Then, update the toggleBookmark function to properly update both arrays
     const toggleBookmark = async (resourceId: any) => {
-        try {
-          const token = localStorage.getItem("token");
-          
-          // Call the bookmark API endpoint
-          const response = await axios.post(
-            `https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/${resourceId}/bookmark`,
-            {},  // Empty body as it's a toggle action
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
+      try {
+        const token = localStorage.getItem("token");
+        // Call the bookmark API endpoint
+        const response =  await apiClient.post(`/resources/${resourceId}/bookmark`);
+        console.log('Bookmark response:', response);
+        // if (response.status === 200|| response.status === 201) {
+          // Update both arrays regardless of where the bookmark was clicked
+          setResources(prevResources => 
+            prevResources.map(resource => 
+              resource.id === resourceId ? {...resource, isBookmarked: !resource.isBookmarked} : resource
+            )
           );
           
-          // Update the local state based on the API response
-          if (response.status === 200) {
-            // If successful, update the UI
-            // For resources array
-            setResources(resources.map(resource => 
-              resource.id === resourceId ? {...resource, isBookmarked: !resource.isBookmarked} : resource
-            ));
-            
-            // For recommended array
-            setRecommened(recommended.map(item => 
+          setRecommened(prevRecommended => 
+            prevRecommended.map(item => 
               item.id === resourceId ? {...item, isBookmarked: !item.isBookmarked} : item
-            ));
-            
-            toast({
-              title: 'Success',
-              description: 'Bookmark status updated successfully',
-              variant: 'default',
-            });
-          }
-        } catch (error) {
-          console.error('Error toggling bookmark:', error);
+            )
+          );
+          
           toast({
-            title: 'Error',
-            description: 'Failed to update bookmark status',
-            variant: 'destructive',
+            title: 'Success',
+            description: 'Bookmark status updated successfully',
+            variant: 'default',
           });
-        }
+        // }
+      } catch (error) {
+        console.error('Error toggling bookmark:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to update bookmark status',
+          variant: 'destructive',
+        });
+      }
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,11 +205,6 @@ function ResourcePage() {
 
     const handleTabChange = (tab: React.SetStateAction<string>) => {
         setActiveTab(tab);
-    };
-
-    const handleBookmark = (id: number, isRecommended: boolean = false) => {
-        // Call the API to toggle bookmark
-        toggleBookmark(id);
     };
     
     const handleFilterSelect = (filter: string) => {
@@ -207,19 +250,15 @@ function ResourcePage() {
           setDetailsLoading(true);
           setSelectedResource(resource); // Set selected resource immediately for UI feedback
           
-          const token = localStorage.getItem("token");
-          const response = await axios.get(
-              `https://ican-api-6000e8d06d3a.herokuapp.com/api/resources/content/${resource.id}`,
-              {
-                  headers: {
-                      Authorization: `Bearer ${token}`,
-                  },
-              }
-          );
+          // const token = localStorage.getItem("token");
+        // await apiClient.get(`/resources/content/${resource.id}`);
+
+          const response = await apiClient.get(`/resources/content/${resource.id}`);
+
           
           // Set the detailed data received from API
-          setResourceDetails(response.data);
-          console.log('Resource details:', response.data);
+          setResourceDetails(response);
+          console.log('Resource details:', response);
           
       } catch (error) {
           console.error('Error fetching resource details:', error);
@@ -307,7 +346,7 @@ function ResourcePage() {
           </div>
    
           <button 
-            onClick={() => handleBookmark(resource.id)}
+             onClick={() => handleBookmark(resource.id)}
             className="text-gray-400 hover:text-blue-600"
             aria-label={resource.isBookmarked ? "Remove bookmark" : "Add bookmark"}
           >
@@ -323,24 +362,25 @@ function ResourcePage() {
         
 
         <div className="mt-2">
-
           <h3 className="text-lg font-semibold mb-2">{resource.title}</h3>
           <div className='flex flex-row justify-between mb-2'>
-                      <p className="text-sm text-primary font-semibold mb-2">{resource.type.charAt(0).toUpperCase() + resource.type.slice(1)}</p>
+            <p className="text-sm text-primary font-semibold mb-2">
+              {resource.type ? `${resource.type.charAt(0).toUpperCase() + resource.type.slice(1)}` : 'Resource'}
+            </p>
 
-          <div className="flex items-center mb-2">
-            {resource.isPremium ? (
-              <span className="text-green-500 mr-2 text-sm flex items-center">
-                <CircleDollarSign className="w-4 h-4 mr-1" />
-                 
-                Premium
-              </span>
-            ):(<span className="text-gray-600 mr-2 text-sm flex items-center">
-                <SquareLibrary className="w-4 h-4 mr-1"/>
-                  
-                Free
-              </span>)}
-          </div>
+            <div className="flex items-center mb-2">
+              {resource.isPremium ? (
+                <span className="text-green-500 mr-2 text-sm flex items-center">
+                  <CircleDollarSign className="w-4 h-4 mr-1" />
+                  Premium
+                </span>
+              ) : (
+                <span className="text-gray-600 mr-2 text-sm flex items-center">
+                  <SquareLibrary className="w-4 h-4 mr-1"/>
+                  Free
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center text-xs text-gray-700 mb-3">
             <span>{resource.date}</span>
@@ -352,7 +392,7 @@ function ResourcePage() {
           </button>
         </div>
       </div>
-      );
+    );
 
     const renderResouceTab = () => {
         if (loading) {
@@ -408,7 +448,7 @@ function ResourcePage() {
           </div>
    
           <button 
-                onClick={() => handleBookmark(recommended.id, true)} // Pass true to indicate this is a recommended item
+                onClick={() => handleBookmark(recommended.id)} // Pass true to indicate this is a recommended item
                 className="text-gray-400 hover:text-blue-600"
                 aria-label={recommended.isBookmarked ? "Remove bookmark" : "Add bookmark"}
             >
@@ -427,21 +467,23 @@ function ResourcePage() {
 
           <h3 className="text-lg font-semibold mb-2">{recommended.title}</h3>
           <div className='flex flex-row justify-between mb-2'>
-                      <p className="text-sm text-primary font-semibold mb-2">{recommended.type.charAt(0).toUpperCase() + recommended.type.slice(1)}</p>
+            <p className="text-sm text-primary font-semibold mb-2">
+              {recommended.type ? `${recommended.type.charAt(0).toUpperCase() + recommended.type.slice(1)}` : 'Resource'}
+            </p>
 
-          <div className="flex items-center mb-2">
-            {recommended.isPremium ? (
-              <span className="text-green-500 mr-2 text-sm flex items-center">
-                <CircleDollarSign className="w-4 h-4 mr-1" />
-                 
-                Premium
-              </span>
-            ):(<span className="text-gray-600 mr-2 text-sm flex items-center">
-                <SquareLibrary className="w-4 h-4 mr-1"/>
-                  
-                Free
-              </span>)}
-          </div>
+            <div className="flex items-center mb-2">
+              {recommended.isPremium ? (
+                <span className="text-green-500 mr-2 text-sm flex items-center">
+                  <CircleDollarSign className="w-4 h-4 mr-1" />
+                  Premium
+                </span>
+              ) : (
+                <span className="text-gray-600 mr-2 text-sm flex items-center">
+                  <SquareLibrary className="w-4 h-4 mr-1"/>
+                  Free
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center text-xs text-gray-700 mb-3">
             <span>{recommended.date}</span>
@@ -453,7 +495,7 @@ function ResourcePage() {
           </button>
         </div>
       </div>
-      );
+    );
 
       const renderRecommendedTab = () => {
         if (loading) {
@@ -468,7 +510,7 @@ function ResourcePage() {
             }
             
             // Filter based on selected filter
-            if (selectedFilter && rec.type.toLowerCase() !== selectedFilter.toLowerCase()) {
+            if (selectedFilter && rec.type && rec.type.toLowerCase() !== selectedFilter.toLowerCase()) {
                 return false;
             }
             
@@ -489,24 +531,40 @@ function ResourcePage() {
     };
 
     const renderBookmarkTab = () => {
-        if (loading) {
-            return <LoadingState />;
-        }
-
-        const bookmarkedResources = filteredResources.filter(resource => resource.isBookmarked);
-        
-        if (bookmarkedResources.length === 0) {
-            return <EmptyState />;
-        }
-
-        return (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {bookmarkedResources.map(resource => (
-                    <ResourceCard key={resource.id} resource={resource} />
-                ))}
-            </div>
-        );
-    };
+      // Show loading state while fetching bookmarks
+      if (bookmarksLoading) {
+          return <LoadingState />;
+      }
+      
+      // Apply filters to bookmarked resources
+      const filteredBookmarks = bookmarkedResources.filter(resource => {
+          // Filter based on search query
+          if (searchQuery && !resource.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+              return false;
+          }
+          
+          // Filter based on selected filter type if one is selected
+          if (selectedFilter && resource.type && resource.type.toLowerCase() !== selectedFilter.toLowerCase()) {
+              return false;
+          }
+          
+          return true;
+      });
+      
+      // Show empty state if no bookmarks found or all filtered out
+      if (filteredBookmarks.length === 0) {
+          return <EmptyState />;
+      }
+  
+      // Render the bookmarked resources grid
+      return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredBookmarks.map(resource => (
+                  <ResourceCard key={resource.id} resource={resource} />
+              ))}
+          </div>
+      );
+  };
 
     return (
         <div className="p-4">

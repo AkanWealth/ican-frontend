@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import CalendarFilter from "@/components/homecomps/CalendarFilter";
+import apiClient from "@/services/apiClient";
 
 interface Event {
   id: string;
@@ -46,24 +47,15 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
     const Token = localStorage.getItem("token");
     const fetchEvents = async () => {
       try {
-        const response = await fetch(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/events",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${Token}`,
-              "Content-Type": "application/json",
-              // Add any additional headers like authorization if required
-            },
-          }
-        );
+        
+        const response = await apiClient.get("/events");
         console.log("Response:", response);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch events");
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch events");
+        // }
 
-        const data = await response.json();
+        const data = await response;
         setEvents(data.data);
         setIsLoading(false);
       } catch (err) {
@@ -111,6 +103,20 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
     router.push(`/EventRegistration?${params.toString()}`);
   };
 
+  // const filteredEvents = events.filter((event) => {
+  //   const matchesName = event.name
+  //     .toLowerCase()
+  //     .includes(searchTerm.toLowerCase());
+  //   const matchesDescription = event.description
+  //     .toLowerCase()
+  //     .includes(searchTerm.toLowerCase());
+  //   const matchesLocation = selectedLocation
+  //     ? event.venue.includes(selectedLocation)
+  //     : true;
+
+  //   return (matchesName || matchesDescription) && matchesLocation;
+  // });
+
   const filteredEvents = events.filter((event) => {
     const matchesName = event.name
       .toLowerCase()
@@ -121,8 +127,10 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
     const matchesLocation = selectedLocation
       ? event.venue.includes(selectedLocation)
       : true;
-
-    return (matchesName || matchesDescription) && matchesLocation;
+  
+    const isUpcoming = new Date(event.date) >= new Date(); // <-- Only allow future events
+  
+    return (matchesName || matchesDescription) && matchesLocation && isUpcoming;
   });
 
   if (isLoading) {
@@ -248,7 +256,7 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
             <div key={event.id} className="border rounded-lg relative">
               <div className="relative h-52 mb-4 rounded-lg overflow-hidden">
                 <Image
-                  src={event.flyer}
+                  src={event.flyer|| "/Event3.jpg"}
                   alt={event.name}
                   fill
                   className="w-full h-full object-cover"

@@ -51,8 +51,6 @@ function AdminDetails({ params }: { params: Promise<{ id: string }> }) {
             variant: "destructive",
           });
         }
-      } finally {
-        // Any cleanup code if needed
       }
     }
 

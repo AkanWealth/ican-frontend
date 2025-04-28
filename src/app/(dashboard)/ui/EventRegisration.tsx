@@ -17,6 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { FlutterWaveButton } from "flutterwave-react-v3";
 import { BASE_API_URL } from "@/utils/setter";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 // import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
@@ -74,19 +76,19 @@ const EventRegistration = () => {
     // Look for the checkUserRegistration function and update it:
     const checkUserRegistration = async () => {
       try {
-        const user = localStorage.getItem("user");
-        const email = user ? JSON.parse(user)?.email : null; 
-        if (!email) return;
+
+        const cookies = parseCookies();
+        const userDataCookie = cookies['user_data'];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const userId = userData?.id;
+        console.log("userId", userId);
+
+        if (!userId) throw new Error("User ID not found in cookies");
+
+        // Specify the return type with UserResponse interface
+       
     
-        const response = await axios.get(
-          `${BASE_API_URL}/events/registrations/user/${email}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`, 
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const response =  await apiClient.get(`/events/registrations/user-events/${userId}`);
     
         console.log("Registration response data:", response.data);
         
@@ -94,12 +96,12 @@ const EventRegistration = () => {
         if (Array.isArray(response.data)) {
           // Handle array response
           const isUserRegistered = response.data.some(
-            (event) => event.eventId === eventDetails.id
+            (event:any) => event.eventId === eventDetails.id
           );
           setIsRegistered(isUserRegistered);
-        } else if (response.data && typeof response.data === 'object') {
+        } else if (response && typeof response === 'object') {
           // Handle single object response
-          const isUserRegistered = response.data.eventId === eventDetails.id;
+          const isUserRegistered = response.eventId === eventDetails.id;
           setIsRegistered(isUserRegistered);
         } else {
           // No valid registration data
@@ -209,6 +211,16 @@ const EventRegistration = () => {
       console.log("isNoFeeFormValid result:", isNoFeeFormValid()); // Debugging log
       return;
     }
+     // Use the appropriate validation function based on event fee
+  const isValid = Number(eventDetails.eventFee) > 0 
+  ? isFormValid() 
+  : isNoFeeFormValid();
+  
+if (!isValid) {
+  console.log("Form validation failed"); // Debugging log
+  return;
+}
+
 
     try {
       console.log("Calling registerForEvent..."); // Debugging log
@@ -237,7 +249,11 @@ const EventRegistration = () => {
   };
 
   const isNoFeeFormValid = () => {
-    const result = formData.fullName && formData.email;
+    // Check if required fields are filled in
+    const result = formData.fullName.trim() !== "" && 
+                   formData.email.trim() !== "" && 
+                   validateEmail(formData.email);
+    
     console.log("isNoFeeFormValid check:", result); // Debugging log
     return result;
   };
@@ -254,60 +270,107 @@ const EventRegistration = () => {
     }
   };
 
+  // const registerForEvent = async () => {
+
+  //   try {
+  //     const eventId = eventDetails.id;
+  //     console.log("eventId:", eventId); // Debugging log
+
+  //     // Construct the payload
+  //     const registrationPayload = {
+  //       fullName: formData.fullName,
+  //       email: formData.email,
+  //       membership: "MEMBER", 
+  //       proofOfPayment: isPaymentSuccessful ? "PAID" : "PENDING", // Set to "PAID" if payment is successful
+  //     };
+
+  //     console.log("Registration payload:", registrationPayload); // Debugging log
+
+  //     // Send the payload to the endpoint
+  //     const response = await axios.post(
+  //       `${BASE_API_URL}/events/registrations/${eventId}/register`,
+  //       registrationPayload,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem('token')}`, // Ensure the token is stored in localStorage
+  //           'Content-Type': 'application/json',
+  //         },
+  //       }
+  //     );
+
+  //     console.log("Registration response:", response.data); // Debugging log
+
+  //     // Only show the success modal if the response status is 200 or 201
+  //     if (response.status === 200 || response.status === 201) {
+  //       setIsModalOpen(true); // Open the success modal
+  //     } else {
+  //       console.error("Unexpected response status:", response.status);
+  //       toast({
+  //         title: "Registration Failed",
+  //         description: "Unexpected response from the server. Please try again.",
+  //         variant: "destructive",
+  //         duration: 3000,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Registration failed:", error);
+  //     console.error("Registration failed:", error);
+
+  //     toast({
+  //       title: "Registration Failed",
+  //       description: "Unable to complete registration. Please try again.",
+  //       variant: "destructive",
+  //       duration: 3000,
+  //     });
+  //   }
+  // };
+
+
   const registerForEvent = async () => {
     try {
       const eventId = eventDetails.id;
       console.log("eventId:", eventId); // Debugging log
-
+  
       // Construct the payload
       const registrationPayload = {
         fullName: formData.fullName,
         email: formData.email,
         membership: "MEMBER", 
-        proofOfPayment: isPaymentSuccessful ? "PAID" : "PENDING", // Set to "PAID" if payment is successful
+        proofOfPayment: Number(eventDetails.eventFee) > 0 
+          ? (isPaymentSuccessful ? "PAID" : "PENDING") 
+          : "FREE", // Set to "FREE" for free events
       };
-
+  
       console.log("Registration payload:", registrationPayload); // Debugging log
-
-      // Send the payload to the endpoint
-      const response = await axios.post(
-        `${BASE_API_URL}/events/registrations/${eventId}/register`,
-        registrationPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Ensure the token is stored in localStorage
-            'Content-Type': 'application/json',
-          },
-        }
+      
+      // Use the apiClient instead of direct axios call
+      const response = await apiClient.post<any>(
+        `/events/registrations/${eventId}/register/member`,
+        registrationPayload
       );
-
-      console.log("Registration response:", response.data); // Debugging log
-
-      // Only show the success modal if the response status is 200 or 201
-      if (response.status === 200 || response.status === 201) {
-        setIsModalOpen(true); // Open the success modal
-      } else {
-        console.error("Unexpected response status:", response.status);
-        toast({
-          title: "Registration Failed",
-          description: "Unexpected response from the server. Please try again.",
-          variant: "destructive",
-          duration: 3000,
-        });
-      }
+  
+      console.log("Registration response:", response); // Debugging log
+  
+      // Only show the success modal if we get a successful response
+      setIsModalOpen(true); // Open the success modal
+      
+      return response;
     } catch (error) {
       console.error("Registration failed:", error);
-      console.error("Registration failed:", error);
-
+      
       toast({
         title: "Registration Failed",
         description: "Unable to complete registration. Please try again.",
         variant: "destructive",
         duration: 3000,
       });
+      
+      throw error;
     }
   };
 
+
+  
   const handleFlutterwavePayment = () => {
     const config = {
       public_key:
@@ -331,6 +394,16 @@ const EventRegistration = () => {
 
     return config;
   };
+  
+const isValidUrl = (url: any) => {
+  try {
+    if (!url) return false;
+    new URL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 
   return (
     <div className="py-2 px-4">
@@ -379,16 +452,20 @@ const EventRegistration = () => {
               {eventDetails.topic} - Understanding Accounting
             </h1>
 
-            {eventDetails.image && (
-              <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
-                <Image
-                  src={eventDetails.image}
-                  alt={eventDetails.topic}
-                  fill
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
+            {eventDetails.image && isValidUrl(eventDetails.image) ? (
+  <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
+    <Image
+      src={eventDetails.image}
+      alt={eventDetails.topic || "Event image"}
+      fill
+      className="w-full h-full object-cover"
+    />
+  </div>
+) : (
+  <div className="relative h-80 mb-4 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
+    <p className="text-gray-500">No image available</p>
+  </div>
+)}
             <div className="mb-4">
               <div className="flex items-center mb-2 text-sm text-gray-500">
                 <CalendarRange className="h-5 w-5 mr-2 text-gray-500" />

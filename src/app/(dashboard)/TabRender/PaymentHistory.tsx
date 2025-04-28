@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect } from "react";
 import {
   X,
   Search,
@@ -11,18 +11,18 @@ import {
 import CalendarFilter from "@/components/homecomps/CalendarFilter";
 import TablePagination from "@/components/Pagenation";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
+import apiClient from "@/services/apiClient";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl lg:p-12 md:p-8 w-full lg:max-w-2xl md:w-2xl relative">
         <button
           onClick={onClose}
@@ -36,15 +36,30 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   );
 };
 
-// Define the payment interface
+// Define the payment interface based on API response
 interface Payment {
-  TransactionID: string;
-  SubscriptionPeriod: string;
-  AmountPaid: number;
-  PaymentMethod: string;
+  id: string;
+  userId: string;
+  billingId: string;
+  paymentType: string;
+  amount: number;
+  datePaid: string;
   status: string;
-  receipt?: string;
-  date: string;
+  transactionId: string | null;
+  subscriptionId: string | null;
+  // Additional fields for UI
+  subscriptionPeriod?: string;
+  paymentMethod?: string;
+}
+
+// Define the billing interface
+interface Billing {
+  id: string;
+  name: string;
+  type: string;
+  amount: number;
+  status: string;
+  createdAt: string;
 }
 
 const PaymentHistory = () => {
@@ -52,6 +67,7 @@ const PaymentHistory = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [paymentHistoryData, setPaymentHistoryData] = useState<Payment[]>([]);
   const [originalData, setOriginalData] = useState<Payment[]>([]);
+  const [billingData, setBillingData] = useState<Billing[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,29 +75,45 @@ const PaymentHistory = () => {
   const itemsPerPage = 5;
   const { toast } = useToast();
 
+  // Fetch billing data from API
+  const fetchBillingData = async () => {
+    try {
+      const response = await apiClient.get("/billing");
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error("Error fetching billing data:", error);
+      return [];
+    }
+  };
+
   // Fetch payment history data from the API
   useEffect(() => {
     const fetchPaymentHistory = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          console.error("User is not authenticated. Please log in again.");
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get(
-          "https://ican-api-6000e8d06d3a.herokuapp.com/api/payments/total-outstanding",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
+        const response = await apiClient.get("/payments/history");
+        const billings = await fetchBillingData();
+        setBillingData(billings);
+        
         // Make sure we're dealing with an array
-        const data = Array.isArray(response.data) ? response.data : [];
-        setPaymentHistoryData(data);
-        setOriginalData(data);
+        const data = Array.isArray(response) ? response : [];
+        
+        // Process payment data to include subscription period and payment method
+        const processedData = data.map((payment: Payment) => {
+          // Find related billing record
+          const relatedBilling = billings.find(b => b.id === payment.billingId);
+          
+          // Extract payment method from transactionId (example: CARD_64413c1f-78e4...)
+          const paymentMethod = payment.transactionId?.split('_')[0] || 'Unknown';
+          
+          return {
+            ...payment,
+            subscriptionPeriod: relatedBilling?.name || 'Unknown Subscription',
+            paymentMethod: paymentMethod === 'CARD' ? 'Debit Card' : 'Bank Transfer'
+          };
+        });
+        
+        setPaymentHistoryData(processedData);
+        setOriginalData(processedData);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching payment history:", error);
@@ -106,7 +138,7 @@ const PaymentHistory = () => {
 
     // Filter payment history data based on the selected date
     const filteredData = originalData.filter((payment: Payment) => {
-      const paymentDate = new Date(payment.date);
+      const paymentDate = new Date(payment.datePaid);
       return (
         paymentDate.getDate() === selectedDate.getDate() &&
         paymentDate.getMonth() === selectedDate.getMonth() &&
@@ -140,9 +172,9 @@ const PaymentHistory = () => {
 
     const filtered = dataToFilter.filter(
       (payment: Payment) =>
-        payment.TransactionID.toLowerCase().includes(term) ||
-        payment.PaymentMethod.toLowerCase().includes(term) ||
-        payment.SubscriptionPeriod.toLowerCase().includes(term)
+        (payment.transactionId?.toLowerCase().includes(term) || false) ||
+        (payment.paymentMethod?.toLowerCase().includes(term) || false) ||
+        (payment.subscriptionPeriod?.toLowerCase().includes(term) || false)
     );
 
     setPaymentHistoryData(filtered);
@@ -150,21 +182,29 @@ const PaymentHistory = () => {
   };
 
   const renderStatusBadgePayment = (status: string) => {
-    if (status === "failed") {
+    if (status === "FAILED") {
       return (
         <div className="flex items-center">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600">
-            <XCircle className="mr-1 h-3 w-3 rounded-full " />
+            <XCircle className="mr-1 h-3 w-3 rounded-full" />
             Failed
           </span>
         </div>
       );
-    } else if (status === "successful") {
+    } else if (status === "SUCCESS") {
       return (
         <div className="flex items-center">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600">
             <CheckCircle className="mr-1 h-3 w-3 rounded-full" />
             Successful
+          </span>
+        </div>
+      );
+    } else if (status === "PENDING") {
+      return (
+        <div className="flex items-center">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-600">
+            Pending
           </span>
         </div>
       );
@@ -182,6 +222,22 @@ const PaymentHistory = () => {
     setPaymentHistoryData(originalData);
     setCurrentPage(1);
     setIsFiltered(false);
+  };
+
+  // Format date to display in a readable format
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  // Safely truncate string to avoid null errors
+  const truncateString = (str: string | null | undefined, length: number): string => {
+    if (!str) return 'N/A';
+    return str.slice(0, length);
   };
 
   // Render different states based on data and filters
@@ -256,25 +312,25 @@ const PaymentHistory = () => {
                   (currentPage - 1) * itemsPerPage,
                   currentPage * itemsPerPage
                 )
-                .map((pay: Payment, index: number) => (
+                .map((payment: Payment, index: number) => (
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-800">
-                      {pay.TransactionID}
+                      {truncateString(payment.transactionId, 12)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-800">
-                      {pay.SubscriptionPeriod}
+                      {payment.subscriptionPeriod || 'Unknown'}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-800">
-                      {pay.AmountPaid}
+                      {payment.amount.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-800">
-                      {pay.PaymentMethod}
+                      {payment.paymentMethod || 'Unknown'}
                     </td>
                     <td className="px-6 py-4">
-                      {renderStatusBadgePayment(pay.status)}
+                      {renderStatusBadgePayment(payment.status)}
                     </td>
                     <td className="px-6 py-4">
-                      {pay.receipt ? (
+                      {payment.status === "SUCCESS" ? (
                         <button className="px-4 py-1 bg-primary text-white text-sm rounded-full hover:bg-blue-700">
                           Download
                         </button>
@@ -316,7 +372,7 @@ const PaymentHistory = () => {
                   type="text"
                   value={searchTerm}
                   onChange={handleSearch}
-                  placeholder="Search by title, tag, or category..."
+                  placeholder="Search by transaction ID, payment method..."
                   className="w-full h-10 pl-10 pr-4 rounded-xl text-base focus:outline-none focus:ring-1 focus:ring-blue-500 text-black border border-gray-500 placeholder:text-black"
                 />
               </div>

@@ -14,9 +14,10 @@ function TestingPage() {
         <FlutterModal
           amount={50000}
           email="woodsedema001@gmail.com"
-          phone_number="08127576854"
+          phoneNumber="08127576854"
           name="Francis Woods"
           title="Payment for services"
+          paymentType="service" 
         />
 
         <UploadS3 />

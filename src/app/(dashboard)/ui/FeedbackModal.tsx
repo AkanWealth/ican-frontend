@@ -3,6 +3,8 @@ import { X, Star } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import apiClient from "@/services/apiClient";
+
 
 // Define the type for the modal props
 interface FeedbackModalProps {
@@ -56,26 +58,20 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
       };
 
       // Submit feedback to API
-      const response = await axios.post(
-        `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/feedback`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const response = await apiClient.post(
+        `/events/${eventId}/feedback`,
+        payload
       );
       console.log("response", response);
       // setTimeout(() => {
-      if (response.status === 201) {
+    
         toast({
           title: "Feedback submitted successfully!",
           description: " ",
           variant: "default",
           duration: 2000,
         });
-      }
+      
       // }, 3000);
 
       setFeedbackData({ comment: "", rating: 0 });

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Fragment, ReactNode } from "react";
+import React, { useState, useEffect, Fragment, ReactNode, useCallback } from "react";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
@@ -80,6 +80,10 @@ function Biodata() {
   const [activeStep, setActiveStep] = useState(0);
   const [skipped, setSkipped] = useState(new Set());
   const toast = useToast();
+  // Add state to track form validity
+  const [isCurrentStepValid, setIsCurrentStepValid] = useState(false);
+  // Add state to track validation error message
+  const [validationMessage, setValidationMessage] = useState("");
 
   const [formData, setFormData] = useState<BiodataFormData>({
     image: null,
@@ -139,6 +143,97 @@ function Biodata() {
     }
   }, []);
 
+  // Wrap validateCurrentStep in useCallback
+  const validateCurrentStep = useCallback(() => {
+    switch (activeStep) {
+      case 0: // Personal data
+        const personalData = formData.personalData;
+        const isPersonalValid = 
+          !!personalData.surname?.trim() && 
+          !!personalData.firstName?.trim() && 
+          !!personalData.gender?.trim() && 
+          !!personalData.dob && 
+          !!personalData.maritalStatus?.trim() && 
+          !!personalData.state?.trim() && 
+          !!personalData.nationality?.trim();
+        
+        setIsCurrentStepValid(isPersonalValid);
+        if (!isPersonalValid) {
+          setValidationMessage("Please fill all required personal details");
+        } else {
+          setValidationMessage("");
+        }
+        break;
+      
+      case 1: // Contact details
+        const contactDetails = formData.contactDetails;
+        const isContactValid = 
+          !!contactDetails.mobileNumber?.trim() &&
+          !!contactDetails.residentialAddress?.trim() &&
+          !!contactDetails.residentialCountry?.trim() &&
+          !!contactDetails.residentialCity?.trim();
+        
+        setIsCurrentStepValid(isContactValid);
+        if (!isContactValid) {
+          setValidationMessage("Please fill all required contact details");
+        } else {
+          setValidationMessage("");
+        }
+        break;
+      
+      case 2: // Qualifications
+        const education = formData.education;
+        const isEducationValid = 
+          !!education?.insitution?.trim() &&
+          !!education?.discipline?.trim() &&
+          !!education?.qualification?.trim() &&
+          !!education?.graduation?.trim() &&
+          !!education?.status?.trim();
+        
+        setIsCurrentStepValid(isEducationValid);
+        if (!isEducationValid) {
+          setValidationMessage("Please fill all required qualification details");
+        } else {
+          setValidationMessage("");
+        }
+        break;
+      
+      case 3: // Experience
+        const experience = formData.experience;
+        const isExperienceValid = 
+          !!experience?.companyName?.trim() &&
+          !!experience?.currentPosition?.trim() &&
+          !!experience?.startDate?.trim();
+        
+        setIsCurrentStepValid(isExperienceValid);
+        if (!isExperienceValid) {
+          setValidationMessage("Please fill all required experience details");
+        } else {
+          setValidationMessage("");
+        }
+        break;
+      
+      case 4: // Payment
+        // For the payment step, validity is determined by isPaymentSuccessful
+        setIsCurrentStepValid(formData.isPaymentSuccessful || false);
+        if (!formData.isPaymentSuccessful) {
+          setValidationMessage("Payment is required to complete registration");
+        } else {
+          setValidationMessage("");
+        }
+        break;
+      
+      default:
+        setIsCurrentStepValid(true);
+        setValidationMessage("");
+    }
+  }, [activeStep, formData]); // Add dependencies here
+
+  // Run validation when activeStep changes or when formData changes
+  useEffect(() => {
+    validateCurrentStep();
+  }, [activeStep,formData, validateCurrentStep]); // Include validateCurrentStep in the dependency array
+
   const getFormProgress = (): Partial<BiodataFormData> | null => {
     if (typeof window === "undefined") return null; // Prevent SSR issues
 
@@ -177,6 +272,7 @@ function Biodata() {
 
   const updateFormData = (data: Partial<BiodataFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
+    // validateCurrentStep will be called via the useEffect
   };
 
   const handleSubmit = async () => {
@@ -248,7 +344,6 @@ function Biodata() {
       });
 
       console.log("Biodata submitted successfully:", response.data);
-      // alert("Biodata submitted successfully!");
       toast.toast({
         title: "Biodata submitted successfully!",
         description: "Registration is complete.",
@@ -259,7 +354,6 @@ function Biodata() {
       setActiveStep(steps.length);
     } catch (error) {
       console.error("Error submitting biodata:", error);
-      // alert("Failed to submit biodata. Please try again.");
       toast.toast({
         title: "Failed to submit biodata",
         description: "Please try again.",
@@ -312,25 +406,44 @@ function Biodata() {
   }, [formData]);
 
   const handleNext = () => {
-    // For the last step (payment page), check if payment is completed
-    if (activeStep === steps.length - 1) {
-      // Only proceed if payment is successful
-      if (formData.isPaymentSuccessful) {
-        handleSubmit(); // Submit the form on the last step
+    // Validate current step first
+    validateCurrentStep();
+    
+    // Only proceed if the step is valid
+    if (isCurrentStepValid) {
+      // For the last step (payment page), check if payment is completed
+      if (activeStep === steps.length - 1) {
+        // Only proceed if payment is successful
+        if (formData.isPaymentSuccessful) {
+          handleSubmit(); // Submit the form on the last step
+        } else {
+          // If trying to finish without payment, show a message or alert
+          toast.toast({
+            title: "Payment required",
+            description: "Please complete your payment before finishing the registration.",
+            variant: "destructive",
+            duration: 3000,
+          });
+          return;
+        }
       } else {
-        // If trying to finish without payment, show a message or alert
-        alert("Please complete your payment before finishing the registration.");
-        return;
+        // For other steps, just proceed normally
+        let newSkipped = skipped;
+        if (isStepSkipped(activeStep)) {
+          newSkipped = new Set(newSkipped.values());
+          newSkipped.delete(activeStep);
+        }
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        setSkipped(newSkipped);
       }
     } else {
-      // For other steps, just proceed normally
-      let newSkipped = skipped;
-      if (isStepSkipped(activeStep)) {
-        newSkipped = new Set(newSkipped.values());
-        newSkipped.delete(activeStep);
-      }
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
-      setSkipped(newSkipped);
+      // If step is not valid, show validation message
+      toast.toast({
+        title: "Required fields missing",
+        description: validationMessage,
+        variant: "destructive",
+        duration: 3000,
+      });
     }
   };
 
@@ -504,9 +617,7 @@ function Biodata() {
                     updateFormData={updateFormData}
                     onClose={() => {
                       // Define what should happen when the payment component is closed
-                      // This could be resetting form state, hiding modals, etc.
                       console.log("Payment component closed");
-                      // You could also add specific behavior here if needed
                     }}
                   />
                 )}
@@ -537,19 +648,19 @@ function Biodata() {
               </Button>
             )}
             
-            {/* Payment message when on payment page but payment not complete */}
-            {isPaymentIncomplete && (
+            {/* Validation message */}
+            {!isCurrentStepValid && (
               <div className="text-red-500 text-sm mr-3 self-center">
-                Complete payment to finish
+                {validationMessage || "Please fill all required fields"}
               </div>
             )}
             
             <Button
               className={`bg-primary p-3 sm:p-4 rounded-full text-sm sm:text-base text-white w-fit ${
-                isPaymentIncomplete ? "opacity-50 cursor-not-allowed" : ""
+                !isCurrentStepValid ? "opacity-50 cursor-not-allowed" : ""
               }`}
               onClick={handleNext}
-              disabled={isPaymentIncomplete}
+              disabled={!isCurrentStepValid}
             >
               {activeStep === steps.length - 1 ? "Finish" : "Continue"}
             </Button>

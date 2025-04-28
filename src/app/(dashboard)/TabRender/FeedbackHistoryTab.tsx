@@ -1,9 +1,9 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Star, CalendarDays, MapPin, ChevronDown } from 'lucide-react';
+import { Star, CalendarDays, MapPin } from 'lucide-react';
 import Image from 'next/image';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
+import apiClient from '@/services/apiClient';
+import { parseCookies } from 'nookies';
 
 // Interfaces for type safety
 interface Feedback {
@@ -11,6 +11,8 @@ interface Feedback {
     comment: string;
     rating: number;
     createdAt: string;
+    event: Event;
+    userId: string; // Added userId property to feedback
 }
 
 interface Event {
@@ -27,6 +29,7 @@ interface Event {
     status: string;
     createdAt: string;
 }
+
 const formatDate = (dateString: string, format: 'relative' | 'full' = 'relative') => {
     const date = new Date(dateString);
     
@@ -62,89 +65,102 @@ const formatDate = (dateString: string, format: 'relative' | 'full' = 'relative'
 };
 
 const FeedbackHistoryTab: React.FC = () => {
-    const [events, setEvents] = useState<Event[]>([]);
-    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [feedbackHistory, setFeedbackHistory] = useState<Feedback[]>([]);
     const [filter, setFilter] = useState('Recent First');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchEvents = async () => {
+        const fetchEvents = async (currentUserId: string) => {
             try {
-                setIsLoading(true);
-                
-                // Fetch list of events
-                const eventsResponse = await axios.get<{data: Event[], meta: any}>('https://ican-api-6000e8d06d3a.herokuapp.com/api/events');
-                
-                // Extract events from the data property
-                const fetchedEvents = eventsResponse.data.data;
-
-                setEvents(fetchedEvents);
-                
-                // If there are events, select the first one by default
-                if (fetchedEvents.length > 0) {
-                    setSelectedEvent(fetchedEvents[0]);
+                const eventsResponse = await apiClient.get('/events');
+                let events = [];
+                if (eventsResponse && eventsResponse.data) {
+                    events = Array.isArray(eventsResponse.data) ? eventsResponse.data : [];
+                } else if (Array.isArray(eventsResponse)) {
+                    events = eventsResponse;
                 }
-                
-                setIsLoading(false);
+
+                if (events.length === 0) {
+                    setIsLoading(false);
+                    setError('No events found. Cannot fetch feedback.');
+                    return;
+                }
+
+                const firstEventId = events[0].id;
+                console.log('Using event ID for API call:', firstEventId);
+
+                fetchFeedbackWithEventId(firstEventId, currentUserId, events);
             } catch (err) {
                 console.error('Error fetching events:', err);
                 setError('Failed to fetch events');
-                setEvents([]);
                 setIsLoading(false);
             }
         };
 
-        fetchEvents();
+        const cookies = parseCookies();
+        const userDataCookie = cookies['user_data'];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const currentUserId = userData?.id;
+
+        setUserId(currentUserId);
+        console.log('User ID:', currentUserId);
+
+        if (currentUserId) {
+            fetchEvents(currentUserId);
+        } else {
+            setIsLoading(false);
+            setError('User not authenticated. Please log in.');
+        }
     }, []);
 
-
-    useEffect(() => {
-        const fetchFeedback = async () => {
-            if (!selectedEvent) return;
-
-            try {
-                setIsLoading(true);
-                if (typeof window === "undefined") return; // Ensure code runs only on the client side
-
-                // Retrieve the token from localStorage
-                const token = localStorage.getItem("token");
-
-                const user = localStorage.getItem("user");
-                const userId = user ? JSON.parse(user)?.id : null;
-                // Fetch feedback for the selected event
-                const feedbackResponse = await axios.get<{ data: Feedback[]; meta: any }>(
-                    `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${userId}/feedback`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`, 
-                            // "Content-Type": "application/json",
-                        },
-                    }
-                );
-                console.log("feedbackResponse", feedbackResponse);
-
-                const fetchedFeedback = feedbackResponse.data.data || [];
-                setFeedbackHistory(fetchedFeedback);
-
-                setIsLoading(false);
-            } catch (err) {
-                console.error("Error fetching feedback:", err);
-                setError("Failed to fetch feedback history");
-                setFeedbackHistory([]);
-                setIsLoading(false);
+    const fetchFeedbackWithEventId = async (eventId: string, currentUserId: string, allEvents: Event[]) => {
+        try {
+            // Get all feedback for the event
+            const feedbackResponse = await apiClient.get(`/events/${eventId}/feedback/user/${currentUserId}`);
+            
+            let allFeedback = [];
+            if (feedbackResponse && feedbackResponse.data) {
+                allFeedback = Array.isArray(feedbackResponse.data) ? feedbackResponse.data : [];
+            } else if (Array.isArray(feedbackResponse)) {
+                allFeedback = feedbackResponse;
             }
-        };
-
-        if (selectedEvent) {
-            fetchFeedback();
+            
+            console.log('All feedback:', allFeedback);
+            
+            // Filter feedback to only show those matching the current user ID
+            const userFeedback = allFeedback.filter((feedback: any) => 
+                feedback.userId === currentUserId
+            );
+            
+            console.log('User feedback after filtering:', userFeedback);
+            
+            // Enrich feedback with event details
+            const enrichedFeedback = userFeedback.map((feedback: any) => {
+                // Find the matching event for this feedback
+                const feedbackEventId = feedback.eventId;
+                const eventDetails = allEvents.find(event => event.id === feedbackEventId) || null;
+                
+                return {
+                    ...feedback,
+                    event: eventDetails
+                };
+            });
+            
+            setFeedbackHistory(enrichedFeedback);
+            setIsLoading(false);
+            
+        } catch (err) {
+            console.error('Error fetching feedback:', err);
+            setError('Failed to fetch your feedback history');
+            setFeedbackHistory([]);
+            setIsLoading(false);
         }
-    }, [selectedEvent]);
+    };
 
     // Sorting and filtering logic
     const sortedFeedback = React.useMemo(() => {
-
         const feedbackArray = Array.isArray(feedbackHistory) ? feedbackHistory : [];
         
         let sorted = [...feedbackArray];
@@ -162,20 +178,12 @@ const FeedbackHistoryTab: React.FC = () => {
         return sorted;
     }, [feedbackHistory, filter]);
 
-    // if (isLoading) {
-    //     return (
-    //         <div className="flex justify-center items-center h-full">
-    //             <p>Loading...</p>
-    //         </div>
-    //     );
-    // }
-
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-800"></div>
-                    <p className="mt-4">Loading registered events...</p>
+                    <p className="mt-4">Loading feedback history...</p>
                 </div>
             </div>
         );
@@ -191,56 +199,27 @@ const FeedbackHistoryTab: React.FC = () => {
 
     return (
         <div className="flex flex-col w-full">
-            {/* Event Selection Dropdown */}
+            {/* Header and Filter */}
             <div className="mb-4 flex items-center justify-between">
-                <h1 className="text-2xl md:text-xl font-bold">Feedback History</h1>
-                <div className="flex items-center space-x-4">
-                    {/* Event Selector */}
-                    {/* <DropdownMenu>
-                        <DropdownMenuTrigger className="flex items-center text-sm text-gray-800 rounded-lg w-48 bg-white border border-gray-300 px-4 py-2 hover:bg-gray-50">
-                            {selectedEvent ? selectedEvent.name : 'Select Event'}
-                            <ChevronDown className="w-4 h-5 ml-2" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48 bg-white z-50 text-xs border border-gray-300 rounded-lg text-gray-700">
-                            {events.map((event) => (
-                                <DropdownMenuItem 
-                                    key={event.id}
-                                    className='transition-colors hover:bg-blue-100 p-2'
-                                    onClick={() => setSelectedEvent(event)}
-                                >
-                                    {event.name}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent> */}
-                    {/* </DropdownMenu> */}
-
-                    {/* Feedback Filter */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger className="flex items-center text-sm text-gray-800 rounded-lg w-28 bg-white border border-gray-300 px-4 py-2 hover:bg-gray-50">
-                            Filter
-                            <ChevronDown className="w-4 h-5 ml-2" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-38 bg-white z-50 text-xs border border-gray-300 rounded-lg text-gray-700 ">
-                            <DropdownMenuItem 
-                                className='transition-colors hover:bg-blue-100 p-2'
-                                onClick={() => setFilter('Recent First')}
-                            >
-                                Recent First
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                                className='transition-colors hover:bg-blue-100 p-2'
-                                onClick={() => setFilter('Oldest First')}
-                            >
-                                Oldest First
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                                className='transition-colors hover:bg-blue-100 p-2'
-                                onClick={() => setFilter('Highest Rated')}
-                            >
-                                Highest Rated
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                <h1 className="text-2xl md:text-xl font-bold">My Feedback History</h1>
+                <div className="flex items-center">
+                    {/* Filter dropdown */}
+                    <div className="relative">
+                        <select 
+                            className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm hover:bg-gray-50"
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                        >
+                            <option value="Recent First">Recent First</option>
+                            <option value="Oldest First">Oldest First</option>
+                            <option value="Highest Rated">Highest Rated</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -279,15 +258,15 @@ const FeedbackHistoryTab: React.FC = () => {
                                 </div>
                             </div>
                             <hr className='border border-gray-300 mb-4'></hr>
-                            <p className='text-base text-gray-600 font-semibold'>{selectedEvent?.name || 'Event Details'}</p>
+                            <p className='text-base text-gray-600 font-semibold'>{feedback.event?.name || 'Event Details'}</p>
                             <div className="flex items-center text-sm text-gray-600 space-x-4">
                                 <div className="flex items-center">
                                     <CalendarDays className="w-4 h-4 mr-1" />
-                                    {selectedEvent ? formatDate(selectedEvent.date, 'full') : 'N/A'}
+                                    {feedback.event ? formatDate(feedback.event.date, 'full') : 'N/A'}
                                 </div>
                                 <div className="flex items-center">
                                     <MapPin className="w-4 h-4 mr-2" />
-                                    {selectedEvent?.venue || 'Unknown Location'}
+                                    {feedback.event?.venue || 'Unknown Location'}
                                 </div>
                             </div>
                         </div>
@@ -299,11 +278,9 @@ const FeedbackHistoryTab: React.FC = () => {
                         <div className="flex justify-center">
                             <Image src="/calendar.png" width={150} height={50} alt="calendar-image" />
                         </div>
-                        <h2 className="mt-10 text-xl font-bold text-gray-800">
-                            No Feedback History
-                        </h2>
+                        <h2 className="mt-10 text-xl font-bold text-gray-800">No Feedback History</h2>
                         <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
-                            No feedback has been submitted for this event yet.
+                            You haven't submitted any feedback for events yet.
                         </p>
                     </div>
                 </div>

@@ -19,7 +19,7 @@ export async function OPTIONS(request: NextRequest): Promise<NextResponse> {
   const response = new NextResponse(null, { status: 204 });
   
   // Add CORS headers
-  response.headers.set('Access-Control-Allow-Origin', '*'); // Adjust this to your specific domain in production
+  response.headers.set('Access-Control-Allow-Origin', 'https://ican-mu.vercel.app'); 
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   response.headers.set('Access-Control-Max-Age', '86400');
@@ -31,6 +31,12 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse> {
   try {
+    console.log("Environment variables check:", {
+      AWS_REGION: !!process.env.AWS_REGION,
+      AWS_ACCESS_KEY_ID: !!process.env.AWS_ACCESS_KEY_ID,
+      AWS_SECRET_ACCESS_KEY: !!process.env.AWS_SECRET_ACCESS_KEY,
+      AWS_BUCKET_NAME: !!process.env.AWS_BUCKET_NAME
+    });
     // Get the request body
     const body = await request.json() as PresignedPostRequestBody;
     const { fileName, fileType } = body;
@@ -83,6 +89,11 @@ export async function POST(
     response.headers.set('Access-Control-Allow-Origin', '*');
     return response;
   } catch (error) {
+    console.error("Error details:", {
+      message: (error as Error).message,
+      stack: (error as Error).stack,
+      name: (error as Error).name
+    });
     console.error("Error creating presigned URL:", error);
     const errorResponse = NextResponse.json(
       { error: "Failed to create upload URL", details: (error as Error).message },

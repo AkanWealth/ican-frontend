@@ -140,7 +140,7 @@ function PaymentActivities() {
   }, [toast]);
   return (
     <div className=" flex flex-col gap-4 items-start ">
-      <div className="flex flex-row gap-2 items-center justify-start w-full">
+      <div className="flex flex-row gap-6 items-center justify-start w-full">
         <StatCard
           name="Total Payments"
           metric={data?.totalPayments}

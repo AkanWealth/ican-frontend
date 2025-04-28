@@ -36,7 +36,7 @@ function InputEle({
   addStyle2 = "",
   errorMsg = "",
   value = "",
-  onChange = () => {},
+  onChange = () => { },
 }: InputEleProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [images, setImages] = useState<File[]>([]);
@@ -83,7 +83,7 @@ function InputEle({
             disabled={disabled}
             type={type}
             min={1900}
-            max={2099}
+            max={new Date().getFullYear().toString()}
             step={1}
             placeholder="2024"
             onChange={onChange}

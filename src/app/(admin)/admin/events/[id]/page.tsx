@@ -110,6 +110,7 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           </button>
 
           <FeedbackModal
+            eventId={eventDetails.id}
             isOpen={showFeedbackModal}
             onClose={() => setShowFeedbackModal(false)}
             feedbacks={feedbacks}

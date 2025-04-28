@@ -48,7 +48,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
         const response = await axios.get(`${BASE_API_URL}/adverts/${id}/`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
           withCredentials: true,
         });
@@ -172,7 +172,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           : `${BASE_API_URL}/adverts`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };

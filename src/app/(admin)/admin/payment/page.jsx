@@ -18,7 +18,7 @@ function Payment() {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/payments`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
 

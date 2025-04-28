@@ -38,17 +38,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
-import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { DashUserLogin } from "@/libs/types";
 
+import apiClient from "@/services-admin/apiClient";
+
 function UserActivities() {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [loginChartData, setLoginChartData] = useState<DashUserLogin>({
     weeklyLogins: [],
     monthlyLogins: [],
@@ -76,7 +75,7 @@ function UserActivities() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
 
         const config = {
           method: "get",
@@ -87,8 +86,11 @@ function UserActivities() {
           },
         };
 
-        const response = await axios.request(config);
-        setData(response.data);
+        const response = await apiClient.get(
+          "/dashboard/user-activity",
+          config
+        );
+        setData(response);
         toast({
           title: "User Activities",
           description: "User activities data fetched successfully.",
@@ -96,27 +98,12 @@ function UserActivities() {
         });
       } catch (error) {
         console.error(error);
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          const config = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: `${BASE_API_URL}/dashboard/user-activity`,
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
-          };
-          await handleUnauthorizedRequest(config, router, setData);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch user activities data.",
-            variant: "destructive",
-          });
-        }
+
+        toast({
+          title: "Error",
+          description: "Failed to fetch user activities data.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -126,7 +113,7 @@ function UserActivities() {
   useEffect(() => {
     const fetchLoginStats = async () => {
       try {
-        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
 
         const config = {
           method: "get",
@@ -137,9 +124,8 @@ function UserActivities() {
           },
         };
 
-        const response = await axios.request(config);
-        setLoginStats(response.data.data);
-        console.log(response.data.data);
+        const response = await apiClient.get("/dashboard/login-stats", config);
+        setLoginStats(response.data);
         toast({
           title: "User Login Stats",
           description: "User login stats fetched successfully.",
@@ -147,27 +133,12 @@ function UserActivities() {
         });
       } catch (error) {
         console.error(error);
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          const config = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: `${BASE_API_URL}/dashboard/login-stats`,
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
-          };
-          await handleUnauthorizedRequest(config, router, setLoginStats);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch user login stats.",
-            variant: "destructive",
-          });
-        }
+
+        toast({
+          title: "Error",
+          description: "Failed to fetch user login stats.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -217,7 +188,7 @@ function UserActivities() {
 
   useEffect(() => {
     const fetchLoginChartData = async () => {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
 
       const config = {
         method: "get",
@@ -228,9 +199,9 @@ function UserActivities() {
         },
       };
       try {
-        const response = await axios.request(config);
-        setLoginChartData(response.data);
-        processLoginChartData(response.data);
+        const response = await apiClient.get("/dashboard/chart-stats", config);
+        setLoginChartData(response);
+        processLoginChartData(response);
         toast({
           title: "Success",
           description: "Chart data fetched successfully",
@@ -238,19 +209,13 @@ function UserActivities() {
         });
       } catch (error) {
         console.error(error);
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          await handleUnauthorizedRequest(config, router, (data) => {
-            setLoginChartData(data);
-            processLoginChartData(data);
-          });
-        } else {
-          toast({
-            title: "Error",
+        toast({
+          title: "Error",
             description: "Failed to fetch chart data",
             variant: "destructive",
           });
         }
-      }
+      
     };
 
     fetchLoginChartData();
@@ -327,7 +292,6 @@ function UserActivities() {
   );
 
   return (
-
     <div className="flex flex-col gap-4 items-start">
       <div className="flex flex-row gap-2 items-center justify-start w-full">
         <StatCard
@@ -393,7 +357,9 @@ function UserActivities() {
           Icon={LiaUserCheckSolid}
         />
         <StatCard
-          name={`Total ${new Date().toLocaleString('default', { month: 'long' })} Logins`}
+          name={`Total ${new Date().toLocaleString("default", {
+            month: "long",
+          })} Logins`}
           metric={loginStats?.totalMonthlyLogins}
           Icon={LiaUserMinusSolid}
         />

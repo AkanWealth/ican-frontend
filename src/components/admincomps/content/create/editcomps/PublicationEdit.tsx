@@ -26,7 +26,7 @@ function PublicationEdit({ mode, id }: CreateContentProps) {
         const response = await axios.get(`${BASE_API_URL}/publications/${id}`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
           withCredentials: true,
         });

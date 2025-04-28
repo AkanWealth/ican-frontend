@@ -59,7 +59,7 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/events/${eventId}`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
       try {

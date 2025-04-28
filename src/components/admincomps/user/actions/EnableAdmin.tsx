@@ -28,7 +28,7 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
         headers: {
           Accept: "application/json",
           ContentType: "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         data: data,
       };

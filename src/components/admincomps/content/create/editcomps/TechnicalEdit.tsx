@@ -35,7 +35,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
             withCredentials: true,
           }
@@ -97,7 +97,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
           : `${BASE_API_URL}/technical-sessions`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };

@@ -18,7 +18,7 @@ function MembersPage() {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/users/users`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
       const result = await axios.request(config);

@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import StatCard from "@/components/genui/StatCard";
-import { MdVerifiedUser } from "react-icons/md";
 
 import { EventTable } from "@/components/admincomps/event/datatable/EventTable";
-import { allcolumns, dashEventRegColumns } from "@/components/admincomps/event/datatable/columns";
+import { dashEventRegColumns } from "@/components/admincomps/event/datatable/columns";
 import { Event } from "../event/datatable/colsdata";
+
+import apiClient from "@/services-admin/apiClient";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
@@ -15,14 +15,7 @@ import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-import {
-  Area,
-  AreaChart,
-  Line,
-  LineChart,
-  CartesianGrid,
-  XAxis,
-} from "recharts";
+import { Line, LineChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -57,7 +50,7 @@ function EventActivities() {
   const router = useRouter();
 
   const [eventData, setEventData] = useState<DashEventReg[]>([]);
-  const [data, setData] = useState({
+  const [eventRegistrationTrendData, setEventRegistrationTrendData] = useState({
     totalPayments: 0,
     pendingPayments: 0,
     completedPayments: 0,
@@ -67,48 +60,28 @@ function EventActivities() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("access_token="))
-          ?.split("=")[1]; // Retrieve token from cookies
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
 
         const config = {
           method: "get",
           maxBodyLength: Infinity,
-          url: `${BASE_API_URL}/dashboard/payment-data`,
+          url: `${BASE_API_URL}/dashboard/event-registration-trend`,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
 
-        const response = await axios.request(config);
-        setData(response.data);
+        const response = await apiClient.get(
+          "/dashboard/event-registration-trend",
+          config
+        );
+        setEventRegistrationTrendData(response);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          const token = document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("access_token="))
-            ?.split("=")[1]; // Retrieve token from cookies
-          const config = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: `${BASE_API_URL}/dashboard/payment-data`,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          };
-          await handleUnauthorizedRequest(config, router, setData);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch payment data.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "Failed to fetch event registration trend data.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -125,37 +98,17 @@ function EventActivities() {
           headers: {},
         };
 
-        const response = await axios.request(config);
-        const upcomingEvents = response.data.data.filter(
-          (event: Event) => event.status === "upcoming"
+        const response = await apiClient.get("/events", config);
+        const upcomingEvents = response.data.filter(
+          (event: Event) => event.status === "UPCOMING"
         );
         setEventData(upcomingEvents);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          const token = document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("access_token="))
-            ?.split("=")[1]; // Retrieve token from cookies
-          const config = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: `${BASE_API_URL}/events`,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          };
-          await handleUnauthorizedRequest(config, router, setEventData);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch events data.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "Failed to fetch events data.",
+          variant: "destructive",
+        });
       }
     }
     fetchEventData();
@@ -171,7 +124,7 @@ function EventActivities() {
           </CardHeader>
           <CardContent>
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>
-              <AreaChart
+              <LineChart
                 accessibilityLayer
                 data={chartData}
                 margin={{
@@ -191,14 +144,14 @@ function EventActivities() {
                   cursor={false}
                   content={<ChartTooltipContent hideLabel />}
                 />
-                <Area
+                <Line
                   dataKey="people"
                   type="natural"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}
                   dot={false}
                 />
-              </AreaChart>
+              </LineChart>
             </ChartContainer>
           </CardContent>
         </Card>

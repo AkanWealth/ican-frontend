@@ -30,7 +30,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/billing/${billingId}`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
       try {

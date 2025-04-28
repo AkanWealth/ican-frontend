@@ -25,7 +25,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
   const router = useRouter();
   const cookies = new Cookies();
   const { toast } = useToast();
-  const [showPreview, setShowPreview] = useState<boolean>(false); 
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -42,7 +42,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
         const response = await axios.get(`${BASE_API_URL}/gallery/${id}`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
           withCredentials: true,
         });
@@ -104,7 +104,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           : `${BASE_API_URL}/gallery`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };
@@ -194,7 +194,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           showPreview={showPreview}
           setShowPreview={setShowPreview}
         />
-      )}  
+      )}
     </div>
   );
 }

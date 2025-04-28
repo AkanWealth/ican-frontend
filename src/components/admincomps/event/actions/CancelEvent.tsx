@@ -29,7 +29,7 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
       url: `${BASE_API_URL}/events/${id}/status`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       withCredentials: true,
       data: data,

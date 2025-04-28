@@ -79,7 +79,7 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
         headers: {
           "Content-Type": "application/json",
 
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         data: submitData,
       };

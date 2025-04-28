@@ -5,7 +5,6 @@ import { ArrowUpDown } from "lucide-react";
 import {
   OverdueBills,
   PaymentDetails,
-  BillingDetails,
   PaymentBasic,
 } from "@/libs/types";
 

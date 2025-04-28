@@ -256,7 +256,7 @@ function NewEvent({
     }
     const draftEvent = async () => {
       try {
-        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
         const formDataToSend = {
           eventName: formData.eventName,
           venue: formData.venue,
@@ -322,7 +322,7 @@ function NewEvent({
     }
     const publishEvent = async () => {
       try {
-        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
         const formDataToSend = {
           eventName: formData.eventName,
           venue: formData.venue,

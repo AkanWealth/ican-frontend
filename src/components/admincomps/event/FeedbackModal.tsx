@@ -37,7 +37,7 @@ export default function FeedbackModal({
           `${BASE_API_URL}/events/${eventId}/feedback`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
               "Content-Type": "application/json",
             },
           }

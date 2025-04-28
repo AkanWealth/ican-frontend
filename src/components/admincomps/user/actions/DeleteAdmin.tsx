@@ -24,7 +24,7 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
         headers: {
           Accept: "application/json",
           ContentType: "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
       try {

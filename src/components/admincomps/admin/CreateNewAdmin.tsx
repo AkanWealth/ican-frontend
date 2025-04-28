@@ -79,7 +79,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/roles`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
 
@@ -113,7 +113,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/users/users`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
 
@@ -141,7 +141,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
     };
 
     fetchUsers();
-  }, [toast ]); // Empty dependency array means this runs once on mount
+  }, [toast]); // Empty dependency array means this runs once on mount
 
   const selectedUser = Array.isArray(users)
     ? users.find((user) => user.id === formData.userId)
@@ -161,7 +161,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );

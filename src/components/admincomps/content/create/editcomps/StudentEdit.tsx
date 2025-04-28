@@ -29,7 +29,7 @@ function StudentEdit({ mode, id }: CreateContentProps) {
         const response = await axios.get(`${BASE_API_URL}/studypacks/${id}`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
           withCredentials: true,
         });
@@ -95,7 +95,7 @@ function StudentEdit({ mode, id }: CreateContentProps) {
           : `${BASE_API_URL}/studypacks`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };

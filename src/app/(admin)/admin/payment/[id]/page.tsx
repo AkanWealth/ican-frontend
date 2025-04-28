@@ -21,7 +21,7 @@ function PaymentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/payments/${paymentId}`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
       const result = await axios.request(config);

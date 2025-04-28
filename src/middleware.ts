@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const user = request.cookies.get("user")?.value;
-  const token = request.cookies.get("access_token")?.value;
+  const user = request.cookies.get("user_data")?.value;
+  const token = request.cookies.get("accessToken")?.value;
   const path = request.nextUrl.pathname;
 
   // If no token or user, redirect to login

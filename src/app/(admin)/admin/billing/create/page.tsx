@@ -60,7 +60,7 @@ function CreateBillingPage() {
       maxBodyLength: Infinity,
       url: `${BASE_API_URL}/billing`,
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };

@@ -33,7 +33,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
         const response = await axios.get(`${BASE_API_URL}/faqs/${id}`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
           withCredentials: true,
         });
@@ -90,7 +90,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
         mode === "edit" ? `${BASE_API_URL}/faqs/${id}` : `${BASE_API_URL}/faqs`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };

@@ -2,8 +2,9 @@ import React from "react";
 import { MdOutlinePublishedWithChanges, MdSubtitles } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
-import axios from "axios";
+
 import { useToast } from "@/hooks/use-toast";
+import apiClient from "@/services-admin/apiClient";
 
 interface EnableAdminProps {
   id: string;
@@ -33,7 +34,7 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
         data: data,
       };
       try {
-        const results = await axios.request(config);
+        const results = await apiClient.request(config);
         console.log(results.data);
         onClose();
         toast({

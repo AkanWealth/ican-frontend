@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
+import apiClient from "@/services-admin/apiClient";
+import { useToast } from "@/hooks/use-toast";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
 import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
 import { BASE_API_URL } from "@/utils/setter";
@@ -10,6 +16,7 @@ import { User } from "@/libs/types";
 function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [data, setData] = useState<User>();
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchData() {
@@ -22,12 +29,25 @@ function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
-      const result = await axios.request(config);
-
-      setData(result.data);
+      try {
+        const result = await apiClient.request(config);
+        setData(result);
+        toast({
+          title: "Member details fetched successfully!",
+          description: "Member details fetched successfully!",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Error fetching member details:", error);
+        toast({
+          title: "Error fetching member details!",
+          description: "Error fetching member details!",
+          variant: "destructive",
+        });
+      }
     }
     fetchData();
-  }, [params]);
+  }, [params, toast]);
 
   return (
     <div className="rounded-3xl p-6">
@@ -236,4 +256,16 @@ function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
-export default MemberDetails;
+export default function PackedMemberDetails({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <MemberDetails params={params} />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

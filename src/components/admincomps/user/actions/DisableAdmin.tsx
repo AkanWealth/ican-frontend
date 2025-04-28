@@ -6,8 +6,10 @@ import {
 } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
-import axios from "axios";
+
+
 import { useToast } from "@/hooks/use-toast";
+import apiClient from "@/services-admin/apiClient";
 
 interface DisableAdminProps {
   id: string;
@@ -37,7 +39,7 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
         data: data,
       };
       try {
-        const results = await axios.request(config);
+        const results = await apiClient.request(config);
         console.log(results.data);
 
         toast({

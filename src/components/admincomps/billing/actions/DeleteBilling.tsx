@@ -14,6 +14,10 @@ interface DeleteBillingProps {
   onClose: () => void;
 }
 
+import apiClient from "@/services-admin/apiClient";
+import { useToast } from "@/hooks/use-toast";
+
+
 function DeleteBilling({
   id,
   title,
@@ -21,6 +25,7 @@ function DeleteBilling({
   date,
   onClose,
 }: DeleteBillingProps) {
+  const { toast } = useToast();
   const handleDelete = () => {
     console.log({ id, title, category, date });
   };

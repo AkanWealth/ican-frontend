@@ -2,7 +2,8 @@ import React from "react";
 import { MdSubtitles, MdDeleteOutline } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
-import axios from "axios";
+
+import apiClient from "@/services-admin/apiClient";
 
 import { useToast } from "@/hooks/use-toast";
 interface DeleteAdminProps {
@@ -28,7 +29,7 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
         },
       };
       try {
-        const results = await axios.request(config);
+        const results = await apiClient.request(config);
         console.log(results.data);
         toast({
           title: "Admin Deleted",

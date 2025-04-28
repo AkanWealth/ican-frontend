@@ -5,10 +5,8 @@ import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
 import InputEle from "@/components/genui/InputEle";
 
-
 import { BillUserTable } from "@/components/admincomps/billing/create/BillUserTable";
 import { userbillingcolumns } from "@/components/admincomps/billing/create/columns";
-import { billings } from "@/components/admincomps/billing/create/colsdata";
 
 import apiClient from "@/services-admin/apiClient";
 import { BASE_API_URL } from "@/utils/setter";
@@ -17,6 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 
 import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
 import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+  
+import { User } from "@/libs/types";
 
 interface IBilling {
   billing_name: string;
@@ -32,6 +32,7 @@ function CreateBillingPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [recipientType, setRecipientType] = useState<string>("all");
   const { toast } = useToast();
+  const [users, setUsers] = useState<User[]>([]);
 
   const router = useRouter();
   const [newBill, setNewBill] = useState<IBilling>({
@@ -73,23 +74,52 @@ function CreateBillingPage() {
     try {
       const response = await apiClient.post("/billing", data, config);
 
-        toast({
-          title: "Success",
-          description: "Bill created successfully.",
-          variant: "default",
-        });
-      
+      toast({
+        title: "Success",
+        description: "Bill created successfully.",
+        variant: "default",
+      });
     } catch (error) {
       console.error("Error creating bill:", error);
-   
-        toast({
-          title: "Error",
-          description: "An error occurred while creating the bill.",
-          variant: "destructive",
-        });
-      
+
+      toast({
+        title: "Error",
+        description: "An error occurred while creating the bill.",
+        variant: "destructive",
+      });
     }
   };
+
+  useEffect(() => {
+    async function fetchData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/users/users`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      };
+      try {
+        const result = await apiClient.request(config);
+
+        setUsers(result.data);
+        toast({
+          title: "Members data fetched successfully!",
+          description: "Members data fetched successfully!",
+          variant: "default",
+        });
+      } catch (error) {
+        toast({
+          title: "Error fetching members data!",
+          description: "Error fetching members data!",
+          variant: "destructive",
+        });
+      }
+    }
+    fetchData();
+  }, [toast]);
+
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-col mb-6 w-full items-start justify-start">
@@ -174,7 +204,7 @@ function CreateBillingPage() {
           </h2>
           <BillUserTable
             columns={userbillingcolumns}
-            data={billings}
+            data={users}
             setter={setSelected}
           />
         </div>

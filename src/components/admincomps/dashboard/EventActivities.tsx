@@ -94,15 +94,13 @@ function EventActivities() {
         const config = {
           method: "get",
           maxBodyLength: Infinity,
-          url: `${BASE_API_URL}/events`,
+          url: `${BASE_API_URL}/dashboard/event-attendance`,
           headers: {},
         };
 
-        const response = await apiClient.get("/events", config);
-        const upcomingEvents = response.data.filter(
-          (event: Event) => event.status === "UPCOMING"
-        );
-        setEventData(upcomingEvents);
+        const response = await apiClient.get("/dashboard/event-attendance", config);
+     
+        setEventData(response);
       } catch (error) {
         toast({
           title: "Error",

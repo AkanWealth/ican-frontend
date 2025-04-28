@@ -6,31 +6,45 @@ import { allcolumns } from "@/components/admincomps/event/datatable/columns";
 import { Event } from "@/components/admincomps/event/datatable/colsdata";
 import NewEvent from "@/components/admincomps/event/create/NewEvent";
 
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
-import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 function EventsPage() {
   const [data, setData] = useState<Event[]>([]);
   const [showNewEvent, setShowNewEvent] = useState(false);
-
+  const { toast } = useToast();
   useEffect(() => {
     async function fetchData() {
       try {
         const config = {
-          method: 'get',
+          method: "get",
           maxBodyLength: Infinity,
           url: `${BASE_API_URL}/events`,
-          headers: {}
         };
 
-        const response = await axios.request(config);
-        setData(response.data.data);
+        const response = await apiClient.request(config);
+        setData(response);
+        toast({
+          title: "Events data fetched successfully!",
+          description: "Events data fetched successfully!",
+          variant: "default",
+        });
       } catch (error) {
         console.error("Error fetching events data:", error);
+        toast({
+          title: "Error fetching events data!",
+          description: "Error fetching events data!",
+          variant: "destructive",
+        });
       }
     }
     fetchData();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="rounded-3xl p-6">
@@ -50,7 +64,6 @@ function EventsPage() {
           </button>
           {showNewEvent && (
             <NewEvent
-            
               showNewEvent={showNewEvent}
               setShowNewEvent={setShowNewEvent}
             />
@@ -68,4 +81,12 @@ function EventsPage() {
   );
 }
 
-export default EventsPage;
+export default function PackedEventsPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <EventsPage />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

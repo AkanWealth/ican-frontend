@@ -212,7 +212,6 @@ type DashEventReg = {
   }[];
 };
 
-
 type DashUserLogin = {
   weeklyLogins: {
     day: string;
@@ -228,8 +227,17 @@ type DashUserLogin = {
   }[];
 };
 
+type RegisteredUsers = {
+  id: string;
+  fullName: string;
+  email: string;
+  membership: string;
+  status: string;
+  proofOfPayment: string;
+};
 
 export type {
+  RegisteredUsers,
   User,
   RolesData,
   StatCardProps,

@@ -8,17 +8,25 @@ import FeedbackModal from "@/components/admincomps/event/FeedbackModal";
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/utils/setter";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import Cookies from "universal-cookie";
 
-import { EventDetails } from "@/libs/types";
+import { EventDetails, RegisteredUsers } from "@/libs/types";
 
-import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useToast } from "@/hooks/use-toast";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import { UserAttendanceTable } from "@/components/admincomps/event/attendance/UserAttendanceTable";
+import { registereduserscolumns } from "@/components/admincomps/event/attendance/columns";
 
 function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { toast } = useToast();
   const cookies = new Cookies();
+
+  const [registeredUsers, setRegisteredUsers] = useState<RegisteredUsers[]>([]);
 
   const router = useRouter();
   const [eventDetails, setEventDetails] = useState<EventDetails>({
@@ -36,21 +44,34 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     createdAt: new Date().toISOString(),
   });
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const feedbacks = [
-    {
-      id: "1",
-      rating: 5,
-      comment: "Great event! Really enjoyed it.",
-      createdAt: new Date("2024-03-10"),
-    },
-    {
-      id: "2",
-      rating: 3,
-      comment: "It was okay, could be better organized.",
-      createdAt: new Date("2024-03-09"),
-    },
-    // ... more feedback items
-  ];
+  const [feedbacks, setFeedbacks] = useState([]);
+
+  useEffect(() => {
+    async function fetchAllFeedbackData() {
+      const eventId = (await params).id;
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/events/${eventId}/feedback`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      };
+      try {
+        const result = await apiClient.request(config);
+        setFeedbacks(result.data);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch event data.",
+          variant: "destructive",
+        });
+      }
+    }
+
+    fetchAllFeedbackData();
+  }, [params, router, toast]);
+
   useEffect(() => {
     async function fetchData() {
       const eventId = (await params).id;
@@ -63,33 +84,46 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         },
       };
       try {
-        const result = await axios.request(config);
+        const result = await apiClient.request(config);
         if (result.status === 200) {
           setEventDetails(result.data);
         }
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 401) {
-            await handleUnauthorizedRequest(config, router, setEventDetails);
-          } else {
-            toast({
-              title: "Error",
-              description: "Failed to fetch event data.",
-              variant: "destructive",
-            });
-          }
-        } else {
-          // Handle unexpected errors
-          toast({
-            title: "Error",
-            description: "An unexpected error occurred.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "Failed to fetch event data.",
+          variant: "destructive",
+        });
       }
     }
 
     fetchData();
+  }, [params, router, toast]);
+
+  useEffect(() => {
+    async function fetchRegisteredUsers() {
+      const eventId = (await params).id;
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/events/registrations/${eventId}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      };
+      try {
+        const result = await apiClient.request(config);
+        setRegisteredUsers(result.data);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch registered users.",
+          variant: "destructive",
+        });
+      }
+    }
+
+    fetchRegisteredUsers();
   }, [params, router, toast]);
 
   return (
@@ -120,46 +154,33 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           </button>
         </div>
       </div>
-      <div className="rounded-xl border bg-white w-full border-gray-200 flex p-4 flex-col">
-        <div className="flex flex-row items-center justify-between w-full">
-          <h1 className=" text-2xl font-medium text-black ">
-            {eventDetails.name}
-          </h1>
+      <div className="rounded-xl border bg-white w-full border-gray-200 p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-medium">{eventDetails.name}</h1>
           <MdOutlineModeEditOutline className="w-5 h-5" />
         </div>
-        <hr />
-        <div className="w-full flex flex-row justify-between gap-4 items-center ">
-          <div className="flex py-3 flex-col justify-between gap-4">
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Description{" "}
-              </span>
-              {eventDetails.description}
-            </p>
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Date{" "}
-              </span>
-              {eventDetails.date}
-            </p>
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Time{" "}
-              </span>
-              {eventDetails.time}
-            </p>
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Fee{" "}
-              </span>
-              {eventDetails.fee}
-            </p>
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Venue
-              </span>
-              {eventDetails.venue}
-            </p>
+        <hr className="mb-4" />
+        <div className="flex justify-between gap-4">
+          <div className="grid grid-cols-2 gap-1 w-full">
+            {[
+              { label: "Event Description", value: eventDetails.description },
+              { label: "Event Date", value: eventDetails.date },
+              { label: "Event Time", value: eventDetails.time },
+              { label: "Event Fee", value: `$${eventDetails.fee}` },
+              { label: "Event Venue", value: eventDetails.venue },
+            ].map(({ label, value }) => (
+              <div
+                key={label}
+                className="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <span className="text-sm text-gray-600 font-medium block mb-1">
+                  {label}
+                </span>
+                <span className="text-base font-medium text-gray-800 block">
+                  {value}
+                </span>
+              </div>
+            ))}
           </div>
           <div className="w-full">
             <Image
@@ -171,9 +192,35 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
             />
           </div>
         </div>
+        <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
+          <h2 className="text-xl font-semibold text-left">
+            Event Registrations
+          </h2>
+          <div>
+            <UserAttendanceTable
+              columns={registereduserscolumns}
+              data={registeredUsers}
+              setter={undefined}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-export default EventDetailsPage;
+export default function PackedEventDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <EventDetailsPage params={params} />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}
+
+

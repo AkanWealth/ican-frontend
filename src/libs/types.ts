@@ -236,6 +236,18 @@ type RegisteredUsers = {
   proofOfPayment: string;
 };
 
+type Resource = {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  access: "PUBLIC" | "MEMBERS";
+  fileUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  recommended: boolean;
+  }
+
 export type {
   RegisteredUsers,
   User,
@@ -250,4 +262,5 @@ export type {
   EventDetails,
   DashEventReg,
   DashUserLogin,
+  Resource,
 };

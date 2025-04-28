@@ -7,10 +7,10 @@ import { MdClose, MdOutlineLibraryBooks } from "react-icons/md";
 import AdvertEdit from "./editcomps/AdvertEdit";
 import BlogEdit from "./editcomps/BlogEdit";
 import GalleryEdit from "./editcomps/GalleryEdit";
-import PublicationEdit from "./editcomps/PublicationEdit";
 import TechnicalEdit from "./editcomps/TechnicalEdit";
 import StudentEdit from "./editcomps/StudentEdit";
 import FaqEdit from "./editcomps/FaqEdit";
+import ResourceEdit from "./editcomps/ResourceEdit";
 
 interface NewContentProps {
   id?: any;
@@ -58,7 +58,7 @@ function NewContent({ showModal, setShowModal }: NewContentProps) {
               options={[
                 { value: "adverts", label: "Adverts" },
                 { value: "blog", label: "Blog" },
-                { value: "publication", label: "Publication" },
+                { value: "resources", label: "Resources" },
                 { value: "gallery", label: "Gallery" },
                 { value: "technical", label: "Technical" },
                 { value: "student", label: "Student" },
@@ -84,7 +84,7 @@ function NewContent({ showModal, setShowModal }: NewContentProps) {
             {contentType === "adverts" && <AdvertEdit mode="create" />}
             {contentType === "blog" && <BlogEdit mode="create" />}
             {contentType === "gallery" && <GalleryEdit mode="create" />}
-            {contentType === "publication" && <PublicationEdit mode="create" />}
+            {contentType === "resources" && <ResourceEdit mode="create" />}
             {contentType === "technical" && <TechnicalEdit mode="create" />}
             {contentType === "student" && <StudentEdit mode="create" />}
             {contentType === "faq" && <FaqEdit mode="create" />}

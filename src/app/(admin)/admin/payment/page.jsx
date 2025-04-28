@@ -5,8 +5,11 @@ import { useRouter } from "next/navigation";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
 
-import axios from "axios";
+
+
 import { BASE_API_URL } from "@/utils/setter";
+
+import apiClient from "@/services-admin/apiClient";
 
 function Payment() {
   const [data, setData] = useState([]);
@@ -23,9 +26,9 @@ function Payment() {
       };
 
       try {
-        const response = await axios.request(config);
-        setData(response.data);
-        console.log(response.data);
+        const response = await apiClient.request(config);
+        setData(response);
+        console.log(response);
       } catch (error) {
         console.error("Error fetching payments:", error);
       }

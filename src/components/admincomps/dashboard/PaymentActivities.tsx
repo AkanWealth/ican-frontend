@@ -10,7 +10,7 @@ import { BASE_API_URL } from "@/utils/setter";
 
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { dashPaymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
-import { OverdueBills } from "@/libs/types";
+import { OverdueBills, DashEventPaymentTrend } from "@/libs/types";
 import {
   Area,
   AreaChart,
@@ -37,14 +37,6 @@ import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-const chartData = [
-  { month: "January", amount: 186 },
-  { month: "February", amount: 305 },
-  { month: "March", amount: 237 },
-  { month: "April", amount: 73 },
-  { month: "May", amount: 209 },
-  { month: "June", amount: 214 },
-];
 const chartConfig = {
   amount: {
     label: "Amount",
@@ -60,6 +52,9 @@ function PaymentActivities() {
   });
   const router = useRouter();
   const { toast } = useToast();
+  const [paymentTrendData, setPaymentTrendData] = useState<
+    DashEventPaymentTrend[]
+  >([]);
 
   const [paymentData, setPaymentData] = useState<OverdueBills[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,6 +79,48 @@ function PaymentActivities() {
         toast({
           title: "Error",
           description: "Failed to fetch payment data.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchData();
+  }, [router, toast]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
+
+        const config = {
+          method: "get",
+          maxBodyLength: Infinity,
+          url: `${BASE_API_URL}/dashboard/payment-trend`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const response = await apiClient.get(
+          "/dashboard/payment-trend",
+          config
+        );
+        const formattedData = response.map((item: any) => ({
+          month: item.month || item.date || item.period,
+          totalPaid: item.totalPaid || 0,
+        }));
+        setPaymentTrendData(formattedData);
+        toast({
+          title: "Payment Activities",
+          description: "Payment activities data fetched successfully.",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error(error);
+
+        toast({
+          title: "Error",
+          description: "Failed to fetch payment activities data.",
           variant: "destructive",
         });
       }
@@ -159,7 +196,7 @@ function PaymentActivities() {
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>
               <AreaChart
                 accessibilityLayer
-                data={chartData}
+                data={paymentTrendData}
                 margin={{
                   left: 12,
                   right: 12,
@@ -178,7 +215,7 @@ function PaymentActivities() {
                   content={<ChartTooltipContent hideLabel />}
                 />
                 <Area
-                  dataKey="amount"
+                  dataKey="totalPaid"
                   type="natural"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}

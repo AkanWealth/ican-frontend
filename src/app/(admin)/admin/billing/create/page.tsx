@@ -2,16 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { MdArrowBack, MdDelete } from "react-icons/md";
+import { MdArrowBack } from "react-icons/md";
 import InputEle from "@/components/genui/InputEle";
+
+
 import { BillUserTable } from "@/components/admincomps/billing/create/BillUserTable";
 import { userbillingcolumns } from "@/components/admincomps/billing/create/columns";
 import { billings } from "@/components/admincomps/billing/create/colsdata";
-import axios from "axios";
+
+import apiClient from "@/services-admin/apiClient";
 import { BASE_API_URL } from "@/utils/setter";
 
-import { toast, useToast } from "@/hooks/use-toast";
-import { handleUnauthorizedRequest } from "@/utils/refresh_token";
+import { useToast } from "@/hooks/use-toast";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
 interface IBilling {
   billing_name: string;
@@ -26,6 +31,7 @@ function CreateBillingPage() {
   //const selected = React.useMemo(() => [], []);
   const [selected, setSelected] = useState<string[]>([]);
   const [recipientType, setRecipientType] = useState<string>("all");
+  const { toast } = useToast();
 
   const router = useRouter();
   const [newBill, setNewBill] = useState<IBilling>({
@@ -65,28 +71,23 @@ function CreateBillingPage() {
       data: data,
     };
     try {
-      const response = await axios.request(config);
+      const response = await apiClient.post("/billing", data, config);
 
-      if (response.status === 200) {
         toast({
           title: "Success",
           description: "Bill created successfully.",
           variant: "default",
         });
-      }
+      
     } catch (error) {
       console.error("Error creating bill:", error);
-      if (axios.isAxiosError(error) && error.response) {
-        if (error.response.status === 401) {
-          await handleUnauthorizedRequest(config, router, setNewBill);
-        }
-      } else {
+   
         toast({
           title: "Error",
           description: "An error occurred while creating the bill.",
           variant: "destructive",
         });
-      }
+      
     }
   };
   return (
@@ -182,4 +183,12 @@ function CreateBillingPage() {
   );
 }
 
-export default CreateBillingPage;
+export default function PackedCreateBillingPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <CreateBillingPage />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

@@ -7,13 +7,18 @@ import { BillingTable } from "@/components/admincomps/billing/datatable/BillingT
 import { billingcolumns } from "@/components/admincomps/billing/datatable/columns";
 import { Billing } from "@/components/admincomps/billing/datatable/colsdata";
 
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import apiClient from "@/services-admin/apiClient";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
-import { toast, useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
 function BillingPage() {
+  const { toast } = useToast();
   const [data, setData] = useState<Billing[]>([]);
   const router = useRouter();
 
@@ -23,38 +28,21 @@ function BillingPage() {
         method: "get",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/billing`,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
       };
       try {
-        const result = await axios.request(config);
+        const result = await apiClient.get("/billing", config);
 
-        setData(result.data);
+        setData(result);
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 401) {
-            await handleUnauthorizedRequest(config, router, setData);
-          } else {
-            toast({
-              title: "Error",
-              description: "Failed to fetch billing data.",
-              variant: "destructive",
-            });
-          }
-        } else {
-          // Handle unexpected errors
-
-          toast({
-            title: "Error",
-            description: "An unexpected error occurred.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
       }
     }
     fetchData();
-  }, [router]);
+  }, [toast]);
 
   return (
     <div className="rounded-3xl p-6">
@@ -85,4 +73,12 @@ function BillingPage() {
   );
 }
 
-export default BillingPage;
+export default function PackedBillingPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <BillingPage />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

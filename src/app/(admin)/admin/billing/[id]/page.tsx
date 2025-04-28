@@ -4,10 +4,13 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
-import {
-  paymentdetailscoloumns,
-  billingdetailscoloumns,
-} from "@/components/admincomps/payment/datatable/columns";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import apiClient from "@/services-admin/apiClient";
+
+import { billingdetailscoloumns } from "@/components/admincomps/payment/datatable/columns";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
@@ -34,28 +37,15 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         },
       };
       try {
-        const result = await axios.request(config);
+        const result = await apiClient.get(`/billing/${billingId}`, config);
 
-        setData(result.data);
+        setData(result);
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 401) {
-            await handleUnauthorizedRequest(config, router, setData);
-          } else {
-            toast({
-              title: "Error",
-              description: "Failed to fetch billing data.",
-              variant: "destructive",
-            });
-          }
-        } else {
-          // Handle unexpected errors
-          toast({
-            title: "Error",
-            description: "An unexpected error occurred.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "Failed to fetch billing data.",
+          variant: "destructive",
+        });
       }
     }
     fetchData();
@@ -128,4 +118,16 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
-export default BillingDetailsPage;
+export default function PackedBillingDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <BillingDetailsPage params={params} />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

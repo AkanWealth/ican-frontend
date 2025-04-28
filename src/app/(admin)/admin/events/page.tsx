@@ -29,6 +29,7 @@ function EventsPage() {
 
         const response = await apiClient.request(config);
         setData(response);
+        console.log(response);
         toast({
           title: "Events data fetched successfully!",
           description: "Events data fetched successfully!",

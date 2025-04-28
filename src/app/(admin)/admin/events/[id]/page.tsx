@@ -58,6 +58,11 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       try {
         const result = await apiClient.request(config);
         setFeedbacks(result.data);
+        toast({
+          title: "Feedback",
+          description: "Feedback fetched successfully.",
+          variant: "default",
+        });
       } catch (error) {
         toast({
           title: "Error",
@@ -83,9 +88,12 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       };
       try {
         const result = await apiClient.request(config);
-        if (result.status === 200) {
-          setEventDetails(result.data);
-        }
+        setEventDetails(result.data);
+        toast({
+          title: "Event Details",
+          description: "Event details fetched successfully.",
+          variant: "default",
+        });
       } catch (error) {
         toast({
           title: "Error",
@@ -164,7 +172,7 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               { label: "Event Description", value: eventDetails.description },
               { label: "Event Date", value: eventDetails.date },
               { label: "Event Time", value: eventDetails.time },
-              { label: "Event Fee", value: `$${eventDetails.fee}` },
+              { label: "Event Fee", value: `₦${eventDetails.fee}` },
               { label: "Event Venue", value: eventDetails.venue },
             ].map(({ label, value }) => (
               <div
@@ -220,5 +228,3 @@ export default function PackedEventDetailsPage({
     </AuthProvider>
   );
 }
-
-

@@ -34,7 +34,7 @@ import { DashEventReg, DashEventAttendanceTrend } from "@/libs/types";
 
 const chartConfig = {
   people: {
-    label: "People",
+    label: "Registered Users",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
@@ -72,6 +72,7 @@ function EventActivities() {
           people: item.count || item.value || item.total || 0,
         }));
         setEventRegistrationTrendData(response);
+
         setChartData(formattedData);
       } catch (error) {
         toast({
@@ -101,6 +102,8 @@ function EventActivities() {
         );
 
         setEventData(response);
+
+
       } catch (error) {
         toast({
           title: "Error",
@@ -123,7 +126,7 @@ function EventActivities() {
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>
               <LineChart
                 accessibilityLayer
-                data={chartData}
+                data={eventRegistrationTrendData}
                 margin={{
                   left: 12,
                   right: 12,

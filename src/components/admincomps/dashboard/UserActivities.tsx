@@ -50,9 +50,16 @@ import { BASE_API_URL } from "@/utils/setter";
 import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { DashUserLogin } from "@/libs/types";
 
 function UserActivities() {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginChartData, setLoginChartData] = useState<DashUserLogin>({
+    weeklyLogins: [],
+    monthlyLogins: [],
+    yearlyLogins: [],
+  });
   const router = useRouter();
   const [data, setData] = useState({
     activeUsers: 0,
@@ -108,6 +115,43 @@ function UserActivities() {
     };
 
     fetchData();
+  }, [router, toast]);
+
+  useEffect(() => {
+    const fetchLoginChartData = async () => {
+      const token = localStorage.getItem("access_token");
+
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/dashboard/chart-stats`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      try {
+        const response = await axios.request(config);
+        setLoginChartData(response.data);
+        toast({
+          title: "Success",
+          description: "Chart data fetched successfully",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error(error);
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          await handleUnauthorizedRequest(config, router, setLoginChartData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch chart data",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    fetchLoginChartData();
   }, [router, toast]);
 
   return (

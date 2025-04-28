@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarOutline } from "@heroicons/react/24/outline";
+
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Feedback {
   id: string;
@@ -12,17 +16,53 @@ interface Feedback {
 }
 
 export default function FeedbackModal({
+  eventId,
   isOpen,
   onClose,
   feedbacks,
 }: {
+  eventId: string;
   isOpen: boolean;
   onClose: () => void;
   feedbacks: Feedback[];
 }) {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
+  const { toast } = useToast();
 
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        const response = await axios.get(
+          `${BASE_API_URL}/events/${eventId}/feedback`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log(response.data);
+        toast({
+          title: "Success",
+          description: "Feedbacks fetched successfully",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Error fetching feedbacks:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch feedbacks",
+          variant: "destructive",
+        });
+      }
+    };
+
+    // Call fetchFeedbacks when component mounts
+    fetchFeedbacks();
+  }, [toast, eventId]);
+
+  // Sort and filter feedbacks
   // Sort and filter feedbacks
   const sortedFeedbacks = [...feedbacks]
     .filter((feedback) =>

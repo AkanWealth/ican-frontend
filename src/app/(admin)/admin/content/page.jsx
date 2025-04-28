@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import All from "./tabs/All";
@@ -21,8 +25,6 @@ function Content() {
   const handleCloseModal = () => {
     setShowModal(false);
   };
-
- 
 
   return (
     <div className="rounded-3xl p-6">
@@ -81,4 +83,12 @@ function Content() {
   );
 }
 
-export default Content;
+export default function PackedContentPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <Content />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

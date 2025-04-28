@@ -3,11 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { advertscolumns } from "@/components/admincomps/content/datatable/columns";
-import axios from "axios";
+
 import { BASE_API_URL } from "@/utils/setter";
+
+import apiClient from "@/services-admin/apiClient";
+import { useToast } from "@/hooks/use-toast";
 
 function Adverts() {
   const [data, setData] = useState([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchAdvertsData() {
@@ -18,14 +22,18 @@ function Adverts() {
         headers: {},
       };
       try {
-        const response = await axios.request(config);
+        const response = await apiClient.get("/adverts", config);
         setData(response.data.data);
       } catch (error) {
-        console.error(error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
       }
     }
     fetchAdvertsData();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">

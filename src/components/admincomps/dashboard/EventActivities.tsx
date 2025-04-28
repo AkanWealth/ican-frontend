@@ -29,7 +29,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { DashEventReg } from "@/libs/types";
+import { DashEventReg, DashEventAttendanceTrend } from "@/libs/types";
 const chartData = [
   { month: "January", people: 186 },
   { month: "February", people: 305 },
@@ -50,12 +50,10 @@ function EventActivities() {
   const router = useRouter();
 
   const [eventData, setEventData] = useState<DashEventReg[]>([]);
-  const [eventRegistrationTrendData, setEventRegistrationTrendData] = useState({
-    totalPayments: 0,
-    pendingPayments: 0,
-    completedPayments: 0,
-    failedPayments: 0,
-  });
+  const [eventRegistrationTrendData, setEventRegistrationTrendData] = useState<
+    DashEventAttendanceTrend[]
+  >([]);
+  const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,7 +73,12 @@ function EventActivities() {
           "/dashboard/event-registration-trend",
           config
         );
+        const formattedData = response.map((item: any) => ({
+          month: item.month || item.date || item.period,
+          people: item.count || item.value || item.total || 0,
+        }));
         setEventRegistrationTrendData(response);
+        setChartData(formattedData);
       } catch (error) {
         toast({
           title: "Error",
@@ -98,8 +101,11 @@ function EventActivities() {
           headers: {},
         };
 
-        const response = await apiClient.get("/dashboard/event-attendance", config);
-     
+        const response = await apiClient.get(
+          "/dashboard/event-attendance",
+          config
+        );
+
         setEventData(response);
       } catch (error) {
         toast({
@@ -117,8 +123,7 @@ function EventActivities() {
       <div className="flex w-full max-h-[700px] flex-col gap-10">
         <Card>
           <CardHeader>
-            <CardTitle>Event Registration Trend</CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
+            <CardTitle>Event Registration Trend for {new Date().getFullYear()}</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>

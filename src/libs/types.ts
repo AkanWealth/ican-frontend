@@ -212,6 +212,11 @@ type DashEventReg = {
   }[];
 };
 
+interface DashEventAttendanceTrend {
+  month: string;
+  count: number;
+}
+
 type DashUserLogin = {
   weeklyLogins: {
     day: string;
@@ -246,7 +251,7 @@ type Resource = {
   createdAt: string;
   updatedAt: string;
   recommended: boolean;
-  }
+};
 
 export type {
   RegisteredUsers,
@@ -263,4 +268,5 @@ export type {
   DashEventReg,
   DashUserLogin,
   Resource,
+  DashEventAttendanceTrend,
 };

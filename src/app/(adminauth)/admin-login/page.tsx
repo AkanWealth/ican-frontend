@@ -122,7 +122,7 @@ function AdminLogin() {
         console.log("Response:", response);
         localStorage.setItem("loginResponse", JSON.stringify(response));
 
-        const { user, access_token } = response.data;
+        const { user, access_token, refresh_token } = response.data;
 
         // Set secure cookies with expiration time of 1 hour
         const expiryTime = new Date(Date.now() + 60 * 60 * 1000).toUTCString(); // 1 hour from now
@@ -131,15 +131,13 @@ function AdminLogin() {
           JSON.stringify(user)
         )}; path=/; secure; samesite=strict; expires=${expiryTime}`;
         document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict; expires=${expiryTime}`;
-        document.cookie = `refresh_token=${response.data.refresh_token}; path=/; secure; samesite=strict; expires=${new Date(Date.now() + 6 * 60 * 60 * 1000).toUTCString()}`;
+        document.cookie = `refresh_token=${refresh_token}`;
 
         // Set secure cookies instead of localStorage
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("access_token", access_token);
 
-        setTimeout(() => {
-          router.push("/admin");
-        }, 1000);
+        router.push("/admin");
 
         toast({
           title: "Login Successful",

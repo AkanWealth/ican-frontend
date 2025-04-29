@@ -1,12 +1,13 @@
 "use client";
 
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-import { BASE_API_URL } from "@/utils/setters";
+import { BASE_API_URL } from "@/utils/setter";
 
+import Heroimg from "@/components/homecomps/Heroimg";
 import { Resource } from "@/libs/types";
+import PublicationsSect from "@/components/pubntech/PublicationsSect";
 
 function Publications() {
   const [publications, setPublications] = useState<Resource[]>([]);
@@ -43,7 +44,23 @@ function Publications() {
       });
   }, [toast]);
 
-  return <div>Publications</div>;
+  return (
+    <div className="flex flex-col items-center w-full">
+      <Heroimg
+        subtxt={""}
+        toggle={false}
+        maintxt="Publications & Resources"
+        imageUrl="/publicationshero.png"
+      />
+      <div className="w-full px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto">
+        <PublicationsSect
+          publications={publications}
+          loading={loading}
+          error={error}
+        />
+      </div>
+    </div>
+  );
 }
 
 export default Publications;

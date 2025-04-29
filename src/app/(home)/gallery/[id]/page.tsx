@@ -131,28 +131,7 @@ export default function GalleryPage({
               </div>
             )}
 
-            {/* Videos Section */}
-            {galleryItem.videos && galleryItem.videos.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-bold text-blue-900 mb-4">
-                  Gallery Videos
-                </h2>
-                <div className="flex flex-wrap gap-4">
-                  {galleryItem.videos.map((video, index) => (
-                    <div key={index} className="relative">
-                      <video
-                        controls
-                        className="w-[300px] h-[200px] object-cover rounded-lg"
-                        poster={galleryItem.images[0]} // Use first image as video thumbnail
-                      >
-                        <source src={video} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+           
           </section>
         </article>
       </section>

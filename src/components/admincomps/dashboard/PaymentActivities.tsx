@@ -12,8 +12,7 @@ import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentT
 import { dashPaymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
 import { OverdueBills, DashEventPaymentTrend } from "@/libs/types";
 import {
-  Area,
-  AreaChart,
+  
   Line,
   LineChart,
   CartesianGrid,
@@ -194,7 +193,7 @@ function PaymentActivities() {
           </CardHeader>
           <CardContent>
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>
-              <AreaChart
+              <LineChart
                 accessibilityLayer
                 data={paymentTrendData}
                 margin={{
@@ -214,14 +213,14 @@ function PaymentActivities() {
                   cursor={false}
                   content={<ChartTooltipContent hideLabel />}
                 />
-                <Area
+                <Line
                   dataKey="totalPaid"
                   type="natural"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}
                   dot={false}
                 />
-              </AreaChart>
+              </LineChart>
             </ChartContainer>
           </CardContent>
         </Card>

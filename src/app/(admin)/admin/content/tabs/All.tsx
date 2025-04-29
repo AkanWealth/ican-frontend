@@ -20,7 +20,7 @@ function All() {
         headers: {},
       };
       try {
-        const response = await apiClient.get("/adverts", config);
+        const response = await apiClient.get("/adverts");
         setData((prevData) => [...prevData, ...response.data]);
         console.log(response.data);
       } catch (error) {
@@ -35,7 +35,7 @@ function All() {
         headers: {},
       };
       try {
-        const response = await apiClient.get("/blogs", config);
+        const response = await apiClient.get("/blogs");
         setData((prevData) => [...prevData, ...response]);
 
         console.log(response);
@@ -51,7 +51,7 @@ function All() {
         headers: {},
       };
       try {
-        const response = await apiClient.get("/faqs", config);
+        const response = await apiClient.get("/faqs");
         setData((prevData) => [...prevData, ...response.faqs]);
         console.log(response.faqs);
       } catch (error) {
@@ -66,8 +66,9 @@ function All() {
         headers: {},
       };
       try {
-        const response = await apiClient.get("/gallery", config);
-        setData((prevData) => [...prevData, ...response]);
+        const response = await apiClient.get("/gallery");
+        setData((prevData) => [...prevData, ...response.data]);
+        console.log(response.gallery);
 
         console.log(response);
       } catch (error) {
@@ -82,7 +83,7 @@ function All() {
         headers: {},
       };
       try {
-        const response = await apiClient.get("/studypacks", config);
+        const response = await apiClient.get("/studypacks");
         setData((prevData) => [...prevData, ...response.studyPacks]);
         console.log(response.studyPacks);
       } catch (error) {
@@ -97,7 +98,7 @@ function All() {
         headers: {},
       };
       try {
-        const response = await apiClient.get("/technical-sessions", config);
+        const response = await apiClient.get("/technical-sessions");
         setData((prevData) => [...prevData, ...response.sessions]);
         console.log(response.sessions);
       } catch (error) {

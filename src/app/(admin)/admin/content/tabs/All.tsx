@@ -36,9 +36,9 @@ function All() {
       };
       try {
         const response = await apiClient.get("/blogs", config);
-        setData((prevData) => [...prevData, ...response.data]);
+        setData((prevData) => [...prevData, ...response]);
 
-        console.log(response.data);
+        console.log(response);
       } catch (error) {
         console.error(error);
       }
@@ -67,9 +67,9 @@ function All() {
       };
       try {
         const response = await apiClient.get("/gallery", config);
-        setData((prevData) => [...prevData, ...response.data]);
+        setData((prevData) => [...prevData, ...response]);
 
-        console.log(response.data);
+        console.log(response);
       } catch (error) {
         console.error(error);
       }

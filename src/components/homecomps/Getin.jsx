@@ -6,7 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import InputEle from "../genui/InputEle";
 
 import { BASE_API_URL } from "@/utils/setter";
-import { title } from "process";
 
 // get in touch form used on the contact us page of the design
 function Getin({ heading, phoneNumber = true, className }) {

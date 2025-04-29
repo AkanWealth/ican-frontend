@@ -257,7 +257,49 @@ type Resource = {
   recommended: boolean;
 };
 
+type GalleryItem = {
+  id: string;
+  name: string;
+  images: string[];
+  videos: string[];
+  createdBy: string;
+  createdAt: string;
+  status: "active" | "inactive";
+  user: {
+    firstname: string;
+    surname: string;
+    email: string;
+  };
+};
+
+type TechnicalPost = {
+  id: string;
+  name: string;
+  document: string;
+  coverImg: string;
+  createdAt: string;
+  status: "DRAFT" | "PUBLISHED";
+  createdBy: string;
+  user: {
+    firstname: string;
+    email: string;
+  };
+};
+
+type Publication = {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  access: "PUBLIC" | "MEMBERS" | string;
+  fileUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  recommended: boolean;
+};
+
 export type {
+  GalleryItem,
   RegisteredUsers,
   User,
   RolesData,
@@ -274,4 +316,6 @@ export type {
   Resource,
   DashEventAttendanceTrend,
   DashEventPaymentTrend,
+  TechnicalPost,
+  Publication,
 };

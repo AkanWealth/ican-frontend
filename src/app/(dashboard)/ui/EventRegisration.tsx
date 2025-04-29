@@ -76,40 +76,36 @@ const EventRegistration = () => {
     // Look for the checkUserRegistration function and update it:
     const checkUserRegistration = async () => {
       try {
-
         const cookies = parseCookies();
         const userDataCookie = cookies['user_data'];
         const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
         const userId = userData?.id;
         console.log("userId", userId);
-
+    
         if (!userId) throw new Error("User ID not found in cookies");
-
-        // Specify the return type with UserResponse interface
-       
-    
-        const response =  await apiClient.get(`/events/registrations/user-events/${userId}`);
-    
+      
+        const response = await apiClient.get(`/events/registrations/user-events/${userId}`);
         console.log("Registration response data:", response.data);
         
         // Check if response data is an array
         if (Array.isArray(response.data)) {
-          // Handle array response
-          const isUserRegistered = response.data.some(
-            (event:any) => event.eventId === eventDetails.id
+          // Check if the current user has registered for this specific event
+          const registration = response.data.find(
+            (event: any) => event.eventId === eventDetails.id && event.userId === userId
           );
-          setIsRegistered(isUserRegistered);
-        } else if (response && typeof response === 'object') {
-          // Handle single object response
-          const isUserRegistered = response.eventId === eventDetails.id;
+          setIsRegistered(!!registration);
+        } else if (response.data && typeof response.data === 'object') {
+          // For single object response, check both eventId and userId
+          const isUserRegistered = response.data.eventId === eventDetails.id && 
+                                  response.data.userId === userId;
           setIsRegistered(isUserRegistered);
         } else {
           // No valid registration data
           setIsRegistered(false);
         }
-      } catch (error: any) {
-        if (error.response && error.response.status === 404) {
-          // User is not registered for this event
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response && error.response.status === 404) {
+              
           setIsRegistered(false);
         } else {
           console.error('Error checking registration:', error);
@@ -352,7 +348,14 @@ if (!isValid) {
       console.log("Registration response:", response); // Debugging log
   
       // Only show the success modal if we get a successful response
-      setIsModalOpen(true); // Open the success modal
+      setTimeout(() => {
+        setIsModalOpen(true); // Open the success modal
+      }, 2000);
+      
+      // setIsModalOpen(true); // Open the success modal
+      setTimeout(() => {
+        router.push("/Event");
+      }, 2000);
       
       return response;
     } catch (error) {
@@ -497,17 +500,36 @@ const isValidUrl = (url: any) => {
 
       {/* Right Column */}
         <div className="order-2 lg:order-2">
-          {isRegistered ? (
-            <div className="text-center border border-gray-300 rounded-lg p-2 bg-gray-50">
-            <div className="flex items-center justify-center">
-              <CircleAlert className="w-6 h-6 text-red-500 mr-2" />
-              <div>
-                <h2 className="text-lg font-bold mb-2">You have already registered for this event.</h2>
-                <p className="text-gray-600 text-xs">If you need to make changes to your registration, please contact support.</p>
-              </div>
-            </div>
-          </div>
-          ) : (
+        {isRegistered ? (
+  <div className="text-center border border-gray-300 rounded-lg p-2 bg-gray-50">
+    <div className="flex items-center justify-center">
+      <CircleAlert className="w-6 h-6 text-red-500 mr-2" />
+      <div>
+        <h2 className="text-lg font-bold mb-2">
+          You have already registered for this event.
+        </h2>
+        <p className="text-gray-600 text-xs">
+          If you need to make changes, contact us at{" "}
+          <a
+            href="mailto:support@company.com"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            support@company.com
+          </a>{" "}
+          or visit our{" "}
+          <a
+            href="https://www.company.com/help-center"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            Help Center
+          </a>.
+        </p>
+      </div>
+    </div>
+  </div>
+) : (
             <>
               <p className="flex flex-row text-sm font-medium">
                 Event fee - <span className='flex text-base text-primary'>₦{eventDetails.eventFee}</span>

@@ -116,7 +116,7 @@ function MemberDueRender() {
           totalPaid: typeof due.totalPaid === 'number' ? due.totalPaid : 0,
           balance: typeof due.balance === 'number' ? due.balance : 0,
           paymentStatus: due.paymentStatus || "NOT_PAID",
-          date: due.date || new Date().toISOString(),
+          date: due.createdAt || new Date().toISOString(),
         }));
 
         setDues(processedDues);
@@ -532,8 +532,8 @@ function MemberDueRender() {
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">Payment Name</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">Type</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">Total Amount (₦)</th>
-                      <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">Amount Paid (₦)</th>
-                      <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">Balance (₦)</th>
+                      {/* <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">Amount Paid (₦)</th> */}
+                      <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">Created Date</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">Status</th>
                       <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">Action</th>
                     </tr>
@@ -544,8 +544,14 @@ function MemberDueRender() {
                         <td className="px-6 py-4 text-sm text-gray-800">{due.name}</td>
                         <td className="px-6 py-4 text-sm text-gray-800">{due.type}</td>
                         <td className="px-6 py-4 text-sm text-gray-800">{due.amount.toLocaleString()}</td>
-                        <td className="px-6 py-4 text-sm text-gray-800">{due.totalPaid.toLocaleString()}</td>
-                        <td className="px-6 py-4 text-sm text-gray-800">{due.balance.toLocaleString()}</td>
+                        {/* <td className="px-6 py-4 text-sm text-gray-800">{due.totalPaid.toLocaleString()}</td> */}
+                        <td className="px-6 py-4 text-sm text-gray-800">
+        {due.date ? new Date(due.date).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }) : "N/A"}
+      </td>
                         <td className="px-6 py-4">
                           {renderStatusBadge(due.paymentStatus, due.balance)}
                         </td>

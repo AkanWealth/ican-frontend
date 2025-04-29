@@ -165,10 +165,10 @@ const FeedbackHistoryTab: React.FC = () => {
         
         let sorted = [...feedbackArray];
         switch(filter) {
-            case 'Recent First':
+            case 'Newest to Oldest':
                 sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                 break;
-            case 'Oldest First':
+            case 'Oldest to Newest':
                 sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
                 break;
             case 'Highest Rated':
@@ -210,8 +210,8 @@ const FeedbackHistoryTab: React.FC = () => {
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
                         >
-                            <option value="Recent First">Recent First</option>
-                            <option value="Oldest First">Oldest First</option>
+                            <option value="Newest to Oldest">Newest to Oldest</option>
+                            <option value="Oldest to Newest">Oldest to Newest</option>
                             <option value="Highest Rated">Highest Rated</option>
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">

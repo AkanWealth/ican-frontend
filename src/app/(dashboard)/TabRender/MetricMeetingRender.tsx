@@ -349,7 +349,7 @@ useEffect(() => {
     if (selectedMonth === "All") {
       totalMeetings = apiMeetingsData.length;
       numberRegistered = userRegistrations.length;
-      numberAttended = userAttendance.filter((item) => item.status === "ATTENDED").length;
+      numberAttended = userAttendance.filter((item) => item.status === "PRESENT").length;
     } else {
       const shortMonth = shortMonths[selectedMonth as keyof typeof shortMonths];
       

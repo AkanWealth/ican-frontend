@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaRegDotCircle } from "react-icons/fa";
 import { Eye, EyeOff, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -8,18 +8,26 @@ import axios from "axios";
 import DeleteAccountModal from "@/components/Modal/Delete";
 import apiClient from "@/services/apiClient";
 
+// Define notification topics as constants for consistency
+const TOPICS = {
+  GENERAL: "GENERAL",
+  EVENT: "EVENT",
+  PAYMENT: "PAYMENT",
+  MCPD: "MCPD"
+};
 
-type NotificationType =
-  | "generalNotifications"
-  | "eventRegistrations"
-  | "payments"
-  | "mcpdUpdates";
+// Define notification channels
+const CHANNELS = {
+  EMAIL: "EMAIL",
+  // Add other channels if needed in the future
+};
 
-interface NotificationState {
-  generalNotifications: boolean;
-  eventRegistrations: boolean;
-  payments: boolean;
-  mcpdUpdates: boolean;
+// Interface for API notification preference object
+interface NotificationPreference {
+  id: string;
+  userId: string;
+  topic: string;
+  channel: string;
 }
 
 function SettingsPage() {
@@ -28,6 +36,15 @@ function SettingsPage() {
   const [deleteReason, setDeleteReason] = useState("");
   const [comment, setComment] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // State for notification preferences
+  const [notificationPreferences, setNotificationPreferences] = useState({
+    [TOPICS.GENERAL]: false,
+    [TOPICS.EVENT]: false,
+    [TOPICS.PAYMENT]: false,
+    [TOPICS.MCPD]: false,
+  });
 
   const [showPassword, setShowPassword] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
@@ -36,6 +53,113 @@ function SettingsPage() {
     newPassword: "",
     confirmPassword: "",
   });
+
+  // Memoize the fetchNotificationPreferences function to avoid dependency issues
+  const fetchNotificationPreferences = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.get('/notifications/preferences');
+      
+      // Initialize all topics as false first
+      const initialPreferences = {
+        [TOPICS.GENERAL]: false,
+        [TOPICS.EVENT]: false,
+        [TOPICS.PAYMENT]: false,
+        [TOPICS.MCPD]: false,
+      };
+      
+      // Set preferences to true for those that exist in the response
+      response.forEach((preference: NotificationPreference) => {
+        if (preference.channel === CHANNELS.EMAIL) {
+          initialPreferences[preference.topic] = true;
+        }
+      });
+      
+      setNotificationPreferences(initialPreferences);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching notification preferences:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load notification preferences",
+        variant: "destructive",
+        duration: 3000,
+      });
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  // Fetch notification preferences when component mounts
+  useEffect(() => {
+    fetchNotificationPreferences();
+  }, [fetchNotificationPreferences]);
+
+  // Function to handle notification preference toggle
+  const handleNotificationChange = async (topic: string) => {
+    const newValue = !notificationPreferences[topic];
+    
+    try {
+      if (newValue) {
+        // Add preference
+        await apiClient.post('/notifications/preferences', {
+          topic: topic,
+          channel: CHANNELS.EMAIL
+        });
+      } else {
+        // Remove preference
+        await apiClient.delete(`/notifications/preferences?topic=${topic}&channel=${CHANNELS.EMAIL}`);
+      }
+      
+      // Update local state
+      setNotificationPreferences(prev => ({
+        ...prev,
+        [topic]: newValue
+      }));
+      
+      // Show success toast
+      toast({
+        title: "Preferences Updated",
+        description: `${topic} notifications ${newValue ? 'enabled' : 'disabled'}.`,
+        variant: "default",
+        duration: 3000,
+      });
+      
+      // Show policy update toast for general notifications (as in your original code)
+      if (topic === TOPICS.GENERAL && newValue) {
+        toast({
+          title: "Policy Update",
+          variant: "primary",
+          description: (
+            <div>
+              We've updated our Terms of Service.
+              <br />{" "}
+              <a
+                href="/policy"
+                className="text-primary font-semibold hover:text-primary hover:underline"
+              >
+                ...Read Policy.
+              </a>
+            </div>
+          ),
+          duration: 5000,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating notification preference:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update notification preferences",
+        variant: "destructive",
+        duration: 3000,
+      });
+      
+      // Revert the optimistic update
+      setNotificationPreferences(prev => ({
+        ...prev,
+        [topic]: !newValue
+      }));
+    }
+  };
 
   const handleDeleteClick = () => {
     setIsModalOpen(true);
@@ -48,7 +172,7 @@ function SettingsPage() {
 
     // Show success toast
     toast({
-      title: "Confimation email sent",
+      title: "Confirmation email sent",
       description: "Please check your email for confirmation",
       variant: "default",
       duration: 3000,
@@ -86,12 +210,6 @@ function SettingsPage() {
         return "";
     }
   };
-  const [notifications, setNotifications] = useState<NotificationState>({
-    generalNotifications: true,
-    eventRegistrations: true,
-    payments: false,
-    mcpdUpdates: false,
-  });
 
   const handleTabChange = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
@@ -131,6 +249,7 @@ function SettingsPage() {
     if (id === "newPassword") {
       validatePassword(value);
     }
+    
     // Check password match when either password field changes
     if (id === "newPassword" || id === "confirmPassword") {
       if (id === "confirmPassword" && value !== formData.newPassword) {
@@ -145,38 +264,6 @@ function SettingsPage() {
         setPasswordsMatch(true);
       }
     }
-  };
-
-  const handleNotificationChange = (notificationType: NotificationType) => {
-    setNotifications((prev) => {
-      const newState = {
-        ...prev,
-        [notificationType]: !prev[notificationType],
-      };
-
-      // Show toast when general notifications are toggled
-      if (notificationType === "generalNotifications") {
-        toast({
-          title: "Policy Update",
-          variant: "primary",
-          description: (
-            <div>
-              We've updated our Terms of Service.
-              <br />{" "}
-              <a
-                href="/policy"
-                className="text-primary font-semibold  hover:text-primary hover:underline"
-              >
-                ...Read Policy.
-              </a>
-            </div>
-          ),
-          duration: 500,
-        });
-      }
-
-      return newState;
-    });
   };
 
   useEffect(() => {
@@ -206,10 +293,6 @@ function SettingsPage() {
     }
 
     try {
-      // Get the authentication token from localStorage or your auth context
-      // const token = localStorage.getItem("token");
-      // console.log("token", token);
-
       // API call to change password
       await apiClient.patch("/users/password", {
         oldPassword: formData.currentPassword,
@@ -217,23 +300,22 @@ function SettingsPage() {
       });
 
       // Success handling
-      
-        showToastOnPasswordChange();
+      showToastOnPasswordChange();
 
-        // Reset form fields
-        setFormData({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
+      // Reset form fields
+      setFormData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
 
-        // Reset password criteria
-        setCriteria({
-          hasUpperCase: false,
-          hasLowerCase: false,
-          hasMinLength: false,
-          hasSpecialChar: false,
-        });
+      // Reset password criteria
+      setCriteria({
+        hasUpperCase: false,
+        hasLowerCase: false,
+        hasMinLength: false,
+        hasSpecialChar: false,
+      });
       
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -258,7 +340,7 @@ function SettingsPage() {
       title: "Password Changed",
       description: "Your password has been successfully updated.",
       variant: "default",
-      duration: 30000,
+      duration: 3000,
     });
   };
 
@@ -391,92 +473,111 @@ function SettingsPage() {
 
   const renderNotificationTab = () => (
     <section className="w-full">
-      <div className="mt-4 flex flex-col gap-3 lg:mt-8 lg:gap-6">
-        <div className="flex flex-row items-center justify-between gap-4">
-          <div className="max-w-[80%]">
-            <h3 className="text-base font-semibold text-grey-700">
-              General Notifications
-            </h3>
-            <p className="pt-1  font-normal text-gray-500 text-base">
-              Get updates on new features, system updates, and policy changes.
-            </p>
-          </div>
-          <label
-            htmlFor="projectAlerts"
-            className="relative h-5 w-8 cursor-pointer rounded-full bg-[hsla(240,3%,49%,0.16)] transition has-[:checked]:bg-[hsla(230,70%,30%,1)] lg:h-8 lg:w-12"
-          >
-            <input
-              type="checkbox"
-              id="projectAlerts"
-              checked={notifications.generalNotifications}
-              onChange={() => handleNotificationChange("generalNotifications")}
-              className="peer sr-only"
-            />
-            <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
-          </label>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <p>Loading preferences...</p>
         </div>
-        <div className="flex flex-row items-center justify-between gap-4">
-          <div className="max-w-[80%]">
-            <h2 className="text-base font-semibold text-grey-900">
-              Event Registrations
-            </h2>
-            <p className="pt-1  font-normal text-gray-500 text-base">
-              Get updates on successful or failed event registrations.
-            </p>
+      ) : (
+        <div className="mt-4 flex flex-col gap-3 lg:mt-8 lg:gap-6">
+          <div className="flex flex-row items-center justify-between gap-4">
+            <div className="max-w-[80%]">
+              <h3 className="text-base font-semibold text-grey-700">
+                General Notifications
+              </h3>
+              <p className="pt-1 font-normal text-gray-500 text-base">
+                Get updates on new features, system updates, and policy changes.
+              </p>
+            </div>
+            <label
+              htmlFor="generalNotifications"
+              className="relative h-5 w-8 cursor-pointer rounded-full bg-[hsla(240,3%,49%,0.16)] transition has-[:checked]:bg-[hsla(230,70%,30%,1)] lg:h-8 lg:w-12"
+            >
+              <input
+                type="checkbox"
+                id="generalNotifications"
+                checked={notificationPreferences[TOPICS.GENERAL]}
+                onChange={() => handleNotificationChange(TOPICS.GENERAL)}
+                className="peer sr-only"
+              />
+              <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
+            </label>
           </div>
-          <label
-            htmlFor="projectUpdates"
-            className="relative h-5 w-8 cursor-pointer rounded-full bg-[hsla(240,3%,49%,0.16)] transition has-[:checked]:bg-[hsla(230,70%,30%,1)] lg:h-8 lg:w-12"
-          >
-            <input
-              type="checkbox"
-              id="projectUpdates"
-              checked={notifications.eventRegistrations}
-              onChange={() => handleNotificationChange("eventRegistrations")}
-              className="peer sr-only"
-            />
-            <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
-          </label>
-        </div>
-        <div className="flex flex-row items-center justify-between gap-4">
-          <div className="max-w-[80%]">
-            <h2 className="text-base font-semibold text-grey-900">Payments</h2>
-            <p className="pt-1  font-normal text-gray-500 text-base">
-              Be notified about successful payments, failed transactions, and
-              receipts.
-            </p>
+          
+          <div className="flex flex-row items-center justify-between gap-4">
+            <div className="max-w-[80%]">
+              <h2 className="text-base font-semibold text-grey-900">
+                Event Registrations
+              </h2>
+              <p className="pt-1 font-normal text-gray-500 text-base">
+                Get updates on successful or failed event registrations.
+              </p>
+            </div>
+            <label
+              htmlFor="eventRegistrations"
+              className="relative h-5 w-8 cursor-pointer rounded-full bg-[hsla(240,3%,49%,0.16)] transition has-[:checked]:bg-[hsla(230,70%,30%,1)] lg:h-8 lg:w-12"
+            >
+              <input
+                type="checkbox"
+                id="eventRegistrations"
+                checked={notificationPreferences[TOPICS.EVENT]}
+                onChange={() => handleNotificationChange(TOPICS.EVENT)}
+                className="peer sr-only"
+              />
+              <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
+            </label>
           </div>
-          <label
-            htmlFor="allNotifications"
-            className="relative h-5 w-8 cursor-pointer rounded-full bg-[hsla(240,3%,49%,0.16)] transition has-[:checked]:bg-[hsla(230,70%,30%,1)] lg:h-8 lg:w-12"
-          >
-            <input
-              type="checkbox"
-              id="allNotifications"
-              className="peer sr-only"
-            />
-            <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
-          </label>
-        </div>
-        <div className="flex flex-row items-center justify-between gap-4">
-          <div className="max-w-[80%]">
-            <h2 className="text-base font-semibold text-grey-900">
-              MCPD Updates
-            </h2>
-            <p className="pt-1  font-normal text-gray-500 text-base">
-              Stay updated on your MCPD points after completing qualifying
-              activities.
-            </p>
+          
+          <div className="flex flex-row items-center justify-between gap-4">
+            <div className="max-w-[80%]">
+              <h2 className="text-base font-semibold text-grey-900">Payments</h2>
+              <p className="pt-1 font-normal text-gray-500 text-base">
+                Be notified about successful payments, failed transactions, and
+                receipts.
+              </p>
+            </div>
+            <label
+              htmlFor="payments"
+              className="relative h-5 w-8 cursor-pointer rounded-full bg-[hsla(240,3%,49%,0.16)] transition has-[:checked]:bg-[hsla(230,70%,30%,1)] lg:h-8 lg:w-12"
+            >
+              <input
+                type="checkbox"
+                id="payments"
+                checked={notificationPreferences[TOPICS.PAYMENT]}
+                onChange={() => handleNotificationChange(TOPICS.PAYMENT)}
+                className="peer sr-only"
+              />
+              <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
+            </label>
           </div>
-          <label
-            htmlFor="Updates"
-            className="relative h-5 w-8 cursor-pointer rounded-full bg-[hsla(240,3%,49%,0.16)] transition has-[:checked]:bg-[hsla(230,70%,30%,1)] lg:h-8 lg:w-12"
-          >
-            <input type="checkbox" id="Updates" className="peer sr-only" />
-            <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
-          </label>
+          
+          {/* Uncomment if you want to add MCPD updates back
+          <div className="flex flex-row items-center justify-between gap-4">
+            <div className="max-w-[80%]">
+              <h2 className="text-base font-semibold text-grey-900">
+                MCPD Updates
+              </h2>
+              <p className="pt-1 font-normal text-gray-500 text-base">
+                Stay updated on your MCPD points after completing qualifying
+                activities.
+              </p>
+            </div>
+            <label
+              htmlFor="mcpdUpdates"
+              className="relative h-5 w-8 cursor-pointer rounded-full bg-[hsla(240,3%,49%,0.16)] transition has-[:checked]:bg-[hsla(230,70%,30%,1)] lg:h-8 lg:w-12"
+            >
+              <input
+                type="checkbox"
+                id="mcpdUpdates"
+                checked={notificationPreferences[TOPICS.MCPD]}
+                onChange={() => handleNotificationChange(TOPICS.MCPD)}
+                className="peer sr-only"
+              />
+              <span className="shadow-[0px_3px_1px_0px_hsla(0, 0%, 0%, 0.06),0px_3px_8px_0px_hsla(0, 0%, 0%, 0.15),0px_0px_0px_1px_hsla(0, 0%, 0%, 0.04)] absolute left-[2px] top-[2px] size-4 rounded-full bg-white transition-all peer-checked:start-[calc(100%-18px)] lg:size-7 lg:peer-checked:start-[calc(100%-30px)]"></span>
+            </label>
+          </div>
+          */}
         </div>
-      </div>
+      )}
     </section>
   );
 
@@ -509,9 +610,6 @@ function SettingsPage() {
                 {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
-            <p className="text-xs text-gray-800 mt-2">
-              Last modified 1year ago
-            </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
             <div className="mb-4">
@@ -663,16 +761,6 @@ function SettingsPage() {
             >
               Notification
             </button>
-            {/* <button
-              onClick={() => handleTabChange("delete")}
-              className={`text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg ${
-                activeTab === "delete"
-                  ? "bg-primary text-white"
-                  : "text-gray-800 hover:bg-gray-300"
-              }`}
-            >
-              Delete Account
-            </button> */}
           </div>
           <div className="text-sm text-gray-500 mt-6">
             {getTabDescription()}
@@ -682,7 +770,6 @@ function SettingsPage() {
         <hr className="mb-8 border-gray-400" />
         {activeTab === "password" && renderPasswordTab()}
         {activeTab === "notification" && renderNotificationTab()}
-        {/* {activeTab === "delete" && renderDeleteTab()} */}
 
         <DeleteAccountModal
           isOpen={isModalOpen}

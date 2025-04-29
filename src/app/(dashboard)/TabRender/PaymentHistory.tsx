@@ -12,29 +12,7 @@ import CalendarFilter from "@/components/homecomps/CalendarFilter";
 import TablePagination from "@/components/Pagenation";
 import { useToast } from "@/hooks/use-toast";
 import apiClient from "@/services/apiClient";
-
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}
-
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl lg:p-12 md:p-8 w-full lg:max-w-2xl md:w-2xl relative">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
-        >
-          <X className="h-5 w-5" />
-        </button>
-        {children}
-      </div>
-    </div>
-  );
-};
+import PaymentReceipt from "@/components/homecomps/RecieptGenerator";
 
 // Define the payment interface based on API response
 interface Payment {
@@ -240,6 +218,15 @@ const PaymentHistory = () => {
     return str.slice(0, length);
   };
 
+  // Notify user when receipt is downloaded
+  const handleReceiptSuccess = () => {
+    toast({
+      title: "Success",
+      description: "Receipt has been downloaded successfully.",
+      variant: "default",
+    });
+  };
+
   // Render different states based on data and filters
   const renderContent = () => {
     // Show loading state
@@ -331,9 +318,7 @@ const PaymentHistory = () => {
                     </td>
                     <td className="px-6 py-4">
                       {payment.status === "SUCCESS" ? (
-                        <button className="px-4 py-1 bg-primary text-white text-sm rounded-full hover:bg-blue-700">
-                          Download
-                        </button>
+                        <PaymentReceipt payment={payment} onSuccess={handleReceiptSuccess} />
                       ) : (
                         <button className="px-4 py-1 bg-primary text-white text-sm rounded-full hover:bg-blue-700">
                           Retry

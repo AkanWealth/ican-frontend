@@ -129,7 +129,7 @@ const RegisteredEventsTab: React.FC = () => {
                         description: registration.event.description,
                         date: new Date(registration.event.date).toLocaleDateString() + " " + registration.event.time,
                         venue: registration.event.venue,
-                        IsAttended: registration.status === "ATTENDED", // Set IsAttended based on status
+                        IsAttended: registration.status === "PRESENT"|| registration.status === "ATTENDED" ||  registration.status === "Present"||  registration.status === "present" ||  registration.status === "Attended"||  registration.status === "attended", // Set IsAttended based on status
                         status: registration.status // Add status field
                     };
                 })
@@ -257,21 +257,22 @@ const RegisteredEventsTab: React.FC = () => {
 
             <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6 mt-8">
                 {filterEvents(registeredEvents).map((event) => (
-                    <div key={event.id} className="rounded-lg relative border-l-4 border-green-600 p-4 bg-white">
-                        <div className="">
-                            <span
-                                className={`rounded-full px-2 py-0.5 text-sm  ${
-                                    event.IsAttended
-                                        ? 'text-green-700 bg-green-100 font-medium'
-                                        : 'text-gray-700 bg-gray-100 font-medium'
-                                }`}
-                            >
-                                {event.IsAttended ? 'Attended' : 'Not Attended'}
-                            </span>
-                        </div>
+                   <div key={event.id} className="rounded-lg relative border-l-4 border-green-600 p-4 bg-white">
+                   {/* Status Badge */}
+                   <div className="absolute top-2 right-2">
+                     <span
+                       className={`rounded-full px-2 py-0.5 text-sm ${
+                         event.IsAttended
+                           ? "text-green-700 bg-green-100 font-medium"
+                           : "text-gray-700 bg-gray-100 font-medium"
+                       }`}
+                     >
+                       {event.IsAttended ? "Attended" : "Not Attended"}
+                     </span>
+                   </div>
 
                         <div className="">
-                            <h3 className="font-bold text-lg mb-2">{event.name}</h3>
+                            <h3 className="font-bold text-xl mb-2">{event.name.toUpperCase()}</h3>
                             <p className="text-sm text-gray-600 mb-4">{event.description}</p>
 
                             <div className="flex flex-col text-sm gap-2 text-gray-600 mb-4">
@@ -286,7 +287,7 @@ const RegisteredEventsTab: React.FC = () => {
                             </div>
 
                             <div className="flex items-center justify-end gap-2 ml-4">
-                                {event.IsAttended && event.status === "ATTENDED" && (
+                                {event.IsAttended && event.status === "PRESENT" && (
                                     <CertificateGenerator
                                         eventId={event.id}
                                         eventTitle={event.name}

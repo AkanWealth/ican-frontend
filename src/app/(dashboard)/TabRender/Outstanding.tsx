@@ -62,7 +62,18 @@ const Outstanding = () => {
       try {
         const cookies = parseCookies();
         const userId = cookies.userId;
-        if (userId) {
+        // Try to get user data from cookie first (like in MemberDueRender)
+        const userDataCookie = cookies["user_data"];
+        
+        if (userDataCookie) {
+          const parsedUserData = JSON.parse(userDataCookie);
+          setUserData({
+            email: parsedUserData.email || "",
+            phoneNumber: parsedUserData.phoneNumber || "",
+            fullName: parsedUserData.fullName || ""
+          });
+        } else if (userId) {
+          // Fallback to API if cookie doesn't exist
           const userResponse = await apiClient.get(`/users/${userId}`);
           setUserData({
             email: userResponse.email || "",
@@ -78,33 +89,52 @@ const Outstanding = () => {
     fetchUserData();
   }, []);
 
-  // Function to fetch outstanding data
+  // New function to fetch dues data using the API from MemberDueRender
   const fetchOutstandingData = useCallback(async () => {
     try {
       setLoading(true);
-
-      // Fetch total outstanding payment
-      const response = await apiClient.get("/payments/total-outstanding");
-      const totalOutstanding = response.totalOutstanding || 0;
-
-      // Fetch outstanding breakdown
-      const outstandingBreakdownResponse = await apiClient.get(
-        "/payments/outstanding-breakdown"
-      );
-
+      
+      // Get user ID from cookies
+      const cookies = parseCookies();
+      const userId = cookies.userId;
+      const userDataCookie = cookies["user_data"];
+      const parsedUserData = userDataCookie ? JSON.parse(userDataCookie) : null;
+      const effectiveUserId = userId || (parsedUserData && parsedUserData.id);
+      
+      if (!effectiveUserId) {
+        console.error("User ID not found");
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch dues data from the endpoint that MemberDueRender uses
+      const response = await apiClient.get(`/billing/user/${effectiveUserId}/billings`);
+      
+      // Proper response handling
+      const duesData = response?.data && Array.isArray(response.data) 
+        ? response.data 
+        : Array.isArray(response) 
+          ? response 
+          : [];
+      
       // Transform the data to match your component's expected structure
-      const transformedData = Array.isArray(outstandingBreakdownResponse)
-        ? outstandingBreakdownResponse.map((item) => ({
-            PaymentType: item.paymentType,
-            AmountDue: item.amount.toString(),
-            date: new Date(item.datePaid).toLocaleDateString(),
-            status: item.status,
-            id: item.id,
-          }))
-        : [];
-
+      const transformedData = duesData.map((due: any) => ({
+        id: due.id || "",
+        PaymentType: due.name || due.type || "",
+        AmountDue: typeof due.amount === 'number' ? due.amount.toString() : "0",
+        date: due.createdAt ? new Date(due.createdAt).toLocaleDateString() : new Date().toLocaleDateString(),
+        status: due.paymentStatus || "UNPAID",
+        amountLeft: due.balance ? due.balance.toString() : "0"
+      }));
+      
+      // Calculate total outstanding
+      const totalOutstandingAmount = duesData.reduce(
+        (sum: number, due: any) => sum + (due.balance || 0), 
+        0
+      );
+      
       // Update state with transformed API data
-      setTotalOutstanding(totalOutstanding);
+      setTotalOutstanding(totalOutstandingAmount);
       setActivities(transformedData);
       setOriginalActivities(transformedData);
       setLoading(false);
@@ -134,8 +164,15 @@ const Outstanding = () => {
     try {
       const cookies = parseCookies();
       const userId = cookies.userId;
+      const userDataCookie = cookies["user_data"];
+      const parsedUserData = userDataCookie ? JSON.parse(userDataCookie) : null;
+      const effectiveUserId = userId || (parsedUserData && parsedUserData.id);
       
-      await paymentService.processPayment(userId, paymentData.billingId, {
+      if (!effectiveUserId) {
+        throw new Error("User ID not found");
+      }
+      
+      await paymentService.processPayment(effectiveUserId, paymentData.billingId, {
         amount: paymentData.amount,
         paymentType: paymentData.paymentType,
         transactionId: paymentData.transactionId
@@ -172,6 +209,13 @@ const Outstanding = () => {
     try {
       const cookies = parseCookies();
       const userId = cookies.userId;
+      const userDataCookie = cookies["user_data"];
+      const parsedUserData = userDataCookie ? JSON.parse(userDataCookie) : null;
+      const effectiveUserId = userId || (parsedUserData && parsedUserData.id);
+      
+      if (!effectiveUserId) {
+        throw new Error("User ID not found");
+      }
       
       // Get all selected billing IDs
       const selectedBillingIds = selectedItems.map(index => {
@@ -180,7 +224,7 @@ const Outstanding = () => {
       });
       
       await paymentService.processSettleAllPayment({
-        userId,
+        userId: effectiveUserId,
         amount: paymentData.amount,
         paymentType: paymentData.paymentType,
         transactionId: paymentData.transactionId,
@@ -211,7 +255,7 @@ const Outstanding = () => {
   };
 
   const renderStatusBadge = (status: string, amountLeft?: string) => {
-    if (status === "UNPAID" || status === "unpaid") {
+    if (status === "UNPAID" || status === "unpaid" || status === "NOT_PAID") {
       return (
         <div className="flex items-center">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600">
@@ -340,12 +384,16 @@ const Outstanding = () => {
     setIsFiltered(true);
 
     const filteredActivities = originalActivities.filter((activity: any) => {
-      const activityDate = new Date(activity.date);
-      return (
-        activityDate.getDate() === selectedDate.getDate() &&
-        activityDate.getMonth() === selectedDate.getMonth() &&
-        activityDate.getFullYear() === selectedDate.getFullYear()
-      );
+      try {
+        const activityDate = new Date(activity.date);
+        return (
+          activityDate.getDate() === selectedDate.getDate() &&
+          activityDate.getMonth() === selectedDate.getMonth() &&
+          activityDate.getFullYear() === selectedDate.getFullYear()
+        );
+      } catch (error) {
+        return false;
+      }
     });
 
     setActivities(filteredActivities);
@@ -421,6 +469,7 @@ const Outstanding = () => {
     setSelectedItems([]);
     setSelectAll(false);
   };
+  
   const getCurrentItems = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return activities.slice(startIndex, startIndex + itemsPerPage);
@@ -491,7 +540,7 @@ const Outstanding = () => {
                   Amount Due(₦)
                 </th>
                 <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">
-                  Due Date
+                   Date
                 </th>
                 <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">
                   Status
@@ -515,18 +564,19 @@ const Outstanding = () => {
                     {activity.PaymentType}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-800  whitespace-nowrap">
-                    {activity.AmountDue}
+                    {isNaN(parseFloat(activity.AmountDue)) ? activity.AmountDue : `₦${parseFloat(activity.AmountDue).toLocaleString()}`}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
                     {activity.date}
                   </td>
                   <td className="px-6 py-4  whitespace-nowrap">
-                    {renderStatusBadge(activity.status, activity.amountLeft)}
+                    {renderStatusBadge(activity.status, activity.amountLeft && `₦${parseFloat(activity.amountLeft).toLocaleString()}`)}
                   </td>
                   <td className="px-6 py-4  whitespace-nowrap">
                     <button
                       onClick={() => handleOpenPaymentModal(activity)}
                       className="px-6 py-2 bg-primary text-white text-sm rounded-lg hover:bg-blue-700"
+                      disabled={activity.status === "FULLY_PAID" || activity.status === "paid"}
                     >
                       Settle Payment
                     </button>
@@ -577,6 +627,7 @@ const Outstanding = () => {
             <div className="flex lg:flex-row md:flex-col justify-between items-center w-full">
               <div className="w-1/2">
                 <button
+                 onClick={handleSelectPaymentAll}
                   className="px-4 py-2 lg:text-base md:text-sm bg-primary text-white rounded-xl flex items-center gap-2 hover:bg-blue-700 hover:text-lg"
                   disabled={activities.length === 0}
                 >

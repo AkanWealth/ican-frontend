@@ -245,7 +245,7 @@ function AttendanceRender() {
           setUserAttendance(attendanceData);
           
           // Get total number of attended meetings
-          const totalAttended = attendanceData.filter((item: any) => item.status === "ATTENDED").length;
+          const totalAttended = attendanceData.filter((item: any) => item.status === "PRESENT").length;
           
           // Update metrics with attendance count
           setMetrics(prev => ({
@@ -409,7 +409,7 @@ function AttendanceRender() {
   };
 
   const renderStatusBadge = (status: string) => {
-    if (status === "absent") {
+    if (status === "absent" || status === "absent") {
       return (
         <div className="flex items-center">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600">
@@ -418,7 +418,7 @@ function AttendanceRender() {
           </span>
         </div>
       );
-    } else if (status === "present") {
+    } else if (status === "present" || status === "PRESENT") {
       return (
         <div className="flex items-center">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600">

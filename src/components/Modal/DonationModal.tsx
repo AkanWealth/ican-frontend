@@ -15,6 +15,7 @@ interface DonationModalProps {
 }
 
 const donationOptions = [
+  { id: "one-time", label: "One-Time" },
   { id: "monthly", label: "Monthly" },
   { id: "quarterly", label: "Quarterly" },
   { id: "yearly", label: "Annually" },
@@ -27,8 +28,8 @@ const DonationModal: React.FC<DonationModalProps> = ({
 }) => {
   const [amount, setAmount] = useState("");
   const [donationOption, setDonationOption] = useState<
-    "monthly" | "quarterly" | "yearly"
-  >("monthly");
+    "one-time"|"monthly" | "quarterly" | "yearly"
+  >("one-time");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const { toast } = useToast();
 

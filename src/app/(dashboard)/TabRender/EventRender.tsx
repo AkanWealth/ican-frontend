@@ -40,14 +40,15 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [selectedDateRange, setSelectedDateRange] =
-    useState("Select Date Range");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [selectedDateRange, setSelectedDateRange] = useState("Select Date Range");
+  const [isFiltered, setIsFiltered] = useState(false);
 
   useEffect(() => {
     const Token = localStorage.getItem("token");
     const fetchEvents = async () => {
       try {
-        
         const response = await apiClient.get("/events");
         console.log("Response:", response);
 
@@ -73,16 +74,30 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+    setIsFiltered(e.target.value !== "" || selectedLocation !== "" || startDate !== null);
   };
 
   const handleLocationSelect = (state: string) => {
     setSelectedLocation(state);
     setIsLocationDropdownOpen(false);
+    setIsFiltered(state !== "" || searchTerm !== "" || startDate !== null);
   };
 
-  const handleDateSelect = (date: string) => {
-    setSelectedDateRange(date);
+  const handleDateSelect = (dateRange: string, start?: Date, end?: Date) => {
+    setSelectedDateRange(dateRange);
+    setStartDate(start || null);
+    setEndDate(end || null);
     setIsCalendarOpen(false);
+    setIsFiltered((start !== null) || searchTerm !== "" || selectedLocation !== "");
+  };
+
+  const resetFilters = () => {
+    setSearchTerm("");
+    setSelectedLocation("");
+    setStartDate(null);
+    setEndDate(null);
+    setSelectedDateRange("Select Date Range");
+    setIsFiltered(false);
   };
 
   const handleRegister = (event: Event) => {
@@ -103,20 +118,6 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
     router.push(`/EventRegistration?${params.toString()}`);
   };
 
-  // const filteredEvents = events.filter((event) => {
-  //   const matchesName = event.name
-  //     .toLowerCase()
-  //     .includes(searchTerm.toLowerCase());
-  //   const matchesDescription = event.description
-  //     .toLowerCase()
-  //     .includes(searchTerm.toLowerCase());
-  //   const matchesLocation = selectedLocation
-  //     ? event.venue.includes(selectedLocation)
-  //     : true;
-
-  //   return (matchesName || matchesDescription) && matchesLocation;
-  // });
-
   const filteredEvents = events.filter((event) => {
     const matchesName = event.name
       .toLowerCase()
@@ -125,12 +126,23 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesLocation = selectedLocation
-      ? event.venue.includes(selectedLocation)
+      ? event.venue.toLowerCase().includes(selectedLocation.toLowerCase())
       : true;
-  
-    const isUpcoming = new Date(event.date) >= new Date(); // <-- Only allow future events
-  
-    return (matchesName || matchesDescription) && matchesLocation && isUpcoming;
+
+    const eventDate = new Date(event.date);
+
+    // Check if event is not past
+    const isDateNotPassed = eventDate >= new Date();
+
+    // Check if event matches selected date range
+    let matchesDateRange = true;
+    if (startDate && endDate) {
+      matchesDateRange = eventDate >= startDate && eventDate <= endDate;
+    }
+
+    const hasUpcomingStatus = event.status.toLowerCase() === "upcoming";
+
+    return (matchesName || matchesDescription) && matchesLocation && isDateNotPassed && matchesDateRange && hasUpcomingStatus;
   });
 
   if (isLoading) {
@@ -242,7 +254,7 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
                 <CalendarFilter
                   isOpen={isCalendarOpen}
                   onClose={() => setIsCalendarOpen(false)}
-                  onSelect={handleDateSelect}
+                  onSelect={(label, start, end) => handleDateSelect(label, start, end)}
                 />
               </div>
             </div>
@@ -251,48 +263,69 @@ const EventsTab: React.FC<EventsTabProps> = ({ nigerianStates }) => {
       </div>
 
       {hasEvents ? (
-        <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6 mt-8">
-          {filteredEvents.map((event) => (
-            <div key={event.id} className="border rounded-lg relative">
-              <div className="relative h-52 mb-4 rounded-lg overflow-hidden">
-                <Image
-                  src={event.flyer|| "/Event3.jpg"}
-                  alt={event.name}
-                  fill
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute flex flex-row top-4 right-4 text-primary bg-blue-50 rounded-full px-3 py-1 text-sm ">
-                  <CircleAlert className="w-5 h-5 mr-2" />
-                  {event.status}
+        filteredEvents.length > 0 ? (
+          <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6 mt-8">
+            {filteredEvents.map((event) => (
+              <div key={event.id} className="border rounded-lg relative">
+                <div className="relative h-52 mb-4 rounded-lg overflow-hidden">
+                  <Image
+                    src={event.flyer || "/Event3.jpg"}
+                    alt={event.name}
+                    fill
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute flex flex-row top-4 right-4 text-primary bg-blue-50 rounded-full px-3 py-1 text-sm ">
+                    <CircleAlert className="w-5 h-5 mr-2" />
+                    {event.status}
+                  </div>
                 </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold mb-2">{event.name}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {event.description}
-                </p>
+                <div className="p-4">
+                  <h3 className="font-bold mb-2">{event.name}</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {event.description}
+                  </p>
 
-                <div className="flex flex-col text-sm gap-2 text-gray-600 mb-4">
-                  <div className="flex">
-                    <CalendarDays className="w-4 h-4" />
-                    {new Date(event.date).toLocaleDateString()} at {event.time}
+                  <div className="flex flex-col text-sm gap-2 text-gray-600 mb-4">
+                    <div className="flex">
+                      <CalendarDays className="w-4 h-4" />
+                      {new Date(event.date).toLocaleDateString()} at {event.time}
+                    </div>
+                    <div className="flex">
+                      <MapPin className="w-4 h-4" />
+                      {event.venue}
+                    </div>
                   </div>
-                  <div className="flex">
-                    <MapPin className="w-4 h-4" />
-                    {event.venue}
-                  </div>
+                  <button
+                    onClick={() => handleRegister(event)}
+                    // disabled={event.isFull}
+                    className="px-6 py-2 rounded-full transition-colors bg-blue-800 text-white hover:bg-blue-900"
+                  >
+                    Register
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleRegister(event)}
-                  // disabled={event.isFull}
-                  className="px-6 py-2 rounded-full transition-colors bg-blue-800 text-white hover:bg-blue-900"
-                >
-                  Register
-                </button>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 mt-8">
+            <div className="text-center">
+              {/* <Image
+                src="/calendar.png"
+                width={120}
+                height={120}
+                alt="No events found"
+              /> */}
+              <h3 className="font-semibold text-lg mt-4">No events found for the selected criteria</h3>
+              <p className="text-gray-500 mt-2 mb-4">Try adjusting your search filters</p>
+              <button
+                onClick={resetFilters}
+                className="px-6 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors"
+              >
+                Reset Filters
+              </button>
             </div>
-          ))}
-        </div>
+          </div>
+        )
       ) : (
         <div className="flex-grow flex items-center justify-center mt-40">
           <div className="text-center p-16">

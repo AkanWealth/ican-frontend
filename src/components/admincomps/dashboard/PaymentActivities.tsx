@@ -37,7 +37,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 const chartConfig = {
-  amount: {
+  desktop: {
     label: "Amount",
     color: "hsl(var(--chart-2))",
   },
@@ -106,9 +106,9 @@ function PaymentActivities() {
         );
         const formattedData = response.map((item: any) => ({
           month: item.month || item.date || item.period,
-          totalPaid: item.totalPaid || 0,
+          total: item.totalPaid || 0,
         }));
-        setPaymentTrendData(response);
+        setPaymentTrendData(formattedData);
         toast({
           title: "Payment Activities",
           description: "Payment activities data fetched successfully.",
@@ -213,8 +213,8 @@ function PaymentActivities() {
                   content={<ChartTooltipContent hideLabel />}
                 />
                 <Line
-                  dataKey="Total"
-                  type="natural"
+                  dataKey="total"
+                  type="linear"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}
                   dot={false}

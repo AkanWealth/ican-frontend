@@ -62,18 +62,13 @@ export function ContentTable<TData, TValue>({
         <Input
           placeholder="Filter by titles..."
           value={
-        (table.getColumn("name")?.getFilterValue() as string) ??
-        (table.getColumn("title")?.getFilterValue() as string) ??
-        ""
+            (table.getColumn("name")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) => {
-        const nameColumn = table.getColumn("name");
-        const titleColumn = table.getColumn("title");
-        if (nameColumn) {
-          nameColumn.setFilterValue(event.target.value);
-        } else if (titleColumn) {
-          titleColumn.setFilterValue(event.target.value);
-        }
+            const nameColumn = table.getColumn("name");
+            if (nameColumn) {
+              nameColumn.setFilterValue(event.target.value);
+            }
           }}
           className="max-w-sm"
         />

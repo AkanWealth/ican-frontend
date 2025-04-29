@@ -35,22 +35,22 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
       };
       try {
         const results = await apiClient.request(config);
-        console.log(results.data);
+        console.log(results);
         onClose();
         toast({
           title: "User Enabled",
-          description: results.data.message,
+          description: results.message,
           variant: "default",
-          duration: 5000,
+          duration: 2000,
         });
         onClose();
       } catch (error: any) {
         console.error(error);
         toast({
           title: "Error",
-          description: error.response?.data?.message || "An error occurred",
+          description: error.response?.message || "An error occurred",
           variant: "destructive",
-          duration: 5000,
+          duration: 2000,
         });
       }
     }

@@ -45,6 +45,8 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const [feedbacks, setFeedbacks] = useState([]);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchAllFeedbackData() {
       const eventId = (await params).id;
       const config = {
@@ -57,23 +59,36 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       };
       try {
         const result = await apiClient.request(config);
-        setFeedbacks(result.data);
-        toast({
-          title: "Feedback",
-          description: "Feedback fetched successfully.",
-          variant: "default",
-        });
+        // Only update state if component is still mounted and we have data
+        if (isMounted && result.data) {
+          setFeedbacks(result.data);
+          // Only show success toast if we actually got data
+          if (result.data.length > 0) {
+            toast({
+              title: "Feedback",
+              description: "Feedback fetched successfully.",
+              variant: "default",
+            });
+          }
+        }
       } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch event data.",
-          variant: "destructive",
-        });
+        if (isMounted) {
+          toast({
+            title: "Error",
+            description: "Failed to fetch event data.",
+            variant: "destructive",
+          });
+        }
       }
     }
 
     fetchAllFeedbackData();
-  }, [params, router, toast]);
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array to run only once
 
   useEffect(() => {
     async function fetchData() {

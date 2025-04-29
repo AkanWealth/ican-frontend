@@ -131,7 +131,8 @@ function UserActivities() {
         setUserActivityTrendData(formattedData);
         console.log(formattedData);
         console.log(response);
-        toast({
+        toast({ 
+          
           title: "User Activities",
           description: "User activities data fetched successfully.",
           variant: "default",

@@ -188,11 +188,10 @@ function PaymentActivities() {
       <div className="flex w-full max-h-[700px] flex-col gap-10">
         <Card>
           <CardHeader>
-            <CardTitle>Payment Trend</CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
+            <CardTitle>Annual Payment Trend</CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer className="max-h-96 w-full" config={chartConfig}>
+            <ChartContainer className="max-h-96 w-full p-4" config={chartConfig}>
               <LineChart
                 accessibilityLayer
                 data={paymentTrendData}
@@ -214,7 +213,7 @@ function PaymentActivities() {
                   content={<ChartTooltipContent hideLabel />}
                 />
                 <Line
-                  dataKey="totalPaid"
+                  dataKey="Total"
                   type="natural"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}

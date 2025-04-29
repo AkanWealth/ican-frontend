@@ -126,13 +126,13 @@ function UserActivities() {
         );
         const formattedData = response.map((item: any) => ({
           month: item.month || item.date || item.period,
-          people: item.count || item.value || item.total || 0,
+          people: item.count || item.value || item.totalRegistrations || 0,
         }));
         setUserActivityTrendData(formattedData);
         console.log(formattedData);
         console.log(response);
         toast({ 
-          
+
           title: "User Activities",
           description: "User activities data fetched successfully.",
           variant: "default",

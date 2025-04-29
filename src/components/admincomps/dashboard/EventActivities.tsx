@@ -47,7 +47,6 @@ function EventActivities() {
   const [eventRegistrationTrendData, setEventRegistrationTrendData] = useState<
     DashEventAttendanceTrend[]
   >([]);
-  const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,11 +68,10 @@ function EventActivities() {
         );
         const formattedData = response.map((item: any) => ({
           month: item.month || item.date || item.period,
-          people: item.count || item.value || item.total || 0,
+          people: item.count || item.value || item.count || 0,
         }));
-        setEventRegistrationTrendData(response);
+        setEventRegistrationTrendData(formattedData);
 
-        setChartData(formattedData);
         console.log(response);
       } catch (error) {
         toast({

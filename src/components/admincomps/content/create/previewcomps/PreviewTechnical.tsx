@@ -28,12 +28,17 @@ function PreviewTechnical({
         <div className="flex flex-col gap-4">
           <TechnicalTile
             post={{
-              title: name,
+              id: "preview-id",
+              name: name,
               document: document,
               coverImg: coverImg,
-              date: new Date().toISOString(),
-              category: "Technical Session",
-              downloadLink: document,
+              createdAt: new Date().toISOString(),
+              status: "DRAFT",
+              createdBy: "preview-user",
+              user: {
+                firstname: "Preview",
+                email: "preview@example.com",
+              },
             }}
           />
         </div>

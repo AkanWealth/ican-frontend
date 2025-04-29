@@ -57,6 +57,12 @@ export function logout() {
     "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
   document.cookie =
     "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+  // Clear cookies
+  document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+  document.cookie =
+    "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+  document.cookie =
+    "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
 
   // Redirect to login
   window.location.href = "/admin-login";

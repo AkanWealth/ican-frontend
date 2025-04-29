@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+
+
 import Heroimg from "@/components/homecomps/Heroimg"; // Import Heroimg component for the page hero section
 import BlogList from "@/components/homecontent/BlogListSection"; // Import BlogList component to display the list of blogs
 import Link from "next/link";

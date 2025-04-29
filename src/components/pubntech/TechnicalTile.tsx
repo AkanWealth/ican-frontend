@@ -2,11 +2,11 @@ import React from "react";
 import Image from "next/image";
 import { TechnicalPost } from "@/libs/types";
 
-type TechnicalTileProps = {
-  technical: TechnicalPost;
-};
+interface TechnicalTileProps {
+  post: TechnicalPost;
+}
 
-function TechnicalTile({ technical }: TechnicalTileProps) {
+export default function TechnicalTile({ post }: TechnicalTileProps) {
   return (
     <div className="min-w-[350px] relative gap-8 sm:gap-6 h-auto p-0 sm:pr-4 rounded-3xl border border-gray-300 justify-start items-center flex flex-col sm:flex-row">
       {/* technical sessions image */}
@@ -14,8 +14,8 @@ function TechnicalTile({ technical }: TechnicalTileProps) {
         <Image
           fill={true}
           loading="lazy"
-          src={technical.coverImg}
-          alt={`Image for ${technical.name}`}
+          src={post.coverImg}
+          alt={`Image for ${post.name}`}
           className="h-full w-full sm:w-fit object-cover sm:rounded-l-lg rounded-3xl"
         />
       </div>
@@ -28,18 +28,18 @@ function TechnicalTile({ technical }: TechnicalTileProps) {
         </span>
 
         <h2 className="sm:mt-4 m-0 text-xl font-semibold leading-6 text-neutral-800">
-          {technical.name}
+          {post.name}
         </h2>
 
         <time className="sm:mt-4 m-0 text-sm leading-snug text-neutral-600">
-          {new Date(technical.createdAt).toLocaleDateString("en-US", {
+          {new Date(post.createdAt).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
-            day: "numeric"
+            day: "numeric",
           })}
         </time>
 
-        <a href={technical.document} download={technical.name}>
+        <a href={post.document} download={post.name}>
           <button className=" px-4 py-1 rounded-full text-sm text-white  font-semibold bg-blue-900 hover:bg-white hover:border hover:border-primary hover:text-primary  ">
             Download
           </button>
@@ -48,5 +48,3 @@ function TechnicalTile({ technical }: TechnicalTileProps) {
     </div>
   );
 }
-
-export default TechnicalTile;

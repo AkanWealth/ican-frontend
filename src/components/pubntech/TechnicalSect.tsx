@@ -67,7 +67,7 @@ function TechnicalSect() {
                 new Date(a.createdAt).getTime()
             )
             .slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage)
-            .map((post) => <TechnicalTile key={post.id} technical={post} />)
+            .map((post) => <TechnicalTile key={post.id} post={post} />)
         )}
       </section>
     </div>

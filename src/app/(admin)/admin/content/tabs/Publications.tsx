@@ -20,11 +20,11 @@ function Resources() {
       const config = {
         method: "get",
         maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/resources/content`,
+        url: `${BASE_API_URL}/resources/contents`,
         headers: {},
       };
       try {
-        const response = await apiClient.get("/resources/content", config);
+        const response = await apiClient.get("/resources/contents", config);
         setData(response);
         toast({
           title: "Content fetched successfully",

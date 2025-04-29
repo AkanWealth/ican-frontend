@@ -23,7 +23,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-
 const chartConfig = {
   desktop: {
     label: "Users",
@@ -61,7 +60,9 @@ function UserActivities() {
     totalMonthlyLogins: 0,
     totalYearlyLogins: 0,
   });
-  const [userActivityTrendData, setUserActivityTrendData] = useState<DashEventAttendanceTrend[]>([]);
+  const [userActivityTrendData, setUserActivityTrendData] = useState<
+    DashEventAttendanceTrend[]
+  >([]);
 
   const [activeChart, setActiveChart] = useState<
     "weekly" | "monthly" | "yearly"
@@ -105,47 +106,49 @@ function UserActivities() {
     fetchData();
   }, [router, toast]);
 
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
 
-          const config = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: `${BASE_API_URL}/dashboard/user-registration-trend`,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          };
+        const config = {
+          method: "get",
+          maxBodyLength: Infinity,
+          url: `${BASE_API_URL}/dashboard/user-registration-trend`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
 
-          const response = await apiClient.get(
-            "/dashboard/user-registration-trend",
-            config
-          );
-          const formattedData = response.map((item: any) => ({
-            month: item.month || item.date || item.period,
-            people: item.count || item.value || item.total || 0,
-          }));
-          setUserActivityTrendData(formattedData);
-          toast({
-            title: "User Activities",
-            description: "User activities data fetched successfully.",
-            variant: "default",
-          });
-        } catch (error) {
-          console.error(error);
+        const response = await apiClient.get(
+          "/dashboard/user-registration-trend",
+          config
+        );
+        const formattedData = response.map((item: any) => ({
+          month: item.month || item.date || item.period,
+          people: item.count || item.value || item.totalRegistrations || 0,
+        }));
+        setUserActivityTrendData(formattedData);
+      
+        toast({ 
 
-          toast({
-            title: "Error",
-            description: "Failed to fetch user activities data.",
-            variant: "destructive",
-          });
-        }
-      };
+          title: "User Activities",
+          description: "User activities data fetched successfully.",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error(error);
 
-      fetchData();
-    }, [router, toast]);
+        toast({
+          title: "Error",
+          description: "Failed to fetch user activities data.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchData();
+  }, [router, toast]);
 
   useEffect(() => {
     const fetchLoginStats = async () => {
@@ -248,11 +251,10 @@ function UserActivities() {
         console.error(error);
         toast({
           title: "Error",
-            description: "Failed to fetch chart data",
-            variant: "destructive",
-          });
-        }
-      
+          description: "Failed to fetch chart data",
+          variant: "destructive",
+        });
+      }
     };
 
     fetchLoginChartData();
@@ -350,8 +352,9 @@ function UserActivities() {
       <div className="flex w-full max-h-[700px] flex-col gap-10">
         <Card>
           <CardHeader>
-            <CardTitle>User Registration Trend for {new Date().getFullYear()}</CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
+            <CardTitle>
+              User Registration Trend for {new Date().getFullYear()}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>
@@ -376,8 +379,8 @@ function UserActivities() {
                   content={<ChartTooltipContent hideLabel />}
                 />
                 <Line
-                  dataKey="desktop"
-                  type="natural"
+                  dataKey="people"
+                  type="linear"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}
                   dot={false}

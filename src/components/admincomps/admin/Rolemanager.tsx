@@ -275,18 +275,17 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
       };
       const response = await apiClient.post("/roles/create", submitData, config);
 
-      // Show success message
-
-      // Reset form and close modal
+  
       setFormData(initialFormData);
       setPermissions([]);
       setShowModal(false);
 
       toast({
         title: "Role Created",
-        description: response.data.message,
+        description: response.message,
         variant: "default",
       });
+
       setIsLoading(false);
       router.refresh();
     } catch (error) {

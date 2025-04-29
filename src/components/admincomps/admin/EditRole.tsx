@@ -15,7 +15,7 @@ import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 
 // Props interface for role manager component
 interface RolemanagerProps {
-  id?: any;
+  id?: string;
   showModal: boolean;
   setShowModal: (show: boolean) => void;
 }
@@ -40,10 +40,10 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
     const fetchRole = async () => {
       try {
         const response = await apiClient.get(`${BASE_API_URL}/roles/${id}`);
-        setFormData(response.data);
+        setFormData(response);
         toast({
           title: "Role Fetched",
-          description: response.data.message,
+          description: response.message,
           variant: "default",
         });
       } catch (error) {
@@ -84,16 +84,11 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
       };
       const response = await apiClient.request(config);
 
-      // Show success message
-
-      // Reset form and close modal
       setFormData(initialFormData);
-
       setShowModal(false);
-
       toast({
         title: "Role Edited",
-        description: response.data.message,
+        description: response.message,
         variant: "default",
       });
       setIsLoading(false);

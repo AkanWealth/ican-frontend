@@ -37,7 +37,8 @@ type parsedRolesType = {
 
 function RolesPage() {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [editRole, setEditRole] = useState<RolesData | null>(null);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [activeRole, setActiveRole] = useState<RolesData | null>(null);
   const [roles, setRoles] = useState<RolesData[]>([]); // Update state type to RolesData[]
   const [isLoading, setIsLoading] = useState(false); // Loading state
 
@@ -82,7 +83,7 @@ function RolesPage() {
           onClick={() => {
             setShowModal(true);
           }}
-          className="bg-blue-600 text-white rounded-md px-4 py-2"
+          className="bg-primary text-base font-semibold text-white rounded-md px-4 py-2"
         >
           Create a New Role
         </button>
@@ -101,10 +102,10 @@ function RolesPage() {
               </div>
               <button
                 onClick={() => {
-                  setEditRole(role);
-                  setShowModal(true);
+                  setActiveRole(role);
+                  setShowEditModal(true);
                 }}
-                className="bg-blue-600 text-white rounded-md px-4 py-2"
+                className="bg-primary flex flex-row gap-1 items-center h-fit w-fit text-base text-white rounded-md  p-2"
               >
                 <Pencil /> Edit
               </button>
@@ -115,6 +116,9 @@ function RolesPage() {
 
       {showModal && (
         <RoleManager showModal={showModal} setShowModal={setShowModal} />
+      )}
+      {showEditModal && (
+        <EditRole id={activeRole?.id} showModal={showEditModal} setShowModal={setShowEditModal}/>
       )}
     </div>
   );

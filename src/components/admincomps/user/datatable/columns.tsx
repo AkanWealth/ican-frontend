@@ -50,7 +50,7 @@ export const allcolumns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "isSuspended",
     header: ({ column }) => {
       return (
         <Button
@@ -64,7 +64,11 @@ export const allcolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      if (row.original.isSuspended) {
+        return <Statbtn status="suspended" />;
+      } else {
+        return <Statbtn status="active" />;
+      }
     },
   },
   {
@@ -204,7 +208,7 @@ export const memberscolumns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "isSuspended",
     header: ({ column }) => {
       return (
         <Button
@@ -218,7 +222,11 @@ export const memberscolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return row.original.isSuspended ? "suspended" : "active";
+      if (row.original.isSuspended) {
+        return <Statbtn status="suspended" />;
+      } else {
+        return <Statbtn status="active" />;
+      }
     },
   },
   {

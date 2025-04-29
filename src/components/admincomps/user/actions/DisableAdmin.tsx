@@ -7,8 +7,8 @@ import {
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
 
-
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 import apiClient from "@/services-admin/apiClient";
 
 interface DisableAdminProps {
@@ -20,6 +20,7 @@ interface DisableAdminProps {
 
 function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const handleConfirm = () => {
     console.log({ id, fullName, role });
     async function fetchData() {
@@ -40,21 +41,24 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
       };
       try {
         const results = await apiClient.request(config);
-        console.log(results.data);
+        console.log(results);
 
         toast({
           title: "User Disabled",
-          description: results.data.message,
+          description: results.message,
           variant: "default",
         });
         onClose(); // Close the modal after successful update
+        router.refresh();
       } catch (error: any) {
         console.error(error);
         toast({
           title: "Error",
-          description: error.response?.data?.message || "An error occurred",
+          description: error.response?.message || "An error occurred",
           variant: "destructive",
         });
+        onClose(); // Close the modal after successful update
+        router.refresh();
       }
     }
     fetchData();

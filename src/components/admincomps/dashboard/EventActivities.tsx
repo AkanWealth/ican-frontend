@@ -33,8 +33,8 @@ import { DashEventReg, DashEventAttendanceTrend } from "@/libs/types";
 
 
 const chartConfig = {
-  people: {
-    label: "Registered Users",
+  desktop: {
+    label: "Users",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
@@ -47,7 +47,6 @@ function EventActivities() {
   const [eventRegistrationTrendData, setEventRegistrationTrendData] = useState<
     DashEventAttendanceTrend[]
   >([]);
-  const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,11 +68,10 @@ function EventActivities() {
         );
         const formattedData = response.map((item: any) => ({
           month: item.month || item.date || item.period,
-          people: item.count || item.value || item.total || 0,
+          people: item.count || item.value || 0,
         }));
-        setEventRegistrationTrendData(response);
+        setEventRegistrationTrendData(formattedData);
 
-        setChartData(formattedData);
         console.log(response);
       } catch (error) {
         toast({
@@ -147,7 +145,7 @@ function EventActivities() {
                 />
                 <Line
                   dataKey="people"
-                  type="natural"
+                  type="linear"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}
                   dot={false}

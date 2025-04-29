@@ -126,13 +126,12 @@ function UserActivities() {
         );
         const formattedData = response.map((item: any) => ({
           month: item.month || item.date || item.period,
-          people: item.count || item.value || item.total || 0,
+          people: item.count || item.value || item.totalRegistrations || 0,
         }));
         setUserActivityTrendData(formattedData);
-        console.log(formattedData);
-        console.log(response);
+      
         toast({ 
-          
+
           title: "User Activities",
           description: "User activities data fetched successfully.",
           variant: "default",
@@ -356,7 +355,6 @@ function UserActivities() {
             <CardTitle>
               User Registration Trend for {new Date().getFullYear()}
             </CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>
@@ -381,8 +379,8 @@ function UserActivities() {
                   content={<ChartTooltipContent hideLabel />}
                 />
                 <Line
-                  dataKey="desktop"
-                  type="natural"
+                  dataKey="people"
+                  type="linear"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}
                   dot={false}

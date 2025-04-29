@@ -45,7 +45,7 @@ function Content() {
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="adverts">Adverts</TabsTrigger>
           <TabsTrigger value="blogs">Blogs</TabsTrigger>
-          <TabsTrigger value="publication">Publication</TabsTrigger>
+          <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="galleries">Galleries</TabsTrigger>
           <TabsTrigger value="technical">Technical Session</TabsTrigger>
           <TabsTrigger value="student">Study Pack</TabsTrigger>
@@ -60,7 +60,7 @@ function Content() {
         <TabsContent value="blogs">
           <Blogs />
         </TabsContent>
-        <TabsContent value="publication">
+        <TabsContent value="resources">
           <Publications />
         </TabsContent>
         <TabsContent value="galleries">

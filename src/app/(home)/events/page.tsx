@@ -29,10 +29,13 @@ function EventsPage() {
       try {
         const response = await axios.get(`${BASE_API_URL}/events`);
         // Ensure we're handling the response data properly
-        const eventsData = Array.isArray(response.data.data) ? response.data.data : [];
+        const eventsData: EventDetails[] = Array.isArray(response.data.data)
+          ? response.data.data.filter(
+              (event: EventDetails) =>
+                event.status?.toUpperCase() === "UPCOMING"
+            )
+          : [];
         setEvents(eventsData);
-        console.log(eventsData);
-        console.log(response.data.data);
         setFilteredEvents(eventsData);
         setLoading(false);
       } catch (err: any) {
@@ -58,8 +61,6 @@ function EventsPage() {
     }
 
     let result = [...events];
-
-    
 
     // Filter by search query
     if (searchQuery) {

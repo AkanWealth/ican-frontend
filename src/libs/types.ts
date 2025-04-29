@@ -185,7 +185,7 @@ type EventDetails = {
   mcpd_credit: number;
   flyer: string | null;
   meeting_link: string | null;
-  status: "DRAFT" | "ONGOING" | "CANCELLED" | "COMPLETED";
+  status: "DRAFT" | "ONGOING" | "CANCELLED" | "COMPLETED" | "UPCOMING";
   createdAt: string;
 };
 

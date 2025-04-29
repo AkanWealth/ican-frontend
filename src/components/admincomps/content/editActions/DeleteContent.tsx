@@ -8,7 +8,8 @@ import {
 } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 
 import { useToast } from "@/hooks/use-toast";
@@ -43,8 +44,8 @@ function DeleteContent({
       },
     };
     try {
-      const response = await axios.request(config);
-      console.log("Content deleted successfully:", response.data);
+      const response = await apiClient.request(config);
+      console.log("Content deleted successfully:", response);
       toast({
         title: "Content Deleted",
         description: "The content has been successfully deleted.",

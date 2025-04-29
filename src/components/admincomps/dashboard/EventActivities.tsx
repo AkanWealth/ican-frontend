@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import StatCard from "@/components/genui/StatCard";
-import { MdVerifiedUser } from "react-icons/md";
 
 import { EventTable } from "@/components/admincomps/event/datatable/EventTable";
-import { allcolumns, dashEventRegColumns } from "@/components/admincomps/event/datatable/columns";
+import { dashEventRegColumns } from "@/components/admincomps/event/datatable/columns";
 import { Event } from "../event/datatable/colsdata";
+
+import apiClient from "@/services-admin/apiClient";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
@@ -15,14 +15,7 @@ import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-import {
-  Area,
-  AreaChart,
-  Line,
-  LineChart,
-  CartesianGrid,
-  XAxis,
-} from "recharts";
+import { Line, LineChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -36,18 +29,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { DashEventReg } from "@/libs/types";
-const chartData = [
-  { month: "January", people: 186 },
-  { month: "February", people: 305 },
-  { month: "March", people: 237 },
-  { month: "April", people: 73 },
-  { month: "May", people: 209 },
-  { month: "June", people: 214 },
-];
+import { DashEventReg, DashEventAttendanceTrend } from "@/libs/types";
+
+
 const chartConfig = {
   people: {
-    label: "People",
+    label: "Registered Users",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
@@ -57,58 +44,43 @@ function EventActivities() {
   const router = useRouter();
 
   const [eventData, setEventData] = useState<DashEventReg[]>([]);
-  const [data, setData] = useState({
-    totalPayments: 0,
-    pendingPayments: 0,
-    completedPayments: 0,
-    failedPayments: 0,
-  });
+  const [eventRegistrationTrendData, setEventRegistrationTrendData] = useState<
+    DashEventAttendanceTrend[]
+  >([]);
+  const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("access_token="))
-          ?.split("=")[1]; // Retrieve token from cookies
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
 
         const config = {
           method: "get",
           maxBodyLength: Infinity,
-          url: `${BASE_API_URL}/dashboard/payment-data`,
+          url: `${BASE_API_URL}/dashboard/event-registration-trend`,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
 
-        const response = await axios.request(config);
-        setData(response.data);
+        const response = await apiClient.get(
+          "/dashboard/event-registration-trend",
+          config
+        );
+        const formattedData = response.map((item: any) => ({
+          month: item.month || item.date || item.period,
+          people: item.count || item.value || item.total || 0,
+        }));
+        setEventRegistrationTrendData(response);
+
+        setChartData(formattedData);
+        console.log(response);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          const token = document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("access_token="))
-            ?.split("=")[1]; // Retrieve token from cookies
-          const config = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: `${BASE_API_URL}/dashboard/payment-data`,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          };
-          await handleUnauthorizedRequest(config, router, setData);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch payment data.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "Failed to fetch event registration trend data.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -121,41 +93,24 @@ function EventActivities() {
         const config = {
           method: "get",
           maxBodyLength: Infinity,
-          url: `${BASE_API_URL}/events`,
+          url: `${BASE_API_URL}/dashboard/event-attendance`,
           headers: {},
         };
 
-        const response = await axios.request(config);
-        const upcomingEvents = response.data.data.filter(
-          (event: Event) => event.status === "upcoming"
+        const response = await apiClient.get(
+          "/dashboard/event-attendance",
+          config
         );
-        setEventData(upcomingEvents);
+
+        setEventData(response);
+
+
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          const token = document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("access_token="))
-            ?.split("=")[1]; // Retrieve token from cookies
-          const config = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: `${BASE_API_URL}/events`,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          };
-          await handleUnauthorizedRequest(config, router, setEventData);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch events data.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "Failed to fetch events data.",
+          variant: "destructive",
+        });
       }
     }
     fetchEventData();
@@ -166,14 +121,13 @@ function EventActivities() {
       <div className="flex w-full max-h-[700px] flex-col gap-10">
         <Card>
           <CardHeader>
-            <CardTitle>Event Registration Trend</CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
+            <CardTitle>Event Registration Trend for {new Date().getFullYear()}</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>
-              <AreaChart
+              <LineChart
                 accessibilityLayer
-                data={chartData}
+                data={eventRegistrationTrendData}
                 margin={{
                   left: 12,
                   right: 12,
@@ -191,14 +145,14 @@ function EventActivities() {
                   cursor={false}
                   content={<ChartTooltipContent hideLabel />}
                 />
-                <Area
+                <Line
                   dataKey="people"
                   type="natural"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}
                   dot={false}
                 />
-              </AreaChart>
+              </LineChart>
             </ChartContainer>
           </CardContent>
         </Card>

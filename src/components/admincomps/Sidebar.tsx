@@ -16,6 +16,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { logout } from "@/lib/auth";
+ 
 
 const topMenuItems = [
   { icon: MdHome, label: "Dashboard", href: "/admin" },
@@ -59,7 +60,7 @@ function Sidebar() {
   const activePage = item?.label;
 
   return (
-    <aside className="h-full w-fit bg-white text-black border-r flex flex-col justify-between p-4">
+    <aside className="h-full w-fit bg-white no-scrollbar text-black border-r flex flex-col justify-between p-4">
       {/* Logo */}
       <div className="h-16 flex items-center px-6 py-12 border-b border-gray-200">
         <Image alt="Logo" width={200} height={80} src="/Logo_big.png" />

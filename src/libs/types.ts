@@ -212,6 +212,14 @@ type DashEventReg = {
   }[];
 };
 
+interface DashEventAttendanceTrend {
+  month: string;
+  count: number;
+}
+interface DashEventPaymentTrend {
+  month: string;
+  totalPaid: number;
+}
 
 type DashUserLogin = {
   weeklyLogins: {
@@ -228,8 +236,29 @@ type DashUserLogin = {
   }[];
 };
 
+type RegisteredUsers = {
+  id: string;
+  fullName: string;
+  email: string;
+  membership: string;
+  status: string;
+  proofOfPayment: string;
+};
+
+type Resource = {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  access: "PUBLIC" | "MEMBERS";
+  fileUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  recommended: boolean;
+};
 
 export type {
+  RegisteredUsers,
   User,
   RolesData,
   StatCardProps,
@@ -242,4 +271,7 @@ export type {
   EventDetails,
   DashEventReg,
   DashUserLogin,
+  Resource,
+  DashEventAttendanceTrend,
+  DashEventPaymentTrend,
 };

@@ -3,39 +3,53 @@
 import React, { useEffect, useState } from "react";
 // import { Pagination } from "@/components/ui/pagination";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
-import { publicationscolumns } from "@/components/admincomps/content/datatable/columns";
-import axios from "axios";
+import { resourcescolumns } from "@/components/admincomps/content/datatable/columns";
+
+import apiClient from "@/services-admin/apiClient";
+import { useToast } from "@/hooks/use-toast";
+
 import { BASE_API_URL } from "@/utils/setter";
 
-function Publicatioms() {
-  const [data, setData] = useState([]);
+import { Resource } from "@/libs/types";  
 
+function Resources() {
+  const [data, setData] = useState<Resource[]>([]);
+  const { toast } = useToast();
   useEffect(() => {
     async function fetchAllContentData() {
       const config = {
         method: "get",
         maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/content`,
+        url: `${BASE_API_URL}/resources/contents`,
         headers: {},
       };
       try {
-        const response = await axios.request(config);
-        setData(response.data);
+        const response = await apiClient.get("/resources/contents", config);
+        setData(response);
+        toast({
+          title: "Content fetched successfully",
+          description: "Content fetched successfully",
+          variant: "default",
+        }); 
       } catch (error) {
-        console.error(error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
       }
     }
     fetchAllContentData();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-      <h2 className="text-xl font-semibold text-left">All Publications</h2>
+      <h2 className="text-xl font-semibold text-left">All Resources</h2>
       <div>
-        <ContentTable columns={publicationscolumns} data={data} />
+        <ContentTable columns={resourcescolumns} data={data} />
       </div>
     </div>
   );
 }
 
-export default Publicatioms;
+export default Resources;

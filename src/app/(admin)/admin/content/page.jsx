@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import All from "./tabs/All";
@@ -22,8 +26,6 @@ function Content() {
     setShowModal(false);
   };
 
- 
-
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
@@ -43,7 +45,7 @@ function Content() {
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="adverts">Adverts</TabsTrigger>
           <TabsTrigger value="blogs">Blogs</TabsTrigger>
-          <TabsTrigger value="publication">Publication</TabsTrigger>
+          <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="galleries">Galleries</TabsTrigger>
           <TabsTrigger value="technical">Technical Session</TabsTrigger>
           <TabsTrigger value="student">Study Pack</TabsTrigger>
@@ -58,7 +60,7 @@ function Content() {
         <TabsContent value="blogs">
           <Blogs />
         </TabsContent>
-        <TabsContent value="publication">
+        <TabsContent value="resources">
           <Publications />
         </TabsContent>
         <TabsContent value="galleries">
@@ -81,4 +83,12 @@ function Content() {
   );
 }
 
-export default Content;
+export default function PackedContentPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <Content />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

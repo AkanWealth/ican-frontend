@@ -5,7 +5,8 @@ import { ContentTable } from "@/components/admincomps/content/datatable/ContentT
 import { allcolumns } from "@/components/admincomps/content/datatable/columns";
 
 import { BASE_API_URL } from "@/utils/setter";
-import axios from "axios";
+
+import apiClient from "@/services-admin/apiClient";
 
 function All() {
   const [data, setData] = useState<any[]>([]);
@@ -19,9 +20,9 @@ function All() {
         headers: {},
       };
       try {
-        const response = await axios.request(config);
-        setData((prevData) => [...prevData, ...response.data.data]);
-        console.log(response.data.data);
+        const response = await apiClient.get("/adverts", config);
+        setData((prevData) => [...prevData, ...response.data]);
+        console.log(response.data);
       } catch (error) {
         console.error(error);
       }
@@ -34,10 +35,10 @@ function All() {
         headers: {},
       };
       try {
-        const response = await axios.request(config);
-        setData((prevData) => [...prevData, ...response.data]);
-        
-        console.log(response.data);
+        const response = await apiClient.get("/blogs", config);
+        setData((prevData) => [...prevData, ...response]);
+
+        console.log(response);
       } catch (error) {
         console.error(error);
       }
@@ -50,9 +51,9 @@ function All() {
         headers: {},
       };
       try {
-        const response = await axios.request(config);
-        setData((prevData) => [...prevData, ...response.data.faqs]);
-        console.log(response.data.faqs);
+        const response = await apiClient.get("/faqs", config);
+        setData((prevData) => [...prevData, ...response.faqs]);
+        console.log(response.faqs);
       } catch (error) {
         console.error(error);
       }
@@ -65,10 +66,10 @@ function All() {
         headers: {},
       };
       try {
-        const response = await axios.request(config);
-        setData((prevData) => [...prevData, ...response.data.data]);
-         
-        console.log(response.data.data);
+        const response = await apiClient.get("/gallery", config);
+        setData((prevData) => [...prevData, ...response]);
+
+        console.log(response);
       } catch (error) {
         console.error(error);
       }
@@ -81,10 +82,9 @@ function All() {
         headers: {},
       };
       try {
-        const response = await axios.request(config);
-        setData((prevData) => [...prevData, ...response.data.studyPacks]);
-        console.log(response.data.studyPacks);
-        
+        const response = await apiClient.get("/studypacks", config);
+        setData((prevData) => [...prevData, ...response.studyPacks]);
+        console.log(response.studyPacks);
       } catch (error) {
         console.error(error);
       }
@@ -97,14 +97,13 @@ function All() {
         headers: {},
       };
       try {
-        const response = await axios.request(config);
-        setData((prevData) => [...prevData, ...response.data.sessions]);
-        console.log(response.data.sessions);
+        const response = await apiClient.get("/technical-sessions", config);
+        setData((prevData) => [...prevData, ...response.sessions]);
+        console.log(response.sessions);
       } catch (error) {
         console.error(error);
       }
     }
-
 
     fetchTSData();
     fetchStudyData();

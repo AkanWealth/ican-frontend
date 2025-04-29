@@ -1,14 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-// import { Pagination } from "@/components/ui/pagination";
+
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { galleriescolumns } from "@/components/admincomps/content/datatable/columns";
-import axios from "axios";
+
+import apiClient from "@/services-admin/apiClient";
+import { useToast } from "@/hooks/use-toast";
+
+
+
 import { BASE_API_URL } from "@/utils/setter";
 
 function Galleries() {
   const [data, setData] = useState([]);
+  const { toast } = useToast();
 
 
   useEffect(() => {
@@ -19,11 +25,21 @@ function Galleries() {
         url: `${BASE_API_URL}/gallery`,
         headers: {},
       };
-      try {
-        const response = await axios.request(config);
-        setData(response.data.data);
+        try {
+        const response = await apiClient.get("/gallery", config);
+        setData(response);
+        toast({
+          title: "Gallery",
+          description: "Gallery fetched successfully",
+          variant: "default",
+        });
       } catch (error) {
         console.error(error);
+        toast({
+          title: "Error",
+          description: "Error fetching gallery",
+          variant: "destructive",
+        }); 
       }
     }
     fetchGalleryData();

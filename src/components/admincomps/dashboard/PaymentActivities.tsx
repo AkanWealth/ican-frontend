@@ -4,16 +4,15 @@ import React, { useEffect, useState } from "react";
 import StatCard from "@/components/genui/StatCard";
 import { MdVerifiedUser } from "react-icons/md";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { dashPaymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
-import { OverdueBills } from "@/libs/types";
-import { TrendingUp } from "lucide-react";
+import { OverdueBills, DashEventPaymentTrend } from "@/libs/types";
 import {
-  Area,
-  AreaChart,
+  
   Line,
   LineChart,
   CartesianGrid,
@@ -37,14 +36,6 @@ import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-const chartData = [
-  { month: "January", amount: 186 },
-  { month: "February", amount: 305 },
-  { month: "March", amount: 237 },
-  { month: "April", amount: 73 },
-  { month: "May", amount: 209 },
-  { month: "June", amount: 214 },
-];
 const chartConfig = {
   amount: {
     label: "Amount",
@@ -60,6 +51,9 @@ function PaymentActivities() {
   });
   const router = useRouter();
   const { toast } = useToast();
+  const [paymentTrendData, setPaymentTrendData] = useState<
+    DashEventPaymentTrend[]
+  >([]);
 
   const [paymentData, setPaymentData] = useState<OverdueBills[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +61,7 @@ function PaymentActivities() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
 
         const config = {
           method: "get",
@@ -78,30 +72,56 @@ function PaymentActivities() {
           },
         };
 
-        const response = await axios.request(config);
-        setData(response.data);
+        const response = await apiClient.get("/dashboard/payment-data", config);
+        setData(response);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          const config = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: `${BASE_API_URL}/dashboard/payment-data`,
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
-          };
-          await handleUnauthorizedRequest(config, router, setData);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch payment data.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "Failed to fetch payment data.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchData();
+  }, [router, toast]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
+
+        const config = {
+          method: "get",
+          maxBodyLength: Infinity,
+          url: `${BASE_API_URL}/dashboard/paymenttrend`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const response = await apiClient.get(
+          "/dashboard/paymenttrend",
+          config
+        );
+        const formattedData = response.map((item: any) => ({
+          month: item.month || item.date || item.period,
+          totalPaid: item.totalPaid || 0,
+        }));
+        setPaymentTrendData(response);
+        toast({
+          title: "Payment Activities",
+          description: "Payment activities data fetched successfully.",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error(error);
+
+        toast({
+          title: "Error",
+          description: "Failed to fetch payment activities data.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -111,7 +131,7 @@ function PaymentActivities() {
   useEffect(() => {
     async function fetchPaymentData() {
       try {
-        const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem("accessToken");
         const config = {
           method: "get",
           maxBodyLength: Infinity,
@@ -120,9 +140,12 @@ function PaymentActivities() {
             Authorization: `Bearer ${token}`,
           },
         };
-        const response = await axios.request(config);
-        const result = response.data;
-        setPaymentData(result);
+        const response = await apiClient.get(
+          "/dashboard/overdue-payments",
+          config
+        );
+
+        setPaymentData(response);
         toast({
           title: "Overdue Payments",
           description: "Overdue payments fetched successfully",
@@ -170,9 +193,9 @@ function PaymentActivities() {
           </CardHeader>
           <CardContent>
             <ChartContainer className="max-h-96 w-full" config={chartConfig}>
-              <AreaChart
+              <LineChart
                 accessibilityLayer
-                data={chartData}
+                data={paymentTrendData}
                 margin={{
                   left: 12,
                   right: 12,
@@ -190,14 +213,14 @@ function PaymentActivities() {
                   cursor={false}
                   content={<ChartTooltipContent hideLabel />}
                 />
-                <Area
-                  dataKey="amount"
+                <Line
+                  dataKey="totalPaid"
                   type="natural"
                   stroke="var(--color-desktop)"
                   strokeWidth={2}
                   dot={false}
                 />
-              </AreaChart>
+              </LineChart>
             </ChartContainer>
           </CardContent>
         </Card>

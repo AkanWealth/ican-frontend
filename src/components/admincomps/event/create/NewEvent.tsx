@@ -4,11 +4,15 @@ import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 import { MdClose } from "react-icons/md";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 
 import { uploadImageToCloud } from "@/lib/uploadImage";
 import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
+
+import { useRouter } from "next/navigation";
 
 function NewEvent({
   id,
@@ -24,7 +28,7 @@ function NewEvent({
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-
+  const router = useRouter();
   const { toast } = useToast();
 
   const [eventPhoto, setEventPhoto] = useState<File | string | null>(null);
@@ -126,22 +130,22 @@ function NewEvent({
           headers: {},
         };
 
-        const response = await axios.request(config);
-        console.log(JSON.stringify(response.data));
+        const response = await apiClient.request(config);
+        console.log(JSON.stringify(response));
 
         // Populate formData with fetched data
         setFormData({
-          event_id: response.data.id || "",
-          eventName: response.data.name || "",
-          venue: response.data.venue || "",
-          eventDescription: response.data.description || "",
-          eventDate: response.data.date || "",
-          eventTime: response.data.time || "",
-          eventFee: response.data.fee ? response.data.fee.toString() : "",
-          mcpdCredit: response.data.mcpd_credit
-            ? response.data.mcpd_credit.toString()
+          event_id: response.id || "",
+          eventName: response.name || "",
+          venue: response.venue || "",
+          eventDescription: response.description || "",
+          eventDate: response.date || "",
+          eventTime: response.time || "",
+          eventFee: response.fee ? response.fee.toString() : "",
+          mcpdCredit: response.mcpd_credit
+            ? response.mcpd_credit.toString()
             : "",
-          eventPhoto: response.data.eventPhoto || null,
+          eventPhoto: response.eventPhoto || null,
         });
 
         setEditDataFetched(true);
@@ -177,14 +181,9 @@ function NewEvent({
 
     if (file.size <= 5 * 1024 * 1024) {
       try {
-        // Show loading state
-        // You might want to add a loading state to your component
-
-        // Upload the file to cloud storage
         const imageUrl = await uploadImageToCloud(file);
 
         console.log("Uploaded image URL:", imageUrl);
-        // Update state with the new URL
         setEventPhoto(imageUrl);
         setFormData((prev) => ({
           ...prev,
@@ -192,7 +191,6 @@ function NewEvent({
         }));
       } catch (error) {
         console.error("Error uploading photo:", error);
-        // alert("Failed to upload photo. Please try again.");
         toast({
           title: "Failed to upload photo",
           description: "Please try again. ",
@@ -249,14 +247,14 @@ function NewEvent({
 
   const handleSaveDraft = () => {
     setIsSavingDraft(true);
-    // Validate form before saving as draft
+
     if (!validateForm()) {
       setIsSavingDraft(false);
       return;
     }
     const draftEvent = async () => {
       try {
-        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
         const formDataToSend = {
           eventName: formData.eventName,
           venue: formData.venue,
@@ -279,35 +277,29 @@ function NewEvent({
           data: JSON.stringify(formDataToSend),
         };
 
-        const response = await axios.request(config);
-        console.log("Event added to drafts successfully:", response.data);
+        const response = await apiClient.request(config);
+        console.log("Event added to drafts successfully:", response);
         handleCancel(); // Close the modal after successful draft
-        alert("Event added to drafts successfully!");
+
+        toast({
+          title: "Event added to drafts successfully!",
+          description: "Event added to drafts successfully!",
+          variant: "default",
+        });
         setIsPublishing(false);
         setIsSavingDraft(false);
+        router.refresh();
       } catch (error) {
         console.error("Error adding the event to draft:", error);
-        setTimeout(() => {
-          handleCancel(); // Close the modal after 3 seconds
-        }, 3000); // Add a 3-second delay
+        toast({
+          title: "Error adding the event to draft!",
+          description: "Error adding the event to draft!",
+          variant: "destructive",
+        });
+        handleCancel(); // Close the modal after 3 seconds
         setIsPublishing(false);
         setIsSavingDraft(false);
-
-        return (
-          <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-4 rounded shadow-lg">
-              <p className="text-red-600 font-bold">
-                Error saving event to draft!
-              </p>
-              <button
-                className="mt-2 bg-red-500 text-white px-4 py-2 rounded"
-                onClick={() => setIsSavingDraft(false)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        );
+        router.refresh();
       }
     };
     draftEvent();
@@ -322,7 +314,7 @@ function NewEvent({
     }
     const publishEvent = async () => {
       try {
-        const token = localStorage.getItem("access_token"); // Retrieve token from local storage
+        const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
         const formDataToSend = {
           eventName: formData.eventName,
           venue: formData.venue,
@@ -345,26 +337,28 @@ function NewEvent({
           data: JSON.stringify(formDataToSend),
         };
 
-        const response = await axios.request(config);
-        console.log("Event published successfully:", response.data);
+        const response = await apiClient.request(config);
+        console.log("Event published successfully:", response);
 
-        handleCancel(); // Close the modal after successful publish
-        alert("Event published successfully!");
+        handleCancel();
+        toast({
+          title: "Event published successfully!",
+          description: "Event published successfully!",
+          variant: "default",
+        });
+        setIsPublishing(false);
+        setIsSavingDraft(false);
+        router.refresh();
       } catch (error) {
         console.error("Error publishing event:", error);
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-4 rounded shadow-lg">
-              <p className="text-red-600 font-bold">Error publishing event!</p>
-              <button
-                className="mt-2 bg-red-500 text-white px-4 py-2 rounded"
-                onClick={() => setIsPublishing(false)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        );
+        toast({
+          title: "Error publishing event!",
+          description: "Error publishing event!",
+          variant: "destructive",
+        });
+        setIsPublishing(false);
+        setIsSavingDraft(false);
+        router.refresh();
       }
     };
 
@@ -443,9 +437,22 @@ function NewEvent({
             errorMsg={formErrors.eventFee}
           />
         </div>
-        <div className="flex flex-col gap-4">
+
+        {/* Event Image */}
+        {formData.eventPhoto && (
+          <div className="flex justify-center items-center bg-gray-100 rounded-lg p-4">
+            <Image
+              src={formData.eventPhoto}
+              alt="Event preview"
+              width={400}
+              height={200}
+              className="max-h-[200px] w-auto object-contain"
+            />
+          </div>
+        )}
+        <div className="flex flex-col w-full gap-4">
           <span className="text-sm text-gray-500">(JPG or PNG, 100KB Max)</span>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap w-full gap-4">
             <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
               Update Event Image
               <input

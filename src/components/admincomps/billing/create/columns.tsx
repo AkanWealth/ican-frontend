@@ -3,13 +3,13 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { BillUser } from "./colsdata";
-
+import { User } from "@/libs/types";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import Statbtn from "@/components/genui/Statbtn";
 
-export const userbillingcolumns: ColumnDef<BillUser>[] = [
+export const userbillingcolumns: ColumnDef<User>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -33,7 +33,7 @@ export const userbillingcolumns: ColumnDef<BillUser>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "firstname",
     header: ({ column }) => {
       return (
         <Button
@@ -41,7 +41,22 @@ export const userbillingcolumns: ColumnDef<BillUser>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Member Name
+          First Name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "surname",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Surname
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

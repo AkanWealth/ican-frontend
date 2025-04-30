@@ -298,7 +298,40 @@ type Publication = {
   recommended: boolean;
 };
 
+type Advert = {
+  id: string;
+  name: string;
+  advertiser: string;
+  content: string;
+  startDate: string;
+  endDate: string;
+  coverImg: string;
+  status: "published" | "draft" | "hidden" | "expired" | "pending";
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    firstname: string;
+    surname: string;
+    email: string;
+  };
+};
+
+type BlogPost = {
+  id: string;
+  title: string;
+  authorName: string;
+  contentType: string;
+  coverImage: string;
+  contentBody: string;
+  createdAt: string;
+  updatedAt: string;
+
+}
+
 export type {
+  Advert,
+  BlogPost,
   GalleryItem,
   RegisteredUsers,
   User,

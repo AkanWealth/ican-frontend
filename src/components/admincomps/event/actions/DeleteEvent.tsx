@@ -38,9 +38,10 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
       const response = await apiClient.request(config);
       toast({
         title: "Event Deleted",
-        description: response.data.message,
+        description: "Event deleted successfully",
         variant: "default",
       });
+      router.refresh();
 
       onClose(); // Close the modal after successful update
       setIsLoading(false);
@@ -51,10 +52,12 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
         variant: "destructive",
       });
       setIsLoading(false);
+      router.refresh();
+
+      onClose(); // Close the modal after successful update
     }
     router.refresh();
   };
-
 
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
@@ -65,10 +68,12 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
             <MdDeleteOutline className="w-6 h-6 text-red-600" />
           </div>
           <div className="flex-1">
-            <h5 className="font-semibold text-xl text-gray-900 mb-2">Delete Event</h5>
+            <h5 className="font-semibold text-xl text-gray-900 mb-2">
+              Delete Event
+            </h5>
             <p className="text-sm text-gray-600 leading-relaxed">
-              If you delete this event, the event will no longer take place
-              and members will be notified via email. Are you sure you want to
+              If you delete this event, the event will no longer take place and
+              members will be notified via email. Are you sure you want to
               proceed?
             </p>
           </div>
@@ -79,7 +84,9 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
           <div className="flex items-center gap-3">
             <MdSubtitles className="w-4 h-4 text-gray-500" />
             <span className="text-sm text-gray-500">Name:</span>
-            <span className="text-sm font-medium text-gray-900">{eventName}</span>
+            <span className="text-sm font-medium text-gray-900">
+              {eventName}
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <HiOutlineTag className="w-4 h-4 text-gray-500" />
@@ -106,7 +113,7 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
             {isLoading ? "Deleting..." : "Delete Event"}
           </button>
         </div>
-      </div>  
+      </div>
     </div>
   );
 }

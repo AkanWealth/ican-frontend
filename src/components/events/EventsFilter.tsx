@@ -32,14 +32,16 @@ const EventsFilter = ({
   // Safely extract unique event types from the events array
   const eventTypes = useMemo(() => {
     if (!Array.isArray(events)) return [];
-    
+
     try {
       // Ensure each event has an eventType before extracting
       const types = events
-        .filter(event => event && typeof event === 'object' && 'eventType' in event)
-        .map(event => event.eventType)
+        .filter(
+          (event) => event && typeof event === "object" && "eventType" in event
+        )
+        .map((event) => event.eventType)
         .filter(Boolean); // Remove any undefined/null/empty values
-      
+
       return Array.from(new Set(types));
     } catch (error) {
       console.error("Error extracting event types:", error);

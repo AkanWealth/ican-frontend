@@ -43,15 +43,17 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}/`);
+        const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}`);
         console.log("Advert details fetched:", response.data);
         setAdvert({
-          name: response.data.name || advert.name,
-          advertiser: response.data.advertiser || advert.advertiser,
-          image: response.data.image || advert.image,
-          textBody: response.data.textBody || advert.textBody,
-          startDate: response.data.startDate
-            ? new Date(response.data.startDate)
+
+          name: response.name || advert.name,
+          advertiser: response.advertiser || advert.advertiser,
+          image: response.coverImg || advert.image,
+          textBody: response.content || advert.textBody,
+          startDate: response.startDate
+            ? new Date(response.startDate)
+
             : advert.startDate,
           endDate: response.data.endDate
             ? new Date(response.data.endDate)
@@ -72,6 +74,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       fetchDetails();
     }
   }, [editDataFetched, id, mode, toast, advert]);
+
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -179,6 +182,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       const response = await apiClient.request(config);
       console.log("Advert submitted:", response);
 
+
       toast({
         title: "Success",
         description: `Advert ${
@@ -201,6 +205,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   };
 
   const handleChange = (
+
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
@@ -267,6 +272,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
               </button>
             )}
           </div>
+
 
           {/* Upload Progress */}
           {isUploading && (

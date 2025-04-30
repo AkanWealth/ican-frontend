@@ -11,7 +11,7 @@ interface ExperienceProps {
 
 function Experience({ isShown, formData, updateFormData }: ExperienceProps) {
   const [isCurrentJob, setIsCurrentJob] = useState(false);
-  
+
   // Create local state to track validation status of this component
   const [isValid, setIsValid] = useState(false);
 
@@ -29,38 +29,32 @@ function Experience({ isShown, formData, updateFormData }: ExperienceProps) {
     }
   };
 
-  const handleDateChange = (field: "startDate" | "endDate", value: string) => {
-    // Convert the date to ISO format
-    const formattedDate = value ? new Date(value).toISOString() : "";
-    updateFormData({
-      experience: {
-        ...formData.experience,
-        [field]: formattedDate,
-      },
-    });
-  };
-
   // Validate component whenever form data changes
   useEffect(() => {
     // Check if required fields are filled
-    const isExperienceValid = 
+    const isExperienceValid =
       !!formData.experience?.companyName?.trim() &&
       !!formData.experience?.currentPosition?.trim() &&
       !!formData.experience?.startDate?.trim();
-      
+
     // If current job is checked, end date is not required
     // Otherwise, end date is required
-    const isEndDateValid = isCurrentJob || !!formData.experience?.endDate?.trim();
-    
+    const isEndDateValid =
+      isCurrentJob || !!formData.experience?.endDate?.trim();
+
     setIsValid(isExperienceValid && isEndDateValid);
-    
+
     // You could also use a callback passed from parent to communicate validation status
     // if that's how you prefer to structure your app
   }, [formData, isCurrentJob]);
 
   // We're not using bucket variable as isShown is directly passed to the component
   return (
-    <div className={`pt-4 flex flex-col justify-between gap-4 mt-4 ${isShown ? 'block' : 'hidden'}`}>
+    <div
+      className={`pt-4 flex flex-col justify-between gap-4 mt-4 ${
+        isShown ? "block" : "hidden"
+      }`}
+    >
       <h3 className="font-bold font-mono text-xl text-black">
         WORK EXPERIENCE
         <hr />
@@ -138,10 +132,19 @@ function Experience({ isShown, formData, updateFormData }: ExperienceProps) {
           label="Start Date"
           value={
             formData.experience?.startDate
-              ? new Date(formData.experience.startDate).toISOString().split("T")[0]
+              ? new Date(formData.experience.startDate)
+                  .toISOString()
+                  .split("T")[0]
               : ""
           }
-          onChange={(e) => handleDateChange("startDate", e.target.value)}
+          onChange={(e) =>
+            updateFormData({
+              experience: {
+                ...formData.experience,
+                startDate: e.target.value,
+              },
+            })
+          }
           required={true}
         />
         <InputEle
@@ -150,12 +153,20 @@ function Experience({ isShown, formData, updateFormData }: ExperienceProps) {
           label="End Date"
           value={
             formData.experience?.endDate
-              ? new Date(formData.experience.endDate).toISOString().split("T")[0]
+              ? new Date(formData.experience.endDate)
+                  .toISOString()
+                  .split("T")[0]
               : ""
           }
-          onChange={(e) => handleDateChange("endDate", e.target.value)}
+          onChange={(e) =>
+            updateFormData({
+              experience: {
+                ...formData.experience,
+                endDate: e.target.value,
+              },
+            })
+          }
           required={true}
-          
         />
       </div>
     </div>

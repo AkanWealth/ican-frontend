@@ -60,16 +60,17 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       try {
         const result = await apiClient.request(config);
         // Only update state if component is still mounted and we have data
-        if (isMounted && result.data) {
-          setFeedbacks(result.data);
+        if (isMounted && result) {
+          setFeedbacks(result);
           // Only show success toast if we actually got data
-          if (result.data.length > 0) {
+          if (result.length > 0) {
             toast({
               title: "Feedback",
               description: "Feedback fetched successfully.",
               variant: "default",
             });
           }
+
         }
       } catch (error) {
         if (isMounted) {
@@ -103,7 +104,7 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       };
       try {
         const result = await apiClient.request(config);
-        setEventDetails(result.data);
+        setEventDetails(result);
         toast({
           title: "Event Details",
           description: "Event details fetched successfully.",
@@ -134,7 +135,7 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       };
       try {
         const result = await apiClient.request(config);
-        setRegisteredUsers(result.data);
+        setRegisteredUsers(result);
       } catch (error) {
         toast({
           title: "Error",
@@ -159,16 +160,15 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         <div className="flex flex-row w-fit items-center gap-3">
           <button
             onClick={() => setShowFeedbackModal(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-primary whitespace-nowrap text-white px-4 py-2 rounded-xl"
           >
             View Feedback
           </button>
-
           <FeedbackModal
             eventId={eventDetails.id}
             isOpen={showFeedbackModal}
             onClose={() => setShowFeedbackModal(false)}
-            feedbacks={feedbacks}
+            feedbacks={Array.isArray(feedbacks) ? feedbacks : []}
           />
           <button className="w-fit whitespace-nowrap rounded px-3 text-black fill-black border-gray-400 border py-2 flex flex-row items-center gap-2 bg-white">
             <MdDownload className="w-5 h-5" /> Export Event
@@ -205,7 +205,7 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
           <div className="w-full">
             <Image
-              src={eventDetails.flyer || ""}
+              src={eventDetails.flyer || "/404.png"}
               width={400}
               height={400}
               alt="Event image"

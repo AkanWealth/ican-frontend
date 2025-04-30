@@ -43,18 +43,18 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}/`);
+        const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}`);
         console.log("Advert details fetched:", response.data);
         setAdvert({
-          name: response.data.name || advert.name,
-          advertiser: response.data.advertiser || advert.advertiser,
-          image: response.data.image || advert.image,
-          textBody: response.data.textBody || advert.textBody,
-          startDate: response.data.startDate
-            ? new Date(response.data.startDate)
+          name: response.name || advert.name,
+          advertiser: response.advertiser || advert.advertiser,
+          image: response.coverImg || advert.image,
+          textBody: response.content || advert.textBody,
+          startDate: response.startDate
+            ? new Date(response.startDate)
             : advert.startDate,
-          endDate: response.data.endDate
-            ? new Date(response.data.endDate)
+          endDate: response.endDate
+            ? new Date(response.endDate)
             : advert.endDate,
         });
         setEditDataFetched(true);

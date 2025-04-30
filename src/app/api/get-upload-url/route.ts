@@ -81,7 +81,7 @@ export async function POST(
         "Content-Type": fileType,
       },
       Expires: 120, // 2 minutes
-      Conditions: [["content-length-range", 0, 5 * 1024 * 1024]], // Limit file size to 5MB
+      Conditions: [["content-length-range", 0, 10 * 1024 * 1024]], // Limit file size to 10MB
     });
 
     // Create response with CORS headers

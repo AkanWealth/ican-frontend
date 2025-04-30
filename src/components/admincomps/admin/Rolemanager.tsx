@@ -282,7 +282,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
 
       toast({
         title: "Role Created",
-        description: response.message,
+        description: "New role created successfully",
         variant: "default",
       });
 

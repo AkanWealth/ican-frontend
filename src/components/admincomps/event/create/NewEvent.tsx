@@ -140,18 +140,30 @@ function NewEvent({
           eventName: response.name || "",
           venue: response.venue || "",
           eventDescription: response.description || "",
-          eventDate: response.date || "",
+          eventDate: response.date
+            ? new Date(response.date).toISOString().split("T")[0]
+            : "",
           eventTime: response.time || "",
           eventFee: response.fee ? response.fee.toString() : "",
           mcpdCredit: response.mcpd_credit
             ? response.mcpd_credit.toString()
             : "",
-          eventPhoto: response.eventPhoto || null,
+          eventPhoto: response.flyer || null,
         });
 
         setEditDataFetched(true);
+        toast({
+          title: "Event details fetched successfully",
+          description: "Event details fetched successfully",
+          variant: "default",
+        });
       } catch (error) {
         console.error("Error fetching event details:", error);
+        toast({
+          title: "Error fetching event details",
+          description: "Error fetching event details",
+          variant: "destructive",
+        });
       }
     };
 
@@ -228,20 +240,19 @@ function NewEvent({
     }
   };
 
-
-   const handleDeleteImage = (e: React.MouseEvent) => {
-     e.preventDefault();
-     setEventPhoto(null);
-     setFormData((prev) => ({
-       ...prev,
-       eventPhoto: "",
-     }));
-     toast({
-       title: "Image removed",
-       description: "The image has been removed from the event.",
-       variant: "default",
-     });
-   };
+  const handleDeleteImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setEventPhoto(null);
+    setFormData((prev) => ({
+      ...prev,
+      eventPhoto: "",
+    }));
+    toast({
+      title: "Image removed",
+      description: "The image has been removed from the event.",
+      variant: "default",
+    });
+  };
 
   const handleCancel = () => {
     // Reset form data to initial state
@@ -292,10 +303,9 @@ function NewEvent({
           mcpdCredit: formData.mcpdCredit ? parseInt(formData.mcpdCredit) : 0,
           status: "DRAFT",
         };
-
         const config = {
-          method: "post",
-          url: `${BASE_API_URL}/events`,
+          method: mode === "edit" ? "patch" : "post", 
+          url: mode === "edit" ? `${BASE_API_URL}/events/${id}` : `${BASE_API_URL}/events`,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -339,6 +349,7 @@ function NewEvent({
       return;
     }
     const publishEvent = async () => {
+
       try {
         const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
         const formDataToSend = {
@@ -354,8 +365,8 @@ function NewEvent({
         };
 
         const config = {
-          method: "post",
-          url: `${BASE_API_URL}/events`,
+          method: mode === "edit" ? "patch" : "post", 
+          url: mode === "edit" ? `${BASE_API_URL}/events/${id}` : `${BASE_API_URL}/events`,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -410,6 +421,7 @@ function NewEvent({
             id="eventName"
             label="Event Name"
             required
+            
             value={formData.eventName}
             onChange={handleChange}
             errorMsg={formErrors.eventName}
@@ -433,15 +445,29 @@ function NewEvent({
           errorMsg={formErrors.eventDescription}
         />
         <div className="flex flex-row items-center gap-4 justify-between">
-          <InputEle
-            type="date"
-            id="eventDate"
-            label="Event Date"
-            required
-            value={formData.eventDate}
-            onChange={handleChange}
-            errorMsg={formErrors.eventDate}
-          />
+          <div className={` w-full h-fit flex flex-col gap-3 `}>
+            <label
+              className=" text-base font-sans font-semibold  "
+              htmlFor={"eventDate"}
+            >
+              Event Date
+              <span className="text-red-600">*</span>
+            </label>
+            <input
+              className=" p-3 rounded border border-gray-400  "
+              name={"eventDate"}
+              id={"eventDate"}
+              value={formData.eventDate}
+              required={true}
+              type={"date"}
+              min={new Date(Date.now() + 86400000).toISOString().split("T")[0]}
+              onChange={handleChange}
+            />
+
+            <p className="text-red-600 text-sm font-light">
+              {formErrors.eventDate}
+            </p>
+          </div>
           <InputEle
             type="time"
             id="eventTime"
@@ -515,6 +541,18 @@ function NewEvent({
                 <img
                   src={eventPhoto as string}
                   alt="Event Image"
+                  className="w-full h-48 object-cover rounded-md"
+                />
+              </div>
+            </div>
+          )}
+          {mode === "edit" && formData.eventPhoto && !isUploading && (
+            <div className="mt-2">
+              <p className="text-sm font-medium mb-2">Current Flyer</p>
+              <div className="relative group w-full max-w-md">
+                <img
+                  src={formData.eventPhoto}
+                  alt="Event Flyer"
                   className="w-full h-48 object-cover rounded-md"
                 />
               </div>

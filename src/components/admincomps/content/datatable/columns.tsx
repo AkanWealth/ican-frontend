@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/content/editActions/CellActions";
 
-import { Resource } from "@/libs/types";
+import { Resource, Advert, BlogPost } from "@/libs/types";
+
 
 export const allcolumns: ColumnDef<Content>[] = [
   {
@@ -68,7 +69,7 @@ export const allcolumns: ColumnDef<Content>[] = [
   },
 ];
 
-export const advertscolumns: ColumnDef<Content>[] = [
+export const advertscolumns: ColumnDef<Advert>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -113,6 +114,10 @@ export const advertscolumns: ColumnDef<Content>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const date = new Date(row.original.startDate);
+      return date.toLocaleDateString();
+    },
   },
   {
     accessorKey: "endDate",
@@ -128,6 +133,10 @@ export const advertscolumns: ColumnDef<Content>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const date = new Date(row.original.endDate);
+      return date.toLocaleDateString();
+    },  
   },
   {
     accessorKey: "status",
@@ -155,7 +164,7 @@ export const advertscolumns: ColumnDef<Content>[] = [
   },
 ];
 
-export const blogscolumns: ColumnDef<Content>[] = [
+export const blogscolumns: ColumnDef<BlogPost>[] = [
   {
     accessorKey: "title",
     header: ({ column }) => {
@@ -199,6 +208,10 @@ export const blogscolumns: ColumnDef<Content>[] = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
     },
   },
 

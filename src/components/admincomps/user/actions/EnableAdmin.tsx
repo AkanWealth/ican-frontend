@@ -39,8 +39,8 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
         const results = await apiClient.request(config);
         console.log(results);
         toast({
-          title: "User Enabled",
-          description: "User Enabled successfully",
+          title: "User Reactivated",
+          description: "User Reactivated successfully",
           variant: "default",
           duration: 2000,
         });

@@ -63,7 +63,7 @@ export async function uploadPDF(file: File, onProgress?: (progress: number) => v
 
     return uploadedUrl;
   } catch (error) {
-    console.error('Error uploading PDF image:', error);
+    console.error('Error uploading PDF:', error);
     
     // Enhanced error reporting
     if (axios.isAxiosError(error)) {
@@ -86,6 +86,8 @@ export async function uploadPDF(file: File, onProgress?: (progress: number) => v
  */
 export function validatePDF(file: File): { valid: boolean; message?: string } {
   // Check if file is an image
+  // Check if the file's MIME type indicates it's a PDF document
+  // The MIME type for PDF files is "application/pdf"
   if (!file.type.startsWith("application/pdf")) {
     return { valid: false, message: "Please select a PDF file" };
     }

@@ -27,7 +27,7 @@ interface CellProps {
 }
 
 const ActionsCell: React.FC<CellProps> = ({ row }) => {
-  const [showEditModal, setshowEditModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -47,7 +47,10 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem className="flex flex-row items-center">
+          <DropdownMenuItem
+            onClick={() => setShowEditModal(true)}
+            className="flex flex-row items-center"
+          >
             <MdEdit className="w-4 h-4" /> Edit Event Details
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -81,7 +84,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           id={row.original.id} // Ensure NewEvent accepts this prop
           mode="edit"
           showNewEvent={showEditModal}
-          setShowNewEvent={setshowEditModal}
+          setShowNewEvent={setShowEditModal}
         />
       )}
 

@@ -8,7 +8,7 @@ import apiClient from "@/services-admin/apiClient";
 
 import { BASE_API_URL } from "@/utils/setter";
 
-import { uploadImageToCloud } from "@/lib/uploadImage";
+import { uploadGalleryImage, validateGalleryImage } from "@/lib/galleryUpload";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 
@@ -30,7 +30,8 @@ function NewEvent({
   const [isPublishing, setIsPublishing] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [eventPhoto, setEventPhoto] = useState<File | string | null>(null);
   const [formData, setFormData] = useState({
     event_id: "",
@@ -139,18 +140,30 @@ function NewEvent({
           eventName: response.name || "",
           venue: response.venue || "",
           eventDescription: response.description || "",
-          eventDate: response.date || "",
+          eventDate: response.date
+            ? new Date(response.date).toISOString().split("T")[0]
+            : "",
           eventTime: response.time || "",
           eventFee: response.fee ? response.fee.toString() : "",
           mcpdCredit: response.mcpd_credit
             ? response.mcpd_credit.toString()
             : "",
-          eventPhoto: response.eventPhoto || null,
+          eventPhoto: response.flyer || null,
         });
 
         setEditDataFetched(true);
+        toast({
+          title: "Event details fetched successfully",
+          description: "Event details fetched successfully",
+          variant: "default",
+        });
       } catch (error) {
         console.error("Error fetching event details:", error);
+        toast({
+          title: "Error fetching event details",
+          description: "Error fetching event details",
+          variant: "destructive",
+        });
       }
     };
 
@@ -173,48 +186,72 @@ function NewEvent({
     }
   };
 
-  const handlePhotoUpload = async (
+  const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size <= 5 * 1024 * 1024) {
-      try {
-        const imageUrl = await uploadImageToCloud(file);
-
-        console.log("Uploaded image URL:", imageUrl);
-        setEventPhoto(imageUrl);
-        setFormData((prev) => ({
-          ...prev,
-          eventPhoto: imageUrl,
-        }));
-      } catch (error) {
-        console.error("Error uploading photo:", error);
-        toast({
-          title: "Failed to upload photo",
-          description: "Please try again. ",
-          variant: "destructive",
-          duration: 2000,
-        });
-      }
-    } else {
-      // alert("Please select an image under 5MB");
+    // Validate the file before uploading
+    const validation = validateGalleryImage(file);
+    if (!validation.valid) {
       toast({
-        title: "Failed to upload photo",
-        description: "Please select an image under 5MB",
+        title: "Invalid file",
+        description: validation.message,
         variant: "destructive",
-        duration: 2000,
       });
+      return;
+    }
+
+    try {
+      // Show loading state
+      setIsUploading(true);
+      setUploadProgress(0);
+
+      // Create a unique folder path for advert images
+      // Use the S3 upload function from galleryUpload.js but with an advert-specific path
+      const uploadedUrl = await uploadGalleryImage(file, (progress) => {
+        setUploadProgress(progress);
+      });
+
+      console.log("Uploaded Event image URL:", uploadedUrl);
+
+      // Update state with the new URL
+      setEventPhoto(uploadedUrl);
+      setFormData((prev) => ({
+        ...prev,
+        eventPhoto: uploadedUrl,
+      }));
+
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error uploading event image:", error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload the image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  const handleDeletePhoto = () => {
+  const handleDeleteImage = (e: React.MouseEvent) => {
+    e.preventDefault();
     setEventPhoto(null);
     setFormData((prev) => ({
       ...prev,
       eventPhoto: "",
     }));
+    toast({
+      title: "Image removed",
+      description: "The image has been removed from the event.",
+      variant: "default",
+    });
   };
 
   const handleCancel = () => {
@@ -266,10 +303,9 @@ function NewEvent({
           mcpdCredit: formData.mcpdCredit ? parseInt(formData.mcpdCredit) : 0,
           status: "DRAFT",
         };
-
         const config = {
-          method: "post",
-          url: `${BASE_API_URL}/events`,
+          method: mode === "edit" ? "patch" : "post", 
+          url: mode === "edit" ? `${BASE_API_URL}/events/${id}` : `${BASE_API_URL}/events`,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -313,6 +349,7 @@ function NewEvent({
       return;
     }
     const publishEvent = async () => {
+
       try {
         const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
         const formDataToSend = {
@@ -328,8 +365,8 @@ function NewEvent({
         };
 
         const config = {
-          method: "post",
-          url: `${BASE_API_URL}/events`,
+          method: mode === "edit" ? "patch" : "post", 
+          url: mode === "edit" ? `${BASE_API_URL}/events/${id}` : `${BASE_API_URL}/events`,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -384,6 +421,7 @@ function NewEvent({
             id="eventName"
             label="Event Name"
             required
+            
             value={formData.eventName}
             onChange={handleChange}
             errorMsg={formErrors.eventName}
@@ -407,15 +445,29 @@ function NewEvent({
           errorMsg={formErrors.eventDescription}
         />
         <div className="flex flex-row items-center gap-4 justify-between">
-          <InputEle
-            type="date"
-            id="eventDate"
-            label="Event Date"
-            required
-            value={formData.eventDate}
-            onChange={handleChange}
-            errorMsg={formErrors.eventDate}
-          />
+          <div className={` w-full h-fit flex flex-col gap-3 `}>
+            <label
+              className=" text-base font-sans font-semibold  "
+              htmlFor={"eventDate"}
+            >
+              Event Date
+              <span className="text-red-600">*</span>
+            </label>
+            <input
+              className=" p-3 rounded border border-gray-400  "
+              name={"eventDate"}
+              id={"eventDate"}
+              value={formData.eventDate}
+              required={true}
+              type={"date"}
+              min={new Date(Date.now() + 86400000).toISOString().split("T")[0]}
+              onChange={handleChange}
+            />
+
+            <p className="text-red-600 text-sm font-light">
+              {formErrors.eventDate}
+            </p>
+          </div>
           <InputEle
             type="time"
             id="eventTime"
@@ -439,37 +491,75 @@ function NewEvent({
         </div>
 
         {/* Event Image */}
-        {formData.eventPhoto && (
-          <div className="flex justify-center items-center bg-gray-100 rounded-lg p-4">
-            <Image
-              src={formData.eventPhoto}
-              alt="Event preview"
-              width={400}
-              height={200}
-              className="max-h-[200px] w-auto object-contain"
-            />
-          </div>
-        )}
-        <div className="flex flex-col w-full gap-4">
-          <span className="text-sm text-gray-500">(JPG or PNG, 100KB Max)</span>
-          <div className="flex flex-wrap w-full gap-4">
+        {/* Image Upload Section */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Event Image</label>
+
+          {/* Image Upload Controls */}
+          <div className="flex flex-wrap gap-4">
             <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
-              Update Event Image
+              Upload Image
               <input
                 type="file"
-                accept="image/jpeg,image/png"
-                onChange={handlePhotoUpload}
+                accept="image/jpeg,image/png,image/gif"
+                onChange={handleImageUpload}
                 className="hidden"
+                disabled={isUploading}
               />
             </label>
-            <button
-              onClick={handleDeletePhoto}
-              className="bg-[#E7EAFF] text-[#27378C] px-6 py-2 rounded-full hover:bg-gray-200 text-sm whitespace-nowrap"
-            >
-              Delete photo
-            </button>
+            {eventPhoto && (
+              <button
+                onClick={handleDeleteImage}
+                className="bg-[#E7EAFF] text-[#27378C] px-6 py-2 rounded-full hover:bg-gray-200 text-sm whitespace-nowrap"
+                disabled={isUploading}
+              >
+                Remove Image
+              </button>
+            )}
           </div>
+
+          {/* Upload Progress */}
+          {isUploading && (
+            <div className="mt-2 space-y-2">
+              <p className="text-sm font-medium">
+                Uploading... {uploadProgress}%
+              </p>
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="bg-primary h-2.5 rounded-full"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+
+          {/* Image Preview */}
+          {eventPhoto && !isUploading && (
+            <div className="mt-2">
+              <p className="text-sm font-medium mb-2">Image Preview</p>
+              <div className="relative group w-full max-w-md">
+                <img
+                  src={eventPhoto as string}
+                  alt="Event Image"
+                  className="w-full h-48 object-cover rounded-md"
+                />
+              </div>
+            </div>
+          )}
+          {mode === "edit" && formData.eventPhoto && !isUploading && (
+            <div className="mt-2">
+              <p className="text-sm font-medium mb-2">Current Flyer</p>
+              <div className="relative group w-full max-w-md">
+                <img
+                  src={formData.eventPhoto}
+                  alt="Event Flyer"
+                  className="w-full h-48 object-cover rounded-md"
+                />
+              </div>
+            </div>
+          )}
         </div>
+
         <div className="flex justify-between mt-4">
           <button
             className="bg-gray-500 w-full  text-white px-4 py-2 rounded mr-2"

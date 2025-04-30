@@ -31,6 +31,9 @@ export default function FeedbackModal({
   const { toast } = useToast();
 
   useEffect(() => {
+    let retryCount = 0;
+    const maxRetries = 2;
+
     const fetchFeedbacks = async () => {
       try {
         const response = await axios.get(
@@ -44,17 +47,24 @@ export default function FeedbackModal({
         );
         console.log(response.data);
         toast({
-          title: "Success",
+          title: "Success", 
           description: "Feedbacks fetched successfully",
           variant: "default",
         });
       } catch (error) {
         console.error("Error fetching feedbacks:", error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch feedbacks",
-          variant: "destructive",
-        });
+        retryCount++;
+
+        if (retryCount < maxRetries) {
+          // Retry the fetch
+          fetchFeedbacks();
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch feedbacks after multiple attempts",
+            variant: "destructive",
+          });
+        }
       }
     };
 
@@ -62,7 +72,6 @@ export default function FeedbackModal({
     fetchFeedbacks();
   }, [toast, eventId]);
 
-  // Sort and filter feedbacks
   // Sort and filter feedbacks
   const sortedFeedbacks = [...feedbacks]
     .filter((feedback) =>
@@ -116,26 +125,40 @@ export default function FeedbackModal({
 
         {/* Feedback list */}
         <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-          {sortedFeedbacks.map((feedback) => (
-            <div key={feedback.id} className="border rounded p-4">
-              <div className="flex gap-1 mb-2">
-                {[1, 2, 3, 4, 5].map((star) =>
-                  star <= feedback.rating ? (
-                    <StarIcon key={star} className="h-5 w-5 text-yellow-400" />
-                  ) : (
-                    <StarOutline
-                      key={star}
-                      className="h-5 w-5 text-yellow-400"
-                    />
-                  )
-                )}
-              </div>
-              <p className="text-gray-700">{feedback.comment}</p>
-              <p className="text-sm text-gray-500 mt-2">
-                {new Date(feedback.createdAt).toLocaleDateString()}
-              </p>
+          {sortedFeedbacks.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 text-lg">No feedback available</p>
+              {selectedRating && (
+                <p className="text-gray-400 mt-2">
+                  Try selecting a different rating filter
+                </p>
+              )}
             </div>
-          ))}
+          ) : (
+            sortedFeedbacks.map((feedback) => (
+              <div key={feedback.id} className="border rounded p-4">
+                <div className="flex gap-1 mb-2">
+                  {[1, 2, 3, 4, 5].map((star) =>
+                    star <= feedback.rating ? (
+                      <StarIcon
+                        key={star}
+                        className="h-5 w-5 text-yellow-400"
+                      />
+                    ) : (
+                      <StarOutline
+                        key={star}
+                        className="h-5 w-5 text-yellow-400"
+                      />
+                    )
+                  )}
+                </div>
+                <p className="text-gray-700">{feedback.comment}</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  {new Date(feedback.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

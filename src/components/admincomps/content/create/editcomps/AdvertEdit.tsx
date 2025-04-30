@@ -43,15 +43,17 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}/`);
+        const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}`);
         console.log("Advert details fetched:", response.data);
         setAdvert({
-          name: response.data.name || advert.name,
-          advertiser: response.data.advertiser || advert.advertiser,
-          image: response.data.image || advert.image,
-          textBody: response.data.textBody || advert.textBody,
-          startDate: response.data.startDate
-            ? new Date(response.data.startDate)
+
+          name: response.name || advert.name,
+          advertiser: response.advertiser || advert.advertiser,
+          image: response.coverImg || advert.image,
+          textBody: response.content || advert.textBody,
+          startDate: response.startDate
+            ? new Date(response.startDate)
+
             : advert.startDate,
           endDate: response.data.endDate
             ? new Date(response.data.endDate)
@@ -73,7 +75,10 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
     }
   }, [editDataFetched, id, mode, toast, advert]);
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -100,7 +105,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       });
 
       console.log("Uploaded advert image URL:", uploadedUrl);
-      
+
       // Update state with the new URL
       setAdvert((prev) => ({
         ...prev,
@@ -176,13 +181,16 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       setIsSubmitting(true);
       const response = await apiClient.request(config);
       console.log("Advert submitted:", response);
-      
+
+
       toast({
         title: "Success",
-        description: `Advert ${status === "published" ? "published" : "saved as draft"} successfully.`,
+        description: `Advert ${
+          status === "published" ? "published" : "saved as draft"
+        } successfully.`,
         variant: "default",
       });
-      
+
       router.refresh();
     } catch (error) {
       console.error("Error submitting advert:", error);
@@ -197,10 +205,13 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { id, value } = e.target;
-    
+
     // Handle date fields separately
     if (id === "start_date" || id === "end_date") {
       setAdvert((prev) => ({
@@ -238,7 +249,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
         {/* Image Upload Section */}
         <div className="space-y-2">
           <label className="block text-sm font-medium">Advert Image</label>
-          
+
           {/* Image Upload Controls */}
           <div className="flex flex-wrap gap-4">
             <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
@@ -261,11 +272,14 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
               </button>
             )}
           </div>
-          
+
+
           {/* Upload Progress */}
           {isUploading && (
             <div className="mt-2 space-y-2">
-              <p className="text-sm font-medium">Uploading... {uploadProgress}%</p>
+              <p className="text-sm font-medium">
+                Uploading... {uploadProgress}%
+              </p>
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
                   className="bg-primary h-2.5 rounded-full"
@@ -274,7 +288,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
               </div>
             </div>
           )}
-          
+
           {/* Image Preview */}
           {advert.image && !isUploading && (
             <div className="mt-2">
@@ -289,7 +303,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
             </div>
           )}
         </div>
-        
+
         <InputEle
           label="Text Body"
           type="textarea"
@@ -314,7 +328,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           />
         </div>
       </div>
-      
+
       {/* Action Buttons */}
       <div className="flex flex-col gap-2">
         <button
@@ -350,7 +364,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           Preview
         </button>
       </div>
-      
+
       {/* Preview Modal */}
       {showPreview && (
         <PreviewAdvert

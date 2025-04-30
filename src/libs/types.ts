@@ -185,7 +185,7 @@ type EventDetails = {
   mcpd_credit: number;
   flyer: string | null;
   meeting_link: string | null;
-  status: "DRAFT" | "ONGOING" | "CANCELLED" | "COMPLETED";
+  status: "DRAFT" | "ONGOING" | "CANCELLED" | "COMPLETED" | "UPCOMING";
   createdAt: string;
 };
 
@@ -257,7 +257,82 @@ type Resource = {
   recommended: boolean;
 };
 
+type GalleryItem = {
+  id: string;
+  name: string;
+  images: string[];
+  videos: string[];
+  createdBy: string;
+  createdAt: string;
+  status: "active" | "inactive";
+  user: {
+    firstname: string;
+    surname: string;
+    email: string;
+  };
+};
+
+type TechnicalPost = {
+  id: string;
+  name: string;
+  document: string;
+  coverImg: string;
+  createdAt: string;
+  status: "DRAFT" | "PUBLISHED";
+  createdBy: string;
+  user: {
+    firstname: string;
+    email: string;
+  };
+};
+
+type Publication = {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  access: "PUBLIC" | "MEMBERS" | string;
+  fileUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  recommended: boolean;
+};
+
+type Advert = {
+  id: string;
+  name: string;
+  advertiser: string;
+  content: string;
+  startDate: string;
+  endDate: string;
+  coverImg: string;
+  status: "published" | "draft" | "hidden" | "expired" | "pending";
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    firstname: string;
+    surname: string;
+    email: string;
+  };
+};
+
+type BlogPost = {
+  id: string;
+  title: string;
+  authorName: string;
+  contentType: string;
+  coverImage: string;
+  contentBody: string;
+  createdAt: string;
+  updatedAt: string;
+
+}
+
 export type {
+  Advert,
+  BlogPost,
+  GalleryItem,
   RegisteredUsers,
   User,
   RolesData,
@@ -274,4 +349,6 @@ export type {
   Resource,
   DashEventAttendanceTrend,
   DashEventPaymentTrend,
+  TechnicalPost,
+  Publication,
 };

@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { MdSubtitles, MdDeleteOutline } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface CancelEventProps {
   id: string;
@@ -17,7 +19,9 @@ interface CancelEventProps {
 function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const handleDelete = () => {
+  const router = useRouter();
+
+  const handleDelete = async () => {
     setIsLoading(true);
     let config = {
       method: "delete",
@@ -30,80 +34,83 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
       withCredentials: true,
       // credentials: "include",
     };
-
-    axios
-      .request(config)
-      .then((response) => {
-        toast({
-          title: "Event Deleted",
-          description: response.data.message,
-          variant: "default",
-        });
-
-        onClose(); // Close the modal after successful update
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        toast({
-          title: "Error",
-          description: error.response.data.message,
-          variant: "destructive",
-        });
-        setIsLoading(false);
+    try {
+      const response = await apiClient.request(config);
+      toast({
+        title: "Event Deleted",
+        description: "Event deleted successfully",
+        variant: "default",
       });
-    window.location.reload();
-  };
-  const handleCancel = () => {
-    onClose();
+      router.refresh();
+
+      onClose(); // Close the modal after successful update
+      setIsLoading(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "failed to delete content",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      router.refresh();
+
+      onClose(); // Close the modal after successful update
+    }
+    router.refresh();
   };
 
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
-        <div className="flex flex-row justify-start gap-4">
-          <div className="rounded-full  h-fit w-fit p-4 bg-red-200">
-            <MdDeleteOutline className="w-6 h-6 fill-red-600" />
+      <div className="flex flex-col p-6 rounded-xl gap-6 bg-white max-w-md w-full mx-4">
+        {/* Header with icon and title */}
+        <div className="flex items-start gap-4">
+          <div className="rounded-full p-3 bg-red-100">
+            <MdDeleteOutline className="w-6 h-6 text-red-600" />
           </div>
-          <div>
-            <div className="flex flex-col w-fit gap-2">
-              <h5 className="font-semibold text-xl text-black">Delete Event</h5>
-              <p className="text-sm text-neutral-600 text-wrap">
-                If you delete this event, the event will no longer take place
-                and members will be notified via email. Are you sure you want to
-                proceed?{" "}
-              </p>
-            </div>
-            <div className="flex flex-col w-fit gap-2 mt-4">
-              <div className="flex flex-row items-center gap-4">
-                <p className="flex text-neutral-700 font-medium text-base flex-row  items-center gap-2">
-                  <MdSubtitles className="w-4 h-4" /> Name:
-                </p>
-                <p className="text-black font-medium text-base ">{eventName}</p>
-              </div>
-              <div className="flex flex-row items-center gap-4">
-                <p className="flex text-neutral-700 font-medium text-base   items-center flex-row gap-2">
-                  <HiOutlineTag className="w-4 h-4" /> Date:
-                </p>
-                <p className="text-black font-medium text-base ">
-                  {new Date(date).toLocaleDateString("en-GB")}
-                </p>
-              </div>
-            </div>
+          <div className="flex-1">
+            <h5 className="font-semibold text-xl text-gray-900 mb-2">
+              Delete Event
+            </h5>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              If you delete this event, the event will no longer take place and
+              members will be notified via email. Are you sure you want to
+              proceed?
+            </p>
           </div>
         </div>
-        <div className="flex w-fit justify-between">
+
+        {/* Event details */}
+        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <MdSubtitles className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-gray-500">Name:</span>
+            <span className="text-sm font-medium text-gray-900">
+              {eventName}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <HiOutlineTag className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-gray-500">Date:</span>
+            <span className="text-sm font-medium text-gray-900">
+              {new Date(date).toLocaleDateString("en-GB")}
+            </span>
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          >
+            Cancel
+          </button>
           <button
             onClick={handleDelete}
             disabled={isLoading}
-            className="flex items-center w-fit  text-nowrap text-center justify-center bg-red-600 font-semibold text-base text-white rounded-full py-3 px-4 h-10"
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Delete Event
-          </button>
-          <button
-            onClick={onClose}
-            className="flex items-center w-fit  text-nowrap text-center justify-center bg-transparent font-semibold text-base text-neutral-700 border border-primary rounded-full py-3 px-4 h-10"
-          >
-            Cancel
+            {isLoading ? "Deleting..." : "Delete Event"}
           </button>
         </div>
       </div>

@@ -37,3 +37,13 @@ export function shuffleArray(array: BlogPost[]) {
 export const handleReadMore = (router: AppRouterInstance, id: string) => {
   router.push(`/blog/${id}`); // Navigate to the blog post page using the provided ID.
 };
+
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}

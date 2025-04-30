@@ -30,25 +30,25 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onReadMore }) => {
 
   // Define background and text colors for different categories
   const categoryColors: Record<
-    "Articles" | "News" | "Videos",
+    "articles" | "news" | "videos",
     { bg: string; text: string }
   > = {
-    Articles: {
+    articles: {
       bg: "bg-lime-300",
       text: "text-black",
     },
-    News: {
+    news: {
       bg: "bg-[#1A379A]",
       text: "text-white",
     },
-    Videos: {
+    videos: {
       bg: "bg-[#2E8E4A]",
       text: "text-white",
     },
   };
 
   // Fallback color settings for undefined categories
-  const categoryColor = categoryColors[post.category] || {
+  const categoryColor = categoryColors[post.contentType] || {
     bg: "bg-gray-300",
     text: "text-black",
   };
@@ -59,7 +59,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onReadMore }) => {
       <div className="sm:w-[253px] h-full w-full">
         <Image
           loading="lazy"
-          src={post.imageUrl}
+          src={post.coverImage}
           alt={`Image for ${post.title}`}
           width={200}
           height={200}
@@ -73,7 +73,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onReadMore }) => {
         <span
           className={`inline-block py-1 text-sm leading-tight ${categoryColor.bg} ${categoryColor.text} rounded text-neutral-900 p-2`}
         >
-          {post.category}
+          {post.contentType}
         </span>
 
         {/* Blog post title */}
@@ -92,7 +92,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onReadMore }) => {
           onClick={() => onReadMore(post.id)}
           onKeyPress={handleKeyPress}
           className="sm:mt-4 m-0 text-base font-semibold text-blue-900 text-left hover:underline focus:outline-none focus:ring-2 focus:ring-blue-900 focus:ring-offset-2"
-          aria-label={`Read more about ${post.title} in ${post.category}`}
+          aria-label={`Read more about ${post.title} in ${post.contentType}`}
         >
           Read more&gt;&gt;
         </button>

@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import InputEle from "@/components/genui/InputEle";
 
 import { User } from "@/libs/types";
+import { useRouter } from "next/navigation";
 
 // Props interface for CreateNewAdmin component
 interface CreateNewAdminProps {
@@ -47,6 +48,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
   // State to store roles
   const [roles, setRoles] = useState<RolesData[]>([]);
   // State to store users
@@ -122,8 +124,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         const response = await apiClient.get("/users/users", config);
 
         // Update roles state with fetched data
-        setUsers(response.data.data);
-        console.log(response.data.data);
+        setUsers(response.data);
         toast({
           title: "Success",
           description: "Users fetched successfully",
@@ -162,8 +163,6 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         formData
       );
 
-        
-
       toast({
         title: "Success",
         description: "Administrator created successfully",
@@ -181,6 +180,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
       });
     } finally {
       setIsLoading(false);
+      router.refresh();
     }
   };
 

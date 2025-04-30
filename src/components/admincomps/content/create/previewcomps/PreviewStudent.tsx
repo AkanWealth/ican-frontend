@@ -25,10 +25,18 @@ function PreviewStudent({
 
         <div className="flex flex-col gap-4">
           <Studenttile
-            imageUrl="/studenthero.png"
-            title={name}
-            fileType="PDF"
-            downloadLink={document}
+            studypack={{
+              name: name,
+              document: document,
+              id: "",
+              createdBy: "",
+              createdAt: "",
+              status: "pending",
+              user: {
+                id: "",
+                email: "" // Added missing required email field
+              }
+            }}
           />
         </div>
       </div>

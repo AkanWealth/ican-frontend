@@ -88,14 +88,16 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           status === "published" ? "published" : "saved as draft"
         } successfully.`,
         variant: "default",
-      });
+      });      window.location.reload();
+
     } catch (error) {
       console.error("Error submitting gallery:", error);
       toast({
         title: "Error",
         variant: "destructive",
         description: "An error occurred while submitting the gallery.",
-      });
+      });      window.location.reload();
+
     } finally {
       setIsSubmitting(false);
     }

@@ -234,6 +234,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         description: "Technical Sessions submitted successfully",
         variant: "default",
       });
+      window.location.reload();
     } catch (error) {
       setIsSubmitting(false);
       toast({
@@ -242,6 +243,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
           "An unknown error occurred while submitting the Technical Session",
         variant: "destructive",
       });
+      window.location.reload();
     }
   };
   return (

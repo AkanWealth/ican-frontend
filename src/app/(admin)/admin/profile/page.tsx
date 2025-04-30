@@ -11,36 +11,64 @@ import { BASE_API_URL } from "@/utils/setter";
 
 import apiClient from "@/services-admin/apiClient";
 
+import { User } from "@/libs/types";
+
 import { useToast } from "@/hooks/use-toast";
 
 function Profile() {
   const { toast } = useToast();
-  const [admin, setAdmin] = useState({
-    firstname: "Admin",
-    surname: "Admin",
+  const [adminDetails, setAdminDetails] = useState({
     email: "",
-    membershipId: "",
+    id: "",
     role: "",
   });
+  const [admin, setAdmin] = useState<User>({} as User);
+  // Function to fetch admin details from API
+  const fetchAdminDetails = async (userId: string) => {
+    try {
+      const response = await apiClient.get(`${BASE_API_URL}/users/${userId}`);
 
-  const handleCancel = () => {
-    // Reset admin state to initial values
-    setAdmin({
-      firstname: "Admin",
-      surname: "Admin",
-      email: "",
-      membershipId: "",
-      role: "",
-    });
+      setAdmin((prevAdmin) => ({
+        ...prevAdmin,
+        ...response,
+      }));
+
+      toast({
+        title: "Success", 
+        description: "Admin details fetched successfully",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error fetching admin details:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch admin details", 
+        variant: "destructive",
+      });
+    }
   };
 
+  // Effect to get admin data from cookie and fetch details
   useEffect(() => {
-    const storedAdmin = localStorage.getItem("user");
-    console.log("storedAdmin", storedAdmin);
-    if (storedAdmin) {
-      setAdmin(JSON.parse(storedAdmin));
+    const storedAdmin = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("user_data="))
+      ?.split("=")[1];
+
+    if (storedAdmin) {  
+      try {
+        const decodedAdmin = decodeURIComponent(storedAdmin);
+        const parsedAdmin = JSON.parse(decodedAdmin);
+        setAdminDetails(parsedAdmin);
+
+        if (parsedAdmin.id) {
+          fetchAdminDetails(parsedAdmin.id);
+        }
+      } catch (error) {
+        console.error("Error parsing admin data from cookie:", error);
+      }
     }
-  }, []);
+  }, []); // Run once on mount
 
   const handleSaveChanges = async () => {
     // Implement save changes logic here
@@ -70,7 +98,7 @@ function Profile() {
         description: "Error saving admin details",
         variant: "destructive",
       });
-      }
+    }
   };
 
   return (
@@ -88,7 +116,9 @@ function Profile() {
             {/* <Image src="./img.png" width={50} height={50}  alt="Profile img" /> */}
             <h5 className="flex flex-col items-center text-center text-black text-xl font-medium">
               {admin.firstname} {admin.surname}
-              <span className="text-xs text-neutral-400">{admin.role}</span>
+              <span className="text-xs text-neutral-400">
+                {admin?.role?.name}
+              </span>
             </h5>
           </div>
           <div className="flex flex-col gap-4 mt-4">
@@ -113,7 +143,7 @@ function Profile() {
                 placeholder="Last Name"
                 value={admin.surname}
                 onChange={(e) =>
-                  setAdmin({ ...admin, lastName: e.target.value })
+                  setAdmin({ ...admin, surname: e.target.value })
                 }
               />
               <InputEle
@@ -140,18 +170,15 @@ function Profile() {
                 label="Role"
                 type="text"
                 placeholder="Role"
-                value={admin.role}
+                value={admin?.role?.name}
                 disabled
-                onChange={(e) => setAdmin({ ...admin, role: e.target.value })}
+                onChange={(e) => {
+                  const updatedRole = { ...admin.role, name: e.target.value };
+                  setAdmin({ ...admin, role: updatedRole });
+                }}
               />
             </div>
             <div className="flex w-full justify-center items-center flex-row gap-4">
-              <button
-                className="px-4 py-2 bg-white border border-gray-600 text-black rounded-md"
-                onClick={handleCancel}
-              >
-                Cancel
-              </button>
               <button
                 className="px-4 py-2 bg-primary text-white rounded-md"
                 onClick={handleSaveChanges}

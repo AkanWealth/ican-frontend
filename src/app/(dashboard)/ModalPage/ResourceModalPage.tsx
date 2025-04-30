@@ -217,15 +217,15 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({
       case "WEBINAR":
         return (
           <div className="p-6">
-            <div className="relative w-full h-80 mb-6">
+            {/* <div className="relative w-full h-80 mb-6">
               <Image
                 src="/ResourceWebinar.png"
                 alt={resource.title}
                 layout="fill"
                 objectFit="cover"
                 className="rounded-lg"
-              />
-            </div>
+              /> 
+            </div> */}
             <div className="flex justify-between items-center mb-2">
               <div className="">
                 <p className="text-primary text-sm font-semibold">
@@ -286,7 +286,7 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({
         // Podcast content rendering
         return (
           <div className="p-6">
-            <div className="relative w-full h-80 mb-6">
+            {/* <div className="relative w-full h-80 mb-6">
               <Image
                 src="/ResourceWebinar.png"
                 alt={resource.title}
@@ -294,7 +294,7 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({
                 objectFit="cover"
                 className="rounded-lg"
               />
-            </div>
+            </div> */}
             <div className="flex justify-between items-center mb-2">
               <div className="">
                 <p className="text-primary text-sm font-semibold">
@@ -355,7 +355,7 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({
         // Video content similar to the existing code
         return (
           <div className="p-6">
-            <div className="relative w-full h-80 mb-6">
+            {/* <div className="relative w-full h-80 mb-6">
               <Image
                 src="/ResourceWebinar.png"
                 alt={resource.title}
@@ -363,7 +363,7 @@ const ResourceDetailsModal: React.FC<ResourceDetailsModalProps> = ({
                 objectFit="cover"
                 className="rounded-lg"
               />
-            </div>
+            </div> */}
             <div className="flex justify-between items-center mb-2">
               <div className="">
                 <p className="text-primary text-sm font-semibold">

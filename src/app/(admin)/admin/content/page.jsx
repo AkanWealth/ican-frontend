@@ -40,16 +40,16 @@ function Content() {
         </button>
       </div>
       {/* Tab sections */}
-      <Tabs defaultValue="all" className="flex flex-col gap-4">
+      <Tabs defaultValue="blogs" className="flex flex-col gap-4">
         <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="adverts">Adverts</TabsTrigger>
           <TabsTrigger value="blogs">Blogs</TabsTrigger>
+          <TabsTrigger value="faq">FAQ</TabsTrigger>
+          <TabsTrigger value="galleries">Galleries</ TabsTrigger>
           <TabsTrigger value="resources">Resources</TabsTrigger>
-          <TabsTrigger value="galleries">Galleries</TabsTrigger>
           <TabsTrigger value="technical">Technical Session</TabsTrigger>
           <TabsTrigger value="student">Study Pack</TabsTrigger>
-          <TabsTrigger value="faq">FAQ</TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
         </TabsList>
         <TabsContent value="all">
           <All />

@@ -28,12 +28,15 @@ function AdminManagementPage() {
       const config = {
         method: "get",
         maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/users/admins`,
+        url: `${BASE_API_URL}/users/users`,
       };
       try {
-        const result = await apiClient.get("/users/admins", config);
-
-        setData(result);
+        const result = await apiClient.get("/users/users", config);
+        // Filter out users with role.name === "MEMBER"
+        const filteredData = result.data.filter(
+          (user: User) => user.role.name !== "MEMBER"
+        );
+        setData(filteredData);
         toast({
           title: "Success",
           description: "Admins fetched successfully.",

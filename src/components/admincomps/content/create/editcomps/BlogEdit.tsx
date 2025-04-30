@@ -41,6 +41,14 @@ function BlogEdit({ mode, id }: CreateContentProps) {
     coverImage: "",
     status: "",
   });
+  const [blogErrors, setBlogErrors] = useState<BlogProps>({
+    title: "",
+    authorName: "",
+    contentBody: "",
+    contentType: "",
+    coverImage: "",
+    status: "",
+  });
   const [post, setPost] = useState("");
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
 
@@ -147,6 +155,48 @@ function BlogEdit({ mode, id }: CreateContentProps) {
     });
   };
 
+  // Validate blog data before submission
+  const validateBlog = () => {
+    // Initialize error messages object
+
+    // Check title
+    if (!blog.title.trim()) {
+      setBlogErrors((prev) => ({
+        ...prev,
+        title: "Title is required",
+      }));
+    }
+
+    // Check author name
+    if (!blog.authorName.trim()) {
+      setBlogErrors((prev) => ({
+        ...prev,
+        authorName: "Author name is required",
+      }));
+    }
+
+    // Check content body
+    if (!post.trim()) {
+      toast({
+        title: "Content body is required",
+        description: "Content body is required",
+        variant: "destructive",
+      });
+    }
+
+    // Check cover image
+    if (!blog.coverImage) {
+      setBlogErrors((prev) => ({
+        ...prev,
+        coverImage: "Cover image is required",
+      }));
+    }
+
+    // If there are any errors, show toast messages and return false
+
+    return true;
+  };
+
   const handleSubmit = async (status: "published" | "draft") => {
     const data = JSON.stringify({
       title: blog.title,
@@ -155,6 +205,8 @@ function BlogEdit({ mode, id }: CreateContentProps) {
       contentType: "article",
       coverImage: blog.coverImage,
     });
+
+    if (!validateBlog()) return;
 
     const config = {
       method: mode === "edit" ? "PATCH" : "POST",
@@ -180,15 +232,20 @@ function BlogEdit({ mode, id }: CreateContentProps) {
       });
       setIsSubmitting(false);
       setIsLoading(false);
-      router.refresh();
-    } catch (error) {
+      router.refresh();      window.location.reload();
+
+    } catch (error: any) {
       setIsSubmitting(false);
       setIsLoading(false);
       toast({
         title: "Error submitting blog",
-        description: "An unknown error occurred",
+        description:
+          error.response?.data?.message ||
+          error?.message ||
+          "An unknown error occurred",
         variant: "destructive",
-      });
+      });      window.location.reload();
+
     }
   };
 
@@ -201,6 +258,8 @@ function BlogEdit({ mode, id }: CreateContentProps) {
           id="title"
           value={blog.title}
           onChange={(e) => setBlog({ ...blog, title: e.target.value })}
+          required={true}
+          errorMsg={blogErrors.title}
         />
         <InputEle
           label="Author Name"
@@ -208,6 +267,8 @@ function BlogEdit({ mode, id }: CreateContentProps) {
           id="authorName"
           value={blog.authorName}
           onChange={(e) => setBlog({ ...blog, authorName: e.target.value })}
+          required={true}
+          errorMsg={blogErrors.authorName}
         />
 
         {/* Image Upload Section */}
@@ -217,9 +278,10 @@ function BlogEdit({ mode, id }: CreateContentProps) {
           {/* Image Upload Controls */}
           <div className="flex flex-wrap gap-4">
             <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
-              Upload Image
+              Upload Blog Image <span className="text-red-600">*</span>
               <input
                 type="file"
+                required={true}
                 accept="image/jpeg,image/png,image/gif"
                 onChange={handleImageUpload}
                 className="hidden"

@@ -219,6 +219,7 @@ interface DashEventAttendanceTrend {
 interface DashEventPaymentTrend {
   month: string;
   totalPaid: number;
+  total?: number;
 }
 
 type DashUserLogin = {

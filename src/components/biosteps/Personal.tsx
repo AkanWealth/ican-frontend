@@ -160,7 +160,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
             updateFormData({
               personalData: {
                 ...formData.personalData,
-                dob: new Date(e.target.value).toISOString(), // Convert to ISO format
+                dob: e.target.value, // Convert to ISO format
               },
             })
           }

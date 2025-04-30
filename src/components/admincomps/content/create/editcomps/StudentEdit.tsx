@@ -101,14 +101,16 @@ function StudentEdit({ mode, id }: CreateContentProps) {
         title: "Success",
         description: "PDF uploaded successfully.",
         variant: "default",
-      });
+      });      window.location.reload();
+
     } catch (error) {
       console.error("Error uploading PDF:", error);
       toast({
         title: "Upload failed",
         description: "Failed to upload the PDF. Please try again.",
         variant: "destructive",
-      });
+      });      window.location.reload();
+
     } finally {
       setIsUploading(false);
     }

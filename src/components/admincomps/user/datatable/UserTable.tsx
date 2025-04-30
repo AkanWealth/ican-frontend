@@ -43,6 +43,8 @@ export function UserTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const [globalFilter, setGlobalFilter] = React.useState("");
+
   const table = useReactTable({
     data,
     columns,
@@ -55,22 +57,19 @@ export function UserTable<TData, TValue>({
     state: {
       sorting,
       columnFilters,
+      globalFilter,
     },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: "includesString",
   });
 
   return (
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by name..."
-          value={
-        (table.getColumn("surname")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) => {
-        const value = event.target.value;
-        table.getColumn("surname")?.setFilterValue(value);
-        table.getColumn("firstname")?.setFilterValue(value);
-          }}
+          placeholder="Filter by name or email..."
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
       </div>

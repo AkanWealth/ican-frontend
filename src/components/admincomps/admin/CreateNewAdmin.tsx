@@ -181,6 +181,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
     } finally {
       setIsLoading(false);
       router.refresh();
+      window.location.reload();
     }
   };
 

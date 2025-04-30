@@ -30,6 +30,14 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [advertErrors, setAdvertErrors] = useState({
+    name: "",
+    advertiser: "",
+    image: "",
+    textBody: "",
+    startDate: "",
+    endDate: "",
+  });
 
   const [advert, setAdvert] = useState<Advert>({
     name: "",
@@ -46,14 +54,12 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
         const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}`);
         console.log("Advert details fetched:", response.data);
         setAdvert({
-
           name: response.name || advert.name,
           advertiser: response.advertiser || advert.advertiser,
           image: response.coverImg || advert.image,
           textBody: response.content || advert.textBody,
           startDate: response.startDate
             ? new Date(response.startDate)
-
             : advert.startDate,
           endDate: response.data.endDate
             ? new Date(response.data.endDate)
@@ -74,7 +80,6 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       fetchDetails();
     }
   }, [editDataFetched, id, mode, toast, advert]);
-
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -144,7 +149,14 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
 
   const handleSubmit = async (status: "published" | "draft") => {
     // Validate required fields
-    if (!advert.name || !advert.advertiser) {
+    if (
+      !advert.name ||
+      !advert.advertiser ||
+      !advert.textBody ||
+      !advert.image ||
+      !advert.startDate ||
+      !advert.endDate
+    ) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields.",
@@ -182,7 +194,6 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       const response = await apiClient.request(config);
       console.log("Advert submitted:", response);
 
-
       toast({
         title: "Success",
         description: `Advert ${
@@ -192,6 +203,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       });
 
       router.refresh();
+      // Manually refresh the page after successful submission
     } catch (error) {
       console.error("Error submitting advert:", error);
       toast({
@@ -201,11 +213,11 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       });
     } finally {
       setIsSubmitting(false);
+      window.location.reload();
     }
   };
 
   const handleChange = (
-
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
@@ -235,6 +247,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           label="Advert Title"
           type="text"
           id="name"
+          required={true}
           value={advert.name}
           onChange={handleChange}
         />
@@ -242,6 +255,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           label="Advertiser"
           type="text"
           id="advertiser"
+          required={true}
           value={advert.advertiser}
           onChange={handleChange}
         />
@@ -253,7 +267,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           {/* Image Upload Controls */}
           <div className="flex flex-wrap gap-4">
             <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
-              Upload Image
+              Upload Image <span className="text-red-600">*</span>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/gif"
@@ -272,7 +286,6 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
               </button>
             )}
           </div>
-
 
           {/* Upload Progress */}
           {isUploading && (
@@ -310,6 +323,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           id="text_body"
           value={advert.textBody}
           onChange={handleChange}
+          required={true}
         />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InputEle
@@ -318,6 +332,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
             id="start_date"
             value={advert.startDate.toISOString().split("T")[0]}
             onChange={handleChange}
+            required={true}
           />
           <InputEle
             label="End Date"
@@ -325,6 +340,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
             id="end_date"
             value={advert.endDate.toISOString().split("T")[0]}
             onChange={handleChange}
+            required={true}
           />
         </div>
       </div>

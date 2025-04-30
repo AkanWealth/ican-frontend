@@ -25,7 +25,6 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
         headers: {
           Accept: "application/json",
           ContentType: "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
       try {
@@ -33,7 +32,7 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
         console.log(results.data);
         toast({
           title: "Admin Deleted",
-          description: results.data.message,
+          description: "Admin deleted successfully",
           variant: "default",
         });
         onClose();

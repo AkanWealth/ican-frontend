@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 
 import InputEle from "@/components/genui/InputEle";
 
-
 import { useRouter } from "next/navigation";
 import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 
@@ -35,215 +34,216 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const OPTIONS: Option[] = [
-    { label: "ADD_CONTENT", value: "ADD_CONTENT", group: "Content" },
-    { label: "ADD_FAQ", value: "ADD_FAQ", group: "Content" },
-    { label: "ADD_PERMISSION", value: "ADD_PERMISSION", group: "User" },
-    { label: "ADD_TO_WAITLIST", value: "ADD_TO_WAITLIST" },
-    { label: "ASSIGN_ROLE", value: "ASSIGN_ROLE", group: "User" },
-    { label: "CHANGE_PASSWORD", value: "CHANGE_PASSWORD", group: "User" },
-    { label: "CREATE_ADVERT", value: "CREATE_ADVERT", group: "Content" },
-    { label: "CREATE_BILLING", value: "CREATE_BILLING", group: "Billing" },
-    { label: "CREATE_BLOG", value: "CREATE_BLOG", group: "Content" },
-    { label: "CREATE_CONTENT", value: "CREATE_CONTENT", group: "Content" },
-    { label: "CREATE_EVENT", value: "CREATE_EVENT", group: "Event" },
-    { label: "CREATE_GALLERY", value: "CREATE_GALLERY", group: "Content" },
-    { label: "CREATE_PAYMENT", value: "CREATE_PAYMENT", group: "Billing" },
-    { label: "CREATE_ROLE", value: "CREATE_ROLE", group: "Content" },
-    { label: "CREATE_STUDYPACK", value: "CREATE_STUDYPACK", group: "Content" },
+    { label: "Add Content", value: "ADD_CONTENT", group: "Content" },
+    { label: "Add FAQ", value: "ADD_FAQ", group: "Content" },
+    { label: "Add Permission", value: "ADD_PERMISSION", group: "User" },
+    { label: "Add to Waitlist", value: "ADD_TO_WAITLIST" },
+    { label: "Assign Role", value: "ASSIGN_ROLE", group: "User" },
+    { label: "Change Password", value: "CHANGE_PASSWORD", group: "User" },
+    { label: "Create Advert", value: "CREATE_ADVERT", group: "Content" },
+    { label: "Create Billing", value: "CREATE_BILLING", group: "Billing" },
+    { label: "Create Blog", value: "CREATE_BLOG", group: "Content" },
+    { label: "Create Content", value: "CREATE_CONTENT", group: "Content" },
+    { label: "Create Event", value: "CREATE_EVENT", group: "Event" },
+    { label: "Create Gallery", value: "CREATE_GALLERY", group: "Content" },
+    { label: "Create Payment", value: "CREATE_PAYMENT", group: "Billing" },
+    { label: "Create Role", value: "CREATE_ROLE", group: "Content" },
+    { label: "Create StudyPack", value: "CREATE_STUDYPACK", group: "Content" },
     {
-      label: "CREATE_TECHNICAL_SESSION",
+      label: "Create Technical Session",
       value: "CREATE_TECHNICAL_SESSION",
       group: "Content",
     },
-    { label: "CREATE_USER", value: "CREATE_USER", group: "User" },
-    { label: "DELETE_ADVERT", value: "DELETE_ADVERT", group: "Content" },
-    { label: "DELETE_BLOG", value: "DELETE_BLOG", group: "Content" },
-    { label: "DELETE_CONTENT", value: "DELETE_CONTENT", group: "Content" },
-    { label: "DELETE_FAQ", value: "DELETE_FAQ", group: "Content" },
-    { label: "DELETE_FEEDBACK", value: "DELETE_FEEDBACK", group: "Event" },
-    { label: "DELETE_GALLERY", value: "DELETE_GALLERY", group: "Content" },
-    { label: "DELETE_PERMISSION", value: "DELETE_PERMISSION", group: "User" },
-    { label: "DELETE_ROLE", value: "DELETE_ROLE", group: "User" },
-    { label: "DELETE_STUDYPACK", value: "DELETE_STUDYPACK", group: "Content" },
+    { label: "Create User", value: "CREATE_USER", group: "User" },
+    { label: "Delete Advert", value: "DELETE_ADVERT", group: "Content" },
+    { label: "Delete Blog", value: "DELETE_BLOG", group: "Content" },
+    { label: "Delete Content", value: "DELETE_CONTENT", group: "Content" },
+    { label: "Delete FAQ", value: "DELETE_FAQ", group: "Content" },
+    { label: "Delete Feedback", value: "DELETE_FEEDBACK", group: "Event" },
+    { label: "Delete Gallery", value: "DELETE_GALLERY", group: "Content" },
+    { label: "Delete Permission", value: "DELETE_PERMISSION", group: "User" },
+    { label: "Delete Role", value: "DELETE_ROLE", group: "User" },
+    { label: "Delete StudyPack", value: "DELETE_STUDYPACK", group: "Content" },
     {
-      label: "DELETE_TECHNICAL_SESSION",
+      label: "Delete Technical Session",
       value: "DELETE_TECHNICAL_SESSION",
       group: "Content",
     },
-    { label: "DELETE_USER", value: "DELETE_USER", group: "User" },
-    { label: "EDIT_ADVERT", value: "EDIT_ADVERT", group: "Content" },
-    { label: "EDIT_CONTENT", value: "EDIT_CONTENT", group: "Content" },
-    { label: "EDIT_EVENT", value: "EDIT_EVENT", group: "Event" },
-    { label: "EDIT_FAQ", value: "EDIT_FAQ", group: "Content" },
-    { label: "EDIT_FEEDBACK", value: "EDIT_FEEDBACK", group: "Event" },
-    { label: "EDIT_GALLERY", value: "EDIT_GALLERY", group: "Content" },
-    { label: "EDIT_STUDYPACK", value: "EDIT_STUDYPACK", group: "Content" },
+    { label: "Delete User", value: "DELETE_USER", group: "User" },
+    { label: "Edit Advert", value: "EDIT_ADVERT", group: "Content" },
+    { label: "Edit Content", value: "EDIT_CONTENT", group: "Content" },
+    { label: "Edit Event", value: "EDIT_EVENT", group: "Event" },
+    { label: "Edit FAQ", value: "EDIT_FAQ", group: "Content" },
+    { label: "Edit Feedback", value: "EDIT_FEEDBACK", group: "Event" },
+    { label: "Edit Gallery", value: "EDIT_GALLERY", group: "Content" },
+    { label: "Edit StudyPack", value: "EDIT_STUDYPACK", group: "Content" },
     {
-      label: "EDIT_TECHNICAL_SESSION",
+      label: "Edit Technical Session",
       value: "EDIT_TECHNICAL_SESSION",
       group: "Content",
     },
-    { label: "REGISTER_EVENT", value: "REGISTER_EVENT", group: "Event" },
+    { label: "Register Event", value: "REGISTER_EVENT", group: "Event" },
+    { label: "Delete Event", value: "DELETE_EVENT", group: "Event" },
     {
-      label: "RESPOND_TO_MESSAGE",
+      label: "Respond to Message",
       value: "RESPOND_TO_MESSAGE",
       group: "Contact",
     },
-    { label: "SUBMIT_FEEDBACK", value: "SUBMIT_FEEDBACK", group: "Event" },
-    { label: "SUSPEND_USER", value: "SUSPEND_USER", group: "User" },
+    { label: "Submit Feedback", value: "SUBMIT_FEEDBACK", group: "Event" },
+    { label: "Suspend User", value: "SUSPEND_USER", group: "User" },
     {
-      label: "UPDATE_ADVERT_STATUS",
+      label: "Update Advert Status",
       value: "UPDATE_ADVERT_STATUS",
       group: "Content",
     },
-    { label: "UPDATE_BILLING", value: "UPDATE_BILLING", group: "Billing" },
-    { label: "UPDATE_BLOG", value: "UPDATE_BLOG", group: "Content" },
-    { label: "UPDATE_CONTENT", value: "UPDATE_CONTENT", group: "Content" },
-    { label: "UPDATE_CONTACT", value: "UPDATE_CONTACT", group: "User" },
+    { label: "Update Billing", value: "UPDATE_BILLING", group: "Billing" },
+    { label: "Update Blog", value: "UPDATE_BLOG", group: "Content" },
+    { label: "Update Content", value: "UPDATE_CONTENT", group: "Content" },
+    { label: "Update Contact", value: "UPDATE_CONTACT", group: "User" },
     {
-      label: "UPDATE_EVENT_REGISTRATION",
+      label: "Update Event Registration",
       value: "UPDATE_EVENT_REGISTRATION",
       group: "Event",
     },
     {
-      label: "UPDATE_EVENT_REGISTRATIONS",
+      label: "Update Event Registrations",
       value: "UPDATE_EVENT_REGISTRATIONS",
       group: "Event",
     },
     {
-      label: "UPDATE_EVENT_STATUS",
+      label: "Update Event Status",
       value: "UPDATE_EVENT_STATUS",
       group: "Event",
     },
-    { label: "UPDATE_PROFILE", value: "UPDATE_PROFILE", group: "User" },
+    { label: "Update Profile", value: "UPDATE_PROFILE", group: "User" },
     {
-      label: "UPDATE_QUALIFICATION",
+      label: "Update Qualification",
       value: "UPDATE_QUALIFICATION",
       group: "User",
     },
-    { label: "UPDATE_ROLE", value: "UPDATE_ROLE", group: "User" },
+    { label: "Update Role", value: "UPDATE_ROLE", group: "User" },
     {
-      label: "UPDATE_ROLE_PERMISSIONS",
+      label: "Update Role Permissions",
       value: "UPDATE_ROLE_PERMISSIONS",
       group: "User",
     },
-    { label: "UPDATE_USER", value: "UPDATE_USER" },
-    { label: "UPDATE_WORK_EXPERIENCE", value: "UPDATE_WORK_EXPERIENCE" },
-    { label: "VIEW_ADMIN", value: "VIEW_ADMIN", group: "User" },
-    { label: "VIEW_ADVERT", value: "VIEW_ADVERT", group: "Content" },
+    { label: "Update User", value: "UPDATE_USER" },
+    { label: "Update Work Experience", value: "UPDATE_WORK_EXPERIENCE" },
+    { label: "View Admin", value: "VIEW_ADMIN", group: "User" },
+    { label: "View Advert", value: "VIEW_ADVERT", group: "Content" },
     { label: "VIEW_ALL_ADVERT", value: "VIEW_ALL_ADVERT", group: "Content" },
     {
-      label: "VIEW_ALL_BILLINGS",
+      label: "View All Billings",
       value: "VIEW_ALL_BILLINGS",
       group: "Billing",
     },
-    { label: "VIEW_ALL_BLOGS", value: "VIEW_ALL_BLOGS", group: "Content" },
-    { label: "VIEW_ALL_CONTENT", value: "VIEW_ALL_CONTENT", group: "Content" },
-    { label: "VIEW_ALL_EVENTS", value: "VIEW_ALL_EVENTS", group: "Event" },
+    { label: "View All Blogs", value: "VIEW_ALL_BLOGS", group: "Content" },
+    { label: "View All Content", value: "VIEW_ALL_CONTENT", group: "Content" },
+    { label: "View All Events", value: "VIEW_ALL_EVENTS", group: "Event" },
     {
-      label: "VIEW_ALL_EVENT_REGISTRATIONS_BY_USER",
+      label: "View All Event Registrations by User",
       value: "VIEW_ALL_EVENT_REGISTRATIONS_BY_USER",
       group: "Event",
     },
-    { label: "VIEW_ALL_FAQ", value: "VIEW_ALL_FAQ", group: "Content" },
-    { label: "VIEW_ALL_GALLERY", value: "VIEW_ALL_GALLERY", group: "Content" },
+    { label: "View All FAQ", value: "VIEW_ALL_FAQ", group: "Content" },
+    { label: "View All Gallery", value: "VIEW_ALL_GALLERY", group: "Content" },
     {
-      label: "VIEW_ALL_MESSAGES",
+      label: "View All Messages",
       value: "VIEW_ALL_MESSAGES",
       group: "Contact",
     },
     {
-      label: "VIEW_ALL_PAYMENTS",
+      label: "View All Payments",
       value: "VIEW_ALL_PAYMENTS",
       group: "Billing",
     },
     {
-      label: "VIEW_ALL_STUDYPACKS",
+      label: "View All StudyPacks",
       value: "VIEW_ALL_STUDYPACKS",
       group: "Content",
     },
     {
-      label: "VIEW_ALL_TECHNICAL_SESSION",
+      label: "View All Technical Sessions",
       value: "VIEW_ALL_TECHNICAL_SESSION",
       group: "Content",
     },
-    { label: "VIEW_ALL_USERS", value: "VIEW_ALL_USERS", group: "User" },
-    { label: "VIEW_BILLING", value: "VIEW_BILLING", group: "Billing" },
-    { label: "VIEW_BLOG", value: "VIEW_BLOG", group: "Content" },
-    { label: "VIEW_CONTENT", value: "VIEW_CONTENT", group: "Content" },
-    { label: "VIEW_EVENT", value: "VIEW_EVENT", group: "Event" },
+    { label: "View All Users", value: "VIEW_ALL_USERS", group: "User" },
+    { label: "View Billing", value: "VIEW_BILLING", group: "Billing" },
+    { label: "View Blog", value: "VIEW_BLOG", group: "Content" },
+    { label: "View Content", value: "VIEW_CONTENT", group: "Content" },
+    { label: "View Event", value: "VIEW_EVENT", group: "Event" },
     {
-      label: "VIEW_EVENT_ATTENDANCE",
+      label: "View Event Attendance",
       value: "VIEW_EVENT_ATTENDANCE",
       group: "Event",
     },
     {
-      label: "VIEW_EVENT_REGISTRATION_TREND",
+      label: "View Event Registration Trend",
       value: "VIEW_EVENT_REGISTRATION_TREND",
       group: "Event",
     },
     {
-      label: "VIEW_EVENT_REGISTRATIONS",
+      label: "View Event Registrations",
       value: "VIEW_EVENT_REGISTRATIONS",
       group: "Event",
     },
     {
-      label: "VIEW_EVENT_REGISTRATIONS_BY_USER",
+      label: "View Event Registrations by User",
       value: "VIEW_EVENT_REGISTRATIONS_BY_USER",
       group: "Event",
     },
-    { label: "VIEW_FAQ", value: "VIEW_FAQ", group: "Content" },
-    { label: "VIEW_FEEDBACK", value: "VIEW_FEEDBACK", group: "Content" },
-    { label: "VIEW_GALLERY", value: "VIEW_GALLERY", group: "Content" },
+    { label: "View FAQ", value: "VIEW_FAQ", group: "Content" },
+    { label: "View Feedback", value: "VIEW_FEEDBACK", group: "Content" },
+    { label: "View Gallery", value: "VIEW_GALLERY", group: "Content" },
     {
-      label: "VIEW_ICAN_MEMBER_REGISTRATIONS",
+      label: "View ICAN Member Registrations",
       value: "VIEW_ICAN_MEMBER_REGISTRATIONS",
       group: "Event",
     },
-    { label: "VIEW_MESSAGE", value: "VIEW_MESSAGE", group: "Contact" },
+    { label: "View Message", value: "VIEW_MESSAGE", group: "Contact" },
     {
-      label: "VIEW_OVERDUE_PAYMENTS",
+      label: "View Overdue Payments",
       value: "VIEW_OVERDUE_PAYMENTS",
       group: "Billing",
     },
-    { label: "VIEW_PAYMENT", value: "VIEW_PAYMENT", group: "Billing" },
+    { label: "View Payment", value: "VIEW_PAYMENT", group: "Billing" },
     {
-      label: "VIEW_PAYMENT_BY_BILLING",
+      label: "View Payment by Billing",
       value: "VIEW_PAYMENT_BY_BILLING",
       group: "Billing",
     },
     {
-      label: "VIEW_PAYMENT_DATA",
+      label: "View Payment Data",
       value: "VIEW_PAYMENT_DATA",
       group: "Billing",
     },
     {
-      label: "VIEW_PAYMENT_TREND",
+      label: "View Payment Trend",
       value: "VIEW_PAYMENT_TREND",
       group: "Billing",
     },
-    { label: "VIEW_PERMISSION", value: "VIEW_PERMISSION", group: "User" },
-    { label: "VIEW_ROLE", value: "VIEW_ROLE", group: "User" },
-    { label: "VIEW_ROLES", value: "VIEW_ROLES", group: "User" },
-    { label: "VIEW_STUDYPACK", value: "VIEW_STUDYPACK", group: "Content" },
+    { label: "View Permission", value: "VIEW_PERMISSION", group: "User" },
+    { label: "View Role", value: "VIEW_ROLE", group: "User" },
+    { label: "View Roles", value: "VIEW_ROLES", group: "User" },
+    { label: "View StudyPack", value: "VIEW_STUDYPACK", group: "Content" },
     {
-      label: "VIEW_TECHNICAL_SESSION",
+      label: "View Technical Session",
       value: "VIEW_TECHNICAL_SESSION",
       group: "Content",
     },
-    { label: "VIEW_USER", value: "VIEW_USER", group: "User" },
-    { label: "VIEW_USER_ACTIVITY", value: "VIEW_USER_ACTIVITY", group: "User" },
+    { label: "View User", value: "VIEW_USER", group: "User" },
+    { label: "View User Activity", value: "VIEW_USER_ACTIVITY", group: "User" },
     {
-      label: "VIEW_USER_LOGIN_TREND",
+      label: "View User Login Trend",
       value: "VIEW_USER_LOGIN_TREND",
       group: "User",
     },
     {
-      label: "VIEW_USER_REGISTRATION_TREND",
+      label: "View User Registration Trend",
       value: "VIEW_USER_REGISTRATION_TREND",
       group: "User",
     },
-    { label: "VIEW_WAITLIST", value: "VIEW_WAITLIST", group: "Event" },
+    { label: "View Waitlist", value: "VIEW_WAITLIST", group: "Event" },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -273,13 +273,18 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
         },
         data: submitData,
       };
-      const response = await apiClient.post("/roles/create", submitData, config);
+      const response = await apiClient.post(
+        "/roles/create",
+        submitData,
+        config
+      );
 
-  
       setFormData(initialFormData);
       setPermissions([]);
       setShowModal(false);
 
+      router.refresh();
+      window.location.reload();
       toast({
         title: "Role Created",
         description: "New role created successfully",
@@ -287,17 +292,17 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
       });
 
       setIsLoading(false);
-      router.refresh();
     } catch (error) {
       console.error("Error creating role:", error);
+      router.refresh();
+      window.location.reload();
       toast({
         title: "Error",
-        description:"An error occurred while creating the role",
+        description: "An error occurred while creating the role",
         variant: "destructive",
       });
     }
     setIsLoading(false);
-    router.refresh();
   };
 
   return (
@@ -310,7 +315,7 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
         }
       }}
     >
-      <div className="bg-white p-8 rounded-lg w-[500px]">
+      <div className="bg-white p-8 rounded-lg w-[800px]">
         <h2 className="text-2xl font-semibold mb-6">Create New Role</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

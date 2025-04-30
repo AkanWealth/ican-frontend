@@ -23,29 +23,33 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
   const router = useRouter();
   const handleConfirm = () => {
     console.log({ id, fullName, role });
-    async function fetchData() {
+    async function disableUser() {
       const data = JSON.stringify({
         userId: id,
         suspend: true,
       });
+      console.log(data);
+
       const config = {
         method: "patch",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/users/${id}/suspend`,
         headers: {
           Accept: "application/json",
-          ContentType: "application/json",
+          "Content-Type": "application/json", // Fixed ContentType -> Content-Type
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Cookie: localStorage.getItem("refreshToken"), // Added Cookie header
         },
         data: data,
       };
+
       try {
-        const results = await apiClient.request(config);
+        const results = await apiClient.request(config); // Use request() instead of patch()
         console.log(results);
 
         toast({
-          title: "User Disabled",
-          description: results.message,
+          title: "User Suspended",
+          description: "User Suspended successfully",
           variant: "default",
         });
         onClose(); // Close the modal after successful update
@@ -61,7 +65,7 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
         router.refresh();
       }
     }
-    fetchData();
+    disableUser();
   };
 
   return (

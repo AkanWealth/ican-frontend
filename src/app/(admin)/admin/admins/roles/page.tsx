@@ -27,7 +27,7 @@ import { BASE_API_URL } from "@/utils/setter";
 import { RolesData } from "@/libs/types";
 
 import { Pencil } from "lucide-react";
-
+import { MdArrowBack } from "react-icons/md";
 type parsedRolesType = {
   id: string;
   name: string;
@@ -78,6 +78,13 @@ function RolesPage() {
   return (
     <div className="rounded-3xl bg-white p-6">
       <div className="flex flex-row justify-between py-4 items-center">
+        {" "}
+        <button
+          onClick={() => router.back()}
+          className="flex flex-row items-center gap-2 text-primary"
+        >
+          <MdArrowBack className="w-6 h-6" /> Back
+        </button>
         <h2 className="text-lg font-semibold">Roles and Permissions</h2>
         <button
           onClick={() => {
@@ -118,7 +125,11 @@ function RolesPage() {
         <RoleManager showModal={showModal} setShowModal={setShowModal} />
       )}
       {showEditModal && (
-        <EditRole id={activeRole?.id} showModal={showEditModal} setShowModal={setShowEditModal}/>
+        <EditRole
+          id={activeRole?.id}
+          showModal={showEditModal}
+          setShowModal={setShowEditModal}
+        />
       )}
     </div>
   );

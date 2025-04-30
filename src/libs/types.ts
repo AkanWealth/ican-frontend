@@ -326,12 +326,25 @@ type BlogPost = {
   contentBody: string;
   createdAt: string;
   updatedAt: string;
+};
 
-}
+type StudyPack = {
+  id: string;
+  name: string;
+  document: string;
+  createdBy: string;
+  createdAt: string;
+  status: "pending" | "approved" | "rejected";
+  user: {
+    id: string;
+    email: string;
+  };
+};
 
 export type {
   Advert,
   BlogPost,
+  StudyPack,
   GalleryItem,
   RegisteredUsers,
   User,

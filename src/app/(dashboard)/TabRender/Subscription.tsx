@@ -151,9 +151,9 @@ const Subscription = () => {
                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">
                       Total Paid(₦)
                     </th>
-                    {/* <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">
-                      Balance(₦)
-                    </th> */}
+                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">
+                      Date
+                    </th>
                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-500">
                       Status
                     </th>
@@ -171,9 +171,9 @@ const Subscription = () => {
                       <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
                         {sub.totalPaid.toLocaleString()}
                       </td>
-                      {/* <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                        {sub.balance.toLocaleString()}
-                      </td> */}
+                      <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                        {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {renderStatusBadge(sub.paymentStatus)}
                       </td>

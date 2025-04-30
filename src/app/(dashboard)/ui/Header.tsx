@@ -36,6 +36,9 @@ export const Header = () => {
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const notificationRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+  const s3Loader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
+    return `${src}?w=${width}&q=${quality || 75}`;
+  };
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -77,9 +80,10 @@ export const Header = () => {
       try {
         if (typeof window === "undefined") return; // Ensure code runs only on the client side
         
-        const userDataCookie = cookies.get("user_data");
-        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
-        const userId = userData?.id;
+          const cookies = parseCookies();
+           const userDataCookie = cookies['user_data'];
+           const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+           const userId = userData?.id;
         
         if (!userId) {
           console.error("User ID not found in cookies");
@@ -171,9 +175,11 @@ export const Header = () => {
                 <Image
                   src={profilePicture || "/default-avatar.png"} // Use default avatar if profile picture is not available
                   alt="Profile"
-                  width={200}
-                  height={200}
-                  className="w-full rounded-full object-cover"
+                  // fill="true"
+                  width={500}
+                  height={500}
+                  unoptimized={true}
+                  className="w-full h-full rounded-full object-cover"
                 />
               </div>
               <ChevronDown className="w-4 h-4 text-gray-600" />

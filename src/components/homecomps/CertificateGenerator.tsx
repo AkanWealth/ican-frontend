@@ -4,6 +4,8 @@ import html2canvas from "html2canvas";
 import { Check } from "lucide-react";
 import { Leckerli_One, League_Spartan } from "next/font/google";
 import Image from "next/image";
+import { parseCookies } from "nookies";
+import apiClient from "@/services/apiClient";
 
 const leckerliOne = Leckerli_One({ subsets: ["latin"], weight: "400" });
 interface CertificateGeneratorProps {
@@ -45,12 +47,16 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const user = localStorage.getItem("user");
-        const parsedUser = user ? JSON.parse(user) : null;
+        const cookies = parseCookies();
+        const userDataCookie = cookies['user_data'];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const currentUserId = userData?.id;
+
+        const response = await apiClient.get(`/users/${currentUserId}`);
         setUserData({
-          firstname: parsedUser?.firstname || "Member",
-          surname: parsedUser?.surname || "",
-          middleName: parsedUser?.middleName || "",
+          firstname: response.firstname || "Member",
+          surname: response.surname || "",
+          middleName: response.middleName || "",
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -184,8 +190,8 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({
                     <p
                       className={`text-3xl font-bold my-4 text-blue-700 ${leckerliOne.className}`}
                     >
-                      {`${userData.surname} ${userData.firstname} ${
-                        userData.middleName || ""
+                      {`${userData.surname.toUpperCase()} ${userData.firstname.toUpperCase()} ${
+                        userData.middleName?.toUpperCase() || ""
                       }`}
                     </p>
                     <div className="w-64 border-t-2 border-blue-700 mb-8"></div>

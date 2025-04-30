@@ -17,29 +17,30 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
   const { toast } = useToast();
   const handleConfirm = () => {
     console.log({ id, fullName, role });
-    async function fetchData() {
+    async function enableUser() {
       const data = JSON.stringify({
         userId: id,
         suspend: false,
       });
+      console.log(data);
       const config = {
         method: "patch",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/users/${id}/suspend`,
         headers: {
           Accept: "application/json",
-          ContentType: "application/json",
+          "Content-Type": "application/json", // Fixed ContentType -> Content-Type
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Cookie: localStorage.getItem("refreshToken"), // Added Cookie header
         },
         data: data,
       };
       try {
         const results = await apiClient.request(config);
         console.log(results);
-        onClose();
         toast({
           title: "User Enabled",
-          description: results.message,
+          description: "User Enabled successfully",
           variant: "default",
           duration: 2000,
         });
@@ -54,7 +55,7 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
         });
       }
     }
-    fetchData();
+    enableUser();
   };
 
   return (

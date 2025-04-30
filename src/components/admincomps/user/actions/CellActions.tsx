@@ -104,25 +104,25 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={() => router.push(`admins/${row.original.id}`)}
+              onClick={() => router.push(`members/${row.original.id}`)}
               className="flex flex-row items-center"
             >
               <MdRemoveRedEye className="w-4 h-4" /> View Admin Details
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {row.original.status === "active" ? (
+            {row.original.isSuspended === false ? (
               <DropdownMenuItem
                 className="flex flex-row items-center"
                 onClick={() => setShowDisableModal(true)}
               >
-                <MdOutlineToggleOn className="w-4 h-4" /> Disable Admin
+                <MdOutlineToggleOn className="w-4 h-4" /> Suspend Admin
               </DropdownMenuItem>
             ) : (
               <DropdownMenuItem
                 className="flex flex-row items-center"
                 onClick={() => setShowEnableModal(true)}
               >
-                <MdOutlineToggleOff className="w-4 h-4" /> Enable Admin
+                <MdOutlineToggleOff className="w-4 h-4" /> Reactivate Admin
               </DropdownMenuItem>
             )}
 
@@ -155,7 +155,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         {showDeleteModal && (
           <DeleteAdmin
             id={row.original.id}
-            fullName={row.original.fullName}
+            fullName={row.original.fullName || row.original.firstname + " " + row.original.surname  }
             role={capitalizeWords(row.original.role ?? "")}
             onClose={() => setShowDeleteModal(false)}
           />

@@ -62,6 +62,7 @@ export function ContentTable<TData, TValue>({
         <Input
           placeholder="Filter by titles..."
           value={
+
             (table.getColumn("name")?.getFilterValue() as string) ??
             (table.getColumn("title")?.getFilterValue() as string) ??
             ""

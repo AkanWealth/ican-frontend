@@ -46,15 +46,17 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
         const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}`);
         console.log("Advert details fetched:", response.data);
         setAdvert({
+
           name: response.name || advert.name,
           advertiser: response.advertiser || advert.advertiser,
           image: response.coverImg || advert.image,
           textBody: response.content || advert.textBody,
           startDate: response.startDate
             ? new Date(response.startDate)
+
             : advert.startDate,
-          endDate: response.endDate
-            ? new Date(response.endDate)
+          endDate: response.data.endDate
+            ? new Date(response.data.endDate)
             : advert.endDate,
         });
         setEditDataFetched(true);
@@ -72,6 +74,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       fetchDetails();
     }
   }, [editDataFetched, id, mode, toast, advert]);
+
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -179,6 +182,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       const response = await apiClient.request(config);
       console.log("Advert submitted:", response);
 
+
       toast({
         title: "Success",
         description: `Advert ${
@@ -201,6 +205,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
   };
 
   const handleChange = (
+
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
@@ -267,6 +272,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
               </button>
             )}
           </div>
+
 
           {/* Upload Progress */}
           {isUploading && (

@@ -153,6 +153,13 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    if (!resource.title || !resource.description || !resource.type || !resource.access || !resource.fileurl) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+    }
 
     try {
       const response = await apiClient.post(

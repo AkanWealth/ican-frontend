@@ -5,7 +5,6 @@ import InputEle from "@/components/genui/InputEle";
 
 import apiClient from "@/services-admin/apiClient";
 
-
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
@@ -41,15 +40,13 @@ function FaqEdit({ mode, id }: CreateContentProps) {
         setEditDataFetched(true);
         setIsSubmitting(false);
       } catch (error) {
-  
-          console.error("Error fetching Faq:", error);
-          toast({
-            title: "Error",
-            description: "An error occurred while fetching the Faq.",
-            variant: "destructive",
-          });
-        }
-      
+        console.error("Error fetching Faq:", error);
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching the Faq.",
+          variant: "destructive",
+        });
+      }
     };
 
     if (mode === "edit" && !editDataFetched) {
@@ -59,6 +56,14 @@ function FaqEdit({ mode, id }: CreateContentProps) {
   }, [editDataFetched, id, mode, toast]);
 
   const handleSubmit = async (status: "published" | "draft") => {
+    if (!faq.question || !faq.answer) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
     const data = JSON.stringify({
       name: faq.question,
       answer: faq.answer,
@@ -87,12 +92,14 @@ function FaqEdit({ mode, id }: CreateContentProps) {
         variant: "default",
       });
       router.refresh();
+      window.location.reload();
     } catch (error) {
       toast({
         title: "Error",
         description: `An error occurred while submitting the FAQ.`,
         variant: "destructive",
       });
+      window.location.reload();
     }
   };
 
@@ -103,6 +110,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           label="Question"
           type="text"
           id="title"
+          required={true}
           placeholder="Enter Question"
           value={faq.question}
           onChange={(e) => setFaq({ ...faq, question: e.target.value })}
@@ -111,6 +119,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           label="Answer"
           type="text"
           id="answer"
+          required={true}
           placeholder="Enter Answer"
           value={faq.answer}
           onChange={(e) => setFaq({ ...faq, answer: e.target.value })}

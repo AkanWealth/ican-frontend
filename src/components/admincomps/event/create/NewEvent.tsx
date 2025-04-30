@@ -350,6 +350,17 @@ function NewEvent({
     }
     const publishEvent = async () => {
 
+      // Validate that eventPhoto is not empty before publishing
+      if (!formData.eventPhoto) {
+        toast({
+          title: "Event Photo Required",
+          description: "Please upload an event photo before publishing",
+          variant: "destructive"
+        });
+        setIsPublishing(false);
+        return;
+      }
+
       try {
         const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
         const formDataToSend = {

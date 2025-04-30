@@ -283,6 +283,8 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
       setPermissions([]);
       setShowModal(false);
 
+      router.refresh();
+      window.location.reload();
       toast({
         title: "Role Created",
         description: "New role created successfully",
@@ -290,9 +292,10 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
       });
 
       setIsLoading(false);
-      router.refresh();
     } catch (error) {
       console.error("Error creating role:", error);
+      router.refresh();
+      window.location.reload();
       toast({
         title: "Error",
         description: "An error occurred while creating the role",
@@ -300,7 +303,6 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
       });
     }
     setIsLoading(false);
-    router.refresh();
   };
 
   return (

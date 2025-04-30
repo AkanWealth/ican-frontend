@@ -15,7 +15,6 @@ import apiClient from "@/services-admin/apiClient";
 import { BASE_API_URL } from "@/utils/setter";
 import { useToast } from "@/hooks/use-toast";
 
-
 function BillingPage() {
   const { toast } = useToast();
   const [data, setData] = useState<Billing[]>([]);
@@ -27,12 +26,17 @@ function BillingPage() {
         method: "get",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/billing`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
       };
       try {
         const result = await apiClient.get("/billing", config);
 
-        setData(result);
+        setData(result.data);
       } catch (error) {
+        console.log(error);
         toast({
           title: "Error",
           description: "An unexpected error occurred.",

@@ -17,7 +17,7 @@ interface Resource {
   description: string;
   type: string;
   access: string;
-  fileurl: string;
+  fileUrl: string;
 }
 
 function ResourceEdit({ mode, id }: CreateContentProps) {
@@ -31,9 +31,9 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
   const [resource, setResource] = useState<Resource>({
     title: "",
     description: "",
-    type: "",
+    type: "DOCUMENT",
     access: "",
-    fileurl: "",
+    fileUrl: "",
   });
 
   const handleChange = (
@@ -60,7 +60,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
           description: response.description,
           type: response.type,
           access: response.access,
-          fileurl: response.fileurl,
+          fileUrl: response.fileUrl,
         });
         setEditDataFetched(true);
         setIsSubmitting(false);
@@ -153,7 +153,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    if (!resource.title || !resource.description || !resource.type || !resource.access || !resource.fileurl) {
+    if (!resource.title || !resource.description || !resource.type || !resource.access || !resource.fileUrl) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -163,7 +163,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
 
     try {
       const response = await apiClient.post(
-        `${BASE_API_URL}/resources/content`,
+        `${BASE_API_URL}/resources/add-content`,
         resource
       );
       console.log("Resource created:", response.data);
@@ -201,13 +201,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
           onChange={handleChange}
           value={resource.description}
         />
-        <InputEle
-          label="Resource Type"
-          type="text"
-          id="type"
-          onChange={handleChange}
-          value={resource.type}
-        />
+  
         <InputEle
           label="Resource Access"
           type="select"
@@ -215,17 +209,11 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
           onChange={handleChange}
           options={[
             { value: "PUBLIC", label: "Public" },
-            { value: "MEMBERS", label: "Members" },
+            { value: "MEMBERS_ONLY", label: "Members" },
           ]}
           value={resource.access}
         />
-        <InputEle
-          label="Upload File (PDF)"
-          type="file"
-          id="resource_file"
-          onChange={() => {}}
-          value={resource.fileurl}
-        />
+       
         {/* PDF Upload Section */}
         <div className="space-y-2">
           <label className="block text-sm font-medium">Upload PDF</label>
@@ -242,7 +230,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
                 disabled={isUploading}
               />
             </label>
-            {resource.fileurl && (
+            {resource.fileUrl && (
               <button
                 onClick={handleDeletePDF}
                 className="bg-[#E7EAFF] text-[#27378C] px-6 py-2 rounded-full hover:bg-gray-200 text-sm whitespace-nowrap"
@@ -269,12 +257,12 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
           )}
 
           {/* Image Preview */}
-          {resource.fileurl && !isUploading && (
+          {resource.fileUrl && !isUploading && (
             <div className="mt-2">
               <p className="text-sm font-medium mb-2">PDF Preview</p>
               <div className="relative group w-full max-w-md">
                 <embed
-                  src={resource.fileurl}
+                  src={resource.fileUrl}
                   className="w-full h-48 object-cover rounded-md"
                 />
               </div>

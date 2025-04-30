@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { BASE_API_URL } from "@/utils/setter";
 
-import { Resource } from "@/libs/types";  
+import { Resource } from "@/libs/types";
 
 function Resources() {
   const [data, setData] = useState<Resource[]>([]);
@@ -25,12 +25,12 @@ function Resources() {
       };
       try {
         const response = await apiClient.get("/resources/contents", config);
-        setData(response);
+        setData(response.data);
         toast({
           title: "Content fetched successfully",
           description: "Content fetched successfully",
           variant: "default",
-        }); 
+        });
       } catch (error) {
         toast({
           title: "Error",

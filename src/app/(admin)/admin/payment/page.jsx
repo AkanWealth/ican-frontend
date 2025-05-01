@@ -56,7 +56,7 @@ function Payment() {
           <h2 className="font-semibol text-2xl text-black">
             Payment Management
           </h2>
-          <p>Manage all member payments details here</p>
+          <p>Manage all member payments here</p>
         </div>
       </div>
 

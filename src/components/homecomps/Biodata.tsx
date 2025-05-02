@@ -19,6 +19,8 @@ import Payment from "../biosteps/Payment";
 import Personal from "../biosteps/Personal";
 import Qualifications from "../biosteps/Qualifications";
 import axios from "axios";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 import Reference from "../biosteps/Reference";
 import Uploadimg from "../biosteps/Uploadimg";
 
@@ -204,9 +206,12 @@ function Biodata() {
           !!experience?.companyName?.trim() &&
           !!experience?.currentPosition?.trim() &&
           !!experience?.startDate?.trim();
-        
-        setIsCurrentStepValid(isExperienceValid);
-        if (!isExperienceValid) {
+
+        // Validate endDate only if isCurrentJob is false
+        const isEndDateValid =!!experience?.endDate?.trim();
+
+        setIsCurrentStepValid(isExperienceValid && isEndDateValid);
+        if (!isExperienceValid || !isEndDateValid) {
           setValidationMessage("Please fill all required experience details");
         } else {
           setValidationMessage("");
@@ -227,7 +232,7 @@ function Biodata() {
         setIsCurrentStepValid(true);
         setValidationMessage("");
     }
-  }, [activeStep, formData]); // Add dependencies here
+  }, [activeStep, formData]); // Add isCurrentJob as a dependency
 
   // Run validation when activeStep changes or when formData changes
   useEffect(() => {
@@ -277,10 +282,23 @@ function Biodata() {
 
   const handleSubmit = async () => {
     if (typeof window === "undefined") return; 
+     
+            
     
     try {
+    //   const cookies = parseCookies();
+    // const userDataCookie = cookies['user_data'];
+    // const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+    // const userId = userData?.id;
+    // console.log("userId", userId);
+    
+    //  if (!userId) throw new Error("User ID not found in cookies");
+    
+            // Specify the return type with UserResponse interface
+      // const response = await apiClient.get(`/users/${userId}`);
       const userEmail = localStorage.getItem("userEmail") || "";
       const memberId = localStorage.getItem("memberId") || "";
+      
       const payload = {
         email: userEmail,
         membershipId: memberId,
@@ -291,9 +309,7 @@ function Biodata() {
         firstname: formData.personalData.firstName || "",
         middlename: formData.personalData.middleName || "",
         gender: formData.personalData.gender || "",
-        dateOfBirth: formData.personalData.dob 
-          ? new Date(formData.personalData.dob).toISOString() 
-          : null,
+        dateOfBirth: formData.personalData.dob || null, // Already in YYYY-MM-DD format
         maritalStatus: formData.personalData.maritalStatus || "",
         stateOfOrigin: formData.personalData.state || "",
         nationality: formData.personalData.nationality || "",
@@ -312,27 +328,28 @@ function Biodata() {
         qualifications: formData.education?.qualification || "",
         yearOfGraduation: formData.education?.graduation 
           ? Number(formData.education.graduation) 
-          : "",
+          : null,
         status: formData.education?.status || "",
         
         // Experience
         companyName: formData.experience?.companyName || "",
         officeAddress: formData.experience?.officeAddress || "",
         position: formData.experience?.currentPosition || "",
-        startDate: formData.experience?.startDate 
-          ? new Date(formData.experience.startDate).toISOString() 
-          : null,
-        endDate: formData.experience?.endDate 
-          ? new Date(formData.experience.endDate).toISOString() 
-          : null,
+        startDate: formData.experience?.startDate || null, // Already in YYYY-MM-DD format
+        endDate: formData.experience?.endDate || null, // Already in YYYY-MM-DD format
       };
+      
       console.log("Payload:", payload);
       const username = localStorage.getItem("userName") || "";
       const Token = localStorage.getItem("token");
       console.log("Token:", Token);
-
+      // const responseBiossata = await apiClient.put<any>(
+      //         `/users/update-user`,
+      //         payload
+      //       );
+  
       // Send the data to the API
-      const response = await axios({
+      const responseBiossata = await axios({
         method: 'put',
         url: 'https://ican-api-6000e8d06d3a.herokuapp.com/api/users/update-user',
         data: payload,
@@ -342,8 +359,8 @@ function Biodata() {
           Accept: 'application/json'
         },
       });
-
-      console.log("Biodata submitted successfully:", response.data);
+  
+      console.log("Biodata submitted successfully:", responseBiossata.data);
       toast.toast({
         title: "Biodata submitted successfully!",
         description: "Registration is complete.",
@@ -356,7 +373,9 @@ function Biodata() {
       console.error("Error submitting biodata:", error);
       toast.toast({
         title: "Failed to submit biodata",
-        description: "Please try again.",
+        description: axios.isAxiosError(error) && error.response?.data?.message 
+          ? error.response.data.message 
+          : "Please try again.",
         variant: "destructive",
         duration: 3000,
       });

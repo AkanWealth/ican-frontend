@@ -511,20 +511,12 @@ const isValidUrl = (url: any) => {
         <p className="text-gray-600 text-xs">
           If you need to make changes, contact us at{" "}
           <a
-            href="mailto:support@company.com"
+            href="mailto:icansuruleredistrictsociety@gmail.com"
             className="text-blue-600 underline hover:text-blue-800"
           >
-            support@company.com
+            icansuruleredistrictsociety@gmail.com
           </a>{" "}
-          or visit our{" "}
-          <a
-            href="https://www.company.com/help-center"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline hover:text-blue-800"
-          >
-            Help Center
-          </a>.
+          or call us at <span className="text-blue-600">+234 808 816 8895</span>.
         </p>
       </div>
     </div>

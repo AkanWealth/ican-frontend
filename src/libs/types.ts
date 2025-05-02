@@ -265,7 +265,7 @@ type GalleryItem = {
   videos: string[];
   createdBy: string;
   createdAt: string;
-  status: "active" | "inactive";
+  status: "active" | "inactive" | string;
   user: {
     firstname: string;
     surname: string;
@@ -335,7 +335,7 @@ type StudyPack = {
   document: string;
   createdBy: string;
   createdAt: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | string;
   user: {
     id: string;
     email: string;

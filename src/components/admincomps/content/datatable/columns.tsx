@@ -8,7 +8,15 @@ import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/content/editActions/CellActions";
 
-import { Resource, Advert, BlogPost } from "@/libs/types";
+import {
+  Resource,
+  Advert,
+  BlogPost,
+  GalleryItem,
+  TechnicalPost,
+  FaqData,
+  StudyPack,
+} from "@/libs/types";
 
 export const allcolumns: ColumnDef<Content>[] = [
   {
@@ -325,7 +333,7 @@ export const resourcescolumns: ColumnDef<Resource>[] = [
     },
   },
 ];
-export const galleriescolumns: ColumnDef<Content>[] = [
+export const galleriescolumns: ColumnDef<GalleryItem>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -370,6 +378,10 @@ export const galleriescolumns: ColumnDef<Content>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
+    },
   },
   {
     accessorKey: "images",
@@ -385,8 +397,10 @@ export const galleriescolumns: ColumnDef<Content>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      return row.original.images.length;
+    },
   },
-
   {
     accessorKey: "status",
     header: ({ column }) => {
@@ -414,7 +428,7 @@ export const galleriescolumns: ColumnDef<Content>[] = [
   },
 ];
 
-export const technicalcolumns: ColumnDef<Content>[] = [
+export const technicalcolumns: ColumnDef<TechnicalPost>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -431,7 +445,7 @@ export const technicalcolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "Document",
+    accessorKey: "document",
     header: ({ column }) => {
       return (
         <Button
@@ -439,7 +453,7 @@ export const technicalcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Document <ArrowUpDown className="ml-2 h-4 w-4" />
+          Document Link <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
@@ -458,6 +472,10 @@ export const technicalcolumns: ColumnDef<Content>[] = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
     },
   },
   {
@@ -481,11 +499,13 @@ export const technicalcolumns: ColumnDef<Content>[] = [
 
   {
     id: "actions",
-    cell: ({ row }) => {},
+    cell: ({ row }) => {
+      return <CellActions contentCategory="technical" row={row} />;
+    },
   },
 ];
 
-export const studentcolumns: ColumnDef<Content>[] = [
+export const studentcolumns: ColumnDef<StudyPack>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -510,7 +530,7 @@ export const studentcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Document <ArrowUpDown className="ml-2 h-4 w-4" />
+          Document Link <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
@@ -528,6 +548,10 @@ export const studentcolumns: ColumnDef<Content>[] = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
     },
   },
   {
@@ -556,7 +580,7 @@ export const studentcolumns: ColumnDef<Content>[] = [
     },
   },
 ];
-export const faqcolumns: ColumnDef<Content>[] = [
+export const faqcolumns: ColumnDef<FaqData>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -585,6 +609,25 @@ export const faqcolumns: ColumnDef<Content>[] = [
           Answer <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date Created
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
     },
   },
 

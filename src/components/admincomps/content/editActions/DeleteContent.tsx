@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   MdSubtitles,
   MdOutlineDateRange,
@@ -32,12 +32,16 @@ function DeleteContent({
   onClose,
 }: DeleteContentProps) {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDelete = async () => {
+    setIsLoading(true);
     const config = {
       method: "DELETE",
       maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/${contentCategory === "resources" ? "resources/content" : contentCategory}/${id}`,
+      url: `${BASE_API_URL}/${
+        contentCategory === "resources" ? "resources/content" : contentCategory
+      }/${id}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -51,6 +55,7 @@ function DeleteContent({
         description: "The content has been successfully deleted.",
         variant: "default",
       });
+      setIsLoading(false);
 
       onClose();
     } catch (error) {
@@ -60,6 +65,7 @@ function DeleteContent({
         description: "There was an error while trying to delete the content.",
         variant: "destructive",
       });
+      setIsLoading(false);
     }
   };
 
@@ -104,9 +110,16 @@ function DeleteContent({
         <div className="flex justify-between">
           <button
             onClick={handleDelete}
-            className="flex items-center w-2/5 text-center justify-center bg-red-600 font-semibold text-base text-white rounded-full py-3 px-4 h-10"
+            disabled={isLoading}
+            className={`flex items-center w-2/5 text-center justify-center ${
+              isLoading ? "bg-red-400" : "bg-red-600"
+            } font-semibold text-base text-white rounded-full py-3 px-4 h-10`}
           >
-            Delete
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              "Delete"
+            )}
           </button>
           <button
             onClick={onClose}

@@ -321,7 +321,7 @@ export const resourcescolumns: ColumnDef<Resource>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellActions contentCategory="resources/content" row={row} />;
+      return <CellActions contentCategory="resources" row={row} />;
     },
   },
 ];

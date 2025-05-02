@@ -37,7 +37,7 @@ function DeleteContent({
     const config = {
       method: "DELETE",
       maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/${contentCategory}/${id}`,
+      url: `${BASE_API_URL}/${contentCategory === "resources" ? "resources/content" : contentCategory}/${id}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

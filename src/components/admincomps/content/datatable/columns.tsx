@@ -10,7 +10,6 @@ import CellActions from "@/components/admincomps/content/editActions/CellActions
 
 import { Resource, Advert, BlogPost } from "@/libs/types";
 
-
 export const allcolumns: ColumnDef<Content>[] = [
   {
     accessorKey: "name",
@@ -136,7 +135,7 @@ export const advertscolumns: ColumnDef<Advert>[] = [
     cell: ({ row }) => {
       const date = new Date(row.original.endDate);
       return date.toLocaleDateString();
-    },  
+    },
   },
   {
     accessorKey: "status",
@@ -285,7 +284,7 @@ export const resourcescolumns: ColumnDef<Resource>[] = [
     },
     cell: ({ row }) => {
       const date = new Date(row.original.createdAt);
-      return date.toLocaleDateString(); 
+      return date.toLocaleDateString();
     },
   },
   {
@@ -319,7 +318,12 @@ export const resourcescolumns: ColumnDef<Resource>[] = [
     },
   },
 
-  
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      return <CellActions contentCategory="resources/content" row={row} />;
+    },
+  },
 ];
 export const galleriescolumns: ColumnDef<Content>[] = [
   {
@@ -382,21 +386,7 @@ export const galleriescolumns: ColumnDef<Content>[] = [
       );
     },
   },
-  {
-    accessorKey: "videos",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Videos
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
+
   {
     accessorKey: "status",
     header: ({ column }) => {

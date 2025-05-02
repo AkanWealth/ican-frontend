@@ -99,7 +99,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         setUploadProgressImage(progress);
       });
 
-      console.log("Uploaded advert image URL:", uploadedUrl);
+      console.log("Uploaded Technical Session image URL:", uploadedUrl);
 
       // Update state with the new URL
       setTechSesh((prev) => ({
@@ -258,7 +258,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         />
         {/* Image Upload Section */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Advert Image</label>
+          <label className="block text-sm font-medium">Technical Session Image</label>
 
           {/* Image Upload Controls */}
           <div className="flex flex-wrap gap-4">
@@ -314,7 +314,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         </div>
 
         {/* PDF Upload Section */}
-        <div className="space-y-2">
+        <div className="space-y-2 mb-4">
           <label className="block text-sm font-medium">Upload PDF</label>
 
           {/* Image Upload Controls */}
@@ -380,23 +380,31 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
         >
-          {mode === "edit" ? "Publish Edit" : "Publish Technical Session"}
+          {isSubmitting ? (
+            <span>Loading...</span>
+          ) : (
+            mode === "edit" ? "Publish Edit" : "Publish Technical Session"
+          )}
         </button>
         <button
-          disabled={isSubmitting}
+          disabled={isSubmitting} 
           onClick={(e) => {
             e.preventDefault();
             setIsSubmitting(true);
             handleSubmit("draft");
           }}
-          className=" py-2 text-primary border border-primary text-base rounded-full w-full"
+          className="py-2 text-primary border border-primary text-base rounded-full w-full"
         >
-          {mode === "edit" ? "Save Edit" : "Save as Draft"}
+          {isSubmitting ? (
+            <span>Loading...</span>
+          ) : (
+            mode === "edit" ? "Save Edit" : "Save as Draft"
+          )}
         </button>
         <button
           disabled={isSubmitting}
           onClick={() => setShowPreview(true)}
-          className=" py-1 text-primary text-base rounded-full w-full"
+          className="py-1 text-primary text-base rounded-full w-full"
         >
           Preview
         </button>

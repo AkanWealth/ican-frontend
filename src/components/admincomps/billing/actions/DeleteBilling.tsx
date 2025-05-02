@@ -15,8 +15,12 @@ interface DeleteBillingProps {
 }
 
 import apiClient from "@/services-admin/apiClient";
+
+import { BASE_API_URL } from "@/utils/setter";
+
 import { useToast } from "@/hooks/use-toast";
 
+import axios from "axios";
 
 function DeleteBilling({
   id,
@@ -26,8 +30,40 @@ function DeleteBilling({
   onClose,
 }: DeleteBillingProps) {
   const { toast } = useToast();
-  const handleDelete = () => {
+  const token = localStorage.getItem("access_token");
+  const handleDelete = async () => {
     console.log({ id, title, category, date });
+    // Configure delete request
+    const config = {
+      method: "delete",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/billing/${id}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    // Send delete request using try-catch
+    try {
+      const response = await apiClient.request(config);
+      console.log("Delete successful:", response.data);
+      toast({
+        title: "Success",
+        description: "Billing record deleted successfully",
+        variant: "default",
+      });
+      onClose(); // Close modal after successful deletion
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast({
+        title: "Error",
+        description: axios.isAxiosError(error) 
+          ? error.response?.data?.message || "Failed to delete billing record" 
+          : "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

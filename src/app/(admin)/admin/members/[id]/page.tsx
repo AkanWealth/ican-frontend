@@ -13,6 +13,26 @@ import { MdArrowBack } from "react-icons/md";
 import { BASE_API_URL } from "@/utils/setter";
 import { User } from "@/libs/types";
 
+// Format date to dd-mm-yyyy
+const formatDate = (dateString: string | undefined): string => {
+  if (!dateString) return "N/A";
+
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "N/A";
+
+    return date
+      .toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+      .replace(/\//g, "-");
+  } catch (error) {
+    return "N/A";
+  }
+};
+
 function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [data, setData] = useState<User>();
@@ -91,7 +111,7 @@ function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
               Date of Birth
               <span className="text-base text-black font-medium">
                 {" "}
-                {data?.dateOfBirth || "N/A"}
+                {formatDate(data?.dateOfBirth)}
               </span>
             </p>{" "}
             <p className=" text-sm text-neutral-600 flex flex-col gap-1">
@@ -239,14 +259,14 @@ function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
               Start Date{" "}
               <span className="text-base text-black font-medium">
                 {" "}
-                {data?.startDate || "N/A"}
+                {formatDate(data?.startDate)}
               </span>
             </p>
             <p className=" text-sm text-neutral-600 flex flex-col gap-1">
               End Date{" "}
               <span className="text-base text-black font-medium">
                 {" "}
-                {data?.endDate || "N/A"}
+                {formatDate(data?.endDate)}
               </span>
             </p>
           </div>

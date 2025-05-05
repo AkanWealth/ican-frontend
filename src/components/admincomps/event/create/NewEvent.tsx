@@ -304,8 +304,11 @@ function NewEvent({
           status: "DRAFT",
         };
         const config = {
-          method: mode === "edit" ? "patch" : "post", 
-          url: mode === "edit" ? `${BASE_API_URL}/events/${id}` : `${BASE_API_URL}/events`,
+          method: mode === "edit" ? "patch" : "post",
+          url:
+            mode === "edit"
+              ? `${BASE_API_URL}/events/${id}`
+              : `${BASE_API_URL}/events`,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -349,13 +352,12 @@ function NewEvent({
       return;
     }
     const publishEvent = async () => {
-
       // Validate that eventPhoto is not empty before publishing
       if (!formData.eventPhoto) {
         toast({
           title: "Event Photo Required",
           description: "Please upload an event photo before publishing",
-          variant: "destructive"
+          variant: "destructive",
         });
         setIsPublishing(false);
         return;
@@ -376,8 +378,11 @@ function NewEvent({
         };
 
         const config = {
-          method: mode === "edit" ? "patch" : "post", 
-          url: mode === "edit" ? `${BASE_API_URL}/events/${id}` : `${BASE_API_URL}/events`,
+          method: mode === "edit" ? "patch" : "post",
+          url:
+            mode === "edit"
+              ? `${BASE_API_URL}/events/${id}`
+              : `${BASE_API_URL}/events`,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -414,25 +419,27 @@ function NewEvent({
   };
 
   return (
-    <div className="fixed inset-0 z-10 bg-gray-800 bg-opacity-75 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg w-fit ">
-        <div className="flex flex-row justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Create New Event</h2>
+    <div className="fixed inset-0 z-20 bg-gray-800 bg-opacity-80 flex items-center justify-center overflow-y-auto py-8">
+      <div className="bg-white p-8 rounded-xl shadow-xl w-[900px] max-w-[95%] max-h-[90vh] overflow-y-auto">
+        <div className="flex flex-row justify-between items-center mb-6 border-b pb-4">
+          <h2 className="text-2xl font-bold text-primary">
+            {mode === "edit" ? "Edit Event" : "Create New Event"}
+          </h2>
 
           <button
-            className=" text-black hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
             onClick={handleCancel}
           >
-            <MdClose className="w-5 h-5" />
+            <MdClose className="w-6 h-6" />
           </button>
         </div>
-        <div className="flex flex-row items-center gap-4 justify-between">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <InputEle
             type="text"
             id="eventName"
             label="Event Name"
             required
-            
             value={formData.eventName}
             onChange={handleChange}
             errorMsg={formErrors.eventName}
@@ -447,25 +454,29 @@ function NewEvent({
             errorMsg={formErrors.venue}
           />
         </div>
-        <InputEle
-          type="text"
-          id="eventDescription"
-          label="Event Description"
-          value={formData.eventDescription}
-          onChange={handleChange}
-          errorMsg={formErrors.eventDescription}
-        />
-        <div className="flex flex-row items-center gap-4 justify-between">
-          <div className={` w-full h-fit flex flex-col gap-3 `}>
+
+        <div className="mb-6">
+          <InputEle
+            type="text"
+            id="eventDescription"
+            label="Event Description"
+            value={formData.eventDescription}
+            onChange={handleChange}
+            errorMsg={formErrors.eventDescription}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className={`w-full h-fit flex flex-col gap-3`}>
             <label
-              className=" text-base font-sans font-semibold  "
+              className="text-base font-sans font-semibold"
               htmlFor={"eventDate"}
             >
               Event Date
-              <span className="text-red-600">*</span>
+              <span className="text-red-600 ml-1">*</span>
             </label>
             <input
-              className=" p-3 rounded border border-gray-400  "
+              className="p-3 rounded-md border border-gray-300 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200"
               name={"eventDate"}
               id={"eventDate"}
               value={formData.eventDate}
@@ -489,7 +500,8 @@ function NewEvent({
             errorMsg={formErrors.eventTime}
           />
         </div>
-        <div className="flex flex-row items-center gap-4 justify-between">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <InputEle
             type="text"
             id="eventFee"
@@ -499,17 +511,27 @@ function NewEvent({
             onChange={handleChange}
             errorMsg={formErrors.eventFee}
           />
+          <InputEle
+            type="text"
+            id="mcpdCredit"
+            label="MCPD Credit (Optional)"
+            required={false}
+            value={formData.mcpdCredit}
+            onChange={handleChange}
+            errorMsg={formErrors.mcpdCredit}
+          />
         </div>
 
         {/* Event Image */}
-        {/* Image Upload Section */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium">Event Image</label>
+        <div className="space-y-4 mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+          <label className="block text-base font-medium text-gray-700">
+            Event Image
+          </label>
 
           {/* Image Upload Controls */}
           <div className="flex flex-wrap gap-4">
-            <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
-              Upload Image
+            <label className="bg-primary text-white px-6 py-2.5 rounded-full cursor-pointer hover:bg-blue-700 text-sm font-medium transition-colors duration-200 flex items-center justify-center">
+              <span className="mr-2">Upload Image</span>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/gif"
@@ -518,13 +540,13 @@ function NewEvent({
                 disabled={isUploading}
               />
             </label>
-            {eventPhoto && (
+            {(eventPhoto || formData.eventPhoto) && (
               <button
                 onClick={handleDeleteImage}
-                className="bg-[#E7EAFF] text-[#27378C] px-6 py-2 rounded-full hover:bg-gray-200 text-sm whitespace-nowrap"
+                className="bg-[#FEE2E2] text-red-600 px-6 py-2.5 rounded-full hover:bg-red-100 text-sm font-medium transition-colors duration-200 flex items-center justify-center"
                 disabled={isUploading}
               >
-                Remove Image
+                <span>Remove Image</span>
               </button>
             )}
           </div>
@@ -532,12 +554,12 @@ function NewEvent({
           {/* Upload Progress */}
           {isUploading && (
             <div className="mt-2 space-y-2">
-              <p className="text-sm font-medium">
+              <p className="text-sm font-medium text-gray-600">
                 Uploading... {uploadProgress}%
               </p>
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
-                  className="bg-primary h-2.5 rounded-full"
+                  className="bg-primary h-2.5 rounded-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 ></div>
               </div>
@@ -545,61 +567,53 @@ function NewEvent({
           )}
 
           {/* Image Preview */}
-          {eventPhoto && !isUploading && (
-            <div className="mt-2">
-              <p className="text-sm font-medium mb-2">Image Preview</p>
-              <div className="relative group w-full max-w-md">
+          {(eventPhoto || formData.eventPhoto) && !isUploading && (
+            <div className="mt-4">
+              <p className="text-sm font-medium mb-2 text-gray-700">
+                Image Preview
+              </p>
+              <div className="relative group w-full max-w-lg mx-auto">
                 <img
-                  src={eventPhoto as string}
+                  src={(eventPhoto as string) || formData.eventPhoto}
                   alt="Event Image"
-                  className="w-full h-48 object-cover rounded-md"
-                />
-              </div>
-            </div>
-          )}
-          {mode === "edit" && formData.eventPhoto && !isUploading && (
-            <div className="mt-2">
-              <p className="text-sm font-medium mb-2">Current Flyer</p>
-              <div className="relative group w-full max-w-md">
-                <img
-                  src={formData.eventPhoto}
-                  alt="Event Flyer"
-                  className="w-full h-48 object-cover rounded-md"
+                  className="w-full h-64 object-contain bg-white border rounded-lg shadow-sm"
                 />
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex justify-between mt-4">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8 border-t pt-6">
           <button
-            className="bg-gray-500 w-full  text-white px-4 py-2 rounded mr-2"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-6 py-3 rounded-lg transition-colors duration-200"
             onClick={handleCancel}
           >
             Cancel
           </button>
-          <button
-            className={`bg-white text-primary w-full px-4 py-2 rounded mr-2 ${
-              isSavingDraft || isPublishing
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-            onClick={handleSaveDraft}
-            disabled={isSavingDraft || isPublishing}
-          >
-            {isSavingDraft ? "Saving Draft..." : "Save as Draft"}
-          </button>
-          <button
-            className={`bg-primary text-white w-full px-4 py-2 rounded ${
-              isPublishing || isSavingDraft
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-            onClick={handlePublish}
-            disabled={isPublishing || isSavingDraft}
-          >
-            {isPublishing ? "Publishing..." : "Publish Event"}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              className={`border border-primary text-primary hover:bg-blue-50 font-medium px-6 py-3 rounded-lg transition-colors duration-200 ${
+                isSavingDraft || isPublishing
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
+              onClick={handleSaveDraft}
+              disabled={isSavingDraft || isPublishing}
+            >
+              {isSavingDraft ? "Saving Draft..." : "Save as Draft"}
+            </button>
+            <button
+              className={`bg-primary hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors duration-200 ${
+                isPublishing || isSavingDraft
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
+              onClick={handlePublish}
+              disabled={isPublishing || isSavingDraft}
+            >
+              {isPublishing ? "Publishing..." : "Publish Event"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

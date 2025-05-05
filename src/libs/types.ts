@@ -139,6 +139,40 @@ type OverdueBills = {
   };
 };
 
+type BillingUsersDetails = {
+  id: string;
+  name: string;
+  type: string;
+  amount: number;
+  createdBy: string;
+  status: "PENDING" | "COMPLETED" | "FAILED";
+  createdAt: string;
+  createdByUser: {
+    id: string;
+    email: string;
+    membershipId: string;
+    surname: string;
+    firstname: string;
+  };
+  payments: {
+    id: string;
+    userId: string;
+    billingId: string;
+    paymentType: string;
+    amount: number;
+    datePaid: string;
+    status: string;
+    transactionId: string;
+  }[];
+  affectedUsers: {
+    id: string;
+    billingId: string;
+    userId: string;
+    amountPaid: number;
+    paymentStatus: "NOT_PAID" | "PARTIALLY_PAID" | "PAID";
+  }[];
+};
+
 /**
  * Represents a payment transaction with details about the payment and associated user
  */
@@ -357,6 +391,7 @@ export type {
   OverdueBills,
   PaymentDets,
   PaymentDetails,
+  BillingUsersDetails,
   EventDetails,
   DashEventReg,
   DashUserLogin,

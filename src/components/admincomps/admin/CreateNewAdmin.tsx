@@ -195,7 +195,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         }
       }}
     >
-      <div className="bg-white p-8 rounded-lg w-[500px]">
+      <div className="bg-white p-8 rounded-lg w-[800px] max-w-[90%] max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-semibold mb-6">
           Create New Administrator
         </h2>

@@ -50,7 +50,7 @@ function DeleteRole({ id, role, onClose }: DeleteRoleProps) {
 
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
+      <div className="flex flex-col p-8 rounded-xl gap-4 bg-white w-[800px] max-w-[90%] max-h-[90vh] overflow-y-auto">
         <div className="flex flex-row justify-start gap-4">
           <div className="rounded-full  h-fit w-fit p-4 bg-red-200">
             <MdDeleteOutline className="w-6 h-6 fill-red-600" />

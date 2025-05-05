@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import Image from "next/image";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -62,7 +62,6 @@ export function ContentTable<TData, TValue>({
         <Input
           placeholder="Filter by titles..."
           value={
-
             (table.getColumn("name")?.getFilterValue() as string) ??
             (table.getColumn("title")?.getFilterValue() as string) ??
             ""
@@ -127,7 +126,12 @@ export function ContentTable<TData, TValue>({
                   className="h-24 text-center"
                 >
                   <div className="flex items-center justify-center">
-                    <div className="w-10 h-10 border-4 border-neutral-200 border-t-neutral-800 rounded-full animate-spin"></div>
+                    <Image
+                      src="/Emptycontenttable.png"
+                      alt="No data"
+                      width={400}
+                      height={400}
+                    />
                   </div>
                 </TableCell>
               </TableRow>

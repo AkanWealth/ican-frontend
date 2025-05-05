@@ -17,7 +17,7 @@ import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 interface RolemanagerProps {
   id?: string;
   showModal: boolean;
-  setShowModal: (show: boolean) => void;
+  setShowModal: (show: boolean) => void;  
 }
 interface FormData {
   name: string;
@@ -97,7 +97,7 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
       console.error("Error creating role:", error);
       toast({
         title: "Error",
-        description:   "An error occurred while editing the role",
+          description:   "An error occurred while editing the role",
         variant: "destructive",
       });
     }
@@ -115,7 +115,7 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
         }
       }}
     >
-      <div className="bg-white p-8 rounded-lg w-[500px]">
+      <div className="bg-white p-8 rounded-lg w-[800px] max-w-[90%] max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-semibold mb-6">Create New Role</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

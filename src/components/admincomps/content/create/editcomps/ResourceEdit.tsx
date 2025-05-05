@@ -178,6 +178,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
         description: "Resource created successfully",
         variant: "default",
       });
+      window.location.reload();
     } catch (error) {
       console.error("Error creating resource:", error);
       toast({

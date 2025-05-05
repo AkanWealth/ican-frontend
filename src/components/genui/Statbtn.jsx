@@ -120,6 +120,27 @@ function Statbtn({ status }) {
       icon: <MdOutlineCancel className="w-4 h-4" />,
       label: "Inactive",
     },
+    not_paid: {
+      bg: "bg-red-200",
+      text: "text-red-500",
+      fill: "fill-red-500",
+      icon: <MdOutlineCancel className="w-4 h-4" />,
+      label: "Not Paid",
+    },
+    partially_paid: {
+      bg: "bg-yellow-200",
+      text: "text-yellow-500",
+      fill: "fill-yellow-500",
+      icon: <MdOutlineCancel className="w-4 h-4" />,
+      label: "Partially Paid",
+    },
+    paid: {
+      bg: "bg-green-200",
+      text: "text-green-500",
+      fill: "fill-green-500",
+      icon: <MdCheckCircleOutline className="w-4 h-4" />,
+      label: "Paid",
+    },
   };
 
   const style = status ? statusStyles[status.toLowerCase()] : null;

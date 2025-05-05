@@ -147,25 +147,29 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           addStyle2="h-[50px]"
           required={true}
         />
+
         <InputEle
           id="dob"
           type="date"
           label="Date of Birth"
           value={
             formData.personalData.dob
-              ? new Date(formData.personalData.dob).toISOString().split("T")[0]
+              ? formData.personalData.dob // Already in YYYY-MM-DD format
               : ""
           }
-          onChange={(e) =>
+          onChange={(e) => {
+            // Store date directly in YYYY-MM-DD format
+            const dateValue = e.target.value; // Already in YYYY-MM-DD format from the date input
             updateFormData({
               personalData: {
                 ...formData.personalData,
-                dob: e.target.value, // Convert to ISO format
+                dob: dateValue, // Store as YYYY-MM-DD string
               },
-            })
-          }
+            });
+          }}
           required={true}
         />
+
         <InputEle
           id="maritalStatus"
           type="marriage"

@@ -27,7 +27,8 @@ function Galleries() {
       };
         try {
         const response = await apiClient.get("/gallery", config);
-        setData(response);
+        setData(response.data);
+        console.log(response.data);
         toast({
           title: "Gallery",
           description: "Gallery fetched successfully",

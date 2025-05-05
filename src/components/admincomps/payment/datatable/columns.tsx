@@ -6,6 +6,7 @@ import {
   OverdueBills,
   PaymentDetails,
   PaymentBasic,
+  BillingUsersDetails,
 } from "@/libs/types";
 
 import { Button } from "@/components/ui/button";
@@ -260,6 +261,39 @@ export const billingdetailscoloumns: ColumnDef<PaymentBasic>[] = [
     header: "Status",
     cell: ({ row }) => {
       return <Statbtn status={row.original.status} />;
+    },
+  },
+];
+export const billingusersdetailscoloumns: ColumnDef<BillingUsersDetails>[] = [
+  {
+    accessorKey: "paymentType",
+    header: "Payment Type",
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+  },
+  {
+    accessorKey: "affectedUsers.amountPaid",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Amount Paid
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+   
+  },
+  {
+    accessorKey: "affectedUsers.paymentStatus",
+    header: "Status",
+    cell: ({ row }) => {
+      return <Statbtn status={row.original.affectedUsers[0].paymentStatus} />;
     },
   },
 ];

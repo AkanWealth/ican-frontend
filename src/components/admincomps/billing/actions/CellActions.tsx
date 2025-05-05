@@ -55,9 +55,10 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
       {showDeleteModal && (
         <DeleteBilling
           id={row.original.id}
-          title={row.original.title}
-          category={capitalizeWords(row.original.category ?? "")}
-          date={row.original.published_date ?? ""}
+          name={row.original.name}
+          type={capitalizeWords(row.original.type ?? "")}
+          amount={row.original.amount ?? ""}
+          createdAt={row.original.createdAt ?? ""}
           onClose={() => setShowDeleteModal(false)}
         />
       )}

@@ -49,6 +49,7 @@ const Outstanding = () => {
   const [loading, setLoading] = useState(true);
   const [isFiltered, setIsFiltered] = useState(false);
   const [selectedBillingId, setSelectedBillingId] = useState("");
+  const [isSettleAll, setIsSettleAll] = useState(false);
   const [userData, setUserData] = useState({
     email: "",
     phoneNumber: "",
@@ -217,19 +218,35 @@ const Outstanding = () => {
         throw new Error("User ID not found");
       }
       
-      // Get all selected billing IDs
-      const selectedBillingIds = selectedItems.map(index => {
-        const realIndex = (currentPage - 1) * itemsPerPage + index;
-        return activities[realIndex].id;
-      });
-      
-      await paymentService.processSettleAllPayment({
-        userId: effectiveUserId,
-        amount: paymentData.amount,
-        paymentType: paymentData.paymentType,
-        transactionId: paymentData.transactionId,
-        billingIds: selectedBillingIds
-      });
+      // For "Settle All Payment" from the header - process all billings
+      if (isSettleAll) {
+        const allBillingIds = originalActivities
+          .filter(activity => activity.status !== "FULLY_PAID" && activity.status !== "paid")
+          .map(activity => activity.id);
+          
+        await paymentService.processSettleAllPayment({
+          userId: effectiveUserId,
+          amount: paymentData.amount,
+          paymentType: paymentData.paymentType,
+          transactionId: paymentData.transactionId,
+          billingIds: allBillingIds
+        });
+      } 
+      // For "Settle payment" button in the breakdown section - process only selected items
+      else {
+        const selectedBillingIds = selectedItems.map(index => {
+          const realIndex = (currentPage - 1) * itemsPerPage + index;
+          return activities[realIndex].id;
+        });
+        
+        await paymentService.processSettleAllPayment({
+          userId: effectiveUserId,
+          amount: paymentData.amount,
+          paymentType: paymentData.paymentType,
+          transactionId: paymentData.transactionId,
+          billingIds: selectedBillingIds
+        });
+      }
       
       toast({
         title: "Payments Successful",
@@ -400,7 +417,8 @@ const Outstanding = () => {
     setCurrentPage(1); // Reset to first page when filtering
   };
 
-  const handleSelectPaymentAll = () => {
+  // Handle the "Settle payment" button in the Due Breakdown section
+  const handleSelectPayment = () => {
     if (selectedItems.length === 0) {
       toast({
         title: "No Items Selected",
@@ -414,6 +432,26 @@ const Outstanding = () => {
     // Calculate total for selected items
     const total = calculateTotalAmount(selectedItems);
     setTotalAmount(total);
+    setIsSettleAll(false);
+    setIsTotalModalOpen(true);
+  };
+
+  // Handle the "Settle All Payment" button in the header
+  const handleSettleAllPayment = () => {
+    // Check if there are any outstanding dues
+    if (totalOutstanding <= 0 || originalActivities.length === 0) {
+      toast({
+        title: "No Outstanding Dues",
+        description: "There are no outstanding dues to settle.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+    
+    // Set the total amount to the total outstanding amount
+    setTotalAmount(totalOutstanding);
+    setIsSettleAll(true);
     setIsTotalModalOpen(true);
   };
 
@@ -456,7 +494,7 @@ const Outstanding = () => {
         onClose={() => setIsTotalModalOpen(false)}
         totalAmount={totalAmount}
         billingId="multiple" // Indicate it's a multiple payment
-        title="Multiple Payments"
+        title={isSettleAll ? "All Outstanding Payments" : "Selected Payments"}
         userData={userData}
         onPaymentSuccess={handleSettleAllPayments}
       />
@@ -609,9 +647,9 @@ const Outstanding = () => {
                 </span>
                 <div className="rounded-full flex items-center justify-center px-4 py-2 bg-primary hover:bg-blue-700 hover:text-lg">
                   <button
-                    onClick={handleSelectPaymentAll}
+                    onClick={handleSettleAllPayment}
                     className="text-sm text-white rounded-xl flex items-center"
-                    disabled={activities.length === 0}
+                    disabled={totalOutstanding <= 0}
                   >
                     Settle All Payment
                   </button>
@@ -627,11 +665,11 @@ const Outstanding = () => {
             <div className="flex lg:flex-row md:flex-col justify-between items-center w-full">
               <div className="w-1/2">
                 <button
-                 onClick={handleSelectPaymentAll}
+                  onClick={handleSelectPayment}
                   className="px-4 py-2 lg:text-base md:text-sm bg-primary text-white rounded-xl flex items-center gap-2 hover:bg-blue-700 hover:text-lg"
                   disabled={activities.length === 0}
                 >
-                  Settle payment
+                  Pay marked Dues
                 </button>
               </div>
               <div className="flex flex-row gap-5 w-full">

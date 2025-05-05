@@ -232,8 +232,8 @@ function BlogEdit({ mode, id }: CreateContentProps) {
       });
       setIsSubmitting(false);
       setIsLoading(false);
-      router.refresh();      window.location.reload();
-
+      router.refresh();
+      window.location.reload();
     } catch (error: any) {
       setIsSubmitting(false);
       setIsLoading(false);
@@ -244,8 +244,8 @@ function BlogEdit({ mode, id }: CreateContentProps) {
           error?.message ||
           "An unknown error occurred",
         variant: "destructive",
-      });      window.location.reload();
-
+      });
+      window.location.reload();
     }
   };
 

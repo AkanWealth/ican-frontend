@@ -22,6 +22,9 @@ function PublicationsSect({
   loading,
   error,
 }: PublicationsSectProps) {
+  console.log(publications);
+  console.log(loading);
+  console.log(error);
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px] sm:min-h-[300px]">

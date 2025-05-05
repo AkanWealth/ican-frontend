@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Search, BellIcon, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import {
@@ -36,7 +36,6 @@ function Header() {
   };
   const item = pathname ? findMenuItem(pathname) : null;
 
-
   return (
     <header className="h-24 w-full py-6 bg-white shadow-sm px-8 flex items-center justify-between">
       <div className="flex flex-row items-center gap-4">
@@ -46,14 +45,17 @@ function Header() {
 
       {/* Profile Section */}
       <div className="flex items-center space-x-8">
-        <DropdownMenu>
+        <div
+          onClick={() => router.push("/admin/notifications")}
+          className=" relative w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"
+        >
+          <BellIcon className="w-6 h-6 " />
+          <span className="hidden z-10 -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white">
+            {notifications.length}
+          </span>
+        </div>
+        {/*  <DropdownMenu >
           <DropdownMenuTrigger className="flex items-center space-x-2 outline-none">
-            <div className=" relative w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <BellIcon className="w-6 h-6 " />
-              <span className="absolute z-10 -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white">
-                {notifications.length}
-              </span>
-            </div>
             <ChevronDown className="w-4 h-4 text-gray-600" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
@@ -101,7 +103,7 @@ function Header() {
               All Notifications
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center space-x-2 outline-none">
             <div className="w-10 h-10 rounded-full overflow-hidden">

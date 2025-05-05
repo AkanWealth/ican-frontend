@@ -170,7 +170,7 @@ const ActionsCell: React.FC<CellProps> = ({ row, contentCategory }) => {
       {showUnpublishModal && (
         <UnpublishContent
           id={row.original.id}
-          title={row.original.title}
+          title={row.original.title ?? row.original.name ?? ""}
           contentCategory={contentCategory}
           category={capitalizeWords(row.original.category ?? "")}
           date={row.original.published_date ?? ""}
@@ -180,7 +180,7 @@ const ActionsCell: React.FC<CellProps> = ({ row, contentCategory }) => {
       {showDeleteModal && (
         <DeleteContent
           id={row.original.id}
-          title={row.original.title}
+          title={row.original.title ?? row.original.name ?? ""}
           contentCategory={contentCategory}
           category={capitalizeWords(row.original.category ?? "")}
           date={row.original.published_date ?? ""}

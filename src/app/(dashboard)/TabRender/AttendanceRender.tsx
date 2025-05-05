@@ -210,6 +210,8 @@ function AttendanceRender() {
   }, []);
 
   // Fetch user attendance - This will populate the table and metrics
+  // The key change is in the fetchUserAttendance function
+
   useEffect(() => {
     const fetchUserAttendance = async () => {
       setIsLoadingAttendance(true);
@@ -231,51 +233,73 @@ function AttendanceRender() {
           setIsLoadingAttendance(false);
           return;
         }
-
+  
         try {
-          const attendanceResponse = await apiClient.get(`/events/registrations/attendance/${userId}`);
+          const response = await apiClient.get(`/events/registrations/attendance/${userId}`);
+          console.log("User attendance raw response:", response);
           
-          console.log("User attendance:", attendanceResponse);
+          // Extract the data array from the response
+          let attendanceData = response.data || [];
           
-          // Check if the response is an array or a single object
-          let attendanceData = Array.isArray(attendanceResponse)
-            ? attendanceResponse
-            : [attendanceResponse];
+          // Ensure we're working with an array
+          if (!Array.isArray(attendanceData)) {
+            attendanceData = [attendanceData];
+          }
           
-          setUserAttendance(attendanceData);
+          console.log("Processed attendance data:", attendanceData);
           
-          // Get total number of attended meetings
-          const totalAttended = attendanceData.filter((item: any) => item.status === "PRESENT").length;
+          // Filter to only include records with PRESENT or ABSENT status
+          // (case insensitive check)
+          const filteredAttendanceData = attendanceData.filter((item: any) => {
+            const status = item.status?.toUpperCase();
+            return status === "PRESENT" || status === "ABSENT";
+          });
           
-          // Update metrics with attendance count
+          setUserAttendance(filteredAttendanceData);
+          
+          // Get total number of attended meetings - look for PRESENT status (case insensitive)
+          const totalAttended = filteredAttendanceData.filter((item: any) => 
+            item.status?.toUpperCase() === "PRESENT"
+          ).length;
+          
+          // Update metrics with attendance count from this endpoint only
           setMetrics(prev => ({
             ...prev,
             numberAttended: totalAttended
           }));
           
           // Format attendance data for table display
-          const formattedAttendance = attendanceData.map((att: any) => {
-            const attDate = new Date(att.createdAt || new Date().toISOString());
+          const formattedAttendance = filteredAttendanceData.map((att: any) => {
+            // Use the event info if available
+            const eventTitle = att.event?.name || "ICAN Meeting";
             
-            // Format date to match the component's expected format
+            // Format date properly from createdAt
+            const attDate = new Date(att.createdAt);
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const formattedDate = `${monthNames[attDate.getMonth()]} ${attDate.getDate()}, ${attDate.getFullYear()}`;
             
+            // Map the API's status values to the component's expected values (lowercase)
+            const displayStatus = att.status?.toUpperCase() === "PRESENT" ? "present" : "absent";
+            
             return {
-              MeetingTitle: att.eventTitle || "ICAN Meeting",
+              MeetingTitle: eventTitle,
               date: formattedDate,
-              status: att.status === "ATTENDED" ? "present" : "absent",
+              status: displayStatus,
               id: att.id
             };
           });
+          
+          console.log("Formatted attendance for display:", formattedAttendance);
           
           // Set both original and current attendance records
           setOriginalAttendanceRecords(formattedAttendance);
           setAttendanceRecords(formattedAttendance);
           
-        } catch (error: any) {
+        } catch (error) {
+          console.error("Error in attendance request:", error);
+          
           // If we get a 404, it means the user has no attendance records
-          if (error.response && error.response.status === 404) {
+          if (axios.isAxiosError(error) && error.response && error.response.status === 404) {
             console.log("No attendance records found for this user");
             setUserAttendance([]);
             setOriginalAttendanceRecords([]);
@@ -299,7 +323,7 @@ function AttendanceRender() {
         setIsLoadingAttendance(false);
       }
     };
-
+  
     fetchUserAttendance();
   }, []);
 
@@ -309,7 +333,12 @@ function AttendanceRender() {
       if (selectedMonth === "All") {
         // Update metrics with all data
         const totalRegistrations = userRegistrations.length;
-        const totalAttended = userAttendance.filter((item: any) => item.status === "ATTENDED").length;
+        
+        // Only count PRESENT status (case insensitive)
+        const totalAttended = userAttendance.filter((item) => 
+          item.status?.toUpperCase() === "PRESENT"
+        ).length;
+        
         const totalMeetings = apiMeetingsData.length;
         
         setMetrics({
@@ -326,31 +355,30 @@ function AttendanceRender() {
         });
         
         // Filter registrations by month for metrics
-        const filteredRegistrations = userRegistrations.filter((reg: any) => {
+        const filteredRegistrations = userRegistrations.filter((reg) => {
           if (!reg.createdAt) return false;
           const regDate = new Date(reg.createdAt);
           return months[regDate.getMonth() + 1] === selectedMonth;
         });
         
         // Filter attendance by month for metrics
-        const filteredAttendance = userAttendance.filter((att: any) => {
+        const filteredAttendance = userAttendance.filter((att) => {
           if (!att.createdAt) return false;
           const attDate = new Date(att.createdAt);
           return months[attDate.getMonth() + 1] === selectedMonth;
         });
         
-        // Update metrics with filtered counts
+        // Update metrics with filtered counts - only count PRESENT statuses
         setMetrics({
           totalMeetings: filteredMeetings.length,
           numberRegistered: filteredRegistrations.length,
-          numberAttended: filteredAttendance.filter((item: any) => item.status === "ATTENDED").length
+          numberAttended: filteredAttendance.filter((item) => 
+            item.status?.toUpperCase() === "PRESENT"
+          ).length
         });
       }
-      
-      // NOTE: We do NOT update the attendance records table here
-      // The table should always show all records regardless of month filter
     }
-  }, [selectedMonth, isLoadingRegistrations, isLoadingAttendance, isLoadingMetrics, userRegistrations, userAttendance, apiMeetingsData,months,shortMonths]);
+  }, [selectedMonth, isLoadingRegistrations, isLoadingAttendance, isLoadingMetrics, userRegistrations, userAttendance, apiMeetingsData, months, shortMonths]);
 
   const resetFilters = () => {
     setSelectedDate(null);

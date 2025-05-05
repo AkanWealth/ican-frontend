@@ -6,7 +6,7 @@ import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
 import Heroimg from "@/components/homecomps/Heroimg";
-import { Resource } from "@/libs/types";
+import { Publication, Resource } from "@/libs/types";
 import PublicationsSect from "@/components/pubntech/PublicationsSect";
 
 function Publications() {
@@ -18,22 +18,18 @@ function Publications() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const config = {
-      method: "get",
-      url: `${BASE_API_URL}/resources/contents`,
-    };
+    const fetchPublications = async () => {
+      const config = {
+        method: "get",
+        url: `${BASE_API_URL}/resources/contents`,
+      };
 
-    axios
-      .request(config)
-      .then((res) => {
-        setPublications(
-          res.data.filter(
-            (publication: Resource) => publication.access === "PUBLIC"
-          )
-        );
+      try {
+        const response = await axios.request(config);
+        setPublications(response.data.data.filter((pub: Publication) => pub.access === "PUBLIC"));
         setLoading(false);
-      })
-      .catch((err) => {
+
+      } catch (err: any) {
         setError(err.message);
         setLoading(false);
         toast({
@@ -41,7 +37,9 @@ function Publications() {
           description: "Please try again later",
           variant: "destructive",
         });
-      });
+      }
+    };
+    fetchPublications();
   }, [toast]);
 
   return (

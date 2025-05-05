@@ -44,7 +44,9 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
         setGallery({
           name: response.name,
           images: response.images || [],
-          videos: response.videos?.length ? response.videos : [DEFAULT_VIDEO_URL],
+          videos: response.videos?.length
+            ? response.videos
+            : [DEFAULT_VIDEO_URL],
         });
         setEditDataFetched(true);
       } catch (error) {
@@ -73,13 +75,13 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
     try {
       setIsSubmitting(true);
       let response;
-      
+
       if (mode === "edit") {
         response = await apiClient.patch(`gallery/${id}`, data);
       } else {
         response = await apiClient.post("gallery", data);
       }
-      
+
       console.log("Gallery submitted successfully:", response);
       router.refresh();
       toast({
@@ -88,16 +90,16 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           status === "published" ? "published" : "saved as draft"
         } successfully.`,
         variant: "default",
-      });      window.location.reload();
-
+      });
+      window.location.reload();
     } catch (error) {
       console.error("Error submitting gallery:", error);
       toast({
         title: "Error",
         variant: "destructive",
         description: "An error occurred while submitting the gallery.",
-      });      window.location.reload();
-
+      });
+      window.location.reload();
     } finally {
       setIsSubmitting(false);
     }
@@ -114,17 +116,17 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
 
   const handleImageUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    
+
     setIsUploading(true);
     const newProgressArray = Array(files.length).fill(0);
     setUploadProgress(newProgressArray);
-    
+
     const uploadedUrls: string[] = [];
-    
+
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        
+
         // Validate the file before uploading
         const validation = validateGalleryImage(file);
         if (!validation.valid) {
@@ -135,23 +137,23 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           });
           continue;
         }
-        
+
         // Upload the file and track progress
         const uploadedUrl = await uploadGalleryImage(file, (progress) => {
           const updatedProgress = [...newProgressArray];
           updatedProgress[i] = progress;
           setUploadProgress(updatedProgress);
         });
-        
+
         uploadedUrls.push(uploadedUrl);
       }
-      
+
       // Add new image URLs to gallery
       setGallery((prev) => ({
         ...prev,
         images: [...prev.images, ...uploadedUrls],
       }));
-      
+
       toast({
         title: "Upload successful",
         description: `${uploadedUrls.length} image(s) uploaded successfully.`,
@@ -186,7 +188,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           value={gallery.name}
           onChange={handleChange}
         />
-        
+
         {/* Image Upload Section */}
         <div className="space-y-2">
           <label className="block text-sm font-medium">Gallery Images</label>
@@ -203,13 +205,16 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
               hover:file:bg-primary/90"
             disabled={isUploading}
           />
-          
+
           {/* Upload Progress */}
           {isUploading && (
             <div className="mt-2 space-y-2">
               <p className="text-sm font-medium">Uploading...</p>
               {uploadProgress.map((progress, index) => (
-                <div key={index} className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  key={index}
+                  className="w-full bg-gray-200 rounded-full h-2.5"
+                >
                   <div
                     className="bg-primary h-2.5 rounded-full"
                     style={{ width: `${progress}%` }}
@@ -218,7 +223,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
               ))}
             </div>
           )}
-          
+
           {/* Image Preview Grid */}
           {gallery.images.length > 0 && (
             <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -235,8 +240,19 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
                     className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1
                       opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -245,7 +261,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           )}
         </div>
       </div>
-      
+
       {/* Action Buttons */}
       <div className="flex flex-col gap-2">
         <button
@@ -270,7 +286,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
         >
           {mode === "edit" ? "Save Edit" : "Save as Draft"}
         </button>
-        <button 
+        <button
           className="py-1 text-primary text-base rounded-full w-full"
           onClick={() => setShowPreview(true)}
           disabled={isUploading}
@@ -278,7 +294,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           Preview
         </button>
       </div>
-      
+
       {/* Preview Modal */}
       {showPreview && (
         <PreviewGallery

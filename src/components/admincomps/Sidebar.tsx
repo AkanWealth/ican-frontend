@@ -38,8 +38,8 @@ const topMenuItems = [
   },
   { icon: IoMdCalendar, label: "Event Management", href: "/admin/events" },
 
-  { icon: MdAttachMoney, label: "Payment", href: "/admin/payment" },
-  { icon: MdOutlineAnalytics, label: "Billing", href: "/admin/billing" },
+  { icon: MdAttachMoney, label: "Payments", href: "/admin/payment" },
+  { icon: MdOutlineAnalytics, label: "Billings", href: "/admin/billing" },
 ];
 
 const bottomMenuItems = [
@@ -97,7 +97,7 @@ function Sidebar() {
                 className={`py-3 px-4 flex flex-row gap-2 ${
                   activePage === item.label &&
                   "bg-primary text-white fill-white"
-                } hover:bg-blue-500 hover:text-white hover:fill-white justify-start items-center rounded-lg text-neutral-900`}
+                } hover:bg-gray-200  justify-start items-center rounded-lg text-neutral-900`}
               >
                 <item.icon className="w-6 h-6" />
                 <p className="whitespace-nowrap test-xs">{item.label}</p>

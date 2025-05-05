@@ -51,9 +51,8 @@ function Experience({ isShown, formData, updateFormData }: ExperienceProps) {
   // We're not using bucket variable as isShown is directly passed to the component
   return (
     <div
-      className={`pt-4 flex flex-col justify-between gap-4 mt-4 ${
-        isShown ? "block" : "hidden"
-      }`}
+      className={`pt-4 flex flex-col justify-between gap-4 mt-4 ${isShown ? "block" : "hidden"
+        }`}
     >
       <h3 className="font-bold font-mono text-xl text-black">
         WORK EXPERIENCE
@@ -125,26 +124,28 @@ function Experience({ isShown, formData, updateFormData }: ExperienceProps) {
         </label> 
       </div> */}
 
+      {/* // Fix for the Start Date and End Date inputs in Experience.tsx */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
         <InputEle
           id="startDate"
           type="date"
           label="Start Date"
           value={
-            formData.experience?.startDate
-              ? new Date(formData.experience.startDate)
-                  .toISOString()
-                  .split("T")[0]
+            formData.experience?.startDate // Already in YYYY-MM-DD form
+              ? formData.experience.startDate // Already in YYYY-MM-DD format
               : ""
           }
-          onChange={(e) =>
+          onChange={(e) => {
+            // Store date directly in YYYY-MM-DD format
+            const dateValue = e.target.value; // Already in YYYY-MM-DD format from the date input
             updateFormData({
               experience: {
                 ...formData.experience,
-                startDate: e.target.value,
+                startDate: dateValue, // Store as YYYY-MM-DD string
               },
-            })
-          }
+            });
+          }}
           required={true}
         />
         <InputEle
@@ -152,22 +153,22 @@ function Experience({ isShown, formData, updateFormData }: ExperienceProps) {
           type="date"
           label="End Date"
           value={
-            formData.experience?.endDate
-              ? new Date(formData.experience.endDate)
-                  .toISOString()
-                  .split("T")[0]
-              : ""
+            formData.experience?.endDate || ""
           }
-          onChange={(e) =>
+          onChange={(e) => {
+            // Store date directly in YYYY-MM-DD format
+            const dateValue = e.target.value; // Already in YYYY-MM-DD format from the date input
             updateFormData({
               experience: {
                 ...formData.experience,
-                endDate: e.target.value,
+                endDate: dateValue, // Store as YYYY-MM-DD string
               },
-            })
-          }
+            });
+          }}
           required={true}
+          disabled={isCurrentJob}
         />
+
       </div>
     </div>
   );

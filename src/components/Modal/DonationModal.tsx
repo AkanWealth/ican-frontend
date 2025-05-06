@@ -79,7 +79,7 @@ const DonationModal: React.FC<DonationModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-xl relative">
+      <div className="bg-white rounded-xl p-6 w-full max-w-[720px] relative">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"

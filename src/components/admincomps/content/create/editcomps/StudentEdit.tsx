@@ -101,16 +101,14 @@ function StudentEdit({ mode, id }: CreateContentProps) {
         title: "Success",
         description: "PDF uploaded successfully.",
         variant: "default",
-      });      window.location.reload();
-
+      });
     } catch (error) {
       console.error("Error uploading PDF:", error);
       toast({
         title: "Upload failed",
         description: "Failed to upload the PDF. Please try again.",
         variant: "destructive",
-      });      window.location.reload();
-
+      });
     } finally {
       setIsUploading(false);
     }
@@ -133,7 +131,6 @@ function StudentEdit({ mode, id }: CreateContentProps) {
     const data = JSON.stringify({
       name: student.name,
       document: student.document,
-      status: status,
     });
 
     const config = {
@@ -160,6 +157,7 @@ function StudentEdit({ mode, id }: CreateContentProps) {
         description: "Study Pack submitted successfully",
         variant: "default",
       });
+      window.location.reload();
     } catch (error) {
       setIsSubmitting(false);
       setIsLoading(false);
@@ -249,20 +247,9 @@ function StudentEdit({ mode, id }: CreateContentProps) {
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
         >
-          {mode === "edit" ? "Publish Edit" : "Publish Study Packs"}
+          {mode === "edit" ? "Upload Edit" : "Upload Study Packs"}
         </button>
-        <button
-          disabled={isSubmitting}
-          onClick={(e) => {
-            e.preventDefault();
-            setIsSubmitting(true);
-            setIsLoading(true);
-            handleSubmit("draft");
-          }}
-          className=" py-2 text-primary border border-primary text-base rounded-full w-full"
-        >
-          {mode === "edit" ? "Save Edit" : "Save as Draft"}
-        </button>
+
         <button
           onClick={() => setShowPreview(true)}
           className=" py-1 text-primary text-base rounded-full w-full"

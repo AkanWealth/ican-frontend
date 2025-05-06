@@ -82,12 +82,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               {data?.type}
             </span>
           </p>
-          {/* <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-            Bill Description
-            <span className="text-base text-black font-medium">
-              Bill description
-            </span>
-          </p> */}
+        
           <p className=" text-sm text-neutral-600 flex flex-col gap-1">
             Bill Amount{" "}
             <span className="text-base text-black font-medium">

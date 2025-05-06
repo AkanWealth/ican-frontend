@@ -3,16 +3,9 @@ import {
   MdSubtitles,
   MdOutlineDateRange,
   MdDeleteOutline,
+  MdOutlineMoney,
 } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
-
-interface DeleteBillingProps {
-  id: string;
-  title: string;
-  category: string;
-  date: string;
-  onClose: () => void;
-}
 
 import apiClient from "@/services-admin/apiClient";
 
@@ -22,17 +15,27 @@ import { useToast } from "@/hooks/use-toast";
 
 import axios from "axios";
 
+interface DeleteBillingProps {
+  id: string;
+  name: string;
+  type: string;
+  amount: string;
+  createdAt: string;
+  onClose: () => void;
+}
+
 function DeleteBilling({
   id,
-  title,
-  category,
-  date,
+  name,
+  type,
+  amount,
+  createdAt,
   onClose,
 }: DeleteBillingProps) {
   const { toast } = useToast();
   const token = localStorage.getItem("access_token");
   const handleDelete = async () => {
-    console.log({ id, title, category, date });
+    console.log({ id, name, type, amount, createdAt });
     // Configure delete request
     const config = {
       method: "delete",
@@ -58,8 +61,8 @@ function DeleteBilling({
       console.error("Delete failed:", error);
       toast({
         title: "Error",
-        description: axios.isAxiosError(error) 
-          ? error.response?.data?.message || "Failed to delete billing record" 
+        description: axios.isAxiosError(error)
+          ? error.response?.data?.message || "Failed to delete billing record"
           : "An unexpected error occurred",
         variant: "destructive",
       });
@@ -68,7 +71,7 @@ function DeleteBilling({
 
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
+      <div className="flex flex-col p-8 rounded-xl gap-4 bg-white w-[800px] max-w-[90%] max-h-[90vh] overflow-y-auto">
         <div className="flex flex-row justify-start gap-4">
           <div className="rounded-full  h-fit w-fit p-4 bg-red-200">
             <MdDeleteOutline className="w-6 h-6 fill-red-600" />
@@ -76,30 +79,42 @@ function DeleteBilling({
           <div>
             <div className="flex flex-col gap-2">
               <h5 className="font-semibold text-xl text-black">
-                Unpublish Content
+                Delete Billing Record
               </h5>
               <p className="text-sm text-neutral-600">
-                Are you sure you want to unpublish this content?
+                Are you sure you want to delete this billing record?
               </p>
             </div>
             <div className="flex flex-col gap-2 mt-4">
               <div className="flex flex-row items-center gap-4">
                 <p className="flex text-neutral-700 font-medium text-base flex-row  items-center gap-2">
-                  <MdSubtitles className="w-4 h-4" /> Title:
+                  <MdSubtitles className="w-4 h-4" /> Name:
                 </p>
-                <p className="text-black font-medium text-base ">{title}</p>
-              </div>
-              <div className="flex flex-row items-center gap-4">
-                <p className="flex text-neutral-700 font-medium text-base  items-center flex-row gap-2">
-                  <MdOutlineDateRange className="w-4 h-4" /> Date Published:
-                </p>
-                <p className="text-black font-medium text-base ">{date}</p>
+                <p className="text-black font-medium text-base ">{name}</p>
               </div>
               <div className="flex flex-row items-center gap-4">
                 <p className="flex text-neutral-700 font-medium text-base   items-centerflex-row gap-2">
-                  <HiOutlineTag className="w-4 h-4" /> Category:
+                  <HiOutlineTag className="w-4 h-4" /> Type:
                 </p>
-                <p className="text-black font-medium text-base ">{category}</p>
+                <p className="text-black font-medium text-base ">{type}</p>
+              </div>
+              <div className="flex flex-row items-center gap-4">
+                <p className="flex text-neutral-700 font-medium text-base   items-centerflex-row gap-2">
+                  <MdOutlineMoney className="w-4 h-4" /> Amount:
+                </p>
+                <p className="text-black font-medium text-base ">{amount}</p>
+              </div>
+              <div className="flex flex-row items-center gap-4">
+                <p className="flex text-neutral-700 font-medium text-base  items-center flex-row gap-2">
+                  <MdOutlineDateRange className="w-4 h-4" /> Created At:
+                </p>
+                <p className="text-black font-medium text-base ">
+                  {new Date(createdAt).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })}
+                </p>
               </div>
             </div>
           </div>

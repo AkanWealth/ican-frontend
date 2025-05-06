@@ -145,9 +145,11 @@ function Mainheader() {
                         Technical Session{" "}
                       </NavigationMenuLink>
                     </Link>
-                    
-                     <Link href="/publications" legacyBehavior passHref>
-                      <NavigationMenuLink>Publications</NavigationMenuLink>
+
+                    <Link href="/publications" legacyBehavior passHref>
+                      <NavigationMenuLink>
+                        Resources & Publications
+                      </NavigationMenuLink>
                     </Link>
                   </div>
                 </NavigationMenuContent>
@@ -273,11 +275,12 @@ function Mainheader() {
                 <Link onClick={() => setOpenMenu(!openMenu)} href="/technical">
                   Technical Session{" "}
                 </Link>{" "}
-                
-                 <Link onClick={() => setOpenMenu(!openMenu)} href="/publications">
-                  Publications
+                <Link
+                  onClick={() => setOpenMenu(!openMenu)}
+                  href="/publications"
+                >
+                  Resources & Publications
                 </Link>
-               
               </AccordionContent>
             </AccordionItem>
           </Accordion>

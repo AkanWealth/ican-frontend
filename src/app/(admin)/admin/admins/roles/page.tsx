@@ -16,6 +16,7 @@ import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/Adm
 import apiClient from "@/services-admin/apiClient";
 
 import EditRole from "@/components/admincomps/admin/EditRole";
+import DeleteRole from "@/components/admincomps/admin/DeleteRole";
 
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -26,7 +27,7 @@ import { BASE_API_URL } from "@/utils/setter";
 
 import { RolesData } from "@/libs/types";
 
-import { Pencil } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
 import { MdArrowBack } from "react-icons/md";
 type parsedRolesType = {
   id: string;
@@ -38,6 +39,7 @@ type parsedRolesType = {
 function RolesPage() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [activeRole, setActiveRole] = useState<RolesData | null>(null);
   const [roles, setRoles] = useState<RolesData[]>([]); // Update state type to RolesData[]
   const [isLoading, setIsLoading] = useState(false); // Loading state
@@ -107,15 +109,27 @@ function RolesPage() {
                 <p>Description: {role.description}</p>
                 <p>Super Admin: {role.isSuperAdmin ? "Yes" : "No"}</p>
               </div>
-              <button
-                onClick={() => {
-                  setActiveRole(role);
-                  setShowEditModal(true);
-                }}
-                className="bg-primary flex flex-row gap-1 items-center h-fit w-fit text-base text-white rounded-md  p-2"
-              >
-                <Pencil /> Edit
-              </button>
+              <div className="flex flex-row gap-6">
+                <button
+                  onClick={() => {
+                    setActiveRole(role);
+                    setShowEditModal(true);
+                  }}
+                  className="bg-primary flex flex-row gap-1 items-center h-fit w-fit text-base text-white rounded-md  p-2"
+                >
+                  <Pencil /> Edit
+                </button>
+
+                <button
+                  className="bg-red-600 flex flex-row gap-1 items-center h-fit w-fit text-base text-white rounded-md  p-2"
+                  onClick={() => {
+                    setActiveRole(role);
+                    setShowDeleteModal(true);
+                  }}
+                >
+                  <Trash /> Delete
+                </button>
+              </div>
             </AccordionContent>
           </AccordionItem>
         ))}
@@ -129,6 +143,13 @@ function RolesPage() {
           id={activeRole?.id}
           showModal={showEditModal}
           setShowModal={setShowEditModal}
+        />
+      )}
+      {showDeleteModal && (
+        <DeleteRole
+          id={activeRole?.id || ""}
+          role={activeRole?.name || ""}
+          onClose={() => setShowDeleteModal(false)}
         />
       )}
     </div>

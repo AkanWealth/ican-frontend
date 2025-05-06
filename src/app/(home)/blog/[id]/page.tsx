@@ -85,46 +85,54 @@ export default function BlogPost({
     : [];
 
   return (
-    <main className="flex flex-col items-center bg-white  mt-16 2xl:container mx-auto">
+    <main className="flex flex-col items-center bg-white mt-20 w-full mx-auto">
       {/** First Section: Main Blog Content */}
-      <section className="p-4 sm:p-20 lg:px-40 border-b-2 border-gray-200">
-        <article className="flex flex-col max-w-full">
-          {/** Back Button */}
-          <div
-            className="flex justify-center items-center px-2 w-8 h-8 bg-blue-900 min-h-[32px] rounded-[999px] cursor-pointer"
-            onClick={() => router.back()} // Go back to the previous page
-          >
-            <FaArrowLeft className="fill-white h-6 w-6" />
+      <section className="w-full max-w-[1400px] px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-8 sm:py-12 border-b-2 border-gray-200">
+        <article className="flex flex-col w-full">
+          {/** Blog Title with Integrated Back Button */}
+          <div className="flex items-start gap-3 mt-2">
+            <button
+              className="flex justify-center items-center px-2 w-8 h-8 bg-blue-900 min-h-[32px] rounded-full cursor-pointer transition-transform hover:scale-105 mt-1"
+              onClick={() => router.back()}
+              aria-label="Go back"
+            >
+              <FaArrowLeft className="fill-white h-4 w-4" />
+            </button>
+
+            <div className="flex-1">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black leading-tight">
+                {post.title}
+              </h1>
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-2">
+                <span className="font-semibold text-sm sm:text-base text-gray-700">
+                  by {post.authorName}
+                </span>
+                <time className="text-sm md:text-base font-semibold text-stone-500">
+                  {post.date}
+                </time>
+              </div>
+            </div>
           </div>
 
-          {/** Blog Title */}
-          <h1 className="mt-4 text-3xl text-black flex flex-row justify-between  items-center sm:text-4xl font-bold leading-[50px]  max-md:max-w-full">
-            {post.title}
-
-            <span className="font-semibold  text-base">
-              by {post.authorName}
-            </span>
-          </h1>
-
-          {/** Date */}
-          <time className="mt-4 text-base font-semibold text-stone-500 max-md:max-w-full">
-            {post.date}
-          </time>
-
-          {/** Blog Image */}
-          <Image
-            loading="lazy"
-            width={100}
-            height={100}
-            src={post.coverImage}
-            className="object-cover mt-12 max-w-full rounded-2xl aspect-[2.27] w-full max-md:mt-10"
-            alt={post.title} // Alt text for the image
-          />
+          {/** Blog Image - Constrained Size */}
+          <div className="mt-8 w-full flex justify-center">
+            <div className="w-full max-w-4xl">
+              <Image
+                loading="lazy"
+                width={500}
+                height={500}
+                src={post.coverImage}
+                className="object-cover w-full h-auto max-h-[500px] rounded-lg md:rounded-xl shadow-sm"
+                alt={post.title}
+              />
+            </div>
+          </div>
 
           {/** Blog Content */}
-          <section className="flex flex-col items-start mt-12 max-w-full text-base leading-6 text-neutral-800 max-md:mt-10 mx-auto">
+          <section className="mt-8 md:mt-10 w-full">
             <div
-              className="text-base font-semibold mb-4 prose prose-lg max-w-none"
+              className="prose prose-sm sm:prose md:prose-lg lg:prose-xl max-w-none prose-headings:text-blue-900 prose-a:text-blue-600"
               dangerouslySetInnerHTML={{ __html: post.contentBody }}
             />
           </section>
@@ -132,7 +140,7 @@ export default function BlogPost({
       </section>
 
       {/** Second Section: Comment Section */}
-      <section className=" hidden mr-auto p-4 sm:p-20 lg:px-40">
+      <section className="hidden mr-auto p-4 sm:p-20 lg:px-40">
         <Getin
           heading={"LEAVE A COMMENT"} // Heading for the comment section
           phoneNumber={false} // A boolean flag to toggle phone number visibility

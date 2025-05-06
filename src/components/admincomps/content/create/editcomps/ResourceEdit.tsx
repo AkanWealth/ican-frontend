@@ -32,7 +32,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
     title: "",
     description: "",
     type: "DOCUMENT",
-    access: "",
+    access: "PUBLIC",
     fileUrl: "",
   });
 
@@ -118,7 +118,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
       // Update state with the new URL
       setResource((prev) => ({
         ...prev,
-        fileurl: uploadedUrl,
+        fileUrl: uploadedUrl,
       }));
 
       toast({
@@ -142,7 +142,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
     e.preventDefault();
     setResource((prev) => ({
       ...prev,
-      fileurl: "",
+      fileUrl: "",
     }));
     toast({
       title: "PDF removed",
@@ -153,7 +153,13 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    if (!resource.title || !resource.description || !resource.type || !resource.access || !resource.fileUrl) {
+    if (
+      !resource.title ||
+      !resource.description ||
+      !resource.type ||
+      !resource.access ||
+      !resource.fileUrl
+    ) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -172,6 +178,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
         description: "Resource created successfully",
         variant: "default",
       });
+      window.location.reload();
     } catch (error) {
       console.error("Error creating resource:", error);
       toast({
@@ -201,19 +208,19 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
           onChange={handleChange}
           value={resource.description}
         />
-  
+
         <InputEle
           label="Resource Access"
           type="select"
           id="access"
-          onChange={handleChange}
           options={[
             { value: "PUBLIC", label: "Public" },
             { value: "MEMBERS_ONLY", label: "Members" },
           ]}
           value={resource.access}
+          onChange={(e) => setResource({ ...resource, access: e.target.value })}
         />
-       
+
         {/* PDF Upload Section */}
         <div className="space-y-2">
           <label className="block text-sm font-medium">Upload PDF</label>

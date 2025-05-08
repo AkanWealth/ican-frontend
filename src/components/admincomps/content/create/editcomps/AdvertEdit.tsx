@@ -54,17 +54,17 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
         const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}`);
         console.log("Advert details fetched:", response.data);
         setAdvert({
-          name: response.name || advert.name,
-          advertiser: response.advertiser || advert.advertiser,
-          image: response.coverImg || advert.image,
-          textBody: response.content || advert.textBody,
-          startDate: response.startDate
-            ? new Date(response.startDate)
-            : advert.startDate,
-          endDate: response.data.endDate
-            ? new Date(response.data.endDate)
-            : advert.endDate,
-        });
+  name: response.name || advert.name,
+  advertiser: response.advertiser || advert.advertiser,
+  image: response.coverImg || advert.image,
+  textBody: response.content || advert.textBody,
+  startDate: response.startDate
+    ? new Date(response.startDate)
+    : advert.startDate,
+  endDate: response.endDate // Fixed this line to directly access 'response.endDate'
+    ? new Date(response.endDate)
+    : advert.endDate,
+});
         setEditDataFetched(true);
       } catch (error) {
         toast({

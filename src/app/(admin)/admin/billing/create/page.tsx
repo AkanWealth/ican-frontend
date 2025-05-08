@@ -55,12 +55,12 @@ function CreateBillingPage() {
     setNewBill((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
   const saveBill = async () => {
-    let data = JSON.stringify({
+    let data = {
       name: newBill.billing_name,
       type: newBill.billing_type,
       amount: newBill.billing_amount,
       affectedUserIds: newBill.reciepients,
-    });
+    };
 
     const config = {
       method: "post",

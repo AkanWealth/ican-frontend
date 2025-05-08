@@ -56,11 +56,10 @@ function CreateBillingPage() {
   };
   const saveBill = async () => {
     let data = {
-      name: newBill.billing_name,
-      type: newBill.billing_type,
-      amount: newBill.billing_amount,
-      affectedUserIds: newBill.reciepients,
-    };
+name: newBill.billing_name,
+  type: newBill.billing_type,
+  amount: Number(newBill.billing_amount), // ensure it's a number
+  affectedUserIds: newBill.reciepients === "all" ? undefined : newBill.reciepients  };
 
     const config = {
       method: "post",

@@ -52,7 +52,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
     const fetchDetails = async () => {
       try {
         const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}`);
-        console.log("Advert details fetched:", response.data);
+        console.log("Advert details fetched:", response);
         setAdvert({
           name: response.name || advert.name,
           advertiser: response.advertiser || advert.advertiser,
@@ -61,8 +61,8 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           startDate: response.startDate
             ? new Date(response.startDate)
             : advert.startDate,
-          endDate: response.data.endDate
-            ? new Date(response.data.endDate)
+          endDate: response.endDate
+            ? new Date(response.endDate)
             : advert.endDate,
         });
         setEditDataFetched(true);
@@ -74,13 +74,12 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
         });
       }
     };
-
+  
     if (mode === "edit" && !editDataFetched) {
       console.log("Fetching advert details for edit mode");
       fetchDetails();
     }
   }, [editDataFetched, id, mode, toast, advert]);
-
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {

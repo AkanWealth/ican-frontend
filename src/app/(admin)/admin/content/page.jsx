@@ -7,7 +7,6 @@ import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/Adm
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import All from "./tabs/All";
 import Adverts from "./tabs/Adverts";
 import Blogs from "./tabs/Blogs";
 import Publications from "./tabs/Publications";
@@ -49,11 +48,8 @@ function Content() {
           <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="technical">Technical Session</TabsTrigger>
           <TabsTrigger value="student">Study Pack</TabsTrigger>
-          <TabsTrigger value="all">All</TabsTrigger>
         </TabsList>
-        <TabsContent value="all">
-          <All />
-        </TabsContent>
+       
         <TabsContent value="adverts">
           <Adverts />
         </TabsContent>

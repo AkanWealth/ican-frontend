@@ -62,7 +62,7 @@ export function PaymentTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by Name..."
+          placeholder="Search by Name..."
           value={
             (table.getColumn("user.firstname")?.getFilterValue() as string) ??
             ""

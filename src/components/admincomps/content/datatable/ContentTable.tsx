@@ -41,23 +41,29 @@ export function ContentTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  
+
   // Let's check the column IDs in the provided columns array
   const columnIds = React.useMemo(() => {
-    return columns.map(col => col.id).filter(Boolean);
+    return columns.map((col) => col.id).filter(Boolean);
   }, [columns]);
-  
+
   // Check if name or title exists in the columns
-  const hasNameColumn = React.useMemo(() => columnIds.includes('name'), [columnIds]);
-  const hasTitleColumn = React.useMemo(() => columnIds.includes('title'), [columnIds]);
-  
+  const hasNameColumn = React.useMemo(
+    () => columnIds.includes("name"),
+    [columnIds]
+  );
+  const hasTitleColumn = React.useMemo(
+    () => columnIds.includes("title"),
+    [columnIds]
+  );
+
   // Determine which column to use for filtering
   const filterColumnId = React.useMemo(() => {
-    if (hasNameColumn) return 'name';
-    if (hasTitleColumn) return 'title';
+    if (hasNameColumn) return "name";
+    if (hasTitleColumn) return "title";
     return null;
   }, [hasNameColumn, hasTitleColumn]);
-  
+
   const table = useReactTable({
     data,
     columns,
@@ -78,10 +84,15 @@ export function ContentTable<TData, TValue>({
       <div className="flex items-center py-4">
         {filterColumnId && (
           <Input
-            placeholder="Filter by titles..."
-            value={(table.getColumn(filterColumnId)?.getFilterValue() as string) ?? ""}
+            placeholder="Search by titles..."
+            value={
+              (table.getColumn(filterColumnId)?.getFilterValue() as string) ??
+              ""
+            }
             onChange={(event) => {
-              table.getColumn(filterColumnId)?.setFilterValue(event.target.value);
+              table
+                .getColumn(filterColumnId)
+                ?.setFilterValue(event.target.value);
             }}
             className="max-w-sm"
           />

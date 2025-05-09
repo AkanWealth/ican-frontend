@@ -129,9 +129,8 @@ function UserActivities() {
           people: item.count || item.value || item.totalRegistrations || 0,
         }));
         setUserActivityTrendData(formattedData);
-      
-        toast({ 
 
+        toast({
           title: "User Activities",
           description: "User activities data fetched successfully.",
           variant: "default",
@@ -347,6 +346,23 @@ function UserActivities() {
           name="No of Deactivated Users"
           metric={data?.deactivatedUsers}
           Icon={LiaUserTimesSolid}
+        />{" "}
+        <StatCard
+          name="Total Weekly Logins"
+          metric={loginStats?.totalWeeklyLogins}
+          Icon={LiaUserCheckSolid}
+        />
+        <StatCard
+          name={`Total ${new Date().toLocaleString("default", {
+            month: "long",
+          })} Logins`}
+          metric={loginStats?.totalMonthlyLogins}
+          Icon={LiaUserMinusSolid}
+        />
+        <StatCard
+          name="Total Yearly Logins"
+          metric={loginStats?.totalYearlyLogins}
+          Icon={LiaUserTimesSolid}
         />
       </div>
       <div className="flex w-full max-h-[700px] flex-col gap-10">
@@ -389,25 +405,6 @@ function UserActivities() {
             </ChartContainer>
           </CardContent>
         </Card>
-      </div>{" "}
-      <div className="flex flex-row gap-2 items-center justify-start w-full">
-        <StatCard
-          name="Total Weekly Logins"
-          metric={loginStats?.totalWeeklyLogins}
-          Icon={LiaUserCheckSolid}
-        />
-        <StatCard
-          name={`Total ${new Date().toLocaleString("default", {
-            month: "long",
-          })} Logins`}
-          metric={loginStats?.totalMonthlyLogins}
-          Icon={LiaUserMinusSolid}
-        />
-        <StatCard
-          name="Total Yearly Logins"
-          metric={loginStats?.totalYearlyLogins}
-          Icon={LiaUserTimesSolid}
-        />
       </div>{" "}
       <div className="flex w-full max-h-[700px] flex-col gap-10">
         <Card>

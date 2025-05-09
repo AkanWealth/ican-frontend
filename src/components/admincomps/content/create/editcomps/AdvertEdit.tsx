@@ -52,7 +52,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
     const fetchDetails = async () => {
       try {
         const response = await apiClient.get(`${BASE_API_URL}/adverts/${id}`);
-        console.log("Advert details fetched:", response.data);
+        console.log("Advert details fetched:", response);
         setAdvert({
           name: response.name || advert.name,
           advertiser: response.advertiser || advert.advertiser,
@@ -61,8 +61,8 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
           startDate: response.startDate
             ? new Date(response.startDate)
             : advert.startDate,
-          endDate: response.data.endDate
-            ? new Date(response.data.endDate)
+          endDate: response.endDate
+            ? new Date(response.endDate)
             : advert.endDate,
         });
         setEditDataFetched(true);
@@ -74,13 +74,12 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
         });
       }
     };
-
+  
     if (mode === "edit" && !editDataFetched) {
       console.log("Fetching advert details for edit mode");
       fetchDetails();
     }
   }, [editDataFetched, id, mode, toast, advert]);
-
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -164,8 +163,8 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       });
       return;
     }
-
-    const data = JSON.stringify({
+  
+    const data = {
       name: advert.name,
       advertiser: advert.advertiser,
       content: advert.textBody,
@@ -173,27 +172,28 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
       endDate: advert.endDate.toISOString(),
       coverImg: advert.image,
       status: status,
-    });
-
-    const config = {
-      method: mode === "edit" ? "PATCH" : "POST",
-      maxBodyLength: Infinity,
-      url:
-        mode === "edit"
-          ? `${BASE_API_URL}/adverts/${id}`
-          : `${BASE_API_URL}/adverts`,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      data: data,
     };
-
+  
     try {
       setIsSubmitting(true);
-      const response = await apiClient.request(config);
+  
+      const response =
+        mode === "edit"
+          ? await apiClient.patch(`/adverts/${id}`, data, {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            })
+          : await apiClient.post(`/adverts`, data, {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            });
+  
       console.log("Advert submitted:", response);
-
+  
       toast({
         title: "Success",
         description: `Advert ${
@@ -201,7 +201,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
         } successfully.`,
         variant: "default",
       });
-
+  
       router.refresh();
       // Manually refresh the page after successful submission
     } catch (error) {

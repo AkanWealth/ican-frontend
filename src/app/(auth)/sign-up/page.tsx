@@ -20,7 +20,7 @@ function Signup() {
   const [fname, setFname] = useState(false);
   const [sname, setSname] = useState(false);
   const [evalid, setEvalid] = useState(false);
-  const [midValid, setMidValid] = useState(true); // Set this to true by default since no validation is needed
+  const [midValid, setMidValid] = useState(false); // Set to false by default since validation is required
   const [plength, setPlength] = useState(false);
   const [pupper, setPupper] = useState(false);
   const [plower, setPlower] = useState(false);
@@ -29,6 +29,7 @@ function Signup() {
   const [cvalid, setCvalid] = useState(false);
   const [consent, setConsent] = useState(false);
   const [complete, setComplete] = useState(false);
+  const [allFieldsFilled, setAllFieldsFilled] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -51,9 +52,20 @@ function Signup() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+  
   const validateMembershipId = (id: string): string => {
+    // Validation for membership ID: Should start with "MB" followed by 6 digits
+    const membershipRegex = /^MB\d{6}$/;
+    
+    if (!membershipRegex.test(id)) {
+      setMidValid(false);
+      return "Membership ID must be in format 'MB' followed by 6 digits (e.g., MB123456)";
+    }
+    
+    setMidValid(true);
     return "";
   };
+  
   const checkFormCompleteness = useCallback(() => {
     const isComplete =
       fname &&
@@ -82,10 +94,25 @@ function Signup() {
     cvalid,
     formData.consent,
   ]);
+  // Check if all fields have been filled regardless of validation status
+  const checkAllFieldsFilled = useCallback(() => {
+    const allFilled = 
+      formData.firstName.trim() !== "" &&
+      formData.surname.trim() !== "" &&
+      formData.email.trim() !== "" &&
+      formData.membershipId.trim() !== "" &&
+      formData.password.trim() !== "" &&
+      formData.confirmPassword.trim() !== "" &&
+      formData.consent;
+    
+    setAllFieldsFilled(allFilled);
+  }, [formData]);
+
   // Use useEffect to ensure state updates are complete before checking form completeness
   useEffect(() => {
     checkFormCompleteness();
-  }, [checkFormCompleteness]);
+    checkAllFieldsFilled();
+  }, [checkFormCompleteness, checkAllFieldsFilled]);
   
   const validateFirstName = (firstName: string): string => {
     const nameRegex = /^[a-zA-Z0-9\-]+$/; // Updated to allow hyphens
@@ -180,8 +207,7 @@ function Signup() {
         error = validateEmail(value);
         break;
       case "membershipId":
-        // No validation needed, just clear any previous errors
-        error = "";
+        error = validateMembershipId(value);
         break;
       case "password":
         error = validatePassword(value);
@@ -396,7 +422,7 @@ function Signup() {
               )}
             </div>
 
-            {/* Membership ID - No validation */}
+            {/* Membership ID - With validation */}
             <div className="w-full flex flex-col">
               <label
                 className="text-base font-sans font-semibold"
@@ -405,8 +431,12 @@ function Signup() {
                 Membership ID <span className="text-red-600">*</span>
               </label>
               <input
-                className="p-3 rounded border border-gray-400"
-                placeholder="Enter your membership ID"
+                className={`p-3 rounded border ${
+                  formSubmitted && formErrors.membershipId
+                    ? "border-red-500"
+                    : "border-gray-400"
+                }`}
+                placeholder="Enter your membership ID (e.g., MB123456)"
                 name="membershipId"
                 id="membershipId"
                 required
@@ -414,6 +444,9 @@ function Signup() {
                 value={formData.membershipId}
                 onChange={handleChange}
               />
+              {formSubmitted && formErrors.membershipId && (
+                <p className="text-red-600 text-sm">{formErrors.membershipId}</p>
+              )}
             </div>
 
             {/* Password */}
@@ -540,9 +573,9 @@ function Signup() {
             )}
 
             <button
-              disabled={!complete || loading}
+              disabled={!allFieldsFilled || loading}
               className={`px-8 py-4 rounded-full text-white text-base font-semibold mt-2 ${
-                !complete || loading ? "bg-slate-500" : "bg-primary"
+                !allFieldsFilled || loading ? "bg-slate-500" : "bg-primary"
               }`}
               type="submit"
             >

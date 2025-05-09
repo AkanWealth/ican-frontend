@@ -16,7 +16,7 @@ const handleTabChange = (tab: React.SetStateAction<string>) => {
           <h1 className="text-2xl md:text-3xl font-bold mb-6">Overview</h1>
     
           <div className="w-full mb-4">
-            <div className='flex w-full max-w-[560px] bg-gray-200 rounded-xl p-2'>
+            <div className='flex w-full max-w-xl bg-gray-200 rounded-xl p-2'>
               <button
                 onClick={() => handleTabChange('attendance')}
                 className={`flex-1 text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg hover:bg-blue-700  ${activeTab === 'attendance'
@@ -27,14 +27,14 @@ const handleTabChange = (tab: React.SetStateAction<string>) => {
               </button>
               <button
                 onClick={() => handleTabChange('dues')}
-                className={`1 text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg ${activeTab === 'dues'
+                className={`flex-1 text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg ${activeTab === 'dues'
                   ? 'bg-primary text-white'
                   : 'text-gray-800 hover:bg-gray-300'
                   }`}
               >
                 Meetings metric
               </button>
-              <button
+              {/* <button
                 onClick={() => handleTabChange('meeting')}
                 className={`1 text-xs px-2 md:px-2 lg:px-8 py-2 rounded-lg ${activeTab === 'meeting'
                   ? 'bg-primary text-white'
@@ -42,7 +42,7 @@ const handleTabChange = (tab: React.SetStateAction<string>) => {
                   }`}
               >
                 Members dues and payment
-              </button>
+              </button> */}
              
             </div>
             {/* <div className="text-sm text-gray-500 mt-6">{getTabDescription()}</div> */}
@@ -53,8 +53,8 @@ const handleTabChange = (tab: React.SetStateAction<string>) => {
 
         {activeTab === 'attendance' && <AttendanceRender/>}
         {activeTab === 'dues' && <MetricMeetingRender/>}
-
-           {activeTab === 'meeting' && <MemberDueRender/>}
+{/* 
+           {activeTab === 'meeting' && <MemberDueRender/>} */}
        
         </div>
       );

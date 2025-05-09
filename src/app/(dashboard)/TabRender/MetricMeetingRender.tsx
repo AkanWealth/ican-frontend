@@ -636,10 +636,10 @@ useEffect(() => {
         <div className="w-full mx-auto">
           <div className="grid grid-cols-1 gap-6 mb-8">
             {/* Metrics Card */}
-            <div className="w-full bg-white p-6 rounded-xl border border-gray-200">
+            {/* <div className="w-full bg-white p-6 rounded-xl border border-gray-200">
               <h3 className="mb-2 text-lg font-semibold">Metric</h3>
               
-              {/* Month dropdown */}
+              // Month dropdown 
               <div className="relative mb-4">
                 <button
                   onClick={toggleDropdown}
@@ -711,7 +711,7 @@ useEffect(() => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Summary Card with Charts */}
             <div className="w-full bg-white p-6 rounded-xl border border-gray-200">

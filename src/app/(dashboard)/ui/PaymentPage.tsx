@@ -66,7 +66,7 @@ const PaymentPage = () => {
                 : "text-gray-800 hover:bg-gray-300"
             }`}
           >
-            Subscription Payment
+           Donations
           </button>
           <button
             onClick={() => handleTabChange("PaymentHistory")}

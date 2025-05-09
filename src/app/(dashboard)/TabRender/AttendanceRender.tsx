@@ -516,7 +516,7 @@ function AttendanceRender() {
                         <Video className="h-4 w-4 text-green-600" />
                       </div>
                       <p className="text-sm text-center p-2">
-                        Total Meetings held
+                        Technical Session
                       </p>
                     </div>
                     {isLoadingMetrics ? (
@@ -533,7 +533,7 @@ function AttendanceRender() {
                         <Files className="h-4 w-4 text-green-600" />
                       </div>
                       <p className="text-sm text-center p-2">
-                        Number of Registrations
+                        Your Total Event Registrations
                       </p>
                     </div>
                     {isLoadingRegistrations ? (
@@ -549,7 +549,7 @@ function AttendanceRender() {
                       <div className="flex bg-green-300 w-[2rem] h-[2rem] p-2 rounded-lg item-center justify-center mr-2">
                         <Mic className="h-4 w-4 text-green-600" />
                       </div>
-                      <p className="text-sm text-center p-2">Number of Attendees</p>
+                      <p className="text-sm text-center p-2">Events You've Attended</p>
                     </div>
                     {isLoadingAttendance ? (
                       <div className="h-8 w-8 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>

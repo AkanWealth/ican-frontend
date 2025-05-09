@@ -9,7 +9,7 @@ import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/user/actions/CellActions";
 
 const capitalizeWords = (str: string): string => {
-  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
 export const allcolumns: ColumnDef<User>[] = [
@@ -46,7 +46,7 @@ export const allcolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return capitalizeWords(row.original.role.name);
+      return capitalizeWords(row.original.role.name.replace(/[_-]/g, " "));
     },
   },
   {
@@ -128,7 +128,7 @@ export const adminscolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return capitalizeWords(row.original.role.name);
+      return capitalizeWords(row.original.role.name.replace(/[_-]/g, " "));
     },
   },
   {

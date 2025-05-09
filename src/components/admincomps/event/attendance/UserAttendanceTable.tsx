@@ -74,7 +74,7 @@ export function UserAttendanceTable<TData, TValue>({
     <div>
       <div className="flex flex-row justify-between w-full items-center py-4">
         <Input
-          placeholder="Filter by attendee name..."
+          placeholder="Search by attendee name..."
           value={
             (table.getColumn("fullName")?.getFilterValue() as string) ?? ""
           }
@@ -138,7 +138,7 @@ export function UserAttendanceTable<TData, TValue>({
                 >
                   <Image
                     className="mx-auto"
-                    src="/EmptyBillingTable.png"
+                    src="/Emptymembers.png"
                     alt="Empty"
                     width={400}
                     height={400}

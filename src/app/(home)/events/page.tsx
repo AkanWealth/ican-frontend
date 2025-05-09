@@ -62,7 +62,7 @@ function EventsPage() {
 
     let result = [...events];
 
-    // Filter by search query
+    // Search by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(

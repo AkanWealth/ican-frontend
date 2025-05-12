@@ -136,6 +136,7 @@ type OverdueBills = {
     type: string;
     createdAt: string;
     amount: number;
+    frequency: string;
   };
 };
 
@@ -376,6 +377,25 @@ type StudyPack = {
   };
 };
 
+type UpdatedBillingStats = {
+  billingId: string;
+  name: string;
+  totalBillingAmount: number;
+  paymentsMade: number;
+  totalAmountPaid: number;
+  totalUsersAffected: number;
+  totalUsersPaid: number;
+  totalUsersNotPaid: number;
+  stackedChartData: {
+    labels: string[];
+    datasets: {
+      label: string;
+      data: number[];
+      backgroundColor: string;
+    }[];
+  };
+};
+
 export type {
   Advert,
   BlogPost,
@@ -400,4 +420,5 @@ export type {
   DashEventPaymentTrend,
   TechnicalPost,
   Publication,
+  UpdatedBillingStats,
 };

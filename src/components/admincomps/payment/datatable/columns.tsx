@@ -119,12 +119,29 @@ export const dashPaymentcoloumns: ColumnDef<OverdueBills>[] = [
     header: "Bill Name",
   },
   {
-    accessorKey: "billing.type",
-    header: "Bill Type",
-  },
-  {
     accessorKey: "billing.amount",
     header: "Amount",
+  },
+  {
+    accessorKey: "billing.frequency",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Billing cycle <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.original.billing.frequency.charAt(0).toUpperCase() + row.original.billing.frequency.slice(1).toLowerCase()}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "billing.createdAt",
@@ -287,7 +304,6 @@ export const billingusersdetailscoloumns: ColumnDef<BillingUsersDetails>[] = [
         </Button>
       );
     },
-   
   },
   {
     accessorKey: "affectedUsers.paymentStatus",

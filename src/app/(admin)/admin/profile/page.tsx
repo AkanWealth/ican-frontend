@@ -34,7 +34,7 @@ function Profile() {
       }));
 
       toast({
-        title: "Success", 
+        title: "Success",
         description: "Admin details fetched successfully",
         variant: "default",
       });
@@ -42,7 +42,7 @@ function Profile() {
       console.error("Error fetching admin details:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch admin details", 
+        description: "Failed to fetch admin details",
         variant: "destructive",
       });
     }
@@ -55,7 +55,7 @@ function Profile() {
       .find((row) => row.startsWith("user_data="))
       ?.split("=")[1];
 
-    if (storedAdmin) {  
+    if (storedAdmin) {
       try {
         const decodedAdmin = decodeURIComponent(storedAdmin);
         const parsedAdmin = JSON.parse(decodedAdmin);
@@ -68,7 +68,7 @@ function Profile() {
         console.error("Error parsing admin data from cookie:", error);
       }
     }
-  }, []); // Run once on mount
+  }, [ toast]); // Run once on mount
 
   const handleSaveChanges = async () => {
     // Implement save changes logic here

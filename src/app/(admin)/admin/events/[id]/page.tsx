@@ -89,7 +89,7 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array to run only once
+  }, [params, router, toast]); // Empty dependency array to run only once
 
   useEffect(() => {
     async function fetchData() {

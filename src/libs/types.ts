@@ -47,6 +47,24 @@ type BillingDetails = {
   }[];
 };
 
+type BillingPayment = {
+  id: string;
+  userId: string;
+  billingId: string;
+  paymentType: string;
+  amount: number;
+  datePaid: string;
+  status: string;
+  transactionId: string | null;
+  subscriptionId: string | null;
+  anonymous: boolean;
+  createdAt: string;
+  donationOption: string | null;
+  paymentCategory: string;
+  eventId: string | null;
+}
+
+
 type User = {
   id: string;
   email: string;

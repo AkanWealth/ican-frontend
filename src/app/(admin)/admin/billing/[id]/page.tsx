@@ -54,6 +54,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { toast } = useToast();
 
   const [data, setData] = useState<BillingDetails>();
+  const [paymentData, setPaymentData] = useState<BillingPaymentTable[]>([]);
   const [billingStats, setBillingStats] = useState<UpdatedBillingStats>();
 
   const chartData = [
@@ -84,6 +85,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         const result = await apiClient.get(`/billing/${billingId}`, config);
 
         setData(result);
+        setPaymentData(result.Payment);
       } catch (error) {
         toast({
           title: "Error",
@@ -197,45 +199,45 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                 )}
               </span>
             </p>{" "}
-            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-              Reciepients{" "}
-              <span className="text-base text-black font-medium">all</span>
-            </p>{" "}
           </div>
 
-          <ChartContainer
-            config={chartConfig}
-            className="mx-auto aspect-square   min-h-[250px] px-0"
-          >
-            <PieChart>
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Pie
-                data={chartData}
-                dataKey="trans_no"
-                labelLine={false}
-                label={({ payload, ...props }) => {
-                  return (
-                    <text
-                      cx={props.cx}
-                      cy={props.cy}
-                      x={props.x}
-                      y={props.y}
-                      textAnchor={props.textAnchor}
-                      dominantBaseline={props.dominantBaseline}
-                      fill="hsla(var(--foreground))"
-                      className="font-medium"
-                    >
-                      {payload.trans_no}
-                    </text>
-                  );
-                }}
-                nameKey="status"
-              />
-            </PieChart>
-          </ChartContainer>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-neutral-600">Bill payment statistics</p>
+
+            <ChartContainer
+              config={chartConfig}
+              className="mx-auto aspect-square   min-h-[250px] px-0"
+            >
+              <PieChart>
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Pie
+                  data={chartData}
+                  dataKey="trans_no"
+                  labelLine={false}
+                  label={({ payload, ...props }) => {
+                    return (
+                      <text
+                        cx={props.cx}
+                        cy={props.cy}
+                        x={props.x}
+                        y={props.y}
+                        textAnchor={props.textAnchor}
+                        dominantBaseline={props.dominantBaseline}
+                        fill="hsla(var(--foreground))"
+                        className="font-medium"
+                      >
+                        {payload.trans_no}
+                      </text>
+                    );
+                  }}
+                  nameKey="status"
+                />
+              </PieChart>
+            </ChartContainer>
+          </div>
         </div>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
@@ -243,10 +245,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           Successful Payment Details
         </h2>
         <hr />
-        <PaymentTable
-          data={(data?.Payment || []) as BillingPaymentTable[]}
-          columns={billingdetailscoloumns}
-        />
+        <PaymentTable data={paymentData} columns={billingdetailscoloumns} />
       </div>
     </div>
   );

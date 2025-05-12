@@ -7,6 +7,8 @@ import {
   PaymentDetails,
   PaymentBasic,
   BillingUsersDetails,
+  BillingDetails,
+  BillingPaymentTable,
 } from "@/libs/types";
 
 import { Button } from "@/components/ui/button";
@@ -138,7 +140,14 @@ export const dashPaymentcoloumns: ColumnDef<OverdueBills>[] = [
     cell: ({ row }) => {
       return (
         <div>
-          {row.original.billing.frequency.replace(/_/g, ' ').charAt(0).toUpperCase() + row.original.billing.frequency.replace(/_/g, ' ').slice(1).toLowerCase()}
+          {row.original.billing.frequency
+            .replace(/_/g, " ")
+            .charAt(0)
+            .toUpperCase() +
+            row.original.billing.frequency
+              .replace(/_/g, " ")
+              .slice(1)
+              .toLowerCase()}
         </div>
       );
     },
@@ -244,13 +253,13 @@ export const paymentdetailscoloumns: ColumnDef<PaymentDetails>[] = [
   // },
 ];
 
-export const billingdetailscoloumns: ColumnDef<PaymentBasic>[] = [
+export const billingdetailscoloumns: ColumnDef<BillingPaymentTable>[] = [
   {
     accessorKey: "paymentType",
     header: "Payment Type",
   },
   {
-    accessorKey: "amountPaid",
+    accessorKey: "amount",
     header: "Amount Paid",
   },
   {
@@ -277,7 +286,7 @@ export const billingdetailscoloumns: ColumnDef<PaymentBasic>[] = [
     accessorKey: "paymentStatus",
     header: "Payment Status",
     cell: ({ row }) => {
-      return <Statbtn status={row.original.paymentStatus} />;
+      return <Statbtn status={row.original.status} />;
     },
   },
 ];

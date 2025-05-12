@@ -85,7 +85,7 @@ const PaymentHistory = () => {
           
           return {
             ...payment,
-            subscriptionPeriod: relatedBilling?.name || 'Unknown Subscription',
+            subscriptionPeriod: response.paymentType || relatedBilling?.name || 'Unknown Subscription',
             paymentMethod: paymentMethod === 'CARD' ? 'Debit Card' : 'Bank Transfer'
           };
         });

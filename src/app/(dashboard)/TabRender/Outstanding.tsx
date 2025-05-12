@@ -1639,6 +1639,7 @@ const Outstanding = () => {
         transactionId: paymentData.transactionId,
         paymentCategory: selectedBilling?.frequency || "ONE_TIME",
         status: paymentData.status
+        
       });
       
       toast({

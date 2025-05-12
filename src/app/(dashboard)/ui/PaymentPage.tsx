@@ -58,7 +58,7 @@ const PaymentPage = () => {
           >
             Settle Payments
           </button>
-          <button
+          {/* <button
             onClick={() => handleTabChange("Subcription")}
             className={`flex-1 text-xs px-2 md:px-4 lg:px-8 py-2 rounded-lg ${
               activeTab === "Subcription"
@@ -67,7 +67,7 @@ const PaymentPage = () => {
             }`}
           >
            Donations
-          </button>
+          </button> */}
           <button
             onClick={() => handleTabChange("PaymentHistory")}
             className={`flex-1 text-xs px-2 md:px-4 lg:px-8 py-2 rounded-lg  ${
@@ -83,7 +83,7 @@ const PaymentPage = () => {
 
       {/* Tab Content */}
       {activeTab === "Outstanding" && <Outstanding />}
-      {activeTab === "Subcription" && <Subscription />}
+      {/* {activeTab === "Subcription" && <Subscription />} */}
       {activeTab === "PaymentHistory" && <PaymentHistory />}
 
       {/* Donation Modal */}

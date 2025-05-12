@@ -57,6 +57,7 @@ const PaymentHistory = () => {
   const fetchBillingData = async () => {
     try {
       const response = await apiClient.get("/billing");
+      console.log("Billing Data:", response);
       return Array.isArray(response) ? response : [];
     } catch (error) {
       console.error("Error fetching billing data:", error);
@@ -79,9 +80,11 @@ const PaymentHistory = () => {
         const processedData = data.map((payment: Payment) => {
           // Find related billing record
           const relatedBilling = billings.find(b => b.id === payment.billingId);
-          
+          console.log("Related Billing:", relatedBilling);
+          console.log("Payment:", payment);
           // Extract payment method from transactionId (example: CARD_64413c1f-78e4...)
           const paymentMethod = payment.transactionId?.split('_')[0] || 'Unknown';
+          console.log("Payment Method:", paymentMethod);
           
           return {
             ...payment,

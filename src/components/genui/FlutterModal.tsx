@@ -255,6 +255,7 @@ interface FlutterModalProps {
   email: string;
   phoneNumber: string;
   name: string;
+  // paymentCategory: string;
   title: string;
   description?: string;
   paymentType: string;

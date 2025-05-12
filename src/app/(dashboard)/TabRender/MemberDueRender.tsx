@@ -891,6 +891,8 @@ function MemberDueRender() {
             amount: paymentDetails.amount,
             paymentType: paymentDetails.paymentType || "CARD",
             transactionId: paymentDetails.transactionId,
+            paymentCategory:   "ONE_TIME",
+            status: "PAID",
           }
         );
       } else {

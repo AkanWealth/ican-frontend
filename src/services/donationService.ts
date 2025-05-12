@@ -2,6 +2,7 @@ import apiClient from '@/services/apiClient';
 
 interface DonationRequest {
   paymentType: string;
+  paymentCategory?: string; // Make it optional
   amount: number;
   donationOption: 'one-time' | 'monthly' | 'quarterly' | 'yearly';
   anonymous: boolean;
@@ -14,6 +15,7 @@ const donationService = {
     try {
       const response = await apiClient.post('/payments/donations', {
         paymentType: donationDetails.paymentType,
+         paymentCategory: donationDetails.paymentCategory || "DONATION", 
         amount: donationDetails.amount,
         donationOption: donationDetails.donationOption,
         anonymous: donationDetails.anonymous,

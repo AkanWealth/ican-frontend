@@ -138,7 +138,7 @@ export const dashPaymentcoloumns: ColumnDef<OverdueBills>[] = [
     cell: ({ row }) => {
       return (
         <div>
-          {row.original.billing.frequency.charAt(0).toUpperCase() + row.original.billing.frequency.slice(1).toLowerCase()}
+          {row.original.billing.frequency.replace(/_/g, ' ').charAt(0).toUpperCase() + row.original.billing.frequency.replace(/_/g, ' ').slice(1).toLowerCase()}
         </div>
       );
     },
@@ -250,8 +250,8 @@ export const billingdetailscoloumns: ColumnDef<PaymentBasic>[] = [
     header: "Payment Type",
   },
   {
-    accessorKey: "amount",
-    header: "Amount",
+    accessorKey: "amountPaid",
+    header: "Amount Paid",
   },
   {
     accessorKey: "datePaid",
@@ -274,10 +274,10 @@ export const billingdetailscoloumns: ColumnDef<PaymentBasic>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "paymentStatus",
+    header: "Payment Status",
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      return <Statbtn status={row.original.paymentStatus} />;
     },
   },
 ];

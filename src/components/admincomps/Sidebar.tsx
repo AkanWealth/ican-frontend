@@ -16,7 +16,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { logout } from "@/lib/auth";
- 
 
 const topMenuItems = [
   { icon: MdHome, label: "Dashboard", href: "/admin" },
@@ -38,7 +37,6 @@ const topMenuItems = [
   },
   { icon: IoMdCalendar, label: "Event Management", href: "/admin/events" },
 
-  { icon: MdAttachMoney, label: "Payments", href: "/admin/payment" },
   { icon: MdOutlineAnalytics, label: "Billings", href: "/admin/billing" },
 ];
 

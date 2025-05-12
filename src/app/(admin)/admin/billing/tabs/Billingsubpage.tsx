@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 
 import { BillingTable } from "@/components/admincomps/billing/datatable/BillingTable";
 import { billingcolumns } from "@/components/admincomps/billing/datatable/columns";
-import { Billing } from "@/components/admincomps/billing/datatable/colsdata";
 
+
+import { Billing } from "@/libs/types";
 import apiClient from "@/services-admin/apiClient";
 
 import { BASE_API_URL } from "@/utils/setter";

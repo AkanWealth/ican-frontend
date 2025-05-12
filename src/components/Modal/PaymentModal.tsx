@@ -131,6 +131,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           title={title}
           description={`Payment for ${title}`}
           paymentType="CARD"
+          // paymentCategory="DONATION"
           onSuccess={(response) => {
             // Handle the success response and pass it to the parent component
             onPaymentSuccess({

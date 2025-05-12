@@ -59,7 +59,7 @@ function Signup() {
     
     if (!membershipRegex.test(id)) {
       setMidValid(false);
-      return "Membership ID must be in format 'MB' followed by 6 digits (e.g., MB123456)";
+      return "Invalid Membership ID.";
     }
     
     setMidValid(true);
@@ -308,13 +308,18 @@ function Signup() {
 
       // Redirect to the next page after successful registration
       router.push(`/Verify-email?email=${encodeURIComponent(formData.email)}`);
-    } catch (error) {
-      console.error("Registration error:", error);
-      toast({
-        title: "Registration Failed",
-        description: "An error occurred during registration.",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+    console.error("Registration error:", error);
+
+    // Extract error message from API response
+    const errorMessage =
+      error.response?.data?.message || "An error occurred during registration.";
+
+    toast({
+      title: "Registration Failed",
+      description: errorMessage,
+      variant: "destructive",
+    });
     } finally {
       setLoading(false);
     }
@@ -436,7 +441,7 @@ function Signup() {
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
-                placeholder="Enter your membership ID (e.g., MB123456)"
+                placeholder="Enter your membership ID"
                 name="membershipId"
                 id="membershipId"
                 required

@@ -5,6 +5,8 @@ interface PaymentRequest {
   amount: number;
   paymentType: string;
   transactionId: string;
+  status: string;
+  paymentCategory?: string;
 }
 
 const paymentService = {

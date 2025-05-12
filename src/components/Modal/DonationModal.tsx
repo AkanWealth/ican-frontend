@@ -49,6 +49,7 @@ const DonationModal: React.FC<DonationModalProps> = ({
         donationOption,
         anonymous: isAnonymous,
         transactionId: response.transaction_id,
+        paymentCategory: "DONATION"
       });
 
       toast({
@@ -162,6 +163,7 @@ const DonationModal: React.FC<DonationModalProps> = ({
               isAnonymous ? " (Anonymous)" : ""
             }`}
             paymentType="CARD"
+            // paymentCategory="DONATION"
             onSuccess={handleSuccess}
             onFailure={() => {
               toast({

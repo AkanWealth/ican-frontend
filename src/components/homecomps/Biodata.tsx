@@ -61,15 +61,18 @@ export type BiodataFormData = {
     graduation?: string;
     status?: string;
   };
-  experience?: {
+   experience?: {
     companyName?: string;
     currentPosition?: string;
     startDate?: string;
     endDate?: string;
     officeAddress?: string;
+    isCurrentJob?: boolean;
+    hasNoExperience?: boolean; // Add this field to track if user has no experience
   };
   payment?: {
     amount?: number;
+    billingId?: string;
   };
   userData?: {
     email: string;
@@ -121,6 +124,7 @@ function Biodata() {
       currentPosition: "",
       startDate: "",
       endDate: "",
+      hasNoExperience: false, // Default to false
     },
     payment: {
       amount: 25000,
@@ -150,15 +154,15 @@ function Biodata() {
     switch (activeStep) {
       case 0: // Personal data
         const personalData = formData.personalData;
-        const isPersonalValid = 
-          !!personalData.surname?.trim() && 
-          !!personalData.firstName?.trim() && 
-          !!personalData.gender?.trim() && 
-          !!personalData.dob && 
-          !!personalData.maritalStatus?.trim() && 
-          !!personalData.state?.trim() && 
+        const isPersonalValid =
+          !!personalData.surname?.trim() &&
+          !!personalData.firstName?.trim() &&
+          !!personalData.gender?.trim() &&
+          !!personalData.dob &&
+          !!personalData.maritalStatus?.trim() &&
+          !!personalData.state?.trim() &&
           !!personalData.nationality?.trim();
-        
+
         setIsCurrentStepValid(isPersonalValid);
         if (!isPersonalValid) {
           setValidationMessage("Please fill all required personal details");
@@ -166,15 +170,15 @@ function Biodata() {
           setValidationMessage("");
         }
         break;
-      
+
       case 1: // Contact details
         const contactDetails = formData.contactDetails;
-        const isContactValid = 
+        const isContactValid =
           !!contactDetails.mobileNumber?.trim() &&
           !!contactDetails.residentialAddress?.trim() &&
           !!contactDetails.residentialCountry?.trim() &&
           !!contactDetails.residentialCity?.trim();
-        
+
         setIsCurrentStepValid(isContactValid);
         if (!isContactValid) {
           setValidationMessage("Please fill all required contact details");
@@ -182,16 +186,16 @@ function Biodata() {
           setValidationMessage("");
         }
         break;
-      
+
       case 2: // Qualifications
         const education = formData.education;
-        const isEducationValid = 
+        const isEducationValid =
           !!education?.insitution?.trim() &&
           !!education?.discipline?.trim() &&
           !!education?.qualification?.trim() &&
           !!education?.graduation?.trim() &&
           !!education?.status?.trim();
-        
+
         setIsCurrentStepValid(isEducationValid);
         if (!isEducationValid) {
           setValidationMessage("Please fill all required qualification details");
@@ -199,25 +203,36 @@ function Biodata() {
           setValidationMessage("");
         }
         break;
-      
+
       case 3: // Experience
-        const experience = formData.experience;
-        const isExperienceValid = 
-          !!experience?.companyName?.trim() &&
-          !!experience?.currentPosition?.trim() &&
-          !!experience?.startDate?.trim();
+        // Check if the user has indicated no work experience
+        const hasNoWorkExperience = formData.experience?.hasNoExperience === true;
 
-        // Validate endDate only if isCurrentJob is false
-        const isEndDateValid =!!experience?.endDate?.trim();
-
-        setIsCurrentStepValid(isExperienceValid && isEndDateValid);
-        if (!isExperienceValid || !isEndDateValid) {
-          setValidationMessage("Please fill all required experience details");
-        } else {
+        if (hasNoWorkExperience) {
+          // If user has no work experience, consider this step valid
+          setIsCurrentStepValid(true);
           setValidationMessage("");
+        } else {
+          // Otherwise validate normal experience fields
+          const experience = formData.experience;
+          const isExperienceValid =
+            !!experience?.companyName?.trim() &&
+            !!experience?.currentPosition?.trim() &&
+            !!experience?.startDate?.trim();
+
+          // Check if end date is required (not current job) and provided
+          const isCurrentJob = experience?.isCurrentJob === true;
+          const isEndDateValid = isCurrentJob || !!experience?.endDate?.trim();
+
+          setIsCurrentStepValid(isExperienceValid && isEndDateValid);
+          if (!isExperienceValid || !isEndDateValid) {
+            setValidationMessage("Please fill all required experience details");
+          } else {
+            setValidationMessage("");
+          }
         }
         break;
-      
+
       case 4: // Payment
         // For the payment step, validity is determined by isPaymentSuccessful
         setIsCurrentStepValid(formData.isPaymentSuccessful || false);
@@ -227,7 +242,7 @@ function Biodata() {
           setValidationMessage("");
         }
         break;
-      
+
       default:
         setIsCurrentStepValid(true);
         setValidationMessage("");
@@ -237,7 +252,7 @@ function Biodata() {
   // Run validation when activeStep changes or when formData changes
   useEffect(() => {
     validateCurrentStep();
-  }, [activeStep,formData, validateCurrentStep]); // Include validateCurrentStep in the dependency array
+  }, [activeStep, formData, validateCurrentStep]); // Include validateCurrentStep in the dependency array
 
   const getFormProgress = (): Partial<BiodataFormData> | null => {
     if (typeof window === "undefined") return null; // Prevent SSR issues
@@ -281,28 +296,28 @@ function Biodata() {
   };
 
   const handleSubmit = async () => {
-    if (typeof window === "undefined") return; 
-     
-            
-    
+    if (typeof window === "undefined") return;
+
+
+
     try {
-    //   const cookies = parseCookies();
-    // const userDataCookie = cookies['user_data'];
-    // const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
-    // const userId = userData?.id;
-    // console.log("userId", userId);
-    
-    //  if (!userId) throw new Error("User ID not found in cookies");
-    
-            // Specify the return type with UserResponse interface
+      //   const cookies = parseCookies();
+      // const userDataCookie = cookies['user_data'];
+      // const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+      // const userId = userData?.id;
+      // console.log("userId", userId);
+
+      //  if (!userId) throw new Error("User ID not found in cookies");
+
+      // Specify the return type with UserResponse interface
       // const response = await apiClient.get(`/users/${userId}`);
       const userEmail = localStorage.getItem("userEmail") || "";
       const memberId = localStorage.getItem("memberId") || "";
-      
+
       const payload = {
         email: userEmail,
         membershipId: memberId,
-        
+
         // Personal Data
         profilePicture: formData.profilePicture || "",
         surname: formData.personalData.surname || "",
@@ -313,7 +328,7 @@ function Biodata() {
         maritalStatus: formData.personalData.maritalStatus || "",
         stateOfOrigin: formData.personalData.state || "",
         nationality: formData.personalData.nationality || "",
-        
+
         // Contact Details
         residentialAddress: formData.contactDetails.residentialAddress || "",
         residentialCountry: formData.contactDetails.residentialCountry || "",
@@ -321,24 +336,27 @@ function Biodata() {
         residentialState: formData.contactDetails.residentialState || "",
         residentialLGA: formData.contactDetails.residentialLga || "",
         contactPhoneNumber: formData.contactDetails.mobileNumber || "",
-        
+
         // Education
         institution: formData.education?.insitution || "",
         discipline: formData.education?.discipline || "",
         qualifications: formData.education?.qualification || "",
-        yearOfGraduation: formData.education?.graduation 
-          ? Number(formData.education.graduation) 
+        yearOfGraduation: formData.education?.graduation
+          ? Number(formData.education.graduation)
           : null,
         status: formData.education?.status || "",
+
+
         
-        // Experience
+
+        //Experience
         companyName: formData.experience?.companyName || "",
         officeAddress: formData.experience?.officeAddress || "",
         position: formData.experience?.currentPosition || "",
         startDate: formData.experience?.startDate || null, // Already in YYYY-MM-DD format
         endDate: formData.experience?.endDate || null, // Already in YYYY-MM-DD format
       };
-      
+
       console.log("Payload:", payload);
       const username = localStorage.getItem("userName") || "";
       const Token = localStorage.getItem("token");
@@ -347,7 +365,7 @@ function Biodata() {
       //         `/users/update-user`,
       //         payload
       //       );
-  
+
       // Send the data to the API
       const responseBiossata = await axios({
         method: 'put',
@@ -359,7 +377,7 @@ function Biodata() {
           Accept: 'application/json'
         },
       });
-  
+
       console.log("Biodata submitted successfully:", responseBiossata.data);
       toast.toast({
         title: "Biodata submitted successfully!",
@@ -373,8 +391,8 @@ function Biodata() {
       console.error("Error submitting biodata:", error);
       toast.toast({
         title: "Failed to submit biodata",
-        description: axios.isAxiosError(error) && error.response?.data?.message 
-          ? error.response.data.message 
+        description: axios.isAxiosError(error) && error.response?.data?.message
+          ? error.response.data.message
           : "Please try again.",
         variant: "destructive",
         duration: 3000,
@@ -427,7 +445,7 @@ function Biodata() {
   const handleNext = () => {
     // Validate current step first
     validateCurrentStep();
-    
+
     // Only proceed if the step is valid
     if (isCurrentStepValid) {
       // For the last step (payment page), check if payment is completed
@@ -575,11 +593,10 @@ function Biodata() {
                       {...labelProps}
                       StepIconComponent={(props) => (
                         <div
-                          className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                            props.completed
+                          className={`w-8 h-8 flex items-center justify-center rounded-full ${props.completed
                               ? "bg-primary text-white"
                               : "bg-gray-300 text-black"
-                          }`}
+                            }`}
                         >
                           {props.icon}
                         </div>
@@ -666,18 +683,17 @@ function Biodata() {
                 Skip
               </Button>
             )}
-            
+
             {/* Validation message */}
             {!isCurrentStepValid && (
               <div className="text-red-500 text-sm mr-3 self-center">
                 {validationMessage || "Please fill all required fields"}
               </div>
             )}
-            
+
             <Button
-              className={`bg-primary p-3 sm:p-4 rounded-full text-sm sm:text-base text-white w-fit ${
-                !isCurrentStepValid ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={`bg-primary p-3 sm:p-4 rounded-full text-sm sm:text-base text-white w-fit ${!isCurrentStepValid ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               onClick={handleNext}
               disabled={!isCurrentStepValid}
             >

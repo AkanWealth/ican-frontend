@@ -201,15 +201,17 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <p className="text-base text-black font-medium">
-            Name: {selectedUser?.firstname} {selectedUser?.surname}
-            <br />
-            Email: {selectedUser?.email}
-            <br />
-            Current Role: {selectedUser?.role.name.replace(/[_-]/g, " ")}
-            <br />
-            New Role: {selectedRole?.name.replace(/[_-]/g, " ")}
-          </p>
+          {formData.userId && (
+            <p className="text-base text-black font-medium">
+              Name: {selectedUser?.firstname} {selectedUser?.surname}
+              <br />
+              Email: {selectedUser?.email}
+              <br />
+              Current Role: {selectedUser?.role.name.replace(/[_-]/g, " ")}
+              <br />
+              New Role: {selectedRole?.name.replace(/[_-]/g, " ")}
+            </p>
+          )}
 
           <InputEle
             label="User"

@@ -17,7 +17,7 @@ import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 interface RolemanagerProps {
   id?: string;
   showModal: boolean;
-  setShowModal: (show: boolean) => void;  
+  setShowModal: (show: boolean) => void;
 }
 interface FormData {
   name: string;
@@ -93,16 +93,19 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
       });
       setIsLoading(false);
       router.refresh();
+      router.refresh();
+      window.location.reload();
     } catch (error) {
       console.error("Error creating role:", error);
       toast({
         title: "Error",
-          description:   "An error occurred while editing the role",
+        description: "An error occurred while editing the role",
         variant: "destructive",
       });
     }
     setIsLoading(false);
     router.refresh();
+    window.location.reload();
   };
 
   return (

@@ -144,65 +144,87 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         <h2 className="text-xl font-semibold text-left">Billing Details</h2>
         <hr />
         <div className="w-full flex flex-row justify-between gap-10">
-          <div className="grid grid-cols-2 gap-6">
-            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-              Bill Name
-              <span className="text-base text-black font-medium">
-                {data?.name}
-              </span>
-            </p>
-            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-              Bill Frequency
-              <span className="text-base text-black font-medium">
-                {data?.frequency
-                  ? data.frequency.charAt(0).toUpperCase() +
-                    data.frequency.slice(1).toLowerCase().replace(/_/g, " ")
-                  : "-"}
-              </span>
-            </p>
-            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-              Bill Amount{" "}
-              <span className="text-base text-black font-medium">
-                {data?.amount}
-              </span>
-            </p>{" "}
-            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-              Reciepients{" "}
-              <span className="text-base text-black font-medium">all</span>
-            </p>{" "}
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-              Total Members Affected
-              <span className="text-base text-black font-medium">
-                {billingStats?.totalUsersAffected}
-              </span>
-            </p>
-            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-              Total Amount Paid
-              <span className="text-base text-black font-medium">
-                {new Intl.NumberFormat("en-NG", {
-                  style: "currency",
-                  currency: "NGN",
-                }).format(billingStats?.totalAmountPaid || 0)}
-              </span>
-            </p>
-            <p className=" text-sm text-neutral-600 flex flex-col gap-1">
-              Total Amount Due
-              <span className="text-base text-black font-medium">
-                {new Intl.NumberFormat("en-NG", {
-                  style: "currency",
-                  currency: "NGN",
-                }).format(
-                  (billingStats?.totalBillingAmount || 0) *
-                    (billingStats?.totalUsersNotPaid || 0)
-                )}
-              </span>
-            </p>{" "}
+          <div className="grid grid-cols-2 gap-8 w-full">
+            <div className="bg-gray-50 p-6 rounded-xl hover:bg-gray-100 transition-all">
+              <h3 className="text-lg font-semibold mb-4">Bill Information</h3>
+              <div className="space-y-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">Bill Name</span>
+                  <span className="text-base font-medium text-black">
+                    {data?.name || '-'}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">Bill Frequency</span>
+                  <span className="text-base font-medium text-black">
+                    {data?.frequency
+                      ? data.frequency.charAt(0).toUpperCase() +
+                        data.frequency.slice(1).toLowerCase().replace(/_/g, " ")
+                      : "-"}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">Bill Amount</span>
+                  <span className="text-base font-medium text-black">
+                    {new Intl.NumberFormat("en-NG", {
+                      style: "currency",
+                      currency: "NGN",
+                    }).format(data?.amount || 0)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">Recipients</span>
+                  <span className="text-base font-medium text-black capitalize">
+                    All Members
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 p-6 rounded-xl hover:bg-gray-100 transition-all">
+              <h3 className="text-lg font-semibold mb-4">Payment Statistics</h3>
+              <div className="space-y-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">Total Members Affected</span>
+                  <span className="text-base font-medium text-black">
+                    {billingStats?.totalUsersAffected || 0}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">Unpaid Members</span>
+                  <span className="text-base font-medium text-red-600">
+                    {billingStats?.totalUsersNotPaid || 0}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">Total Amount Paid</span>
+                  <span className="text-base font-medium text-green-600">
+                    {new Intl.NumberFormat("en-NG", {
+                      style: "currency",
+                      currency: "NGN",
+                    }).format(billingStats?.totalAmountPaid || 0)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">Total Amount Due</span>
+                  <span className="text-base font-medium text-red-600">
+                    {new Intl.NumberFormat("en-NG", {
+                      style: "currency", 
+                      currency: "NGN",
+                    }).format(
+                      (billingStats?.totalBillingAmount || 0) *
+                      (billingStats?.totalUsersNotPaid || 0)
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <p className="text-sm text-neutral-600">Bill payment statistics</p>
+            <p className="text-lg  mx-auto  text-neutral-600">
+              Bill payment statistics
+            </p>
 
             <ChartContainer
               config={chartConfig}

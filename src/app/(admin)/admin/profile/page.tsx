@@ -68,7 +68,7 @@ function Profile() {
         console.error("Error parsing admin data from cookie:", error);
       }
     }
-  }, [ toast]); // Run once on mount
+  }, [fetchAdminDetails, toast]); // Run once on mount
 
   const handleSaveChanges = async () => {
     // Implement save changes logic here

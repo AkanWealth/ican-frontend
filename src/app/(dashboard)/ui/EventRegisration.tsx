@@ -16,12 +16,9 @@ import SuccessModal from "./SuccessMessage";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { FlutterWaveButton } from "flutterwave-react-v3";
-<<<<<<< HEAD
-=======
 import { BASE_API_URL } from "@/utils/setter";
 import apiClient from "@/services/apiClient";
 import { parseCookies } from "nookies";
->>>>>>> 63904a7358490cc7e9900e22f341358b8f0b6c72
 // import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
@@ -641,10 +638,7 @@ const isValidUrl = (url: any) => {
                                 duration: 3000,
                               });
                             }
-<<<<<<< HEAD
-=======
                             // closePaymentModal(); // Close the modal programmatically
->>>>>>> 63904a7358490cc7e9900e22f341358b8f0b6c72
                           }}
                           onClose={() => {
                             console.log('Payment closed');

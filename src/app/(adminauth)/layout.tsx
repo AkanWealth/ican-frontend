@@ -16,7 +16,7 @@ export default function AdminAuthLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex flex-row h-full bg-white items-center   ">
+      <body className="flex flex-row h-full bg-white items-center">
         <div className="flex flex-col h-screen w-1/2 bg-[#0d1b4b] pl-24 pt-12 justify-between ">
           <Image
             src="/Logo_small_white.png"

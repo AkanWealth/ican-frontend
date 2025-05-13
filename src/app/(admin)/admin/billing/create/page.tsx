@@ -2,41 +2,43 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { MdArrowBack, MdDelete } from "react-icons/md";
+import { MdArrowBack } from "react-icons/md";
 import InputEle from "@/components/genui/InputEle";
+
 import { BillUserTable } from "@/components/admincomps/billing/create/BillUserTable";
 import { userbillingcolumns } from "@/components/admincomps/billing/create/columns";
-import {
-  BillUser,
-  billings,
-} from "@/components/admincomps/billing/create/colsdata";
+
+import apiClient from "@/services-admin/apiClient";
+import { BASE_API_URL } from "@/utils/setter";
+
+import { useToast } from "@/hooks/use-toast";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import { User } from "@/libs/types";
 
 interface IBilling {
   billing_name: string;
-  billing_type: string;
-  billing_description: string;
+  billing_frequency: string;
   billing_amount: string;
-  billing_date: string;
-  reciepients: "all" | string[];
+  billing_autoApply: boolean;
 }
 
 function CreateBillingPage() {
   //const selected = React.useMemo(() => [], []);
   const [selected, setSelected] = useState<string[]>([]);
   const [recipientType, setRecipientType] = useState<string>("all");
+  const { toast } = useToast();
+  const [users, setUsers] = useState<User[]>([]);
 
   const router = useRouter();
   const [newBill, setNewBill] = useState<IBilling>({
     billing_name: "",
-    billing_type: "",
-    billing_description: "",
     billing_amount: "0",
-    billing_date: "",
-    reciepients: "all",
+    billing_frequency: "MONTHLY",
+    billing_autoApply: false,
   });
-  useEffect(() => {
-    console.log("Selected recipients:", selected);
-  }, [selected]);
 
   const onInputChange = (
     e: React.ChangeEvent<
@@ -45,6 +47,71 @@ function CreateBillingPage() {
   ) => {
     setNewBill((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
+  const saveBill = async () => {
+    let data = {
+      name: newBill.billing_name,
+      frequency: newBill.billing_frequency,
+      amount: Number(newBill.billing_amount), // ensure it's a number
+      autoApply: newBill.billing_autoApply,
+    };
+
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/billing`,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      data: data,
+    };
+    try {
+      const response = await apiClient.post("/billing", data, config);
+
+      toast({
+        title: "Success",
+        description: "Bill created successfully.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error creating bill:", error);
+
+      toast({
+        title: "Error",
+        description: "An error occurred while creating the bill.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/users/users`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      };
+      try {
+        const result = await apiClient.request(config);
+
+        setUsers(result.data);
+        toast({
+          title: "Members data fetched successfully!",
+          description: "Members data fetched successfully!",
+          variant: "default",
+        });
+      } catch (error) {
+        toast({
+          title: "Error fetching members data!",
+          description: "Error fetching members data!",
+          variant: "destructive",
+        });
+      }
+    }
+    fetchData();
+  }, [toast]);
 
   return (
     <div className="rounded-3xl p-6">
@@ -73,21 +140,19 @@ function CreateBillingPage() {
             placeholder="Enter bill name"
           />{" "}
           <InputEle
-            label="Bill type"
-            id="billing_type"
-            type="text"
-            value={newBill.billing_type}
+            label="Bill frequency"
+            id="billing_frequency"
+            type="select"
+            options={[
+              { value: "MONTHLY", label: "Monthly" },
+              { value: "YEARLY", label: "Yearly" },
+              { value: "ONE_TIME", label: "One Time" },
+            ]}
+            value={newBill.billing_frequency}
             onChange={onInputChange}
-            placeholder="Enter bill type"
+            placeholder="Enter bill frequency"
           />
-          <InputEle
-            label="Billing Description"
-            id="billing_description"
-            type="text"
-            value={newBill.billing_description}
-            onChange={onInputChange}
-            placeholder="Enter bill description"
-          />
+         
           <InputEle
             label="Bill Amount"
             id="billing_amount"
@@ -96,14 +161,7 @@ function CreateBillingPage() {
             onChange={onInputChange}
             placeholder="Enter bill amount"
           />
-          <InputEle
-            label="Due Date"
-            id="billing_date"
-            type="date"
-            value={newBill.billing_date}
-            onChange={onInputChange}
-            placeholder="Enter bill due date"
-          />
+    
           <InputEle
             label="Reciepients"
             id="reciepients"
@@ -116,6 +174,12 @@ function CreateBillingPage() {
             onChange={(e) => setRecipientType(e.target.value)}
           />
         </div>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          onClick={saveBill}
+        >
+          Create Bill
+        </button>
       </div>
       {recipientType === "select" && (
         <div className="rounded-3xl mt-10 px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
@@ -124,7 +188,7 @@ function CreateBillingPage() {
           </h2>
           <BillUserTable
             columns={userbillingcolumns}
-            data={billings}
+            data={users}
             setter={setSelected}
           />
         </div>
@@ -133,4 +197,12 @@ function CreateBillingPage() {
   );
 }
 
-export default CreateBillingPage;
+export default function PackedCreateBillingPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <CreateBillingPage />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

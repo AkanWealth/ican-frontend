@@ -70,10 +70,9 @@ export const Sidebar = () => {
     router.push(href);
   };
   const handleLogout = () => {
-
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-  
+
     router.push("/login");
   };
   const isActiveLink = (href: string) => {
@@ -120,7 +119,7 @@ export const Sidebar = () => {
 
           {/* Logo - Fixed at Top */}
           <div className="h-16 flex items-center py-12 border-b border-gray-200 px-6 flex-shrink-0">
-            <Image src="/Icanlogo.png" alt="Logo" width={170} height={90}  />
+            <Image src="/Icanlogo.png" alt="Logo" width={170} height={90} />
           </div>
 
           {/* Scrollable Navigation Section */}
@@ -198,7 +197,7 @@ export const Sidebar = () => {
       {/* Mobile Overlay */}
       {isMobileView && isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0  bg-black bg-opacity-50 z-40"
           onClick={() => setIsOpen(false)}
         />
       )}

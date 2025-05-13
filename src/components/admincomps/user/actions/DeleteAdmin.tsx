@@ -2,9 +2,10 @@ import React from "react";
 import { MdSubtitles, MdDeleteOutline } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
-import axios from "axios";
-import Toast from "@/components/genui/Toast";
 
+import apiClient from "@/services-admin/apiClient";
+
+import { useToast } from "@/hooks/use-toast";
 interface DeleteAdminProps {
   id: string;
   fullName: string;
@@ -13,6 +14,7 @@ interface DeleteAdminProps {
 }
 
 function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
+  const { toast } = useToast();
   const handleDelete = () => {
     console.log({ id, fullName, role });
     async function fetchData() {
@@ -23,24 +25,33 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
         headers: {
           Accept: "application/json",
           ContentType: "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
       };
       try {
-        const results = await axios.request(config);
+        const results = await apiClient.request(config);
         console.log(results.data);
+        toast({
+          title: "Admin Deleted",
+          description: "Admin deleted successfully",
+          variant: "default",
+        });
         onClose();
-        return <Toast type="success" message={results.data.message} />;
       } catch (error: any) {
         console.error(error);
-        return <Toast type="error" message={error.response?.data?.message || "An error occurred"} />;
+        toast({
+          title: "Error",
+          description:
+            error.response?.data?.message || "An error occurred while deleting",
+          variant: "destructive",
+        });
+        onClose();
       }
     }
     fetchData();
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
       <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
         <div className="flex flex-row justify-start gap-4">
           <div className="rounded-full  h-fit w-fit p-4 bg-red-200">

@@ -9,6 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import Statbtn from "@/components/genui/Statbtn";
 
+import { RegisteredUsers } from "@/libs/types";
+
 export const userattendancecolumns: ColumnDef<UserAttendance>[] = [
   {
     id: "select",
@@ -74,5 +76,31 @@ export const userattendancecolumns: ColumnDef<UserAttendance>[] = [
     cell: ({ row }) => {
       return <Statbtn status={row.original.status} />;
     },
+  },
+];
+export const registereduserscolumns: ColumnDef<RegisteredUsers>[] = [
+  {
+    accessorKey: "fullName",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Name of Attendee
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+
+  {
+    accessorKey: "membership",
+    header: "Membership",
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
   },
 ];

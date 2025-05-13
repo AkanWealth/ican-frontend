@@ -97,6 +97,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           placeholder="Enter your surname"
           type="text"
           label="Surname"
+          required={true}
         />
         <InputEle
           value={formData.personalData.firstName}
@@ -112,6 +113,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           placeholder="Enter your first name"
           type="text"
           label="First Name"
+          required={true}
         />
         <InputEle
           value={formData.personalData?.middleName}
@@ -127,6 +129,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           placeholder="Enter your middle name"
           type="text"
           label="Middle Name"
+          required={false}
         />
         <InputEle
           id="gender"
@@ -142,26 +145,31 @@ function Personal({ formData, updateFormData }: PersonalProps) {
             })
           }
           addStyle2="h-[50px]"
-          
+          required={true}
         />
+
         <InputEle
           id="dob"
           type="date"
           label="Date of Birth"
           value={
             formData.personalData.dob
-              ? new Date(formData.personalData.dob).toISOString().split("T")[0]
+              ? formData.personalData.dob // Already in YYYY-MM-DD format
               : ""
           }
-          onChange={(e) =>
+          onChange={(e) => {
+            // Store date directly in YYYY-MM-DD format
+            const dateValue = e.target.value; // Already in YYYY-MM-DD format from the date input
             updateFormData({
               personalData: {
                 ...formData.personalData,
-                dob: new Date(e.target.value).toISOString(), // Convert to ISO format
+                dob: dateValue, // Store as YYYY-MM-DD string
               },
-            })
-          }
+            });
+          }}
+          required={true}
         />
+
         <InputEle
           id="maritalStatus"
           type="marriage"
@@ -176,6 +184,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
             })
           }
           addStyle2="h-[50px]"
+          required={true}
         />
         <InputEle
           value={formData.personalData?.state}
@@ -191,6 +200,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
           type="text"
           label="State of origin"
           placeholder="Enter your state of origin"
+          required={true}
         />
         <InputEle
           id="nationality"
@@ -206,6 +216,7 @@ function Personal({ formData, updateFormData }: PersonalProps) {
             })
           }
           addStyle2="h-[50px]"
+          required={true}
         />
       </div>
     </div>

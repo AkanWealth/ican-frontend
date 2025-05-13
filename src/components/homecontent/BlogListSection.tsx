@@ -2,67 +2,58 @@
 
 import * as React from "react";
 import BlogCard from "@/components/homecontent/BlogCard";
-import { BlogTabs } from "@/components/homecontent/BlogTabs";
 import { Pagination } from "@/components/homecomps/Pagination";
-import { blogPosts } from "@/lib/data";
 import { handleReadMore } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
-/**
- * BlogList Component
- * @description Displays a list of blog posts with tab filtering and pagination.
- * Allows users to filter posts by category and navigate between pages.
- *
- * Features:
- * - Displays blog posts in a grid layout.
- * - Filters posts by category using tabs.
- * - Supports pagination for large sets of posts.
- * - Handles navigation to the detailed blog post view.
- *
- * @returns {JSX.Element} The rendered BlogList component.
- */
-const BlogList: React.FC = () => {
-  const router = useRouter();
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+import { BlogPost } from "@/types";
 
-  // State for active category tab and current pagination page
+import { useToast } from "@/hooks/use-toast";
+
+const BlogList: React.FC = () => {
+  const { toast } = useToast();
+
+  const [blogPosts, setBlogPosts] = React.useState<BlogPost[]>([]);
+  const router = useRouter();
   const [activeTab, setActiveTab] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  /**
-   * Filters blog posts based on the active category tab.
-   * If no tab is active, all posts are shown.
-   *
-   * @returns {BlogPost[]} The filtered list of blog posts.
-   */
   const filteredPosts = React.useMemo(() => {
     return activeTab
-      ? blogPosts.filter((post) => post.category === activeTab)
+      ? blogPosts.filter((post) => post.contentType === activeTab)
       : blogPosts;
-  }, [activeTab]);
+  }, [activeTab, blogPosts]);
 
-  // Number of posts to display per page
-  const postsPerPage = 6;
+  const postsPerPage = 10;
 
-  // Total number of posts after filtering
   const totalFilteredPosts = filteredPosts.length;
 
-  // Reset pagination to the first page when the active tab changes
   React.useEffect(() => {
     setCurrentPage(1);
   }, [activeTab]);
 
-  /**
-   * Handles changes to the active tab.
-   * Updates the active category and resets pagination.
-   *
-   * @param {string} tab - The selected category tab.
-   */
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    setCurrentPage(1);
-  };
+  React.useEffect(() => {
+    const fetchBlogPosts = async () => {
+      try {
+        const response = await axios.get(`${BASE_API_URL}/blogs`);
+        setBlogPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching blog posts:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load blog posts. Please try again later.",
+          variant: "destructive",
+        });
+      }
+    };
 
-  // Compute the posts to display on the current page
+    fetchBlogPosts();
+  }, [toast]);
+
+
+
   const paginatedPosts = filteredPosts.slice(
     (currentPage - 1) * postsPerPage,
     currentPage * postsPerPage
@@ -74,7 +65,6 @@ const BlogList: React.FC = () => {
       <h1 className="text-3xl font-bold text-blue-900">Latest Blog Posts</h1>
 
       {/* Blog tabs for category filtering */}
-      <BlogTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
       {/* Blog posts section */}
       <section

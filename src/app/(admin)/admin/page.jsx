@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import Toast from "@/components/genui/Toast";
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
 import UserActivities from "@/components/admincomps/dashboard/UserActivities";
 import PaymentActivities from "@/components/admincomps/dashboard/PaymentActivities";
 import EventActivities from "@/components/admincomps/dashboard/EventActivities";
 
 function AdminDashboard() {
-
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
@@ -20,7 +19,6 @@ function AdminDashboard() {
           </h2>
           <p>View and Manage all user reports here</p>
         </div>
-      
       </div>
       {/* Tab sections */}
       <Tabs defaultValue="user" className="flex flex-col gap-4">
@@ -43,4 +41,12 @@ function AdminDashboard() {
   );
 }
 
-export default AdminDashboard;
+export default function AdminDashboardPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <AdminDashboard />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

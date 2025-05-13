@@ -2,15 +2,22 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
-import { PaymentDets } from "./colsdata";
+import {
+  OverdueBills,
+  PaymentDetails,
+  PaymentBasic,
+  BillingUsersDetails,
+  BillingDetails,
+  BillingPaymentTable,
+} from "@/libs/types";
 
 import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
-import CellActions from "@/components/admincomps/billing/actions/CellActions";
+import CellActions from "@/components/admincomps/payment/actions/CellActions";
 
-export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
+export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
   {
-    accessorKey: "member_name",
+    accessorKey: "user.firstname",
     header: ({ column }) => {
       return (
         <Button
@@ -22,17 +29,17 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.original.user.firstname} {row.original.user.surname}
+        </div>
+      );
+    },
   },
+
   {
-    accessorKey: "member_id",
-    header: "Member ID",
-  },
-  {
-    accessorKey: "billing_name",
-    header: "Billing Name",
-  },
-  {
-    accessorKey: "payment_type",
+    accessorKey: "paymentType",
     header: "Payment Type",
   },
   {
@@ -40,7 +47,7 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
     header: "Amount",
   },
   {
-    accessorKey: "date",
+    accessorKey: "datePaid",
     header: ({ column }) => {
       return (
         <Button
@@ -48,30 +55,16 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Due Date
+          Date Paid
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-  },
-  {
-    accessorKey: "paid_date",
-    header: ({ column }) => {
+    cell: ({ row }) => {
       return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Paid Date
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div>{new Date(row.original.datePaid).toLocaleDateString("en-GB")}</div>
       );
     },
-  },
-  {
-    accessorKey: "created_by",
-    header: "Created By",
   },
 
   {
@@ -83,7 +76,7 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Invoice Status
+          Status
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -92,17 +85,16 @@ export const paymentcoloumns: ColumnDef<PaymentDets>[] = [
       return <Statbtn status={row.original.status} />;
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      return <CellActions row={row} />;
-    },
-  },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     return <CellActions row={row} />;
+  //   },
+  // },
 ];
-
-export const paymentdetailscoloumns: ColumnDef<PaymentDets>[] = [
+export const dashPaymentcoloumns: ColumnDef<OverdueBills>[] = [
   {
-    accessorKey: "member_name",
+    accessorKey: "user.firstname",
     header: ({ column }) => {
       return (
         <Button
@@ -114,17 +106,26 @@ export const paymentdetailscoloumns: ColumnDef<PaymentDets>[] = [
         </Button>
       );
     },
+
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.original.user.firstname} {row.original.user.surname}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "billing.name",
+    header: "Bill Name",
   },
   {
-    accessorKey: "member_id",
-    header: "Member ID",
-  },
-  {
-    accessorKey: "amount",
+    accessorKey: "billing.amount",
     header: "Amount",
   },
   {
-    accessorKey: "date",
+    accessorKey: "billing.frequency",
     header: ({ column }) => {
       return (
         <Button
@@ -132,14 +133,81 @@ export const paymentdetailscoloumns: ColumnDef<PaymentDets>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Due Date
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          Billing cycle <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.original.billing.frequency
+            .replace(/_/g, " ")
+            .charAt(0)
+            .toUpperCase() +
+            row.original.billing.frequency
+              .replace(/_/g, " ")
+              .slice(1)
+              .toLowerCase()}
+        </div>
       );
     },
   },
   {
-    accessorKey: "paid_date",
+    accessorKey: "billing.createdAt",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Created at
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {new Date(row.original.billing.createdAt).toLocaleDateString("en-GB")}
+        </div>
+      );
+    },
+  },
+];
+
+export const paymentdetailscoloumns: ColumnDef<PaymentDetails>[] = [
+  {
+    accessorKey: "user.firstname",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Member Name <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.original.user.firstname} {row.original.user.surname}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "user.membershipId",
+    header: "Member ID",
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+  },
+  {
+    accessorKey: "datePaid",
     header: ({ column }) => {
       return (
         <Button
@@ -152,10 +220,11 @@ export const paymentdetailscoloumns: ColumnDef<PaymentDets>[] = [
         </Button>
       );
     },
-  },
-  {
-    accessorKey: "created_by",
-    header: "Created By",
+    cell: ({ row }) => {
+      return (
+        <div>{new Date(row.original.datePaid).toLocaleDateString("en-GB")}</div>
+      );
+    },
   },
 
   {
@@ -176,10 +245,80 @@ export const paymentdetailscoloumns: ColumnDef<PaymentDets>[] = [
       return <Statbtn status={row.original.status} />;
     },
   },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     return <CellActions row={row} />;
+  //   },
+  // },
+];
+
+export const billingdetailscoloumns: ColumnDef<BillingPaymentTable>[] = [
   {
-    id: "actions",
+    accessorKey: "paymentType",
+    header: "Payment Type",
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount Paid",
+  },
+  {
+    accessorKey: "datePaid",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date Paid
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
-      return <CellActions row={row} />;
+      return (
+        <div>{new Date(row.original.datePaid).toLocaleDateString("en-GB")}</div>
+      );
+    },
+  },
+  {
+    accessorKey: "paymentStatus",
+    header: "Payment Status",
+    cell: ({ row }) => {
+      return <Statbtn status={row.original.status} />;
+    },
+  },
+];
+export const billingusersdetailscoloumns: ColumnDef<BillingUsersDetails>[] = [
+  {
+    accessorKey: "paymentType",
+    header: "Payment Type",
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+  },
+  {
+    accessorKey: "affectedUsers.amountPaid",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Amount Paid
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "affectedUsers.paymentStatus",
+    header: "Status",
+    cell: ({ row }) => {
+      return <Statbtn status={row.original.affectedUsers[0].paymentStatus} />;
     },
   },
 ];

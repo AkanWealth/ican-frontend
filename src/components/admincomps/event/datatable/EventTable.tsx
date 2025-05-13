@@ -62,12 +62,10 @@ export function EventTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by event name..."
-          value={
-            (table.getColumn("eventName")?.getFilterValue() as string) ?? ""
-          }
+          placeholder="Search by event name..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("eventName")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

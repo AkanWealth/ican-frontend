@@ -6,6 +6,7 @@ import {
   MdOutlineTag,
 } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
+import apiClient from "@/services-admin/apiClient";
 
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
@@ -33,16 +34,10 @@ function UnpublishContent({
     const data = JSON.stringify({
       status: "draft",
     });
-    const config = {
-      method: "PATCH",
-      maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/${contentCategory}/${id}`,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-      },
-      data: data,
-    };
+
+    const config = await apiClient.patch(
+      `/${contentCategory}/${id}`,
+      data);
     try {
       const response = await axios.request(config);
       console.log("Content unpubished successfully:", response.data);
@@ -56,7 +51,7 @@ function UnpublishContent({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
+      <div className="flex flex-col p-4 rounded-xl gap-4  bg-white">
         <div className="flex flex-row justify-start gap-4">
           <div className="rounded-full  h-fit w-fit p-4 bg-yellow-200">
             <MdOutlineUnpublished className="w-6 h-6 fill-yellow-400" />

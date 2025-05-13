@@ -1,26 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import axios from "axios";
 import Link from "next/link";
-import Toast from "@/components/genui/Toast";
 
+import { useToast } from "@/hooks/use-toast";
 import InputEle from "@/components/genui/InputEle";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
 
-import { useRouter } from "next/navigation";
-import { BASE_API_URL } from "@/utils/setter";
+import { useAuth } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminPublicRoute } from "@/components/authcomps/AdminPublicRoute";
 
 function AdminLogin() {
-  const router = useRouter();
+  const { toast } = useToast();
+  const { login } = useAuth();
+
   const [loading, setLoading] = useState(false);
   const [complete, setComplete] = useState(false);
-  const [isSwitchOn, setIsSwitchOn] = useState(false);
-  const [otp, setOtp] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -103,161 +98,108 @@ function AdminLogin() {
       email: email,
       password: password,
     });
-    console.log(data);
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/auth/login`,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      data: data,
-    };
 
-    if (Object.values(errors).every((error) => error === "")) {
-      try {
-        const response = await axios.request(config);
-        const { user, access_token } = response.data;
+    try {
+      // Use the login method from AuthContext
+      await login(formData.email, formData.password);
 
-        // Set secure cookies instead of localStorage
-        localStorage.setItem("user", JSON.stringify(user));
-        document.cookie = `user=${encodeURIComponent(JSON.stringify(user))}; path=/; secure; samesite=strict`;
+      toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+        variant: "default",
+        duration: 2000,
+      });
+    } catch (error: any) {
+      console.error("Login error:", error);
 
-        localStorage.setItem("access_token", access_token);
-        document.cookie = `access_token=${access_token}; path=/; secure; samesite=strict`;
-
-        console.log("User data:", user);
-        console.log("Access token:", access_token);
-
-        setTimeout(() => {
-          router.push("/admin");
-        }, 5000);
-
-        return <Toast type="success" message="Login successful" />;
-      } catch (error) {
-        return <Toast type="error" message="An error occurred during login." />;
-      } finally {
-        setLoading(false);
+      let errorMessage = "An error occurred during login.";
+      if (error.response) {
+        errorMessage = error.response.data.message || errorMessage;
       }
-    } else {
+
+      toast({
+        title: "Login Failed",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 2000,
+      });
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className=" m-auto ">
-      <div className="flex flex-col w-96 sm:w-[550px] items-center rounded-2xl  bg-white p-8 gap-6 ">
-        <h4 className=" text-black w-full text-left text-3xl font-semibold font-mono   ">
-          Login to your account
-        </h4>
+    <AuthProvider>
+      <AdminPublicRoute>
+        <div className=" m-auto ">
+          <div className="flex flex-col w-96 sm:w-[550px] items-center rounded-2xl  bg-white p-8 gap-6 ">
+            <h4 className=" text-black w-full text-left text-3xl font-semibold font-mono   ">
+              Login to your account
+            </h4>
 
-        {isSwitchOn ? (
-          <div className="space-y-2 flex items-center flex-col">
-            <p className="text-base text-black font-sans">
-              Enter the 6-digit verification code sent to your email address
-            </p>
-            <InputOTP
-              className="flex gap-3"
-              maxLength={6}
-              value={otp}
-              onChange={(otp) => setOtp(otp)}
+            <form
+              className="w-full flex flex-col gap-4 "
+              onSubmit={handleSignin}
             >
-              <InputOTPGroup>
-                <InputOTPSlot className=" outline-blue-600 " index={0} />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot
-                  className=" focus-visible:outline-primary "
-                  index={1}
-                />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot
-                  className=" focus-visible:outline-primary "
-                  index={2}
-                />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot
-                  className=" focus-visible:outline-primary "
-                  index={3}
-                />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot
-                  className=" focus-visible:outline-primary "
-                  index={4}
-                />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot
-                  className=" focus-visible:outline-primary "
-                  index={5}
-                />
-              </InputOTPGroup>
-            </InputOTP>
-            <button
-              className=" w-full px-8 py-4 bg-primary  rounded-full text-white text-base font-semibold "
-              type="submit"
-            >
-              Log In
-            </button>
-            <p className="text-left w-full text-sm">
-              {otp === "" ? (
-                <>Enter your one-time password.</>
-              ) : (
-                <>You entered: {otp}</>
-              )}
-            </p>
-          </div>
-        ) : (
-          <form className="w-full flex flex-col gap-4 " onSubmit={handleSignin}>
-            {/* <InputEle /> */}
-            <InputEle
-              id="email"
-              type="text"
-              placeholder="Enter email address"
-              label="Email Address"
-              value={formData.email}
-              onChange={handleChange}
-              errorMsg={formErrors.email}
-            />
-            <InputEle
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              label="Password"
-              value={formData.password}
-              onChange={handleChange}
-              errorMsg={formErrors.password}
-            />
+              {/* <InputEle /> */}
+              <InputEle
+                id="email"
+                type="text"
+                placeholder="Enter email address"
+                label="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                errorMsg={formErrors.email}
+              />
+              <InputEle
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                label="Password"
+                value={formData.password}
+                onChange={handleChange}
+                errorMsg={formErrors.password}
+              />
 
-            <button
-              className=" px-8 py-4 bg-primary  rounded-full text-white text-base font-semibold "
-              type="submit"
-            >
-              Log In
-            </button>
-            <div className=" flex flex-row justify-between  ">
-              <p className=" text-base font-medium   ">
-                Don&apos;t have an account? {"       "}
-                <Link className=" text-primary " href={"/admin-signup"}>
-                  Sign Up
-                </Link>
-              </p>
-              <Link
-                className=" text-gray-500 text-base font-medium  "
-                href={"/admin-pass-reset"}
+              <button
+                className="px-8 py-4 bg-primary rounded-full text-white text-base font-semibold flex items-center justify-center"
+                type="submit"
+                disabled={loading}
               >
-                Forgot Password
-              </Link>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
+                {loading ? (
+                  <span className="loader border-white border-2 rounded-full w-5 h-5 animate-spin"></span>
+                ) : (
+                  "Log In"
+                )}
+              </button>
+              <div className=" flex flex-row justify-between  ">
+                <p className=" text-base font-medium   ">
+                  Don&apos;t have an account? {"       "}
+                  <Link className=" text-primary " href={"/admin-signup"}>
+                    Sign Up
+                  </Link>
+                </p>
+                <Link
+                  className=" text-gray-500 text-base font-medium  "
+                  href={"/admin-pass-reset"}
+                >
+                  Forgot Password
+                </Link>
+              </div>
+            </form>
+          </div>
+        </div>
+      </AdminPublicRoute>
+    </AuthProvider>
   );
 }
 
-export default AdminLogin;
+export default function AdminLoginPage() {
+  return (
+    <AuthProvider>
+      <AdminPublicRoute>
+        <AdminLogin />
+      </AdminPublicRoute>
+    </AuthProvider>
+  );
+}

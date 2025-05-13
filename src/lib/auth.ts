@@ -48,12 +48,22 @@ export function hasRole(allowedRoles: string[]) {
 
 export function logout() {
   console.log("logout: Clearing cookies and redirecting to login");
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
 
   // Clear cookies
   document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
   document.cookie =
     "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+  document.cookie =
+    "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+  // Clear cookies
+  document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+  document.cookie =
+    "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+  document.cookie =
+    "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
 
   // Redirect to login
-  window.location.href = "/";
+  window.location.href = "/admin-login";
 }

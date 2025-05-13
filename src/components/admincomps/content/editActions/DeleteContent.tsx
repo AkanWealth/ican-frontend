@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   MdSubtitles,
   MdOutlineDateRange,
@@ -8,9 +8,11 @@ import {
 } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
-import Toast from "@/components/genui/Toast";
+
+import { useToast } from "@/hooks/use-toast";
 
 interface DeleteContentProps {
   id: string;
@@ -29,27 +31,46 @@ function DeleteContent({
   date,
   onClose,
 }: DeleteContentProps) {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleDelete = async () => {
+    setIsLoading(true);
     const config = {
       method: "DELETE",
       maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/${contentCategory}/${id}`,
+      url: `${BASE_API_URL}/${
+        contentCategory === "resources" ? "resources/content" : contentCategory
+      }/${id}`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     };
     try {
-      const response = await axios.request(config);
-      console.log("Content deleted successfully:", response.data);
-      return <Toast type="success" message="Content deleted successfully!" />;
+      const response = await apiClient.request(config);
+      console.log("Content deleted successfully:", response);
+      toast({
+        title: "Content Deleted",
+        description: "The content has been successfully deleted.",
+        variant: "default",
+      });
+      setIsLoading(false);
+
+      onClose();
     } catch (error) {
       console.error("Error deleting:", error);
+      toast({
+        title: "Error Deleting Content",
+        description: "There was an error while trying to delete the content.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
       <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
         <div className="flex flex-row justify-start gap-4">
           <div className="rounded-full  h-fit w-fit p-4 bg-red-200">
@@ -89,9 +110,16 @@ function DeleteContent({
         <div className="flex justify-between">
           <button
             onClick={handleDelete}
-            className="flex items-center w-2/5 text-center justify-center bg-red-600 font-semibold text-base text-white rounded-full py-3 px-4 h-10"
+            disabled={isLoading}
+            className={`flex items-center w-2/5 text-center justify-center ${
+              isLoading ? "bg-red-400" : "bg-red-600"
+            } font-semibold text-base text-white rounded-full py-3 px-4 h-10`}
           >
-            Delete
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              "Delete"
+            )}
           </button>
           <button
             onClick={onClose}

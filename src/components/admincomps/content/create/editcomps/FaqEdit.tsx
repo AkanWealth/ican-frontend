@@ -3,18 +3,27 @@
 import React, { useState, useEffect } from "react";
 import InputEle from "@/components/genui/InputEle";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+
 import { BASE_API_URL } from "@/utils/setter";
 import { CreateContentProps } from "@/libs/types";
 
-import Toast from "@/components/genui/Toast";
+import { useRouter } from "next/navigation";
+
+import { useToast } from "@/hooks/use-toast";
 
 type Faq = {
   question: string;
   answer: string;
 };
+import PreviewFaq from "../previewcomps/PreviewFaq";
 
 function FaqEdit({ mode, id }: CreateContentProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+
   const [editDataFetched, setEditDataFetched] = useState<boolean>(false);
 
   const [faq, setFaq] = useState<Faq>({ question: "", answer: "" });
@@ -22,32 +31,21 @@ function FaqEdit({ mode, id }: CreateContentProps) {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(`${BASE_API_URL}/faqs/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-          withCredentials: true,
-        });
+        const response = await apiClient.get(`${BASE_API_URL}/faqs/${id}`);
         console.log("Faq details fetched:", response.data);
         setFaq({
-          question: response.data.name,
-          answer: response.data.amswer || "",
+          question: response.name,
+          answer: response.answer || "",
         });
         setEditDataFetched(true);
+        setIsSubmitting(false);
       } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setEditDataFetched(true);
-          console.error(
-            "Faq not found (404). Stopping further fetch attempts."
-          );
-        } else {
-          console.error("Error fetching Faq:", error);
-        }
+        console.error("Error fetching Faq:", error);
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching the Faq.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -55,13 +53,20 @@ function FaqEdit({ mode, id }: CreateContentProps) {
       console.log("Fetching FAQ details for edit mode");
       fetchDetails();
     }
-  }, [editDataFetched, id, mode]);
+  }, [editDataFetched, id, mode, toast]);
 
   const handleSubmit = async (status: "published" | "draft") => {
+    if (!faq.question || !faq.answer) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
     const data = JSON.stringify({
       name: faq.question,
       answer: faq.answer,
-
     });
 
     const config = {
@@ -71,17 +76,30 @@ function FaqEdit({ mode, id }: CreateContentProps) {
         mode === "edit" ? `${BASE_API_URL}/faqs/${id}` : `${BASE_API_URL}/faqs`,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       data: data,
     };
 
     try {
-      const response = await axios.request(config);
-      console.log("FAQ submitted successfully:", response.data);
-      return <Toast type="success" message="FAQ submitted successfully!" />;
+      const response = await apiClient.request(config);
+      console.log("FAQ submitted successfully:", response);
+      toast({
+        title: "Success",
+        description: `FAQ ${
+          mode === "edit" ? "edited" : "created"
+        } successfully.`,
+        variant: "default",
+      });
+      router.refresh();
+      window.location.reload();
     } catch (error) {
-      console.error("Error submitting FAQ:", error);
+      toast({
+        title: "Error",
+        description: `An error occurred while submitting the FAQ.`,
+        variant: "destructive",
+      });
+      window.location.reload();
     }
   };
 
@@ -92,6 +110,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           label="Question"
           type="text"
           id="title"
+          required={true}
           placeholder="Enter Question"
           value={faq.question}
           onChange={(e) => setFaq({ ...faq, question: e.target.value })}
@@ -100,6 +119,7 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           label="Answer"
           type="text"
           id="answer"
+          required={true}
           placeholder="Enter Answer"
           value={faq.answer}
           onChange={(e) => setFaq({ ...faq, answer: e.target.value })}
@@ -107,8 +127,10 @@ function FaqEdit({ mode, id }: CreateContentProps) {
       </div>
       <div className="flex flex-col gap-2">
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("published");
           }}
           className="rounded-full py-2 bg-primary text-white text-base w-full"
@@ -116,8 +138,10 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           {mode === "edit" ? "Publish Edit" : "Publish FAQ"}
         </button>
         <button
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
+            setIsSubmitting(true);
             handleSubmit("draft");
           }}
           className=" py-2 text-primary border border-primary text-base rounded-full w-full"
@@ -128,6 +152,14 @@ function FaqEdit({ mode, id }: CreateContentProps) {
           Preview
         </button>
       </div>
+      {showPreview && (
+        <PreviewFaq
+          question={faq.question}
+          answer={faq.answer}
+          showPreview={showPreview}
+          setShowPreview={setShowPreview}
+        />
+      )}
     </div>
   );
 }

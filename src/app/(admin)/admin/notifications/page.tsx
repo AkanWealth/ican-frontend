@@ -1,77 +1,65 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
-import { MdArrowBack, MdDelete } from "react-icons/md";
+import { MdArrowBack } from "react-icons/md";
 import { BellIcon } from "lucide-react";
+
+import NewNotification from "@/components/admincomps/notifications/NewNotification";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
 function NotificationPage() {
   const router = useRouter();
-  const [notifications, setNotifications] = useState([
-    {
-      header: "Admin Created",
-      message: "A new admin has been created",
-      date: "2 minutes ago",
-    },
-  ]);
 
   return (
-    <div className="rounded-3xl p-6">
+    <div className="rounded-3xl p-6 max-w-5xl mx-auto">
       <div className="flex flex-col mb-6 w-full items-start justify-start">
         <button
-          className="text-gray-500 text-base flex flex-row gap-2  font-semibold w-fit my-2 h-fit"
+          className="text-gray-500 text-base flex flex-row gap-2 font-semibold w-fit my-2 h-fit hover:text-gray-700 transition-colors"
           onClick={() => router.back()}
         >
-          <MdArrowBack className="w-6 h-6 " />
+          <MdArrowBack className="w-6 h-6" />
           Back
         </button>
-        <h2 className="font-semibol text-2xl text-black">Notifications</h2>
-        <p>Update and Manage your Profile here</p>
-      </div>
-      {/* Tab sections */}
-      <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl w-full font-semibold text-left border-b border-gray-500 ">
-          Notifications
-        </h2>
-        <div>
-          {notifications.length > 0
-            ? notifications.slice(0, 4).map((notification, index) => (
-                <div
-                  key={index}
-                  className="flex flex-row justify-between items-center"
-                >
-                  <div className="flex flex-row items-center justify-start gap-2">
-                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                      <BellIcon className="w-4 h-4 " />
-                    </div>
-                    <div className="flex flex-col items-start gap-1">
-                      <h5 className="text-sm text-black font-medium">
-                        {notification.header}
-                      </h5>
-                      <p className="text-xs text-neutral-600">
-                        {notification.message}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex-row items-end flex gap-2">
-                    <p className="text-xs text-neutral-600">
-                      {notification.date}
-                    </p>
-                    <button className="text-blue-500 text-xs">
-                      View details
-                    </button>
-                    <button>
-                      {" "}
-                      <MdDelete className="w-4 text-red-500 h-4 " />
-                    </button>
-                  </div>
-                </div>
-              ))
-            : "p0"}
+        <div className="flex items-center gap-3 mt-2">
+          <div className="p-2 bg-blue-100 rounded-full">
+            <BellIcon className="w-6 h-6 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-2xl text-black">
+              Create Notification
+            </h2>
+            <p className="text-gray-600">
+              Send notifications to users and administrators
+            </p>
+          </div>
         </div>
+      </div>
+
+      {/* Main content area */}
+      <div className="rounded-3xl p-6 border border-neutral-200 bg-white shadow-sm">
+        <div className="mb-4 pb-4 border-b border-gray-200">
+          <h3 className="text-xl font-semibold">New Notification</h3>
+          <p className="text-sm text-gray-500">
+            Complete the form below to create and send a new notification
+          </p>
+        </div>
+
+        {/* Display NewNotification component directly */}
+        <NewNotification />
       </div>
     </div>
   );
 }
 
-export default NotificationPage;
+export default function PackedNotificationPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <NotificationPage />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

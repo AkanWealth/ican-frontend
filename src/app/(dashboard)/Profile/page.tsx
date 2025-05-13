@@ -1,23 +1,19 @@
+"use client";
 import React from "react";
-import { AuthProvider } from "../LoginAuthentication/AuthContext";
+
 import { ProtectedRoute } from "../LoginAuthentication/ProtectedRoute";
+import { AuthProvider } from "../LoginAuthentication/AuthContext";
 import Profile from "../ui/Profile";
+// s
 
-
-// const ProfilePage = () => {
-//     return (
-//         <div>
-//             <Profile/>
-//         </div>
-//     );
-// };
-
-export default function ProfilePage(){
+export default function ProfilePage() {
     return (
-        <AuthProvider>
-            <ProtectedRoute>
-                <Profile />
-            </ProtectedRoute>
-        </AuthProvider>
-    )
-        };
+      <AuthProvider>
+        <ProtectedRoute>
+          
+          <Profile />
+          
+        </ProtectedRoute>
+      </AuthProvider>
+    );
+  }

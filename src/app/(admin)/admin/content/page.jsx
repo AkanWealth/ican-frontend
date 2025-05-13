@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import All from "./tabs/All";
 import Adverts from "./tabs/Adverts";
 import Blogs from "./tabs/Blogs";
 import Publications from "./tabs/Publications";
@@ -16,12 +19,11 @@ import NewContent from "@/components/admincomps/content/create/NewContent";
 
 function Content() {
   const [showModal, setShowModal] = useState(false);
+  const [data, setData] = useState([]);
+
   const handleCloseModal = () => {
     setShowModal(false);
   };
-
-  useEffect(() => {
-  }, []);
 
   return (
     <div className="rounded-3xl p-6">
@@ -37,27 +39,24 @@ function Content() {
         </button>
       </div>
       {/* Tab sections */}
-      <Tabs defaultValue="all" className="flex flex-col gap-4">
+      <Tabs defaultValue="blogs" className="flex flex-col gap-4">
         <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="adverts">Adverts</TabsTrigger>
           <TabsTrigger value="blogs">Blogs</TabsTrigger>
-          <TabsTrigger value="publication">Publication</TabsTrigger>
-          <TabsTrigger value="galleries">Galleries</TabsTrigger>
+          <TabsTrigger value="faq">FAQ</TabsTrigger>
+          <TabsTrigger value="galleries">Galleries</ TabsTrigger>
+          <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="technical">Technical Session</TabsTrigger>
           <TabsTrigger value="student">Study Pack</TabsTrigger>
-          <TabsTrigger value="faq">FAQ</TabsTrigger>
         </TabsList>
-        <TabsContent value="all">
-          <All />
-        </TabsContent>
+       
         <TabsContent value="adverts">
           <Adverts />
         </TabsContent>
         <TabsContent value="blogs">
           <Blogs />
         </TabsContent>
-        <TabsContent value="publication">
+        <TabsContent value="resources">
           <Publications />
         </TabsContent>
         <TabsContent value="galleries">
@@ -80,4 +79,12 @@ function Content() {
   );
 }
 
-export default Content;
+export default function PackedContentPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <Content />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

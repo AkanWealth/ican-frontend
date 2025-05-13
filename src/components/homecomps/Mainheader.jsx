@@ -134,9 +134,9 @@ function Mainheader() {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="flex flex-col gap-5 p-4 md:w-[400px] lg:w-[500px] py-4 px-2  ">
-                    {/* <Link href="/blog" legacyBehavior passHref>
+                    <Link href="/blog" legacyBehavior passHref>
                       <NavigationMenuLink>Blog </NavigationMenuLink>
-                    </Link> */}
+                    </Link>
                     <Link href="/gallery" legacyBehavior passHref>
                       <NavigationMenuLink>Gallery</NavigationMenuLink>
                     </Link>
@@ -145,10 +145,12 @@ function Mainheader() {
                         Technical Session{" "}
                       </NavigationMenuLink>
                     </Link>
-                    {/* 
-                     <Link href="/publications" legacyBehavior passHref>
-                      <NavigationMenuLink>Publication</NavigationMenuLink>
-                    </Link> */}
+
+                    <Link href="/publications" legacyBehavior passHref>
+                      <NavigationMenuLink>
+                        Resources & Publications
+                      </NavigationMenuLink>
+                    </Link>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -160,6 +162,16 @@ function Mainheader() {
                   } text-sm font-semibold`}
                 >
                   FAQ
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link
+                  href="/events"
+                  className={`${
+                    pathname === "/events" ? "text-primary" : ""
+                  } text-sm font-semibold`}
+                >
+                  Events
                 </Link>
               </NavigationMenuItem>
 
@@ -254,20 +266,21 @@ function Mainheader() {
             <AccordionItem value="item-3">
               <AccordionTrigger>Media & Resources </AccordionTrigger>
               <AccordionContent className=" flex flex-col gap-2">
-                {/* <Link onClick={() => setOpenMenu(!openMenu)} href="/blog">
+                <Link onClick={() => setOpenMenu(!openMenu)} href="/blog">
                   Blog{" "}
-                </Link>{" "} */}
+                </Link>{" "}
                 <Link onClick={() => setOpenMenu(!openMenu)} href="/gallery">
                   Gallery
                 </Link>
                 <Link onClick={() => setOpenMenu(!openMenu)} href="/technical">
                   Technical Session{" "}
                 </Link>{" "}
-                {/*
-                 <Link onClick={() => setOpenMenu(!openMenu)} href="/publications">
-                  Publications
+                <Link
+                  onClick={() => setOpenMenu(!openMenu)}
+                  href="/publications"
+                >
+                  Resources & Publications
                 </Link>
-                */}
               </AccordionContent>
             </AccordionItem>
           </Accordion>

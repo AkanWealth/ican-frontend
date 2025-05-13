@@ -1,15 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
+import apiClient from "@/services-admin/apiClient";
+import { useToast } from "@/hooks/use-toast";
 
 import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { memberscolumns } from "@/components/admincomps/user/datatable/columns";
 import { User } from "@/libs/types";
 import { BASE_API_URL } from "@/utils/setter";
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
 function MembersPage() {
   const [data, setData] = useState<User[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchData() {
@@ -18,17 +23,28 @@ function MembersPage() {
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/users/users`,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       };
-      const result = await axios.request(config);
-      const filteredData = result.data.filter(
-        (user: User) => user.role.name === "MEMBER"
-      );
-      setData(result.data);
+      try {
+        const result = await apiClient.request(config);
+
+        setData(result.data);
+        toast({
+          title: "Members data fetched successfully!",
+          description: "Members data fetched successfully!",
+          variant: "default",
+        });
+      } catch (error) {
+        toast({
+          title: "Error fetching members data!",
+          description: "Error fetching members data!",
+          variant: "destructive",
+        });
+      }
     }
     fetchData();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="rounded-3xl p-6">
@@ -51,4 +67,12 @@ function MembersPage() {
   );
 }
 
-export default MembersPage;
+export default function PackedMembersPage() {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <MembersPage />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

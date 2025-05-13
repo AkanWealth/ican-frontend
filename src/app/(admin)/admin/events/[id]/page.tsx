@@ -1,28 +1,152 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MdDownload, MdOutlineModeEditOutline } from "react-icons/md";
 import FeedbackModal from "@/components/admincomps/event/FeedbackModal";
 
+import { useRouter } from "next/navigation";
+import { BASE_API_URL } from "@/utils/setter";
+
+import apiClient from "@/services-admin/apiClient";
+
+import Cookies from "universal-cookie";
+
+import { EventDetails, RegisteredUsers } from "@/libs/types";
+import { useToast } from "@/hooks/use-toast";
+import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
+import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
+
+import { UserAttendanceTable } from "@/components/admincomps/event/attendance/UserAttendanceTable";
+import { registereduserscolumns } from "@/components/admincomps/event/attendance/columns";
+
 function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const feedbacks = [
-    {
-      id: "1",
-      rating: 5,
-      comment: "Great event! Really enjoyed it.",
-      createdAt: new Date("2024-03-10"),
-    },
-    {
-      id: "2",
-      rating: 3,
-      comment: "It was okay, could be better organized.",
-      createdAt: new Date("2024-03-09"),
-    },
-    // ... more feedback items
-  ];
-  const eventId = params;
+  const { toast } = useToast();
+  const cookies = new Cookies();
+
+  const [registeredUsers, setRegisteredUsers] = useState<RegisteredUsers[]>([]);
+
+  const router = useRouter();
+  const [eventDetails, setEventDetails] = useState<EventDetails>({
+    id: "",
+    name: "",
+    description: "",
+    date: "",
+    time: "",
+    fee: 0,
+    venue: "",
+    flyer: "",
+    mcpd_credit: 0,
+    meeting_link: "",
+    status: "DRAFT",
+    createdAt: new Date().toISOString(),
+  });
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbacks, setFeedbacks] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchAllFeedbackData() {
+      const eventId = (await params).id;
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/events/${eventId}/feedback`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      };
+      try {
+        const result = await apiClient.request(config);
+        // Only update state if component is still mounted and we have data
+        if (isMounted && result) {
+          setFeedbacks(result);
+          // Only show success toast if we actually got data
+          if (result.length > 0) {
+            toast({
+              title: "Feedback",
+              description: "Feedback fetched successfully.",
+              variant: "default",
+            });
+          }
+        }
+      } catch (error) {
+        if (isMounted) {
+          toast({
+            title: "Error",
+            description: "Failed to fetch event data.",
+            variant: "destructive",
+          });
+        }
+      }
+    }
+
+    fetchAllFeedbackData();
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  }, [params, router, toast]); // Empty dependency array to run only once
+
+  useEffect(() => {
+    async function fetchData() {
+      const eventId = (await params).id;
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/events/${eventId}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      };
+      try {
+        const result = await apiClient.request(config);
+        setEventDetails(result);
+        toast({
+          title: "Event Details",
+          description: "Event details fetched successfully.",
+          variant: "default",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch event data.",
+          variant: "destructive",
+        });
+      }
+    }
+
+    fetchData();
+  }, [params, router, toast]);
+
+  useEffect(() => {
+    async function fetchRegisteredUsers() {
+      const eventId = (await params).id;
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/events/registrations/${eventId}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      };
+      try {
+        const result = await apiClient.request(config);
+        setRegisteredUsers(result);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch registered users.",
+          variant: "destructive",
+        });
+      }
+    }
+
+    fetchRegisteredUsers();
+  }, [params, router, toast]);
+
   return (
     <div className="flex flex-col w-full items-center">
       <div className="flex flex-row w-full mb-2  justify-between items-center">
@@ -35,70 +159,71 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         <div className="flex flex-row w-fit items-center gap-3">
           <button
             onClick={() => setShowFeedbackModal(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-primary whitespace-nowrap text-white px-4 py-2 rounded-xl"
           >
             View Feedback
           </button>
-
           <FeedbackModal
+            eventId={eventDetails.id}
             isOpen={showFeedbackModal}
             onClose={() => setShowFeedbackModal(false)}
-            feedbacks={feedbacks}
+            feedbacks={Array.isArray(feedbacks) ? feedbacks : []}
           />
           <button className="w-fit whitespace-nowrap rounded px-3 text-black fill-black border-gray-400 border py-2 flex flex-row items-center gap-2 bg-white">
             <MdDownload className="w-5 h-5" /> Export Event
           </button>
         </div>
       </div>
-      <div className="rounded-xl border bg-white w-full border-gray-200 flex p-4 flex-col">
-        <div className="flex flex-row items-center justify-between w-full">
-          <h1 className=" text-2xl font-medium text-black ">Event Name</h1>
+      <div className="rounded-xl border bg-white w-full border-gray-200 p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-medium">{eventDetails.name}</h1>
           <MdOutlineModeEditOutline className="w-5 h-5" />
         </div>
-        <hr />
-        <div className="w-full flex flex-row justify-between gap-4 items-center ">
-          <div className="flex py-3 flex-col justify-between gap-4">
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Description{" "}
-              </span>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam
-              cum voluptate hic optio quaerat, voluptas dolor ducimus non ipsa
-              autem velit iure ratione quasi tenetur quia atque modi explicabo
-              ea?
-            </p>
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Date{" "}
-              </span>
-              20-02-2021
-            </p>
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Time{" "}
-              </span>
-              10:00 am{" "}
-            </p>
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Fee{" "}
-              </span>
-              N4000
-            </p>
-            <p className="flex flex-col gap-1 text-left text-base font-medium text-gray-800  ">
-              <span className="text-sm text-gray-600 font-medium ">
-                Event Venue
-              </span>
-              122, Random street Lagos
-            </p>
+        <hr className="mb-4" />
+        <div className="flex justify-between gap-4">
+          <div className="grid grid-cols-2 gap-1 w-full">
+            {[
+              { label: "Event Description", value: eventDetails.description },
+              {
+                label: "Event Date",
+                value: new Date(eventDetails.date).toLocaleDateString(),
+              },
+              { label: "Event Time", value: eventDetails.time },
+              { label: "Event Fee", value: `₦${eventDetails.fee}` },
+              { label: "Event Venue", value: eventDetails.venue },
+            ].map(({ label, value }) => (
+              <div
+                key={label}
+                className="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <span className="text-sm text-gray-600 font-medium block mb-1">
+                  {label}
+                </span>
+                <span className="text-base font-medium text-gray-800 block">
+                  {value}
+                </span>
+              </div>
+            ))}
           </div>
           <div className="w-full">
             <Image
-              src="/Event1.jpg"
+              src={eventDetails.flyer || "/404.png"}
               width={400}
               height={400}
               alt="Event image"
               className="rounded-xl mx-auto py-3"
+            />
+          </div>
+        </div>
+        <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
+          <h2 className="text-xl font-semibold text-left">
+            Event Registrations
+          </h2>
+          <div>
+            <UserAttendanceTable
+              columns={registereduserscolumns}
+              data={registeredUsers}
+              setter={undefined}
             />
           </div>
         </div>
@@ -107,4 +232,16 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
-export default EventDetailsPage;
+export default function PackedEventDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <AuthProvider>
+      <AdminProtectedRoute>
+        <EventDetailsPage params={params} />
+      </AdminProtectedRoute>
+    </AuthProvider>
+  );
+}

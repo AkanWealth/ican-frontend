@@ -35,6 +35,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const capitalizeWords = (str: string): string => {
+    if (typeof str !== "string") return "";
     return str.replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
@@ -73,6 +74,22 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        {showDisableModal && (
+          <DisableAdmin
+            id={row.original.id}
+            fullName={row.original.firstname + " " + row.original.surname}
+            role={capitalizeWords(row.original.role.name ?? "")}
+            onClose={() => setShowDisableModal(false)}
+          />
+        )}
+        {showEnableModal && (
+          <EnableAdmin
+            id={row.original.id}
+            fullName={row.original.firstname + " " + row.original.surname}
+            role={capitalizeWords(row.original.role.name ?? "")}
+            onClose={() => setShowEnableModal(false)}
+          />
+        )}
       </>
     );
   } else {
@@ -87,25 +104,25 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={() => router.push(`admins/${row.original.id}`)}
+              onClick={() => router.push(`members/${row.original.id}`)}
               className="flex flex-row items-center"
             >
               <MdRemoveRedEye className="w-4 h-4" /> View Admin Details
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {row.original.status === "active" ? (
+            {row.original.isSuspended === false ? (
               <DropdownMenuItem
                 className="flex flex-row items-center"
                 onClick={() => setShowDisableModal(true)}
               >
-                <MdOutlineToggleOn className="w-4 h-4" /> Disable Admin
+                <MdOutlineToggleOn className="w-4 h-4" /> Suspend Admin
               </DropdownMenuItem>
             ) : (
               <DropdownMenuItem
                 className="flex flex-row items-center"
                 onClick={() => setShowEnableModal(true)}
               >
-                <MdOutlineToggleOff className="w-4 h-4" /> Enable Admin
+                <MdOutlineToggleOff className="w-4 h-4" /> Reactivate Admin
               </DropdownMenuItem>
             )}
 
@@ -122,7 +139,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         {showDisableModal && (
           <DisableAdmin
             id={row.original.id}
-            fullName={row.original.firstName + " " + row.original.lastName}
+            fullName={row.original.firstname + " " + row.original.surname}
             role={capitalizeWords(row.original.role.name ?? "")}
             onClose={() => setShowDisableModal(false)}
           />
@@ -130,15 +147,15 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         {showEnableModal && (
           <EnableAdmin
             id={row.original.id}
-            fullName={row.original.fullName}
-            role={capitalizeWords(row.original.role ?? "")}
-            onClose={() => setShowDisableModal(false)}
+            fullName={row.original.firstname + " " + row.original.surname}
+            role={capitalizeWords(row.original.role.name ?? "")}
+            onClose={() => setShowEnableModal(false)}
           />
         )}
         {showDeleteModal && (
           <DeleteAdmin
             id={row.original.id}
-            fullName={row.original.fullName}
+            fullName={row.original.fullName || row.original.firstname + " " + row.original.surname  }
             role={capitalizeWords(row.original.role ?? "")}
             onClose={() => setShowDeleteModal(false)}
           />

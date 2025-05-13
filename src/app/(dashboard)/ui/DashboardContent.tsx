@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Clock, Info } from "lucide-react";
 import Attendance from "../ui/Attendance";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
 
 function DashboardContent() {
   const [userName, setUserName] = useState("User");
@@ -15,25 +16,21 @@ function DashboardContent() {
       try {
         if (typeof window === "undefined") return; // Ensure code runs only on the client side
 
-        const user = localStorage.getItem("user");
-        const userId = user ? JSON.parse(user)?.id : null;
-        const token = localStorage.getItem("token"); 
-        console.log(userId, token);
-// console.log(userId, token);
-        if (!userId || !token) throw new Error("User ID or token not found in localStorage");
+        const cookies = parseCookies();
+        const userDataCookie = cookies['user_data'];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const userId = userData?.id;
+        console.log("userId", userId);
 
-        const response = await axios.get(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/users/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-// console.log(response);
-        const data = response.data;
-        setUserName(data.firstname || "User");
-        setAccountStatus(data.isVerified ? "approved" : "pending");
+        if (!userId) throw new Error("User ID not found in cookies");
+
+        // Specify the return type with UserResponse interface
+        const response = await apiClient.get(`/users/${userId}`);
+        
+
+
+        setUserName(response.firstname || "User");
+        setAccountStatus(response.isVerified ? "approved" : "pending");
       } catch (error) {
         console.error("Error fetching user data:", error);
         setUserName("User");
@@ -74,6 +71,16 @@ function DashboardContent() {
     switch (accountStatus) {
       case "approved":
         return <div className="flex flex-row gap-2 sm:gap-5 mt-4 sm:mt-8"></div>;
+      case "pending":
+        return ( 
+          <div className="flex flex-row gap-2 sm:gap-5 mt-4 sm:mt-8">
+            <Info className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />
+            <p className="text-gray-500 lg:text-base text-xs">
+              Your account is pending review. We will send an email to you once <br className="lg:block hidden" />
+              review is complete. Please keep an eye on your email.
+            </p>
+          </div>
+        );
       default:
         return (
           <div className="flex flex-row gap-2 sm:gap-5 mt-4 sm:mt-8">
@@ -88,9 +95,9 @@ function DashboardContent() {
   };
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto py-6 px-4">
+    <div className="w-full mx-auto py-6 px-4">
       {/* Main Card */}
-      <div className="flex flex-col p-4 sm:p-6 bg-blue-900 rounded-lg">
+      <div className="flex flex-col p-4 sm:p-6 bg-blue-900 rounded-lg mb-8">
         {/* Greeting Section */}
         <div className="text-left">
           <h2 className="text-2xl sm:text-3xl font-semibold text-white">
@@ -98,13 +105,13 @@ function DashboardContent() {
           </h2>
           <div className="flex flex-row items-center text-white mt-4 sm:mt-6 text-sm">
             <span>{currentDate}</span>
-            {renderStatusBadge()}
+            {/* {renderStatusBadge()} */}
           </div>
         </div>
       </div>
 
       {/* Notification Section */}
-      {renderStatusNotification()}
+      {/* {renderStatusNotification()} */}
       {accountStatus === "approved" && <Attendance />}
     </div>
   );

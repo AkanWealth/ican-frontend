@@ -56,18 +56,18 @@ function EventPage() {
   };
 
  
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      try {
-        const user = JSON.parse(userData);
+  // useEffect(() => {
+  //   const userData = localStorage.getItem("user");
+  //   if (userData) {
+  //     try {
+  //       const user = JSON.parse(userData);
 
-        setUserEmail(user.email);
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-      }
-    }
-  }, []);
+  //       setUserEmail(user.email);
+  //     } catch (error) {
+  //       console.error("Error parsing user data:", error);
+  //     }
+  //   }
+  // }, []);
 
   return (
     <div className="py-6 px-4">

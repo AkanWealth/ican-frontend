@@ -16,6 +16,12 @@ import SuccessModal from "./SuccessMessage";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { FlutterWaveButton } from "flutterwave-react-v3";
+<<<<<<< HEAD
+=======
+import { BASE_API_URL } from "@/utils/setter";
+import apiClient from "@/services/apiClient";
+import { parseCookies } from "nookies";
+>>>>>>> 63904a7358490cc7e9900e22f341358b8f0b6c72
 // import CertificateGenerator from "@/components/homecomps/CertificateGenerator";
 
 const EventRegistration = () => {
@@ -70,31 +76,39 @@ const EventRegistration = () => {
   }, [searchParams]);
 
   useEffect(() => {
+    // Look for the checkUserRegistration function and update it:
     const checkUserRegistration = async () => {
       try {
-        const user = localStorage.getItem("user");
-        const email = user ? JSON.parse(user)?.email : null; 
-        if (!email) return;
-
-        const response = await axios.get(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/registrations/user/${email}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`, 
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        const registeredEvents = response.data || [];
-        const isUserRegistered = registeredEvents.some(
-          (event: { id: string }) => event.id === eventDetails.id
-        );
-
-        setIsRegistered(isUserRegistered);
-      } catch (error: any) {
-        if (error.response && error.response.status === 404) {
-          // User is not registered for this event
+        const cookies = parseCookies();
+        const userDataCookie = cookies['user_data'];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const userId = userData?.id;
+        console.log("userId", userId);
+    
+        if (!userId) throw new Error("User ID not found in cookies");
+      
+        const response = await apiClient.get(`/events/registrations/user-events/${userId}`);
+        console.log("Registration response data:", response.data);
+        
+        // Check if response data is an array
+        if (Array.isArray(response.data)) {
+          // Check if the current user has registered for this specific event
+          const registration = response.data.find(
+            (event: any) => event.eventId === eventDetails.id && event.userId === userId
+          );
+          setIsRegistered(!!registration);
+        } else if (response.data && typeof response.data === 'object') {
+          // For single object response, check both eventId and userId
+          const isUserRegistered = response.data.eventId === eventDetails.id && 
+                                  response.data.userId === userId;
+          setIsRegistered(isUserRegistered);
+        } else {
+          // No valid registration data
+          setIsRegistered(false);
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response && error.response.status === 404) {
+              
           setIsRegistered(false);
         } else {
           console.error('Error checking registration:', error);
@@ -196,6 +210,16 @@ const EventRegistration = () => {
       console.log("isNoFeeFormValid result:", isNoFeeFormValid()); // Debugging log
       return;
     }
+     // Use the appropriate validation function based on event fee
+  const isValid = Number(eventDetails.eventFee) > 0 
+  ? isFormValid() 
+  : isNoFeeFormValid();
+  
+if (!isValid) {
+  console.log("Form validation failed"); // Debugging log
+  return;
+}
+
 
     try {
       console.log("Calling registerForEvent..."); // Debugging log
@@ -224,7 +248,11 @@ const EventRegistration = () => {
   };
 
   const isNoFeeFormValid = () => {
-    const result = formData.fullName && formData.email;
+    // Check if required fields are filled in
+    const result = formData.fullName.trim() !== "" && 
+                   formData.email.trim() !== "" && 
+                   validateEmail(formData.email);
+    
     console.log("isNoFeeFormValid check:", result); // Debugging log
     return result;
   };
@@ -241,60 +269,114 @@ const EventRegistration = () => {
     }
   };
 
+  // const registerForEvent = async () => {
+
+  //   try {
+  //     const eventId = eventDetails.id;
+  //     console.log("eventId:", eventId); // Debugging log
+
+  //     // Construct the payload
+  //     const registrationPayload = {
+  //       fullName: formData.fullName,
+  //       email: formData.email,
+  //       membership: "MEMBER", 
+  //       proofOfPayment: isPaymentSuccessful ? "PAID" : "PENDING", // Set to "PAID" if payment is successful
+  //     };
+
+  //     console.log("Registration payload:", registrationPayload); // Debugging log
+
+  //     // Send the payload to the endpoint
+  //     const response = await axios.post(
+  //       `${BASE_API_URL}/events/registrations/${eventId}/register`,
+  //       registrationPayload,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem('token')}`, // Ensure the token is stored in localStorage
+  //           'Content-Type': 'application/json',
+  //         },
+  //       }
+  //     );
+
+  //     console.log("Registration response:", response.data); // Debugging log
+
+  //     // Only show the success modal if the response status is 200 or 201
+  //     if (response.status === 200 || response.status === 201) {
+  //       setIsModalOpen(true); // Open the success modal
+  //     } else {
+  //       console.error("Unexpected response status:", response.status);
+  //       toast({
+  //         title: "Registration Failed",
+  //         description: "Unexpected response from the server. Please try again.",
+  //         variant: "destructive",
+  //         duration: 3000,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Registration failed:", error);
+  //     console.error("Registration failed:", error);
+
+  //     toast({
+  //       title: "Registration Failed",
+  //       description: "Unable to complete registration. Please try again.",
+  //       variant: "destructive",
+  //       duration: 3000,
+  //     });
+  //   }
+  // };
+
+
   const registerForEvent = async () => {
     try {
       const eventId = eventDetails.id;
       console.log("eventId:", eventId); // Debugging log
-
+  
       // Construct the payload
       const registrationPayload = {
         fullName: formData.fullName,
         email: formData.email,
         membership: "MEMBER", 
-        proofOfPayment: isPaymentSuccessful ? "PAID" : "PENDING", // Set to "PAID" if payment is successful
+        proofOfPayment: Number(eventDetails.eventFee) > 0 
+          ? (isPaymentSuccessful ? "PAID" : "PENDING") 
+          : "FREE", // Set to "FREE" for free events
       };
-
+  
       console.log("Registration payload:", registrationPayload); // Debugging log
-
-      // Send the payload to the endpoint
-      const response = await axios.post(
-        `https://ican-api-6000e8d06d3a.herokuapp.com/api/events/${eventId}/registrations/register`,
-        registrationPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Ensure the token is stored in localStorage
-            'Content-Type': 'application/json',
-          },
-        }
+      
+      // Use the apiClient instead of direct axios call
+      const response = await apiClient.post<any>(
+        `/events/registrations/${eventId}/register/member`,
+        registrationPayload
       );
-
-      console.log("Registration response:", response.data); // Debugging log
-
-      // Only show the success modal if the response status is 200 or 201
-      if (response.status === 200 || response.status === 201) {
+  
+      console.log("Registration response:", response); // Debugging log
+  
+      // Only show the success modal if we get a successful response
+      setTimeout(() => {
         setIsModalOpen(true); // Open the success modal
-      } else {
-        console.error("Unexpected response status:", response.status);
-        toast({
-          title: "Registration Failed",
-          description: "Unexpected response from the server. Please try again.",
-          variant: "destructive",
-          duration: 3000,
-        });
-      }
+      }, 2000);
+      
+      // setIsModalOpen(true); // Open the success modal
+      setTimeout(() => {
+        router.push("/Event");
+      }, 2000);
+      
+      return response;
     } catch (error) {
       console.error("Registration failed:", error);
-      console.error("Registration failed:", error);
-
+      
       toast({
         title: "Registration Failed",
         description: "Unable to complete registration. Please try again.",
         variant: "destructive",
         duration: 3000,
       });
+      
+      throw error;
     }
   };
 
+
+  
   const handleFlutterwavePayment = () => {
     const config = {
       public_key:
@@ -318,6 +400,16 @@ const EventRegistration = () => {
 
     return config;
   };
+  
+const isValidUrl = (url: any) => {
+  try {
+    if (!url) return false;
+    new URL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 
   return (
     <div className="py-2 px-4">
@@ -366,16 +458,20 @@ const EventRegistration = () => {
               {eventDetails.topic} - Understanding Accounting
             </h1>
 
-            {eventDetails.image && (
-              <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
-                <Image
-                  src={eventDetails.image}
-                  alt={eventDetails.topic}
-                  fill
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
+            {eventDetails.image && isValidUrl(eventDetails.image) ? (
+  <div className="relative h-80 mb-4 rounded-lg overflow-hidden">
+    <Image
+      src={eventDetails.image}
+      alt={eventDetails.topic || "Event image"}
+      fill
+      className="w-full h-full object-cover"
+    />
+  </div>
+) : (
+  <div className="relative h-80 mb-4 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
+    <p className="text-gray-500">No image available</p>
+  </div>
+)}
             <div className="mb-4">
               <div className="flex items-center mb-2 text-sm text-gray-500">
                 <CalendarRange className="h-5 w-5 mr-2 text-gray-500" />
@@ -406,14 +502,29 @@ const EventRegistration = () => {
         </div>
 
       {/* Right Column */}
-      <div className="order-2 lg:order-2">
+        <div className="order-2 lg:order-2">
         {isRegistered ? (
-            <div className="text-center border-2 border-gray-300 rounded-lg p-6 bg-gray-50">
-              <h2 className="text-2xl font-bold mb-4">You have already registered for this event. </h2>
-              
-              <p className="text-gray-700">If you need to make changes to your registration, please contact support.</p>
-            </div>
-          ) : (
+  <div className="text-center border border-gray-300 rounded-lg p-2 bg-gray-50">
+    <div className="flex items-center justify-center">
+      <CircleAlert className="w-6 h-6 text-red-500 mr-2" />
+      <div>
+        <h2 className="text-lg font-bold mb-2">
+          You have already registered for this event.
+        </h2>
+        <p className="text-gray-600 text-xs">
+          If you need to make changes, contact us at{" "}
+          <a
+            href="mailto:icansuruleredistrictsociety@gmail.com"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            icansuruleredistrictsociety@gmail.com
+          </a>{" "}
+          or call us at <span className="text-blue-600">+234 808 816 8895</span>.
+        </p>
+      </div>
+    </div>
+  </div>
+) : (
             <>
               <p className="flex flex-row text-sm font-medium">
                 Event fee - <span className='flex text-base text-primary'>₦{eventDetails.eventFee}</span>
@@ -530,15 +641,19 @@ const EventRegistration = () => {
                                 duration: 3000,
                               });
                             }
+<<<<<<< HEAD
+=======
+                            // closePaymentModal(); // Close the modal programmatically
+>>>>>>> 63904a7358490cc7e9900e22f341358b8f0b6c72
                           }}
                           onClose={() => {
                             console.log('Payment closed');
-                            toast({
-                              title: "Payment Cancelled",
-                              description: "You cancelled the payment process.",
-                              variant: "default",
-                              duration: 3000,
-                            });
+                            // toast({
+                            //   title: "Payment Cancelled",
+                            //   description: "You cancelled the payment process.",
+                            //   variant: "default",
+                            //   duration: 3000,
+                            // });
                           }}
                           text={`Pay ₦${eventDetails.eventFee}`}
                           className={`w-full py-2 px-4 rounded-full ${isPaymentSuccessful

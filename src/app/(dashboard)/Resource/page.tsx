@@ -1,6 +1,8 @@
+"use client";
+
 import React from "react";
-import { AuthProvider } from "../LoginAuthentication/AuthContext";
 import { ProtectedRoute } from "../LoginAuthentication/ProtectedRoute";
+import { AuthProvider } from "../LoginAuthentication/AuthContext";
 import ResourcePage from "../ui/Resource";
 
 // const Resource = () => {
@@ -11,12 +13,17 @@ import ResourcePage from "../ui/Resource";
 //     );
 // };
 
-export default function Resource(){
+// export default Resource;
+
+
+export default function Resource() {
     return (
-        <AuthProvider>
-            <ProtectedRoute>
-                <ResourcePage />
-            </ProtectedRoute>
-        </AuthProvider>
-    )
-};
+      <AuthProvider>
+        <ProtectedRoute>
+          
+          <ResourcePage />
+          
+        </ProtectedRoute>
+      </AuthProvider>
+    );
+  }

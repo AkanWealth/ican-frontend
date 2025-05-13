@@ -5,12 +5,14 @@ import React, { useEffect, useState } from "react";
 import { ContentTable } from "@/components/admincomps/content/datatable/ContentTable";
 import { studentcolumns } from "@/components/admincomps/content/datatable/columns";
 
-import axios from "axios";
+import apiClient from "@/services-admin/apiClient";
+import { useToast } from "@/hooks/use-toast";
+
 import { BASE_API_URL } from "@/utils/setter";
 
 function Student() {
   const [data, setData] = useState([]);
-
+  const { toast } = useToast();
   useEffect(() => {
     async function fetchStudyData() {
       const config = {
@@ -20,18 +22,22 @@ function Student() {
         headers: {},
       };
       try {
-        const response = await axios.request(config);
-        setData(response.data);
+        const response = await apiClient.get("/studypacks", config);
+        setData(response.studyPacks);
       } catch (error) {
-        console.error(error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
       }
     }
     fetchStudyData();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-      <h2 className="text-xl font-semibold text-left">All Content</h2>
+      <h2 className="text-xl font-semibold text-left">All Study Packs</h2>
       <div>
         <ContentTable columns={studentcolumns} data={data} />
       </div>

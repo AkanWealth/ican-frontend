@@ -5,13 +5,17 @@ import InputEle from "@/components/genui/InputEle";
 import Link from "next/link";
 import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
-import Toast from "@/components/genui/Toast";
+
+import { useToast } from "@/hooks/use-toast";
 
 function AdminPasswordRequest() {
   const [evalid, setEvalid] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
   });
+  const [loading, setLoading] = useState(false);
+
+  const { toast } = useToast();
 
   const validateEmail = (email: string): string => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,9 +35,14 @@ function AdminPasswordRequest() {
     if (name === "email") {
       validateEmail(value);
     }
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
   const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     let data = JSON.stringify({
       email: formData.email,
     });
@@ -51,10 +60,28 @@ function AdminPasswordRequest() {
     try {
       const response = await axios.request(config);
       console.log(JSON.stringify(response.data));
-      return <Toast type="success" message="Request successful" />;
-    } catch (error) {
-      console.log(error);
-      return <Toast type="error" message="An error occurred during request." />;
+
+      toast({
+        title: "Success",
+        description: "Password reset link sent to your email.",
+        variant: "default",
+      });
+      setLoading(false);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast({
+          title: "Error",
+          description: error.response.data.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to send password reset link.",
+          variant: "destructive",
+        });
+      }
+      setLoading(false);
     }
   };
 
@@ -73,13 +100,15 @@ function AdminPasswordRequest() {
             label="Email Address"
             value={formData.email}
             onChange={handleChange}
+            disabled={loading}
+            required={true}
           />{" "}
           <button
             className=" w-full px-8 py-4 bg-primary  rounded-full text-white text-base font-semibold "
             type="submit"
-            disabled={!evalid}
+            disabled={!evalid || loading}
           >
-            Request reset
+            {loading ? "Requesting..." : "Request reset"}
           </button>
         </form>
 

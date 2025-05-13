@@ -3,13 +3,16 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import Toast from "@/components/genui/Toast";
+
+import { useToast } from "@/hooks/use-toast";
+
 import InputEle from "@/components/genui/InputEle";
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/utils/setter";
 
 function AdminSignup() {
   const router = useRouter();
+  const { toast } = useToast();
 
   const [loading, setLoading] = useState(false);
   const [complete, setComplete] = useState(false);
@@ -210,20 +213,30 @@ function AdminSignup() {
       // Submit form
       try {
         const response = await axios.request(config);
-        const { message, user, access_token } = response.data;
+        const { message, user, accessToken } = response.data;
 
         // Store the response data as needed
         console.log("User registered successfully:", user);
-        console.log("Access token:", access_token);
+        console.log("Access token:", accessToken);
 
         if (user.role === "SUPER_ADMIN" || user.role === "ADMIN") {
           router.push("/admin-login/");
         } else {
           router.push("/login/");
         }
-        return <Toast type="success" message={message} />;
+
+        toast({
+          title: "Success",
+          description: message,
+          variant: "default",
+        });
       } catch (error) {
-        return <Toast type="error" message="An error occurred during login." />;
+        toast({
+          title: "Error",
+          description:
+            "There was an error signing up. Please check your details and try again.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }

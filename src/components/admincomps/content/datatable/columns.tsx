@@ -8,9 +8,19 @@ import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/content/editActions/CellActions";
 
+import {
+  Resource,
+  Advert,
+  BlogPost,
+  GalleryItem,
+  TechnicalPost,
+  FaqData,
+  StudyPack,
+} from "@/libs/types";
+
 export const allcolumns: ColumnDef<Content>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -24,25 +34,7 @@ export const allcolumns: ColumnDef<Content>[] = [
       );
     },
   },
-  {
-    accessorKey: "category",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Category
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "author",
-    header: "Author",
-  },
+
   {
     accessorKey: "date_created",
     header: ({ column }) => {
@@ -84,9 +76,9 @@ export const allcolumns: ColumnDef<Content>[] = [
   },
 ];
 
-export const advertscolumns: ColumnDef<Content>[] = [
+export const advertscolumns: ColumnDef<Advert>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -116,7 +108,7 @@ export const advertscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "start_date",
+    accessorKey: "startDate",
     header: ({ column }) => {
       return (
         <Button
@@ -129,9 +121,13 @@ export const advertscolumns: ColumnDef<Content>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const date = new Date(row.original.startDate);
+      return date.toLocaleDateString();
+    },
   },
   {
-    accessorKey: "end_date",
+    accessorKey: "endDate",
     header: ({ column }) => {
       return (
         <Button
@@ -143,6 +139,10 @@ export const advertscolumns: ColumnDef<Content>[] = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      const date = new Date(row.original.endDate);
+      return date.toLocaleDateString();
     },
   },
   {
@@ -171,7 +171,7 @@ export const advertscolumns: ColumnDef<Content>[] = [
   },
 ];
 
-export const blogscolumns: ColumnDef<Content>[] = [
+export const blogscolumns: ColumnDef<BlogPost>[] = [
   {
     accessorKey: "title",
     header: ({ column }) => {
@@ -188,7 +188,7 @@ export const blogscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "author",
+    accessorKey: "authorName",
     header: ({ column }) => {
       return (
         <Button
@@ -203,7 +203,7 @@ export const blogscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "date_created",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -216,38 +216,9 @@ export const blogscolumns: ColumnDef<Content>[] = [
         </Button>
       );
     },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
-    },
-  },
-  {
-    accessorKey: "published_date",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Published Date
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
     },
   },
 
@@ -259,7 +230,7 @@ export const blogscolumns: ColumnDef<Content>[] = [
   },
 ];
 
-export const publicationscolumns: ColumnDef<Content>[] = [
+export const resourcescolumns: ColumnDef<Resource>[] = [
   {
     accessorKey: "title",
     header: ({ column }) => {
@@ -276,7 +247,7 @@ export const publicationscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "author",
+    accessorKey: "description",
     header: ({ column }) => {
       return (
         <Button
@@ -291,7 +262,22 @@ export const publicationscolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "date_created",
+    accessorKey: "type",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          File Category
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -304,51 +290,52 @@ export const publicationscolumns: ColumnDef<Content>[] = [
         </Button>
       );
     },
-  },
-  {
-    accessorKey: "materials",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Type
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
+    },
+  },
+  {
+    accessorKey: "fileUrl",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          File URL
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "access",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Access
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
     },
   },
 
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellActions contentCategory="publications" row={row} />;
+      return <CellActions contentCategory="resources" row={row} />;
     },
   },
 ];
-export const galleriescolumns: ColumnDef<Content>[] = [
+export const galleriescolumns: ColumnDef<GalleryItem>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -363,7 +350,7 @@ export const galleriescolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "author",
+    accessorKey: "user.email",
     header: ({ column }) => {
       return (
         <Button
@@ -378,7 +365,7 @@ export const galleriescolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "date_created",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -391,9 +378,13 @@ export const galleriescolumns: ColumnDef<Content>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
+    },
   },
   {
-    accessorKey: "materials",
+    accessorKey: "images",
     header: ({ column }) => {
       return (
         <Button
@@ -401,10 +392,13 @@ export const galleriescolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Images/Videos
+          Images
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      return row.original.images.length;
     },
   },
   {
@@ -423,21 +417,6 @@ export const galleriescolumns: ColumnDef<Content>[] = [
     },
     cell: ({ row }) => {
       return <Statbtn status={row.original.status} />;
-    },
-  },
-  {
-    accessorKey: "published_date",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date Uploaded
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
     },
   },
 
@@ -449,9 +428,9 @@ export const galleriescolumns: ColumnDef<Content>[] = [
   },
 ];
 
-export const technicalcolumns: ColumnDef<Content>[] = [
+export const technicalcolumns: ColumnDef<TechnicalPost>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -466,7 +445,7 @@ export const technicalcolumns: ColumnDef<Content>[] = [
     },
   },
   {
-    accessorKey: "materials",
+    accessorKey: "document",
     header: ({ column }) => {
       return (
         <Button
@@ -474,14 +453,14 @@ export const technicalcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Format <ArrowUpDown className="ml-2 h-4 w-4" />
+          Document Link <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
 
   {
-    accessorKey: "date_created",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -493,6 +472,10 @@ export const technicalcolumns: ColumnDef<Content>[] = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
     },
   },
   {
@@ -516,13 +499,15 @@ export const technicalcolumns: ColumnDef<Content>[] = [
 
   {
     id: "actions",
-    cell: ({ row }) => {},
+    cell: ({ row }) => {
+      return <CellActions contentCategory="technical" row={row} />;
+    },
   },
 ];
 
-export const studentcolumns: ColumnDef<Content>[] = [
+export const studentcolumns: ColumnDef<StudyPack>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -530,14 +515,14 @@ export const studentcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Title
+          Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "materials",
+    accessorKey: "document",
     header: ({ column }) => {
       return (
         <Button
@@ -545,28 +530,13 @@ export const studentcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Material Type <ArrowUpDown className="ml-2 h-4 w-4" />
+          Document Link <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "author",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Uploaded By
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "date_created",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -578,6 +548,10 @@ export const studentcolumns: ColumnDef<Content>[] = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
     },
   },
   {
@@ -606,9 +580,9 @@ export const studentcolumns: ColumnDef<Content>[] = [
     },
   },
 ];
-export const faqcolumns: ColumnDef<Content>[] = [
+export const faqcolumns: ColumnDef<FaqData>[] = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
@@ -616,14 +590,15 @@ export const faqcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Title
+          Question
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
+
   {
-    accessorKey: "materials",
+    accessorKey: "answer",
     header: ({ column }) => {
       return (
         <Button
@@ -631,13 +606,13 @@ export const faqcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Material Type <ArrowUpDown className="ml-2 h-4 w-4" />
+          Answer <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "author",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -645,43 +620,14 @@ export const faqcolumns: ColumnDef<Content>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Uploaded By
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "date_created",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date Uploaded
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="pl-0 text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
+          Date Created
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      const date = new Date(row.original.createdAt);
+      return date.toLocaleDateString();
     },
   },
 

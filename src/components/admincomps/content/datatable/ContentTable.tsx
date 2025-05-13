@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import Image from "next/image";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -41,6 +41,29 @@ export function ContentTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+
+  // Let's check the column IDs in the provided columns array
+  const columnIds = React.useMemo(() => {
+    return columns.map((col) => col.id).filter(Boolean);
+  }, [columns]);
+
+  // Check if name or title exists in the columns
+  const hasNameColumn = React.useMemo(
+    () => columnIds.includes("name"),
+    [columnIds]
+  );
+  const hasTitleColumn = React.useMemo(
+    () => columnIds.includes("title"),
+    [columnIds]
+  );
+
+  // Determine which column to use for filtering
+  const filterColumnId = React.useMemo(() => {
+    if (hasNameColumn) return "name";
+    if (hasTitleColumn) return "title";
+    return null;
+  }, [hasNameColumn, hasTitleColumn]);
+
   const table = useReactTable({
     data,
     columns,
@@ -59,14 +82,21 @@ export function ContentTable<TData, TValue>({
   return (
     <div>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter by titles..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        {filterColumnId && (
+          <Input
+            placeholder="Search by titles..."
+            value={
+              (table.getColumn(filterColumnId)?.getFilterValue() as string) ??
+              ""
+            }
+            onChange={(event) => {
+              table
+                .getColumn(filterColumnId)
+                ?.setFilterValue(event.target.value);
+            }}
+            className="max-w-sm"
+          />
+        )}
       </div>
       <div className="">
         <Table>
@@ -115,7 +145,14 @@ export function ContentTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  <div className="flex items-center justify-center">
+                    <Image
+                      src="/Emptycontenttable.png"
+                      alt="No data"
+                      width={400}
+                      height={400}
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             )}

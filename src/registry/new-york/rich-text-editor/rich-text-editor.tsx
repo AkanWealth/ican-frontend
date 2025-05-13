@@ -383,7 +383,7 @@ export function RichTextEditor({
         </ToggleGroup>
       </div>
 
-      <EditorContent editor={editor} />
+      <EditorContent className="min-h-[4.5rem] mb-4" editor={editor} />
     </div>
   );
 }

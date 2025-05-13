@@ -4,7 +4,6 @@ import Heroimg from "@/components/homecomps/Heroimg";
 import React from "react";
 import TechnicalSect from "@/components/pubntech/TechnicalSect";
 
-
 function Technical() {
   return (
     <div className="flex flex-col items-center ">

@@ -6,8 +6,10 @@ import {
 } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
-import axios from "axios";
-import Toast from "@/components/genui/Toast";
+
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import apiClient from "@/services-admin/apiClient";
 
 interface DisableAdminProps {
   id: string;
@@ -17,44 +19,57 @@ interface DisableAdminProps {
 }
 
 function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
+  const { toast } = useToast();
+  const router = useRouter();
   const handleConfirm = () => {
     console.log({ id, fullName, role });
-    async function fetchData() {
+    async function disableUser() {
       const data = JSON.stringify({
-        userId: "",
+        userId: id,
         suspend: true,
       });
+      console.log(data);
+
       const config = {
         method: "patch",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/users/${id}/suspend`,
         headers: {
           Accept: "application/json",
-          ContentType: "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          "Content-Type": "application/json", // Fixed ContentType -> Content-Type
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Cookie: localStorage.getItem("refreshToken"), // Added Cookie header
         },
         data: data,
       };
+
       try {
-        const results = await axios.request(config);
-        console.log(results.data);
-        onClose();
-        return <Toast type="success" message={results.data.message} />;
+        const results = await apiClient.request(config); // Use request() instead of patch()
+        console.log(results);
+
+        toast({
+          title: "User Suspended",
+          description: "User Suspended successfully",
+          variant: "default",
+        });
+        onClose(); // Close the modal after successful update
+        router.refresh();
       } catch (error: any) {
         console.error(error);
-        return (
-          <Toast
-            type="error"
-            message={error.response?.data?.message || "An error occurred"}
-          />
-        );
+        toast({
+          title: "Error",
+          description: error.response?.message || "An error occurred",
+          variant: "destructive",
+        });
+        onClose(); // Close the modal after successful update
+        router.refresh();
       }
     }
-    fetchData();
+    disableUser();
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
       <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
         <div className="flex flex-row justify-start gap-4">
           <div className="rounded-full  h-fit w-fit p-4 bg-yellow-200">
@@ -62,11 +77,9 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
           </div>
           <div>
             <div className="flex flex-col gap-2">
-              <h5 className="font-semibold text-xl text-black">
-                Disable Admin
-              </h5>
+              <h5 className="font-semibold text-xl text-black">Disable User</h5>
               <p className="text-sm text-neutral-600">
-                Are you sure you want to disable this admin?
+                Are you sure you want to disable this user?
               </p>
             </div>
             <div className="flex flex-col gap-2 mt-4">

@@ -1,7 +1,8 @@
+
 "use client";
 import React from "react";
-import { AuthProvider } from "../LoginAuthentication/AuthContext";
 import { ProtectedRoute } from "../LoginAuthentication/ProtectedRoute";
+import { AuthProvider } from "../LoginAuthentication/AuthContext";
 import PaymentPage from "../ui/PaymentPage";
 // const Payment = () => {
 //     return (
@@ -11,12 +12,16 @@ import PaymentPage from "../ui/PaymentPage";
 //     );
 // };
 
-export default function Payment(){
+// export default Payment;
+export default function  Payment() {
     return (
-        <AuthProvider>
-            <ProtectedRoute>
-                <PaymentPage />
-            </ProtectedRoute>
-        </AuthProvider>
+      <AuthProvider>
+        <ProtectedRoute>
+          
+          <PaymentPage />
+          
+        </ProtectedRoute>
+      </AuthProvider>
     );
-};
+  }
+

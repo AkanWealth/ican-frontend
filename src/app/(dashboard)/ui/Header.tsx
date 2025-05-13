@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Search, BellIcon, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Notification from "@/components/membercomps/Notification";
@@ -12,15 +12,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { parseCookies, destroyCookie } from "nookies";
+import apiClient from "@/services/apiClient";
+import Cookies from "universal-cookie";
+
+
+
+
+interface UserData {
+  id: string;
+  firstname: string;
+  surname: string;
+  email: string;
+  profilePicture?: string;
+
+}
 
 export const Header = () => {
+  const cookies = useMemo(() => new Cookies(), []); // Wrap cookies in useMemo
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  const [profilePicture, setProfilePicture] = useState<string | null>(null); // State for profile picture
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const notificationRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+  const s3Loader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
+    return `${src}?w=${width}&q=${quality || 75}`;
+  };
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -35,7 +53,7 @@ export const Header = () => {
     return () => {
       window.removeEventListener("resize", checkScreenSize);
     };
-  }, []);
+  }, [cookies]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,27 +74,28 @@ export const Header = () => {
     };
   }, [isNotificationOpen, isMobile]);
 
-  // Fetch the user's profile picture
+  // Fetch the user's profile picture using cookies
   useEffect(() => {
     const fetchProfilePicture = async () => {
       try {
-        const user = localStorage.getItem("user");
-        const userId = user ? JSON.parse(user)?.id : null;
-
+        if (typeof window === "undefined") return; // Ensure code runs only on the client side
+        
+          const cookies = parseCookies();
+           const userDataCookie = cookies['user_data'];
+           const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+           const userId = userData?.id;
+        
         if (!userId) {
-          console.error("User ID not found in local storage");
+          console.error("User ID not found in cookies");
           return;
         }
 
-        const response = await axios.get(
-          `https://ican-api-6000e8d06d3a.herokuapp.com/api/users/${userId}`,{
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        const profilePictureUrl = response.data?.profilePicture;
+        // Use apiClient instead of direct axios call
+        const userDetails = await apiClient.get<UserData>(`/users/${userId}`);
+        
+        const profilePictureUrl = userDetails.profilePicture;
+        console.log("Profile Picture URL:", profilePictureUrl); // Log the URL for debugging
+        
         if (profilePictureUrl) {
           setProfilePicture(profilePictureUrl); // Update the profile picture state
         } else {
@@ -88,11 +107,14 @@ export const Header = () => {
     };
 
     fetchProfilePicture();
-  }, []);
+  }, [cookies]); // Include cookies in the dependency array
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    // Remove cookies instead of localStorage
+    destroyCookie(null, 'access_token');
+    destroyCookie(null, 'refresh_token');
+    destroyCookie(null, 'user_data');
+    
     router.push("/login");
   };
 
@@ -153,9 +175,11 @@ export const Header = () => {
                 <Image
                   src={profilePicture || "/default-avatar.png"} // Use default avatar if profile picture is not available
                   alt="Profile"
-                  width={200}
-                  height={200}
-                  className="w-full h-full object-cover"
+                  // fill="true"
+                  width={500}
+                  height={500}
+                  unoptimized={true}
+                  className="w-full h-full rounded-full object-cover"
                 />
               </div>
               <ChevronDown className="w-4 h-4 text-gray-600" />
@@ -183,10 +207,7 @@ export const Header = () => {
               <DropdownMenuItem onClick={() => router.push("/Setting")}>
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-red-600"
-              >
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

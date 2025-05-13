@@ -9,7 +9,7 @@ import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/user/actions/CellActions";
 
 const capitalizeWords = (str: string): string => {
-  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
 export const allcolumns: ColumnDef<User>[] = [
@@ -46,11 +46,11 @@ export const allcolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return capitalizeWords(row.original.role.name);
+      return capitalizeWords(row.original.role.name.replace(/[_-]/g, " "));
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "isSuspended",
     header: ({ column }) => {
       return (
         <Button
@@ -64,7 +64,11 @@ export const allcolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      if (row.original.isSuspended) {
+        return <Statbtn status="suspended" />;
+      } else {
+        return <Statbtn status="active" />;
+      }
     },
   },
   {
@@ -124,11 +128,11 @@ export const adminscolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return capitalizeWords(row.original.role.name);
+      return capitalizeWords(row.original.role.name.replace(/[_-]/g, " "));
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "isSuspended",
     header: ({ column }) => {
       return (
         <Button
@@ -142,9 +146,14 @@ export const adminscolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      if (row.original.isSuspended) {
+        return <Statbtn status="suspended" />;
+      } else {
+        return <Statbtn status="active" />;
+      }
     },
   },
+
   {
     id: "actions",
     cell: ({ row }) => {
@@ -221,7 +230,7 @@ export const memberscolumns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "isSuspended",
     header: ({ column }) => {
       return (
         <Button
@@ -235,7 +244,11 @@ export const memberscolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      if (row.original.isSuspended) {
+        return <Statbtn status="suspended" />;
+      } else {
+        return <Statbtn status="active" />;
+      }
     },
   },
   {

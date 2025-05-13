@@ -62,12 +62,15 @@ export function PaymentTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by Name..."
+          placeholder="Search by Name..."
           value={
-            (table.getColumn("member_name")?.getFilterValue() as string) ?? ""
+            (table.getColumn("user.firstname")?.getFilterValue() as string) ??
+            ""
           }
           onChange={(event) =>
-            table.getColumn("member_name")?.setFilterValue(event.target.value)
+            table
+              .getColumn("user.firstname")
+              ?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

@@ -2,7 +2,6 @@
 
 import { use, useEffect, useState } from "react";
 import Image from "next/image";
-import { galleryItems } from "@/lib/gallerydata"; // Assuming you have a data file for gallery items
 import { notFound } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useRouter } from "next/navigation";

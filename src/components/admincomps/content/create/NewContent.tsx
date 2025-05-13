@@ -38,7 +38,7 @@ function NewContent({
 
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto py-4">
-      <div className="flex flex-col w-full max-w-3xl max-h-[90vh] px-6 py-4 rounded-xl gap-4 bg-white my-auto mx-4 overflow-hidden">
+      <div className="flex flex-col w-full max-w-5xl max-h-[90vh] px-6 py-4 rounded-xl gap-4 bg-white my-auto mx-4 overflow-hidden">
         {/* Header */}
         <div className="flex flex-col items-start justify-between gap-4">
           {/* Title section with close button */}

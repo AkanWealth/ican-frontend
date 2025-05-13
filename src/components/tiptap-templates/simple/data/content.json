@@ -1,0 +1,263 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "textAlign": null,
+        "level": 1
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Your Blog Title"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "textAlign": null
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Welcome to your "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "italic"
+            },
+            {
+              "type": "highlight",
+              "attrs": {
+                "color": "var(--tt-color-highlight-yellow)"
+              }
+            }
+          ],
+          "text": "new blog post"
+        },
+        {
+          "type": "text",
+          "text": "! This is your introduction paragraph where you can "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "bold"
+            }
+          ],
+          "text": "highlight"
+        },
+        {
+          "type": "text",
+          "text": " key points and set the tone for your readers."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "textAlign": null,
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Key Points"
+        }
+      ]
+    },
+    {
+      "type": "blockquote",
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": {
+            "textAlign": null
+          },
+          "content": [
+            {
+              "type": "text",
+              "marks": [
+                {
+                  "type": "italic"
+                }
+              ],
+              "text": "Start with a compelling quote or important message that captures the essence of your post. This helps engage readers from the start."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "textAlign": "left"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Add your main content here. You can include "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "highlight",
+              "attrs": {
+                "color": "var(--tt-color-highlight-blue)"
+              }
+            }
+          ],
+          "text": "important highlights"
+        },
+        {
+          "type": "text",
+          "text": " and format your text to make it more engaging."
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "attrs": {
+        "src": "/images/your-image.jpg",
+        "alt": "Your image description",
+        "title": "Your image title"
+      }
+    },
+    {
+      "type": "bulletList",
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "textAlign": "left"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "First Point"
+                },
+                {
+                  "type": "text",
+                  "text": ": Add your first key point here."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "textAlign": "left"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "Second Point"
+                },
+                {
+                  "type": "text",
+                  "text": ": Add your second key point here."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "horizontalRule"
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "textAlign": "left",
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Next Steps"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "textAlign": "left"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Conclude your post with a call to action or next steps for your readers."
+        }
+      ]
+    },
+    {
+      "type": "taskList",
+      "content": [
+        {
+          "type": "taskItem",
+          "attrs": {
+            "checked": false
+          },
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "textAlign": "left"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Add your first action item"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "taskItem",
+          "attrs": {
+            "checked": false
+          },
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "textAlign": "left"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Add your second action item"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

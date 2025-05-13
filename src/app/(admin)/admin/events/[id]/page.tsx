@@ -70,7 +70,6 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               variant: "default",
             });
           }
-
         }
       } catch (error) {
         if (isMounted) {
@@ -89,7 +88,7 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array to run only once
+  }, [params, router, toast]); // Empty dependency array to run only once
 
   useEffect(() => {
     async function fetchData() {
@@ -185,7 +184,10 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           <div className="grid grid-cols-2 gap-1 w-full">
             {[
               { label: "Event Description", value: eventDetails.description },
-              { label: "Event Date", value: eventDetails.date },
+              {
+                label: "Event Date",
+                value: new Date(eventDetails.date).toLocaleDateString(),
+              },
               { label: "Event Time", value: eventDetails.time },
               { label: "Event Fee", value: `₦${eventDetails.fee}` },
               { label: "Event Venue", value: eventDetails.venue },

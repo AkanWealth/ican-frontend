@@ -15,16 +15,14 @@ import { useToast } from "@/hooks/use-toast";
 
 import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
 import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
-  
+
 import { User } from "@/libs/types";
 
 interface IBilling {
   billing_name: string;
-  billing_type: string;
-  billing_description: string;
+  billing_frequency: string;
   billing_amount: string;
-  billing_date: string;
-  reciepients: "all" | string[];
+  billing_autoApply: boolean;
 }
 
 function CreateBillingPage() {
@@ -37,15 +35,10 @@ function CreateBillingPage() {
   const router = useRouter();
   const [newBill, setNewBill] = useState<IBilling>({
     billing_name: "",
-    billing_type: "",
-    billing_description: "",
     billing_amount: "0",
-    billing_date: "",
-    reciepients: "all",
+    billing_frequency: "MONTHLY",
+    billing_autoApply: false,
   });
-  useEffect(() => {
-    console.log("Selected recipients:", selected);
-  }, [selected]);
 
   const onInputChange = (
     e: React.ChangeEvent<
@@ -56,10 +49,11 @@ function CreateBillingPage() {
   };
   const saveBill = async () => {
     let data = {
-name: newBill.billing_name,
-  type: newBill.billing_type,
-  amount: Number(newBill.billing_amount), // ensure it's a number
-  affectedUserIds: newBill.reciepients === "all" ? undefined : newBill.reciepients  };
+      name: newBill.billing_name,
+      frequency: newBill.billing_frequency,
+      amount: Number(newBill.billing_amount), // ensure it's a number
+      autoApply: newBill.billing_autoApply,
+    };
 
     const config = {
       method: "post",
@@ -146,21 +140,19 @@ name: newBill.billing_name,
             placeholder="Enter bill name"
           />{" "}
           <InputEle
-            label="Bill type"
-            id="billing_type"
-            type="text"
-            value={newBill.billing_type}
+            label="Bill frequency"
+            id="billing_frequency"
+            type="select"
+            options={[
+              { value: "MONTHLY", label: "Monthly" },
+              { value: "YEARLY", label: "Yearly" },
+              { value: "ONE_TIME", label: "One Time" },
+            ]}
+            value={newBill.billing_frequency}
             onChange={onInputChange}
-            placeholder="Enter bill type"
+            placeholder="Enter bill frequency"
           />
-          <InputEle
-            label="Billing Description"
-            id="billing_description"
-            type="text"
-            value={newBill.billing_description}
-            onChange={onInputChange}
-            placeholder="Enter bill description"
-          />
+         
           <InputEle
             label="Bill Amount"
             id="billing_amount"
@@ -169,14 +161,7 @@ name: newBill.billing_name,
             onChange={onInputChange}
             placeholder="Enter bill amount"
           />
-          <InputEle
-            label="Due Date"
-            id="billing_date"
-            type="date"
-            value={newBill.billing_date}
-            onChange={onInputChange}
-            placeholder="Enter bill due date"
-          />
+    
           <InputEle
             label="Reciepients"
             id="reciepients"

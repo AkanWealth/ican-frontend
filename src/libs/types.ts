@@ -10,13 +10,16 @@ type FaqData = {
 type BillingDetails = {
   id: string;
   name: string;
-  type: string;
   amount: number;
-  createdBy: string;
-  status: string;
   createdAt: string;
-  createdByUser: User;
-  payments: {
+  autoApply: boolean;
+  createdById: string;
+  nextDueDate: string | null;
+  description: string | null;
+  frequency: string;
+  nextBillingAt: string | null;
+  createdBy: User;
+  Payment: {
     id: string;
     userId: string;
     billingId: string;
@@ -26,13 +29,41 @@ type BillingDetails = {
     status: string;
     transactionId: string | null;
     subscriptionId: string | null;
+    anonymous: boolean;
+    createdAt: string;
+    donationOption: string | null;
+    paymentCategory: string;
+    eventId: string | null;
   }[];
   affectedUsers: {
     id: string;
     billingId: string;
     userId: string;
+    amountPaid: number;
+    paymentStatus: string;
+    createdAt: string;
+    updatedAt: string;
+    user: User;
   }[];
 };
+
+type BillingPayment = {
+  id: string;
+  userId: string;
+  billingId: string;
+  paymentType: string;
+  amount: number;
+  datePaid: string;
+  status: string;
+  transactionId: string | null;
+  subscriptionId: string | null;
+  anonymous: boolean;
+  createdAt: string;
+  donationOption: string | null;
+  paymentCategory: string;
+  eventId: string | null;
+}
+
 
 type User = {
   id: string;
@@ -136,6 +167,7 @@ type OverdueBills = {
     type: string;
     createdAt: string;
     amount: number;
+    frequency: string;
   };
 };
 
@@ -234,6 +266,23 @@ export interface PaymentBasic {
   transactionId: string | null;
   subscriptionId: string | null;
 }
+
+type BillingPaymentTable = {
+  id: string;
+  userId: string;
+  billingId: string;
+  paymentType: string;
+  amount: number;
+  datePaid: string;
+  status: string;
+  transactionId: string | null;
+  subscriptionId: string | null;
+  anonymous: boolean;
+  createdAt: string;
+  donationOption: string | null;
+  paymentCategory: string;
+  eventId: string | null;
+};
 
 type DashEventReg = {
   id: string;
@@ -376,8 +425,131 @@ type StudyPack = {
   };
 };
 
+type Billing = {
+  id: string;
+  name: string;
+  amount: number;
+  createdAt: string;
+  autoApply: boolean;
+  createdById: string;
+  nextDueDate: string | null;
+  description: string | null;
+  frequency: "ONE_TIME" | "MONTHLY" | "YEARLY" | string;
+  nextBillingAt: string | null;
+  createdBy: {
+    id: string;
+    email: string;
+    membershipId: string;
+    surname: string;
+    firstname: string;
+    middlename: string | null;
+    gender: string | null;
+    dateOfBirth: string | null;
+    maritalStatus: string | null;
+    stateOfOrigin: string | null;
+    nationality: string | null;
+    residentialAddress: string | null;
+    residentialCountry: string | null;
+    residentialCity: string | null;
+    residentialState: string | null;
+    residentialLGA: string | null;
+    contactPhoneNumber: string | null;
+    institution: string | null;
+    discipline: string | null;
+    qualifications: string | null;
+    yearOfGraduation: number | null;
+    status: string | null;
+    companyName: string | null;
+    officeAddress: string | null;
+    position: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    isVerified: boolean;
+    isSuspended: boolean;
+    profilePicture: string | null;
+    notificationPreference: string;
+  };
+  Payment: {
+    id: string;
+    userId: string;
+    billingId: string;
+    paymentType: string;
+    amount: number;
+    datePaid: string;
+    status: "SUCCESS" | "PENDING" | string;
+    transactionId: string;
+    subscriptionId: string | null;
+    anonymous: boolean;
+    createdAt: string;
+    donationOption: string | null;
+    paymentCategory: string;
+    eventId: string | null;
+  }[];
+  affectedUsers: {
+    id: string;
+    billingId: string;
+    userId: string;
+    amountPaid: number;
+    paymentStatus: "NOT_PAID" | "FULLY_PAID" | string;
+    createdAt: string;
+    updatedAt: string;
+    user: {
+      id: string;
+      email: string;
+      membershipId: string;
+      surname: string;
+      firstname: string;
+      middlename: string | null;
+      gender: string | null;
+      dateOfBirth: string | null;
+      maritalStatus: string | null;
+      stateOfOrigin: string | null;
+      nationality: string | null;
+      residentialAddress: string | null;
+      residentialCountry: string | null;
+      residentialCity: string | null;
+      residentialState: string | null;
+      residentialLGA: string | null;
+      contactPhoneNumber: string | null;
+      institution: string | null;
+      discipline: string | null;
+      qualifications: string | null;
+      yearOfGraduation: number | null;
+      status: string | null;
+      companyName: string | null;
+      officeAddress: string | null;
+      position: string | null;
+      startDate: string | null;
+      endDate: string | null;
+      isVerified: boolean;
+      isSuspended: boolean;
+      profilePicture: string | null;
+      notificationPreference: string;
+    };
+  }[];
+};
+type UpdatedBillingStats = {
+  billingId: string;
+  name: string;
+  totalBillingAmount: number;
+  paymentsMade: number;
+  totalAmountPaid: number;
+  totalUsersAffected: number;
+  totalUsersPaid: number;
+  totalUsersNotPaid: number;
+  stackedChartData: {
+    labels: string[];
+    datasets: {
+      label: string;
+      data: number[];
+      backgroundColor: string;
+    }[];
+  };
+};
+
 export type {
   Advert,
+  Billing,
   BlogPost,
   StudyPack,
   GalleryItem,
@@ -400,4 +572,6 @@ export type {
   DashEventPaymentTrend,
   TechnicalPost,
   Publication,
+  UpdatedBillingStats,
+  BillingPaymentTable,
 };

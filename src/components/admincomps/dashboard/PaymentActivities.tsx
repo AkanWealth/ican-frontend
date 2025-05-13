@@ -11,7 +11,11 @@ import { BASE_API_URL } from "@/utils/setter";
 
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { dashPaymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
-import { OverdueBills, DashEventPaymentTrend } from "@/libs/types";
+import {
+  OverdueBills,
+  DashEventPaymentTrend,
+  UpdatedBillingStats,
+} from "@/libs/types";
 import { Line, LineChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
@@ -27,7 +31,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -283,7 +286,6 @@ function PaymentActivities() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-        
             <DropdownMenuItem onClick={() => handleExport("pdf")}>
               Export as PDF
             </DropdownMenuItem>
@@ -333,7 +335,7 @@ function PaymentActivities() {
           </CardContent>
         </Card>
         <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-          <h2 className="text-xl font-semibold text-left">All Payments</h2>
+          <h2 className="text-xl font-semibold text-left">Overdue Payments</h2>
           <div>
             <PaymentTable columns={dashPaymentcoloumns} data={paymentData} />
           </div>

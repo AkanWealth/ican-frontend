@@ -7,6 +7,8 @@ import {
   PaymentDetails,
   PaymentBasic,
   BillingUsersDetails,
+  BillingDetails,
+  BillingPaymentTable,
 } from "@/libs/types";
 
 import { Button } from "@/components/ui/button";
@@ -119,12 +121,36 @@ export const dashPaymentcoloumns: ColumnDef<OverdueBills>[] = [
     header: "Bill Name",
   },
   {
-    accessorKey: "billing.type",
-    header: "Bill Type",
-  },
-  {
     accessorKey: "billing.amount",
     header: "Amount",
+  },
+  {
+    accessorKey: "billing.frequency",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Billing cycle <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.original.billing.frequency
+            .replace(/_/g, " ")
+            .charAt(0)
+            .toUpperCase() +
+            row.original.billing.frequency
+              .replace(/_/g, " ")
+              .slice(1)
+              .toLowerCase()}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "billing.createdAt",
@@ -227,14 +253,14 @@ export const paymentdetailscoloumns: ColumnDef<PaymentDetails>[] = [
   // },
 ];
 
-export const billingdetailscoloumns: ColumnDef<PaymentBasic>[] = [
+export const billingdetailscoloumns: ColumnDef<BillingPaymentTable>[] = [
   {
     accessorKey: "paymentType",
     header: "Payment Type",
   },
   {
     accessorKey: "amount",
-    header: "Amount",
+    header: "Amount Paid",
   },
   {
     accessorKey: "datePaid",
@@ -257,8 +283,8 @@ export const billingdetailscoloumns: ColumnDef<PaymentBasic>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "paymentStatus",
+    header: "Payment Status",
     cell: ({ row }) => {
       return <Statbtn status={row.original.status} />;
     },
@@ -287,7 +313,6 @@ export const billingusersdetailscoloumns: ColumnDef<BillingUsersDetails>[] = [
         </Button>
       );
     },
-   
   },
   {
     accessorKey: "affectedUsers.paymentStatus",

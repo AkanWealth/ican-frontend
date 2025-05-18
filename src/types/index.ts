@@ -6,7 +6,10 @@ export interface BlogPost {
   id: string;
 
   /** The category of the blog post */
-  category: "Articles" | "News" | "Videos";
+  contentType: "articles" | "news" | "videos";
+
+  /** URL to the featured image of the blog post */
+  coverImage: string;
 
   /** Title of the blog post */
   title: string;
@@ -14,17 +17,14 @@ export interface BlogPost {
   /** Publication date of the blog post in string format */
   date: string;
 
-  /** URL to the featured image of the blog post */
-  imageUrl: string;
+  /** The author of the blog post */
+  authorName: string;
 
-  /** Content details of the blog post */
-  blogContent: {
-    /** Subtitle of the blog post */
-    subtitle: string;
+  contentBody: string;
 
-    /** Main content of the blog post */
-    content: string;
-  };
+  createdAt: string;
+
+  updatedAt: string;
 }
 
 export interface DownloadTile {

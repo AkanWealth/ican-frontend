@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import Success from "./steps/Success";
 import New from "./steps/New";
+import { Suspense } from "react";
 
-function ResetPassword() {
+function ResetPasswordContent() {
   const [step, setStep] = useState(1);
 
   const steps = [
@@ -28,8 +29,8 @@ function ResetPassword() {
   };
 
   return (
-    <div className=" m-auto ">
-      <div className="flex flex-col w-[440px] items-center rounded-2xl  bg-white p-8 gap-6 ">
+    <div className=" m-auto flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center rounded-2xl bg-white p-2 gap-6 w-full max-w-md sm:max-w-lg md:max-w-xl">
         {step === 1 && <New onNext={handleNext} />}
         {step === 2 && <Success onNext={handleNext} />}
       </div>
@@ -37,4 +38,10 @@ function ResetPassword() {
   );
 }
 
-export default ResetPassword;
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}

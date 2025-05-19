@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import InputEle from "@/components/genui/InputEle";
 
@@ -23,32 +23,35 @@ function Profile() {
     role: "",
   });
   const [admin, setAdmin] = useState<User>({} as User);
-  // Function to fetch admin details from API
-  const fetchAdminDetails = async (userId: string) => {
-    try {
-      const response = await apiClient.get(`${BASE_API_URL}/users/${userId}`);
 
-      setAdmin((prevAdmin) => ({
-        ...prevAdmin,
-        ...response,
-      }));
+  // Move fetchAdminDetails outside useEffect and wrap it in useCallback
+  const fetchAdminDetails = useCallback(
+    async (userId: string) => {
+      try {
+        const response = await apiClient.get(`${BASE_API_URL}/users/${userId}`);
 
-      toast({
-        title: "Success",
-        description: "Admin details fetched successfully",
-        variant: "default",
-      });
-    } catch (error) {
-      console.error("Error fetching admin details:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch admin details",
-        variant: "destructive",
-      });
-    }
-  };
+        setAdmin((prevAdmin) => ({
+          ...prevAdmin,
+          ...response,
+        }));
 
-  // Effect to get admin data from cookie and fetch details
+        toast({
+          title: "Success",
+          description: "Admin details fetched successfully",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Error fetching admin details:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch admin details",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast]
+  );
+
   useEffect(() => {
     const storedAdmin = document.cookie
       .split("; ")
@@ -68,7 +71,7 @@ function Profile() {
         console.error("Error parsing admin data from cookie:", error);
       }
     }
-  }, [fetchAdminDetails, toast]); // Run once on mount
+  }, [fetchAdminDetails]); // Now this is safe because fetchAdminDetails is memoized
 
   const handleSaveChanges = async () => {
     // Implement save changes logic here

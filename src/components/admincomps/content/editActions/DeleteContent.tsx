@@ -40,6 +40,7 @@ function DeleteContent({
       method: "DELETE",
       maxBodyLength: Infinity,
       url: `${BASE_API_URL}/${
+        contentCategory === "technical" ? "technical/content" : 
         contentCategory === "resources" ? "resources/content" : contentCategory
       }/${id}`,
       headers: {

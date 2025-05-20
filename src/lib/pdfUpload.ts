@@ -92,8 +92,8 @@ export function validatePDF(file: File): { valid: boolean; message?: string } {
     return { valid: false, message: "Please select a PDF file" };
     }
   
-  // Check file size (5MB limit)
-  const MAX_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+  // Check file size (15MB limit)
+  const MAX_SIZE = 15 * 1024 * 1024; // 15MB in bytes
   if (file.size > MAX_SIZE) {
     return { 
       valid: false, 

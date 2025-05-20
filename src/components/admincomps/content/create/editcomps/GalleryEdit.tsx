@@ -208,7 +208,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
 
           {/* Upload Progress */}
           {isUploading && (
-            <div className="mt-2 space-y-2">
+            <div className="my-2 space-y-2">
               <p className="text-sm font-medium">Uploading...</p>
               {uploadProgress.map((progress, index) => (
                 <div

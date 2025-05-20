@@ -4,6 +4,7 @@ import { Star, CalendarDays, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import apiClient from '@/services/apiClient';
 import { parseCookies } from 'nookies';
+import axios from 'axios';
 
 // Interfaces for type safety
 interface Feedback {
@@ -69,6 +70,7 @@ const FeedbackHistoryTab: React.FC = () => {
     const [filter, setFilter] = useState('Recent First');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [is404Error, setIs404Error] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -84,7 +86,7 @@ const FeedbackHistoryTab: React.FC = () => {
 
                 if (events.length === 0) {
                     setIsLoading(false);
-                    setError('No events found. Cannot fetch feedback.');
+                    setIs404Error(true);
                     return;
                 }
 
@@ -94,7 +96,13 @@ const FeedbackHistoryTab: React.FC = () => {
                 fetchFeedbackWithEventId(firstEventId, currentUserId, events);
             } catch (err) {
                 console.error('Error fetching events:', err);
-                setError('Failed to fetch events');
+                
+                if (axios.isAxiosError(err) && err.response?.status === 404) {
+                    setIs404Error(true);
+                } else {
+                    setError('Failed to fetch events');
+                }
+                
                 setIsLoading(false);
             }
         };
@@ -153,8 +161,15 @@ const FeedbackHistoryTab: React.FC = () => {
             
         } catch (err) {
             console.error('Error fetching feedback:', err);
-            setError('Failed to fetch your feedback history');
-            setFeedbackHistory([]);
+            
+            if (axios.isAxiosError(err) && err.response?.status === 404) {
+                setIs404Error(true);
+                setFeedbackHistory([]);
+            } else {
+                setError('Failed to fetch your feedback history');
+                setFeedbackHistory([]);
+            }
+            
             setIsLoading(false);
         }
     };
@@ -177,6 +192,20 @@ const FeedbackHistoryTab: React.FC = () => {
         }
         return sorted;
     }, [feedbackHistory, filter]);
+    
+    const emptyFeedbackDisplay = (
+        <div className="flex-grow flex items-center justify-center mt-40">
+            <div className="text-center p-16">
+                <div className="flex justify-center">
+                    <Image src="/calendar.png" width={150} height={50} alt="calendar-image" />
+                </div>
+                <h2 className="mt-10 text-xl font-bold text-gray-800">No Feedback History</h2>
+                <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
+                    You haven't submitted any feedback for events yet.
+                </p>
+            </div>
+        </div>
+    );
 
     if (isLoading) {
         return (
@@ -187,6 +216,11 @@ const FeedbackHistoryTab: React.FC = () => {
                 </div>
             </div>
         );
+    }
+
+    // Show the empty feedback display for 404 errors or when no feedback is available
+    if (is404Error || feedbackHistory.length === 0) {
+        return emptyFeedbackDisplay;
     }
 
     if (error) {
@@ -223,68 +257,54 @@ const FeedbackHistoryTab: React.FC = () => {
                 </div>
             </div>
 
-            {sortedFeedback.length > 0 ? (
-                <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6">
-                    {sortedFeedback.map((feedback) => (
-                        <div 
-                            key={feedback.id} 
-                            className="border border-gray-200 rounded-lg p-6 bg-white"
-                        >
-                            <div className="flex items-center justify-between mb-2">
-                                <p className="text-sm text-gray-600">Submission Date {formatDate(feedback.createdAt)}</p>
-                            </div>
+            <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-6">
+                {sortedFeedback.map((feedback) => (
+                    <div 
+                        key={feedback.id} 
+                        className="border border-gray-200 rounded-lg p-6 bg-white"
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm text-gray-600">Submission Date {formatDate(feedback.createdAt)}</p>
+                        </div>
 
-                            <div className="mb-4">
-                                <p className="text-gray-800 text-lg">Feedback/Comment</p>
-                                <p className="text-gray-800 text-sm">
-                                    {feedback.comment.length > 150 
-                                        ? `${feedback.comment.slice(0, 150)}...`
-                                        : feedback.comment}
-                                    {feedback.comment.length > 150 && (
-                                        <span className="text-blue-600 ml-1 cursor-pointer">read more</span>
-                                    )}
-                                </p>
-                                <div className="flex mt-2">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <Star
-                                            key={star}
-                                            className={`w-6 h-6 ${
-                                                star <= feedback.rating
-                                                    ? 'fill-yellow-400 text-yellow-400'
-                                                    : 'text-gray-300'
-                                            }`}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                            <hr className='border border-gray-300 mb-4'></hr>
-                            <p className='text-base text-gray-600 font-semibold'>{feedback.event?.name || 'Event Details'}</p>
-                            <div className="flex items-center text-sm text-gray-600 space-x-4">
-                                <div className="flex items-center">
-                                    <CalendarDays className="w-4 h-4 mr-1" />
-                                    {feedback.event ? formatDate(feedback.event.date, 'full') : 'N/A'}
-                                </div>
-                                <div className="flex items-center">
-                                    <MapPin className="w-4 h-4 mr-2" />
-                                    {feedback.event?.venue || 'Unknown Location'}
-                                </div>
+                        <div className="mb-4">
+                            <p className="text-gray-800 text-lg">Feedback/Comment</p>
+                            <p className="text-gray-800 text-sm">
+                                {feedback.comment.length > 150 
+                                    ? `${feedback.comment.slice(0, 150)}...`
+                                    : feedback.comment}
+                                {feedback.comment.length > 150 && (
+                                    <span className="text-blue-600 ml-1 cursor-pointer">read more</span>
+                                )}
+                            </p>
+                            <div className="flex mt-2">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                        key={star}
+                                        className={`w-6 h-6 ${
+                                            star <= feedback.rating
+                                                ? 'fill-yellow-400 text-yellow-400'
+                                                : 'text-gray-300'
+                                        }`}
+                                    />
+                                ))}
                             </div>
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="flex-grow flex items-center justify-center mt-40">
-                    <div className="text-center p-16">
-                        <div className="flex justify-center">
-                            <Image src="/calendar.png" width={150} height={50} alt="calendar-image" />
+                        <hr className='border border-gray-300 mb-4'></hr>
+                        <p className='text-base text-gray-600 font-semibold'>{feedback.event?.name || 'Event Details'}</p>
+                        <div className="flex items-center text-sm text-gray-600 space-x-4">
+                            <div className="flex items-center">
+                                <CalendarDays className="w-4 h-4 mr-1" />
+                                {feedback.event ? formatDate(feedback.event.date, 'full') : 'N/A'}
+                            </div>
+                            <div className="flex items-center">
+                                <MapPin className="w-4 h-4 mr-2" />
+                                {feedback.event?.venue || 'Unknown Location'}
+                            </div>
                         </div>
-                        <h2 className="mt-10 text-xl font-bold text-gray-800">No Feedback History</h2>
-                        <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
-                            You haven't submitted any feedback for events yet.
-                        </p>
                     </div>
-                </div>
-            )}
+                ))}
+            </div>
         </div>
     );
 };

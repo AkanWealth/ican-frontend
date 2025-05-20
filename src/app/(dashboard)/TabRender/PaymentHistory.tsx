@@ -57,8 +57,8 @@ const PaymentHistory = () => {
   const fetchBillingData = async () => {
     try {
       const response = await apiClient.get("/billing");
-      console.log("Billing Data:", response);
-      return Array.isArray(response) ? response : [];
+      console.log("Billing Data:", response.data);
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       console.error("Error fetching billing data:", error);
       return [];
@@ -73,13 +73,14 @@ const PaymentHistory = () => {
         const billings = await fetchBillingData();
         setBillingData(billings);
         
+        
         // Make sure we're dealing with an array
         const data = Array.isArray(response) ? response : [];
         
         // Process payment data to include subscription period and payment method
         const processedData = data.map((payment: Payment) => {
           // Find related billing record
-          const relatedBilling = billings.find(b => b.id === payment.billingId);
+          const relatedBilling = billings.find((b: { id: string; }) => b.id === payment.billingId);
           console.log("Related Billing:", relatedBilling);
           console.log("Payment:", payment);
           // Extract payment method from transactionId (example: CARD_64413c1f-78e4...)
@@ -88,7 +89,7 @@ const PaymentHistory = () => {
           
           return {
             ...payment,
-            subscriptionPeriod: response.paymentType || relatedBilling?.name || 'Unknown Subscription',
+            subscriptionPeriod: payment.paymentType || relatedBilling?.name || 'Unknown Subscription',
             paymentMethod: paymentMethod === 'CARD' ? 'Debit Card' : 'Bank Transfer'
           };
         });

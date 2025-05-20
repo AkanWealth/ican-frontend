@@ -1,13 +1,47 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TechnicalTile from "@/components/pubntech/TechnicalTile";
 
 import { useRouter } from "next/navigation";
 import { handleReadMore } from "@/lib/utils";
 import { technicalPosts } from "@/lib/technicaldata";
+import axios from "axios";
+import { BASE_API_URL } from "@/utils/setter";
+import { TechnicalPost } from "@/libs/types";
+import { useToast } from "@/hooks/use-toast";
+
+
+
 
 function Stories() {
+  
+   const { toast } = useToast();
+  const [technicalPosts, setTechnicalPosts] = useState<TechnicalPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const postsPerPage = 4;
+
+  useEffect(() => {
+    setIsLoading(true);
+    axios
+      .get(`${BASE_API_URL}/technical-sessions`)
+      .then((res) => {
+        setTechnicalPosts(
+          res.data.sessions.filter(
+            (session: TechnicalPost) => session.status === "PUBLISHED"
+          )
+        );
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        toast({
+          title: "Error fetching technical posts",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+      });
+  }, [toast]);
   const router = useRouter();
   var raw = technicalPosts.slice(0, 4);
 

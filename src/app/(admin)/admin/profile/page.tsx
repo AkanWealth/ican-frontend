@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import InputEle from "@/components/genui/InputEle";
 
@@ -23,30 +23,34 @@ function Profile() {
     role: "",
   });
   const [admin, setAdmin] = useState<User>({} as User);
-  // Function to fetch admin details from API
-  const fetchAdminDetails = async (userId: string) => {
-    try {
-      const response = await apiClient.get(`${BASE_API_URL}/users/${userId}`);
 
-      setAdmin((prevAdmin) => ({
-        ...prevAdmin,
-        ...response,
-      }));
+  // Function to fetch admin details from API - memoized with useCallback
+  const fetchAdminDetails = useCallback(
+    async (userId: string) => {
+      try {
+        const response = await apiClient.get(`${BASE_API_URL}/users/${userId}`);
 
-      toast({
-        title: "Success",
-        description: "Admin details fetched successfully",
-        variant: "default",
-      });
-    } catch (error) {
-      console.error("Error fetching admin details:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch admin details",
-        variant: "destructive",
-      });
-    }
-  };
+        setAdmin((prevAdmin) => ({
+          ...prevAdmin,
+          ...response,
+        }));
+
+        toast({
+          title: "Success",
+          description: "Admin details fetched successfully",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Error fetching admin details:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch admin details",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast]
+  );
 
   // Effect to get admin data from cookie and fetch details
   useEffect(() => {

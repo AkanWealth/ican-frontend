@@ -8,21 +8,22 @@ interface TechnicalTileProps {
 
 export default function TechnicalTile({ post }: TechnicalTileProps) {
   return (
-    <div className="min-w-[350px] relative gap-8 sm:gap-6 h-auto p-0 sm:pr-4 rounded-3xl border border-gray-300 justify-start items-center flex flex-col sm:flex-row">
+    <div className="min-w-[350px] relative gap-8 sm:gap-6 p-0 sm:pr-4 rounded-3xl border border-gray-300 justify-start items-center flex flex-col sm:flex-row">
       {/* technical sessions image */}
-      <div className="sm:w-[253px] relative h-full w-full">
+      <div className="sm:w-[253px] w-full h-[200px] relative overflow-hidden sm:flex-shrink-0">
         <Image
-          fill={true}
-          loading="lazy"
           src={post.coverImg}
           alt={`Image for ${post.name}`}
-          className="h-full w-full sm:w-fit object-cover sm:rounded-l-lg rounded-3xl"
+          className="object-cover rounded-t-3xl sm:rounded-t-none sm:rounded-l-3xl"
+          fill
+          sizes="(max-width: 640px) 100vw, 253px"
+          priority
         />
       </div>
 
-      <div className="flex-col flex-1 justify-start items-start gap-4 inline-flex sm:p-6 py-8 px-4 ">
+      <div className="flex-col flex-1 justify-start items-start gap-4 inline-flex sm:p-6 py-8 px-4 z-10 bg-white">
         <span
-          className={`inline-block py-1 text-sm leading-tight bg-[#2C9D27] text-white  rounded  p-2`}
+          className={`inline-block py-1 text-sm leading-tight bg-[#2C9D27] text-white rounded p-2`}
         >
           Technical Session
         </span>
@@ -40,7 +41,7 @@ export default function TechnicalTile({ post }: TechnicalTileProps) {
         </time>
 
         <a href={post.document} download={post.name}>
-          <button className=" px-4 py-1 rounded-full text-sm text-white  font-semibold bg-blue-900 hover:bg-white hover:border hover:border-primary hover:text-primary  ">
+          <button className="px-4 py-1 rounded-full text-sm text-white font-semibold bg-blue-900 hover:bg-white hover:border hover:border-primary hover:text-primary">
             Download
           </button>
         </a>

@@ -10,6 +10,9 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
+import axios from "axios";
+
+
 const ImageOverlay = ({
   isOpen,
   onClose,

@@ -83,7 +83,7 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             placeholder="Enter your residential address"
             type="text"
             label="Residential Address"
-            required={false}
+            required={true}
             onChange={handleChange}
             value={formData.contactDetails?.residentialAddress}
           />
@@ -116,7 +116,7 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             type="text"
             label="Residential State"
             onChange={handleChange}
-            required={false}
+            required={true}
             value={formData.contactDetails?.residentialState}
           />
           <InputEle
@@ -125,7 +125,7 @@ function Contact({ isShown, formData, updateFormData }: ContactProps) {
             type="text"
             label="Residential LGA"
             onChange={handleChange}
-            required={false}
+            required={true}
             value={formData.contactDetails?.residentialLga}
           />
           {/* <InputEle

@@ -35,9 +35,7 @@ export default function Home() {
           </div>
         </Heroimg>
         <Speech />
-        <div className="hidden w-full sm:block">
-          <Gallery />
-        </div>
+        <Gallery />
         <Stories />
         <Adverts />
         <Cta />

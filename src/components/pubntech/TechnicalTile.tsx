@@ -10,7 +10,7 @@ export default function TechnicalTile({ post }: TechnicalTileProps) {
   return (
     <div className="min-w-[350px] relative gap-8 sm:gap-6 p-0 sm:pr-4 rounded-3xl border border-gray-300 justify-start items-center flex flex-col sm:flex-row">
       {/* technical sessions image */}
-      <div className="sm:w-[253px] w-full h-[200px] relative overflow-hidden sm:flex-shrink-0">
+      <div className="sm:w-[253px] w-full h-[200px] sm:h-full sm:rounded-l-xl relative overflow-hidden sm:flex-shrink-0">
         <Image
           src={post.coverImg}
           alt={`Image for ${post.name}`}

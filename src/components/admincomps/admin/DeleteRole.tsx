@@ -33,6 +33,7 @@ function DeleteRole({ id, role, onClose }: DeleteRoleProps) {
           description: "Role deleted successfully",
           variant: "default",
         });
+        window.location.reload();
         onClose();
       } catch (error: any) {
         console.error(error);
@@ -43,6 +44,7 @@ function DeleteRole({ id, role, onClose }: DeleteRoleProps) {
           variant: "destructive",
         });
         onClose();
+        window.location.reload();
       }
     }
     fetchData();

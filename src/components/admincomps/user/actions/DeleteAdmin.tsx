@@ -31,8 +31,8 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
         const results = await apiClient.request(config);
         console.log(results.data);
         toast({
-          title: "Admin Deleted",
-          description: "Admin deleted successfully",
+          title: "User Deleted",
+          description: "User deleted successfully",
           variant: "default",
         });
         onClose();
@@ -48,6 +48,7 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
       }
     }
     fetchData();
+    window.location.reload();
   };
 
   return (
@@ -59,9 +60,9 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
           </div>
           <div>
             <div className="flex flex-col gap-2">
-              <h5 className="font-semibold text-xl text-black">Delete Admin</h5>
+              <h5 className="font-semibold text-xl text-black">Delete User</h5>
               <p className="text-sm text-neutral-600">
-                Are you sure you want to delete this admin?
+                Are you sure you want to delete this User?
               </p>
             </div>
             <div className="flex flex-col gap-2 mt-4">

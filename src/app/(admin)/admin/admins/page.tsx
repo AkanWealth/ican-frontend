@@ -51,6 +51,7 @@ function AdminManagementPage() {
       }
     }
     fetchData();
+    
   }, [router, toast]);
 
   return (

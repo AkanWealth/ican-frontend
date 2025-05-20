@@ -94,6 +94,7 @@ function EventAttendancePage({ params }: { params: Promise<{ id: string }> }) {
       });
       setSelected([]);
       setIsLoading(false);
+      window.location.reload();
     } catch (error) {
       toast({
         title: "Error",

@@ -56,6 +56,7 @@ function DeleteBilling({
         description: "Billing record deleted successfully",
         variant: "default",
       });
+      window.location.reload();
       onClose(); // Close modal after successful deletion
     } catch (error) {
       console.error("Delete failed:", error);

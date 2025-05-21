@@ -258,7 +258,9 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         />
         {/* Image Upload Section */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Technical Session Image</label>
+          <label className="block text-sm font-medium">
+            Technical Session Image
+          </label>
 
           {/* Image Upload Controls */}
           <div className="flex flex-wrap gap-4">
@@ -370,7 +372,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col mt-4 gap-2">
         <button
           disabled={isSubmitting}
           onClick={(e) => {
@@ -382,12 +384,14 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         >
           {isSubmitting ? (
             <span>Loading...</span>
+          ) : mode === "edit" ? (
+            "Publish Edit"
           ) : (
-            mode === "edit" ? "Publish Edit" : "Publish Technical Session"
+            "Publish Technical Session"
           )}
         </button>
         <button
-          disabled={isSubmitting} 
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
             setIsSubmitting(true);
@@ -397,8 +401,10 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         >
           {isSubmitting ? (
             <span>Loading...</span>
+          ) : mode === "edit" ? (
+            "Save Edit"
           ) : (
-            mode === "edit" ? "Save Edit" : "Save as Draft"
+            "Save as Draft"
           )}
         </button>
         <button

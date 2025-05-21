@@ -76,7 +76,7 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
                 <p className="flex text-neutral-700 font-medium text-base   items-centerflex-row gap-2">
                   <HiOutlineTag className="w-4 h-4" /> Role:
                 </p>
-                <p className="text-black font-medium text-base ">{role}</p>
+                <p className="text-black font-medium text-base ">{role.replace(/[_\-]/g, ' ')}</p>
               </div>
             </div>
           </div>

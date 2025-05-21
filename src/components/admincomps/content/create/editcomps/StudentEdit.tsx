@@ -236,7 +236,7 @@ function StudentEdit({ mode, id }: CreateContentProps) {
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col mt-4 gap-2">
         <button
           disabled={isSubmitting}
           onClick={(e) => {

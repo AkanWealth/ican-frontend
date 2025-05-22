@@ -56,6 +56,7 @@ const RegisteredEventsTab: React.FC = () => {
     const [registrationsMap, setRegistrationsMap] = useState<Record<string, Registration[]>>({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [is404Error, setIs404Error] = useState(false);
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
@@ -145,8 +146,14 @@ const RegisteredEventsTab: React.FC = () => {
             console.error('Error in fetchUserRegistrations:', err);
             
             if (axios.isAxiosError(err)) {
-                const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch registered events';
-                setError(`${errorMessage}. Please try again later.`);
+                // Check if it's a 404 error
+                if (err.response?.status === 404) {
+                    setIs404Error(true);
+                    setRegisteredEvents([]);
+                } else {
+                    const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch registered events';
+                    setError(`${errorMessage}. Please try again later.`);
+                }
             } else {
                 setError('An unexpected error occurred. Please try again later.');
             }
@@ -182,6 +189,20 @@ const RegisteredEventsTab: React.FC = () => {
         }
     };
 
+    const emptyEventsDisplay = (
+        <div className="flex-grow flex items-center justify-center mt-40">
+            <div className="text-center p-16">
+                <div className="flex justify-center">
+                    <Image src="/calendar.png" width={150} height={150} alt="calendar-image" />
+                </div>
+                <h2 className="mt-10 text-xl font-bold text-gray-800">No Registered Events</h2>
+                <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
+                    Please check back later for updates or explore other sections for more opportunities.
+                </p>
+            </div>
+        </div>
+    );
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-64">
@@ -191,6 +212,11 @@ const RegisteredEventsTab: React.FC = () => {
                 </div>
             </div>
         );
+    }
+
+    // Show empty events display for both empty events and 404 errors
+    if (is404Error || registeredEvents.length === 0) {
+        return emptyEventsDisplay;
     }
 
     if (error) {
@@ -211,24 +237,6 @@ const RegisteredEventsTab: React.FC = () => {
                 </button>
             </div>
         );
-    }
-
-    const emptyEventsDisplay = (
-        <div className="flex-grow flex items-center justify-center mt-40">
-            <div className="text-center p-16">
-                <div className="flex justify-center">
-                    <Image src="/calendar.png" width={150} height={150} alt="calendar-image" />
-                </div>
-                <h2 className="mt-10 text-xl font-bold text-gray-800">No Registered Events</h2>
-                <p className="mt-2 text-sm text-gray-700 max-w-lg mx-auto px-14">
-                    Please check back later for updates or explore other sections for more opportunities.
-                </p>
-            </div>
-        </div>
-    );
-
-    if (registeredEvents.length === 0) {
-        return emptyEventsDisplay;
     }
 
     return (

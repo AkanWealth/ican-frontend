@@ -64,12 +64,12 @@ export const userbillingcolumns: ColumnDef<User>[] = [
   },
 
   {
-    accessorKey: "memberid",
+    accessorKey: "membershipId",
     header: "Member ID",
   },
 
   {
-    accessorKey: "status",
+    accessorKey: "isSuspended",
     header: ({ column }) => {
       return (
         <Button
@@ -77,13 +77,13 @@ export const userbillingcolumns: ColumnDef<User>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Invoice Status
+          Membership Status
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
-      return <Statbtn status={row.original.status} />;
+      return <Statbtn status={row.original.isSuspended ? "Suspended" : "Active"} />;
     },
   },
 ];

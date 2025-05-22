@@ -15,40 +15,41 @@ interface DeleteAdminProps {
 
 function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
   const { toast } = useToast();
-  const handleDelete = () => {
+  const handleDelete = async () => {
     console.log({ id, fullName, role });
-    async function fetchData() {
-      const config = {
-        method: "delete",
-        maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/users/${id}`,
-        headers: {
-          Accept: "application/json",
-          ContentType: "application/json",
-        },
-      };
-      try {
-        const results = await apiClient.request(config);
-        console.log(results.data);
-        toast({
-          title: "User Deleted",
-          description: "User deleted successfully",
-          variant: "default",
-        });
-        onClose();
-      } catch (error: any) {
-        console.error(error);
-        toast({
-          title: "Error",
-          description:
-            error.response?.data?.message || "An error occurred while deleting",
-          variant: "destructive",
-        });
-        onClose();
-      }
+
+    const config = {
+      method: "delete",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/users/${id}`,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    };
+
+    try {
+      const results = await apiClient.request(config);
+      console.log(results.data);
+      toast({
+        title: "User Deleted",
+        description: "User deleted successfully",
+        variant: "default",
+      });
+      onClose();
+      // Reload page after successful deletion and UI updates
+      setTimeout(() => window.location.reload(), 500);
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description:
+          error.response?.data?.message || "An error occurred while deleting",
+        variant: "destructive",
+      });
+      onClose();
     }
-    fetchData();
-    window.location.reload();
   };
 
   return (
@@ -76,7 +77,9 @@ function DeleteAdmin({ id, fullName, role, onClose }: DeleteAdminProps) {
                 <p className="flex text-neutral-700 font-medium text-base   items-centerflex-row gap-2">
                   <HiOutlineTag className="w-4 h-4" /> Role:
                 </p>
-                <p className="text-black font-medium text-base ">{role.replace(/[_\-]/g, ' ')}</p>
+                <p className="text-black font-medium text-base ">
+                  {role.replace(/[_\-]/g, " ")}
+                </p>
               </div>
             </div>
           </div>

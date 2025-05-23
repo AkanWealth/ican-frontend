@@ -17,6 +17,7 @@ import {
   BillingDetails,
   BillingPaymentTable,
   UpdatedBillingStats,
+  WaiverCode,
 } from "@/libs/types";
 
 import CreateWaiver from "@/components/admincomps/billing/actions/CreateWaiver";
@@ -58,6 +59,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const [data, setData] = useState<BillingDetails>();
   const [paymentData, setPaymentData] = useState<BillingPaymentTable[]>([]);
   const [billingStats, setBillingStats] = useState<UpdatedBillingStats>();
+  const [waivers, setWaivers] = useState<WaiverCode[]>([]);
 
   const [isWaiver, setisWaiver] = useState(false);
 
@@ -125,9 +127,54 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       }
     }
 
+    async function fetchWaivers() {
+      const billingId = (await params).id;
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: `${BASE_API_URL}/payments/waivers`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      };
+
+      try {
+        console.log("fetching waivers");
+        const result = await apiClient.get("/payments/waivers", config);
+        const filteredWaivers = result.filter(
+          (waiver: WaiverCode) => waiver.billingId === billingId
+        );
+        setWaivers(filteredWaivers);
+        console.log("filtered waivers", filteredWaivers);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch waivers data.",
+          variant: "destructive",
+        });
+      }
+    }
+
     fetchData();
     fetchStats();
+    fetchWaivers();
   }, [params, router, toast]);
+
+  // Add this helper function to format the date
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString("en-NG", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Sort waivers by expiration date
+  const sortedWaivers = [...waivers].sort(
+    (a, b) => new Date(b.expiresAt).getTime() - new Date(a.expiresAt).getTime()
+  );
 
   return (
     <div className="rounded-3xl flex flex-col gap-6 p-6">
@@ -144,7 +191,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         </div>
         <button
           onClick={() => setisWaiver(!isWaiver)}
-          className="flex flex-row items-center gap-2 text-primary"
+          className="flex flex-row items-center gap-2 text-white bg-primary px-4 py-2 rounded-md"
         >
           {" "}
           Create Waiver
@@ -277,6 +324,48 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               </PieChart>
             </ChartContainer>
           </div>
+        </div>
+      </div>
+      <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
+        <h2 className="text-xl font-semibold text-left">Waiver Codes</h2>
+        <hr />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {waivers.map((waiver) => (
+            <Card key={waiver.id} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-lg font-mono">
+                  {waiver.code}
+                </CardTitle>
+                <CardDescription>
+                  Expires: {formatDateTime(waiver.expiresAt)}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Status:</span>
+                    <span
+                      className={`text-sm font-medium ${
+                        new Date(waiver.expiresAt) > new Date()
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {new Date(waiver.expiresAt) > new Date()
+                        ? "Active"
+                        : "Expired"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Created by:</span>
+                    <span className="text-sm font-medium">
+                      {waiver.createdBy.email}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">

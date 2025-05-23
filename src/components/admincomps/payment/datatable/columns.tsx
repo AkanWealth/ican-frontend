@@ -17,7 +17,7 @@ import CellActions from "@/components/admincomps/payment/actions/CellActions";
 
 export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
   {
-    accessorKey: "user.firstname",
+    accessorKey: "userId",
     header: ({ column }) => {
       return (
         <Button
@@ -32,7 +32,8 @@ export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
     cell: ({ row }) => {
       return (
         <div>
-          {row.original.user.firstname} {row.original.user.surname}
+          {row.original.user.firstname} {row.original.user.middlename} 
+          {row.original.user.surname}
         </div>
       );
     },

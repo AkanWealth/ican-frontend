@@ -547,6 +547,35 @@ type UpdatedBillingStats = {
   };
 };
 
+type WaiverCode = {
+  id: string;
+  code: string;
+  billingId: string;
+  createdById: string;
+  usedById: string | null;
+  expiresAt: string;
+  createdAt: string;
+  usedBy: {
+    id: string;
+    email: string;
+  } | null;
+  billing: {
+    id: string;
+    name: string;
+    amount: number;
+    createdAt: string;
+    autoApply: boolean;
+    createdById: string;
+    nextDueDate: string | null;
+    description: string | null;
+    frequency: string;
+    nextBillingAt: string | null;
+  };
+  createdBy: {
+    id: string;
+    email: string;
+  };
+}
 export type {
   Advert,
   Billing,
@@ -574,4 +603,5 @@ export type {
   Publication,
   UpdatedBillingStats,
   BillingPaymentTable,
+  WaiverCode,
 };

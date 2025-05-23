@@ -32,7 +32,7 @@ export default function Billingsubpage() {
       try {
         const result = await apiClient.get("/billing", config);
 
-        setData(result.data);
+        setData(result);
       } catch (error) {
         console.log(error);
         toast({

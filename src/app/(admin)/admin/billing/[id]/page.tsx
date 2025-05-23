@@ -19,6 +19,8 @@ import {
   UpdatedBillingStats,
 } from "@/libs/types";
 
+import CreateWaiver from "@/components/admincomps/billing/actions/CreateWaiver";
+
 import { TrendingUp } from "lucide-react";
 import { Pie, PieChart } from "recharts";
 import {
@@ -56,6 +58,8 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const [data, setData] = useState<BillingDetails>();
   const [paymentData, setPaymentData] = useState<BillingPaymentTable[]>([]);
   const [billingStats, setBillingStats] = useState<UpdatedBillingStats>();
+
+  const [isWaiver, setisWaiver] = useState(false);
 
   const chartData = [
     {
@@ -138,6 +142,13 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           <h2 className="font-semibold text-2xl text-black">Billing Details</h2>
           <p>View billings and payments here</p>
         </div>
+        <button
+          onClick={() => setisWaiver(!isWaiver)}
+          className="flex flex-row items-center gap-2 text-primary"
+        >
+          {" "}
+          Create Waiver
+        </button>
       </div>
       {/* Tab sections */}
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
@@ -151,7 +162,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                 <div className="flex flex-col gap-1">
                   <span className="text-sm text-gray-600">Bill Name</span>
                   <span className="text-base font-medium text-black">
-                    {data?.name || '-'}
+                    {data?.name || "-"}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -185,7 +196,9 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               <h3 className="text-lg font-semibold mb-4">Payment Statistics</h3>
               <div className="space-y-4">
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-600">Total Members Affected</span>
+                  <span className="text-sm text-gray-600">
+                    Total Members Affected
+                  </span>
                   <span className="text-base font-medium text-black">
                     {billingStats?.totalUsersAffected || 0}
                   </span>
@@ -197,7 +210,9 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-600">Total Amount Paid</span>
+                  <span className="text-sm text-gray-600">
+                    Total Amount Paid
+                  </span>
                   <span className="text-base font-medium text-green-600">
                     {new Intl.NumberFormat("en-NG", {
                       style: "currency",
@@ -206,14 +221,16 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-600">Total Amount Due</span>
+                  <span className="text-sm text-gray-600">
+                    Total Amount Due
+                  </span>
                   <span className="text-base font-medium text-red-600">
                     {new Intl.NumberFormat("en-NG", {
-                      style: "currency", 
+                      style: "currency",
                       currency: "NGN",
                     }).format(
                       (billingStats?.totalBillingAmount || 0) *
-                      (billingStats?.totalUsersNotPaid || 0)
+                        (billingStats?.totalUsersNotPaid || 0)
                     )}
                   </span>
                 </div>
@@ -269,6 +286,14 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         <hr />
         <PaymentTable data={paymentData} columns={billingdetailscoloumns} />
       </div>
+      {isWaiver && (
+        <CreateWaiver
+          isOpen={isWaiver}
+          onClose={() => setisWaiver(false)}
+          billingId={data?.id || ""}
+          createdById={data?.createdById || ""}
+        />
+      )}
     </div>
   );
 }

@@ -139,13 +139,11 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       };
 
       try {
-        console.log("fetching waivers");
         const result = await apiClient.get("/payments/waivers", config);
         const filteredWaivers = result.filter(
           (waiver: WaiverCode) => waiver.billingId === billingId
         );
         setWaivers(filteredWaivers);
-        console.log("filtered waivers", filteredWaivers);
       } catch (error) {
         toast({
           title: "Error",

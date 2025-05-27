@@ -10,6 +10,7 @@ import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/Adm
 
 import Billingsubpage from "./tabs/Billingsubpage";
 import Paymentsubpage from "./tabs/Paymentsubpage";
+import Donationsubpage from "./tabs/Donationsubpage";
 
 function BillingPage() {
   return (
@@ -18,12 +19,16 @@ function BillingPage() {
         <TabsList>
           <TabsTrigger value="billing">Billing</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="donations">Donations</TabsTrigger>
         </TabsList>
         <TabsContent value="billing">
           <Billingsubpage />
         </TabsContent>
         <TabsContent value="payments">
           <Paymentsubpage />
+        </TabsContent>
+        <TabsContent value="donations">
+          <Donationsubpage />
         </TabsContent>
       </Tabs>
     </div>

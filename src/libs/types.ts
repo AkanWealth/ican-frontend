@@ -62,8 +62,7 @@ type BillingPayment = {
   donationOption: string | null;
   paymentCategory: string;
   eventId: string | null;
-}
-
+};
 
 type User = {
   id: string;
@@ -325,8 +324,11 @@ type RegisteredUsers = {
   fullName: string;
   email: string;
   membership: string;
+  eventId: string;
   status: string;
   proofOfPayment: string;
+  createdAt: string;
+  userId: string;
 };
 
 type Resource = {
@@ -575,7 +577,7 @@ type WaiverCode = {
     id: string;
     email: string;
   };
-}
+};
 export type {
   Advert,
   Billing,

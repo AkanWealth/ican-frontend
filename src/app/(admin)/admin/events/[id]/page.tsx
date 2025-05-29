@@ -5,6 +5,9 @@ import React, { useState, useEffect } from "react";
 import { MdDownload, MdOutlineModeEditOutline } from "react-icons/md";
 import FeedbackModal from "@/components/admincomps/event/FeedbackModal";
 
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/utils/setter";
 
@@ -44,51 +47,67 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbacks, setFeedbacks] = useState([]);
 
-  useEffect(() => {
-    let isMounted = true;
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   let retryCount = 0;
+  //   const maxRetries = 3;
+  //   const retryDelay = 1000;
 
-    async function fetchAllFeedbackData() {
-      const eventId = (await params).id;
-      const config = {
-        method: "get",
-        maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/events/${eventId}/feedback`,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      };
-      try {
-        const result = await apiClient.request(config);
-        // Only update state if component is still mounted and we have data
-        if (isMounted && result) {
-          setFeedbacks(result);
-          // Only show success toast if we actually got data
-          if (result.length > 0) {
-            toast({
-              title: "Feedback",
-              description: "Feedback fetched successfully.",
-              variant: "default",
-            });
-          }
-        }
-      } catch (error) {
-        if (isMounted) {
-          toast({
-            title: "Error",
-            description: "Failed to fetch event data.",
-            variant: "destructive",
-          });
-        }
-      }
-    }
+  //   async function fetchAllFeedbackData() {
+  //     try {
+  //       const eventId = (await params).id;
+  //       const accessToken = localStorage.getItem("accessToken");
 
-    fetchAllFeedbackData();
+  //       if (!accessToken) {
+  //         toast({
+  //           title: "Authentication Error",
+  //           description: "No access token found",
+  //           variant: "destructive",
+  //         });
+  //         return;
+  //       }
 
-    // Cleanup function to prevent state updates after unmount
-    return () => {
-      isMounted = false;
-    };
-  }, [params, router, toast]); // Empty dependency array to run only once
+  //       const { data } = await apiClient.get(`/events/${eventId}/feedback`, {
+  //         headers: { Authorization: `Bearer ${accessToken}` }
+  //       });
+
+  //       if (isMounted) {
+  //         setFeedbacks(data);
+  //         if (data.length > 0) {
+  //           toast({
+  //             title: "Feedback",
+  //             description: "Feedback fetched successfully",
+  //             variant: "default",
+  //           });
+  //         }
+  //       }
+  //     } catch (error: any) {
+  //       if (!isMounted) return;
+
+  //       if (error.response?.status === 429 && retryCount < maxRetries) {
+  //         retryCount++;
+  //         toast({
+  //           title: "Rate Limited",
+  //           description: `Retrying in ${retryDelay/1000}s (${retryCount}/${maxRetries})`,
+  //           variant: "default",
+  //         });
+  //         setTimeout(() => {
+  //           if (isMounted) fetchAllFeedbackData();
+  //         }, retryDelay);
+  //       } else {
+  //         toast({
+  //           title: "Error",
+  //           description: error.response?.data?.message ||
+  //             "Failed to fetch feedback data",
+  //           variant: "destructive",
+  //         });
+  //       }
+  //     }
+  //   }
+
+  //   fetchAllFeedbackData();
+  //   return () => { isMounted = false; };
+  // }, [params, toast]);
 
   useEffect(() => {
     async function fetchData() {
@@ -134,7 +153,7 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       };
       try {
         const result = await apiClient.request(config);
-        setRegisteredUsers(result);
+        setRegisteredUsers(result.data);
       } catch (error) {
         toast({
           title: "Error",
@@ -216,11 +235,19 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </div>
         <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-          <h2 className="text-xl font-semibold text-left">
-            Event Registrations
-          </h2>
+          <div className="flex flex-row justify-between items-center">
+            <h2 className="text-xl font-semibold text-left">
+              Event Registrations
+            </h2>
+            <Link href={`/admin/events/${eventDetails.id}/attendance`}>
+              <Button className="bg-primary text-white text-lg">
+                Mark Attendance
+              </Button>
+            </Link>
+          </div>
           <div>
             <UserAttendanceTable
+              type="registered"
               columns={registereduserscolumns}
               data={registeredUsers}
               setter={undefined}

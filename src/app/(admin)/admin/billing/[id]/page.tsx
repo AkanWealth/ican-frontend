@@ -174,6 +174,35 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     (a, b) => new Date(b.expiresAt).getTime() - new Date(a.expiresAt).getTime()
   );
 
+  const deleteWaiver = async (waiverId: string) => {
+    const config = {
+      method: "delete",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/payments/waivers/${waiverId}`,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    };
+    try {
+      const result = await apiClient.delete(
+        `/payments/waivers/${waiverId}`,
+        config
+      );
+      toast({
+        title: "Success",
+        description: "Waiver deleted successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete waiver.",
+        variant: "destructive",
+      });
+    } finally {
+      window.location.reload();
+    }
+  };
+
   return (
     <div className="rounded-3xl flex flex-col gap-6 p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
@@ -362,6 +391,14 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                   </div>
                 </div>
               </CardContent>
+              <CardFooter>
+                <button
+                  onClick={() => deleteWaiver(waiver.id)}
+                  className="w-full text-sm text-red-600 hover:text-red-700 hover:bg-red-50 py-2 px-4 rounded-md transition-colors"
+                >
+                  Delete Waiver
+                </button>
+              </CardFooter>
             </Card>
           ))}
         </div>

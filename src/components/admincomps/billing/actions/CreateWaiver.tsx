@@ -59,14 +59,13 @@ function CreateWaiver({
         expiresAt: expiryDate,
       });
 
-      if (response.data) {
-        setCreatedWaiver(response.data);
-        setShowSuccessPopup(true);
-        setTimeout(() => {
-          setShowSuccessPopup(false);
-          onClose();
-        }, 3000);
-      }
+      setCreatedWaiver(response);
+      setShowSuccessPopup(true);
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+        onClose();
+        window.location.reload(); // Moved reload inside timeout
+      }, 3000);
     } catch (err) {
       setError("Failed to create waiver. Please try again.");
       console.error("Waiver creation error:", err);
@@ -75,8 +74,7 @@ function CreateWaiver({
         description: "There was an error while trying to create the waiver.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      window.location.reload();
     }
   };
 
@@ -85,7 +83,7 @@ function CreateWaiver({
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Create Payment Waiver</DialogTitle>
+            <DialogTitle>Create Payment Waiver Code</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -181,8 +179,8 @@ function CreateWaiver({
           </DialogHeader>
           <div className="space-y-4">
             <div className="p-4 bg-green-50 rounded-md">
-              <pre className="text-sm overflow-auto">
-                {JSON.stringify(createdWaiver, null, 2)}
+              <pre className="text-base font-semibold overflow-auto">
+                <p>Waiver Code: {createdWaiver?.code}</p>
               </pre>
             </div>
             <p className="text-sm text-muted-foreground">

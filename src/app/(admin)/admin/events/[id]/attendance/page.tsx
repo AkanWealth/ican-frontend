@@ -44,7 +44,7 @@ function EventAttendancePage({ params }: { params: Promise<{ id: string }> }) {
       };
       try {
         const result = await apiClient.request(config);
-        setRegisteredUsers(result);
+        setRegisteredUsers(result.data);
       } catch (error) {
         toast({
           title: "Error",
@@ -108,11 +108,16 @@ function EventAttendancePage({ params }: { params: Promise<{ id: string }> }) {
   return (
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
-        <div className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-black">
-            Event Attendance
-          </h2>
-          <p>View and Manage all events attendees here</p>
+        <div className="flex flex-row items-center gap-4">
+          <Button onClick={() => router.back()} variant="outline" size="sm">
+            ← Back
+          </Button>
+          <div className="flex flex-col gap-3">
+            <h2 className="font-semibold text-2xl text-black">
+              Event Attendance
+            </h2>
+            <p>View and Manage all events attendees here</p>
+          </div>
         </div>
       </div>
       {/* Tab sections */}
@@ -165,6 +170,7 @@ function EventAttendancePage({ params }: { params: Promise<{ id: string }> }) {
         </div>
         <div>
           <UserAttendanceTable
+            type="attendance"
             setter={setSelected}
             columns={registereduserscolumns}
             data={registeredUsers}

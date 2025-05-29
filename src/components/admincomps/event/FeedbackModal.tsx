@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarOutline } from "@heroicons/react/24/outline";
 
-import axios from "axios";
-import { BASE_API_URL } from "@/utils/setter";
 import { useToast } from "@/components/ui/use-toast";
+import apiClient from "@/services-admin/apiClient";
+
 
 interface Feedback {
   id: string;
@@ -31,33 +31,34 @@ export default function FeedbackModal({
   const { toast } = useToast();
 
   useEffect(() => {
-    let retryCount = 0;
-    const maxRetries = 2;
+    let isMounted = true;
+    const abortController = new AbortController();
+    let retryTimeout: NodeJS.Timeout;
 
-    const fetchFeedbacks = async () => {
+    const fetchFeedbacks = async (retryCount = 0) => {
       try {
-        const response = await axios.get(
-          `${BASE_API_URL}/events/${eventId}/feedback`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log(response.data);
-        toast({
-          title: "Success", 
-          description: "Feedbacks fetched successfully",
-          variant: "default",
+        const response = await apiClient.get(`/events/${eventId}/feedback`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          signal: abortController.signal
         });
-      } catch (error) {
-        console.error("Error fetching feedbacks:", error);
-        retryCount++;
 
-        if (retryCount < maxRetries) {
-          // Retry the fetch
-          fetchFeedbacks();
+        if (isMounted) {
+          console.log(response.data);
+          toast({
+            title: "Success", 
+            description: "Feedbacks fetched successfully",
+            variant: "default",
+          });
+        }
+      } catch (error) {
+        if (!isMounted) return;
+        
+        console.error("Error fetching feedbacks:", error);
+        
+        if (retryCount < 2) {
+          retryTimeout = setTimeout(() => fetchFeedbacks(retryCount + 1), 1000 * (retryCount + 1));
         } else {
           toast({
             title: "Error",
@@ -68,9 +69,13 @@ export default function FeedbackModal({
       }
     };
 
-    // Call fetchFeedbacks when component mounts
     fetchFeedbacks();
-  }, [toast, eventId]);
+    return () => {
+      isMounted = false;
+      abortController.abort();
+      clearTimeout(retryTimeout);
+    };
+  }, [eventId]); // Removed toast from dependencies as it's stable
 
   // Sort and filter feedbacks
   const sortedFeedbacks = [...feedbacks]

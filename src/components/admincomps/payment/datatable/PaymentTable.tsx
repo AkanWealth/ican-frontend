@@ -124,7 +124,7 @@ export function PaymentTable<TData, TValue>({
                 >
                   <Image
                     className="mx-auto"
-                    src="/EmptyUserTable.png"
+                    src="/EmptyBillingTable.png"
                     alt="Empty"
                     width={400}
                     height={400}

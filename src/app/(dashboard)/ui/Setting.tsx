@@ -183,15 +183,16 @@ function SettingsPage() {
     switch (activeTab) {
       case "password":
         return (
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={handleDeleteClick}
-              className="px-8 py-2 rounded-full bg-red-600 text-white"
-            >
-              Delete account
-            </button>
-          </div>
+          // <div className="flex justify-end">
+          //   <button
+          //     type="button"
+          //     onClick={handleDeleteClick}
+          //     className="px-8 py-2 rounded-full bg-red-600 text-white"
+          //   >
+          //     Delete account
+          //   </button>
+          // </div>
+          <></>
         );
       case "notification":
         return (

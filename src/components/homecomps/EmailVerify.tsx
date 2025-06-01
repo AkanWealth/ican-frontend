@@ -20,7 +20,7 @@ function VerifyEmailPage() {
     
     try {
       const response = await axios.post(
-        "https://ican-api-6000e8d06d3a.herokuapp.com/api/auth/resend-verification",
+        "https://ican-api-6000e8d06d3a.herokuapp.com/api/users/resend-verification-email",
         { email }
       );
       

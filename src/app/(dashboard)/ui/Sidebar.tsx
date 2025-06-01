@@ -145,7 +145,7 @@ export const Sidebar = () => {
                         active ? "text-blue-900" : "text-white"
                       )}
                     />
-                    <span className="ml-3 whitespace-nowrap hover:text-green-500">
+                    <span className="ml-3 whitespace-nowrap">
                       {item.label}
                     </span>
                   </div>
@@ -174,7 +174,7 @@ export const Sidebar = () => {
                         active ? "text-blue-900" : "text-white"
                       )}
                     />
-                    <span className="ml-3 whitespace-nowrap hover:text-green-500">
+                    <span className="ml-3 whitespace-nowrap">
                       {item.label}
                     </span>
                   </div>

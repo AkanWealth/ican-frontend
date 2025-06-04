@@ -12,24 +12,6 @@ import InputEle from "@/components/genui/InputEle";
 import { User } from "@/libs/types";
 import { useRouter } from "next/navigation";
 
-import { Check, ChevronsUpDown } from "lucide-react";
-
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
 // Props interface for CreateNewAdmin component
 interface CreateNewAdminProps {
   id?: any;
@@ -71,9 +53,6 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
   const [roles, setRoles] = useState<RolesData[]>([]);
   // State to store users
   const [users, setUsers] = useState<User[]>([]);
-
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
 
   // Handle form input changes
   const handleChange = (
@@ -220,10 +199,6 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         <h2 className="text-2xl font-semibold mb-6">
           Create New Administrator
         </h2>
-        <p className="text-sm text-gray-500">
-          Create a new administrator to manage the platform. This will grant
-          them access to all features and settings.
-        </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {formData.userId && (
@@ -238,63 +213,26 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
             </p>
           )}
 
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                role="combobox"
-                aria-expanded={open}
-                className="w-[200px] justify-between p-3 rounded border border-gray-400 bg-white text-base font-sans font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400"
-              >
-                {value
-                  ? users.find((user) => user.id === value)?.firstname +
-                    " " +
-                    users.find((user) => user.id === value)?.surname
-                  : "Select User..."}
-                <ChevronsUpDown className="opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0 bg-white border border-gray-400 rounded shadow-lg">
-              <Command>
-                <CommandInput
-                  placeholder="Search User..."
-                  className="h-9 p-3 rounded border border-gray-400 bg-white text-base font-sans font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                <CommandList>
-                  <CommandEmpty className="p-3 text-gray-500">
-                    No User found.
-                  </CommandEmpty>
-                  <CommandGroup>
-                    {users.map((user) => (
-                      <CommandItem
-                        key={user.id}
-                        value={user.id}
-                        onSelect={(currentValue) => {
-                          setValue(currentValue === value ? "" : currentValue);
-                          setFormData({ ...formData, userId: currentValue });
-                          setOpen(false);
-                        }}
-                        className={cn(
-                          "p-3 rounded cursor-pointer text-base font-sans font-normal",
-                          value === user.id
-                            ? "bg-blue-100"
-                            : "hover:bg-gray-100 focus:bg-blue-50"
-                        )}
-                      >
-                        {user.firstname} {user.surname}
-                        <Check
-                          className={cn(
-                            "ml-auto",
-                            value === user.id ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-
+          <InputEle
+            label="User"
+            type="select"
+            id="userId"
+            value={formData.userId}
+            options={
+              Array.isArray(users)
+                ? [
+                    { value: "", label: "Select User" },
+                    ...users.map((user) => ({
+                      value: user.id,
+                      label: `${user.firstname} ${user.surname}`,
+                    })),
+                  ]
+                : [{ value: "", label: "Select User" }]
+            }
+            onChange={(e) =>
+              setFormData({ ...formData, userId: e.target.value })
+            }
+          />
           <InputEle
             label="Role Type"
             type="select"

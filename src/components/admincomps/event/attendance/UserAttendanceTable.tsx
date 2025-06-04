@@ -85,11 +85,6 @@ export function UserAttendanceTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-        {setter && (
-          <button className="bg-primary text-white rounded-full py-2 px-3 border border-white whitespace-nowrap">
-            Mark as Present
-          </button>
-        )}
       </div>
       <div className="">
         <Table>

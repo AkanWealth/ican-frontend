@@ -125,6 +125,10 @@ function Profile() {
             <h5 className="text-base w-full border-b border-gray-600 text-neutral-900">
               Admin Details
             </h5>
+            <div className="w-full p-4 mb-4 bg-yellow-50/50 rounded-md text-center text-sm text-gray-600 border border-yellow-200">
+              <span className="mr-2">⚠️</span>
+              Please note: Profile changes cannot be made through the admin interface. To update your personal information, please visit your user profile section.
+            </div>
             <div className="grid grid-cols-2  gap-4 ">
               <InputEle
                 id="first_name"

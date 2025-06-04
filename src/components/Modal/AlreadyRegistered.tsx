@@ -34,7 +34,7 @@ const AlreadyRegisteredModal: React.FC<AlreadyRegisteredModalProps> = ({
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
         {/* Modal Header */}
-        <div className="bg-green-600 text-white p-4 flex justify-between items-center">
+        <div className="bg-blue-900 text-white p-4 flex justify-between items-center">
           <div className="flex items-center">
             <Check className="w-6 h-6 mr-2" />
             <h2 className="text-xl font-bold">Already Registered</h2>
@@ -48,8 +48,8 @@ const AlreadyRegisteredModal: React.FC<AlreadyRegisteredModalProps> = ({
         <div className="p-6">
           <div className="mb-6">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <Check className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <Check className="w-8 h-8 text-blue-900" />
               </div>
             </div>
             <h3 className="text-lg font-semibold text-center mb-2">
@@ -99,18 +99,18 @@ const AlreadyRegisteredModal: React.FC<AlreadyRegisteredModalProps> = ({
             please contact us at{" "}
             <a
               href="mailto:icansuruleredistrictsociety@gmail.com"
-              className="text-blue-600 underline hover:text-blue-800"
+              className="text-blue-900 underline hover:text-blue-800"
             >
               icansuruleredistrictsociety@gmail.com
             </a>{" "}
             or call{" "}
-            <span className="text-blue-600">+234 808 816 8895</span>.
+            <span className="text-blue-900">+234 808 816 8895</span>.
           </div>
 
           {/* Close button */}
           <button 
             onClick={onClose}
-            className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors"
+            className="w-full bg-blue-900 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Close
           </button>

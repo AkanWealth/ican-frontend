@@ -8,7 +8,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import RoleManager from "@/components/admincomps/admin/Rolemanager";
 
 import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
 import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
@@ -22,7 +21,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { handleUnauthorizedRequest } from "@/utils/refresh_token";
 
-import axios from "axios";
 import { BASE_API_URL } from "@/utils/setter";
 
 import { RolesData } from "@/libs/types";
@@ -90,7 +88,7 @@ function RolesPage() {
         <h2 className="text-lg font-semibold">Roles and Permissions</h2>
         <button
           onClick={() => {
-            setShowModal(true);
+            router.push("/admin/admins/roles/create");
           }}
           className="bg-primary text-base font-semibold text-white rounded-md px-4 py-2"
         >
@@ -135,9 +133,7 @@ function RolesPage() {
         ))}
       </Accordion>
 
-      {showModal && (
-        <RoleManager showModal={showModal} setShowModal={setShowModal} />
-      )}
+
       {showEditModal && (
         <EditRole
           id={activeRole?.id}

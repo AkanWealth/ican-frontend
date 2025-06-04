@@ -41,7 +41,7 @@ function DeleteContent({
       maxBodyLength: Infinity,
       url: `${BASE_API_URL}/${
         contentCategory === "technical"
-          ? "technical/content"
+          ? "technical-sessions"
           : contentCategory === "resources"
           ? "resources/content"
           : contentCategory

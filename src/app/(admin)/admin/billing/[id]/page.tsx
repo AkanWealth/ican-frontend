@@ -91,6 +91,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
         setData(result);
         setPaymentData(result.Payment);
+        console.log(result);
       } catch (error) {
         toast({
           title: "Error",

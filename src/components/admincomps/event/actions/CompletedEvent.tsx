@@ -9,14 +9,14 @@ import { BASE_API_URL } from "@/utils/setter";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
-interface CancelEventProps {
+interface CompletedEventProps {
   id: string;
   eventName: string;
   date: string;
   onClose: () => void;
 }
 
-function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
+function CompletedEvent({ id, eventName, date, onClose }: CompletedEventProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -118,4 +118,4 @@ function CancelEvent({ id, eventName, date, onClose }: CancelEventProps) {
   );
 }
 
-export default CancelEvent;
+export default CompletedEvent;

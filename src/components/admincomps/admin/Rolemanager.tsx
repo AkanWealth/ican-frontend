@@ -317,8 +317,16 @@ function Rolemanager({ id, showModal, setShowModal }: RolemanagerProps) {
     >
       <div className="bg-white p-8 rounded-lg w-[800px]">
         <h2 className="text-2xl font-semibold mb-6">Create New Role</h2>
+        <p className="text-sm text-gray-500">
+          Create a new role to manage the platform. This will grant them access
+          to all features and settings.
+        </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <p className="text-sm text-gray-500">
+            Role name should be in alphabets only and should not contain any
+            special characters.
+          </p>
           <InputEle
             label="Role Name"
             type="text"

@@ -129,6 +129,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           id={row.original.id}
           eventName={row.original.name}
           date={row.original.date}
+          onClose={() => setShowCompletedModal(false)}
         />
       )}
     </>

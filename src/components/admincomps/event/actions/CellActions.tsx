@@ -14,12 +14,14 @@ import {
   MdOutlineCancel,
   MdOutlineDelete,
   MdOutlineRemoveRedEye,
+  MdCheckCircle,
 } from "react-icons/md";
 
 import { MoreHorizontal } from "lucide-react";
 import CancelEvent from "./CancelEvent";
 import DeleteEvent from "./DeleteEvent";
 import NewEvent from "../create/NewEvent";
+import CompletedEvent from "./CompletedEvent";
 import { useRouter } from "next/navigation";
 
 interface CellProps {
@@ -30,6 +32,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCompletedModal, setShowCompletedModal] = useState(false);
 
   const router = useRouter(); // Hook to navigate programmatically
 
@@ -62,6 +65,15 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="hover:bg-green-600 hover:text-white text-green-600 flex flex-row items-center fill-green-600 "
+            onClick={() => setShowCompletedModal(true)}
+          >
+            <MdCheckCircle className="w-4 h-4" />
+            Mark as Completed
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+
           <DropdownMenuItem
             className="hover:bg-red-600 hover:text-white text-red-600 flex flex-row items-center fill-red-600 "
             onClick={() => setShowCancelModal(true)}
@@ -110,6 +122,13 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           eventName={row.original.name}
           date={row.original.date}
           onClose={() => setShowCancelModal(false)}
+        />
+      )}
+      {showCompletedModal && (
+        <CompletedEvent
+          id={row.original.id}
+          eventName={row.original.name}
+          date={row.original.date}
         />
       )}
     </>

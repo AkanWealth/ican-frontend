@@ -220,7 +220,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           className="flex flex-row items-center gap-2 text-white bg-primary px-4 py-2 rounded-md"
         >
           {" "}
-          Create Waiver
+          Create Waiver Code
         </button>
       </div>
       {/* Tab sections */}
@@ -356,50 +356,69 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         <h2 className="text-xl font-semibold text-left">Waiver Codes</h2>
         <hr />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {waivers.map((waiver) => (
-            <Card key={waiver.id} className="hover:shadow-md transition-shadow">
+          {waivers.length === 0 ? (
+            <Card className="hover:shadow-md transition-shadow">
               <CardHeader>
-                <CardTitle className="text-lg font-mono">
-                  {waiver.code}
+                <CardTitle className="text-lg text-gray-500 text-center">
+                  No waiver codes created yet
                 </CardTitle>
-                <CardDescription>
-                  Expires: {formatDateTime(waiver.expiresAt)}
-                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Status:</span>
-                    <span
-                      className={`text-sm font-medium ${
-                        new Date(waiver.expiresAt) > new Date()
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {new Date(waiver.expiresAt) > new Date()
-                        ? "Active"
-                        : "Expired"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Created by:</span>
-                    <span className="text-sm font-medium">
-                      {waiver.createdBy.email}
-                    </span>
-                  </div>
-                </div>
+              <CardContent className="text-center">
+                <p className="text-sm text-gray-400">
+                  Click the "Create Waiver Code" button above to add your first
+                  waiver
+                </p>
               </CardContent>
-              <CardFooter>
-                <button
-                  onClick={() => deleteWaiver(waiver.id)}
-                  className="w-full text-sm text-red-600 hover:text-red-700 hover:bg-red-50 py-2 px-4 rounded-md transition-colors"
-                >
-                  Delete Waiver
-                </button>
-              </CardFooter>
             </Card>
-          ))}
+          ) : (
+            waivers.map((waiver) => (
+              <Card
+                key={waiver.id}
+                className="hover:shadow-md transition-shadow"
+              >
+                <CardHeader>
+                  <CardTitle className="text-lg font-mono">
+                    {waiver.code}
+                  </CardTitle>
+                  <CardDescription>
+                    Expires: {formatDateTime(waiver.expiresAt)}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Status:</span>
+                      <span
+                        className={`text-sm font-medium ${
+                          new Date(waiver.expiresAt) > new Date()
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {new Date(waiver.expiresAt) > new Date()
+                          ? "Active"
+                          : "Expired"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Created by:</span>
+                      <span className="text-sm font-medium">
+                        {waiver.createdBy.email}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <button
+                    onClick={() => deleteWaiver(waiver.id)}
+                    className="w-full text-sm text-red-600 hover:text-red-700 hover:bg-red-50 py-2 px-4 rounded-md transition-colors"
+                  >
+                    Delete Waiver
+                  </button>
+                </CardFooter>
+              </Card>
+            ))
+          )}
         </div>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">

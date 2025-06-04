@@ -165,18 +165,7 @@ function Profile() {
                   setAdmin({ ...admin, membershipId: e.target.value })
                 }
               />
-              <InputEle
-                id="role"
-                label="Role"
-                type="text"
-                placeholder="Role"
-                value={admin?.role?.name}
-                disabled
-                onChange={(e) => {
-                  const updatedRole = { ...admin.role, name: e.target.value };
-                  setAdmin({ ...admin, role: updatedRole });
-                }}
-              />
+            
             </div>
             <div className="flex w-full justify-center items-center flex-row gap-4">
               <button

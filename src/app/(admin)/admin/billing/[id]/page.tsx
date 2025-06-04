@@ -404,7 +404,13 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Created by:</span>
                       <span className="text-sm font-medium">
-                        {waiver.createdBy.email}
+                        {waiver?.createdBy?.email}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Used by:</span>
+                      <span className="text-sm font-medium">
+                        {waiver?.usedBy?.length || 0} users
                       </span>
                     </div>
                   </div>

@@ -9,7 +9,7 @@ import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/user/actions/CellActions";
 
 const capitalizeWords = (str: string): string => {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  return str.replace(/[_-]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 export const allcolumns: ColumnDef<User>[] = [

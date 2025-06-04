@@ -557,10 +557,12 @@ type WaiverCode = {
   usedById: string | null;
   expiresAt: string;
   createdAt: string;
-  usedBy: {
-    id: string;
-    email: string;
-  } | null;
+  usedBy:
+    | {
+        id: string;
+        email: string;
+      }[]
+    | null;
   billing: {
     id: string;
     name: string;

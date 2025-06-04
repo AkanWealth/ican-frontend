@@ -270,7 +270,7 @@ function AdvertEdit({ mode, id }: CreateContentProps) {
               Upload Image <span className="text-red-600">*</span>
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/gif"
+                accept="image/jpeg,image/png,image/jpg"
                 onChange={handleImageUpload}
                 className="hidden"
                 disabled={isUploading}

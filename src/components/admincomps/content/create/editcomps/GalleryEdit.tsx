@@ -195,7 +195,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           <input
             type="file"
             multiple
-            accept="image/*"
+            accept="image/jpeg,image/png,image/jpg"
             onChange={(e) => handleImageUpload(e.target.files)}
             className="block w-full text-sm text-gray-500
               file:mr-4 file:py-2 file:px-4

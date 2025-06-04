@@ -265,7 +265,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
             </div>
           )}
 
-          {/* Image Preview */}
+          {/* Resource Preview */}
           {resource.fileUrl && !isUploading && (
             <div className="mt-2">
               <p className="text-sm font-medium mb-2">PDF Preview</p>

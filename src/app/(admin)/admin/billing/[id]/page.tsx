@@ -22,7 +22,6 @@ import {
 
 import CreateWaiver from "@/components/admincomps/billing/actions/CreateWaiver";
 
-import { TrendingUp } from "lucide-react";
 import { Pie, PieChart } from "recharts";
 import {
   Card,

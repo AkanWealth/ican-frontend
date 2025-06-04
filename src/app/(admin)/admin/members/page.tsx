@@ -30,11 +30,7 @@ function MembersPage() {
         const result = await apiClient.request(config);
 
         setData(result.data);
-        toast({
-          title: "Members data fetched successfully!",
-          description: "Members data fetched successfully!",
-          variant: "default",
-        });
+   
       } catch (error) {
         toast({
           title: "Error fetching members data!",

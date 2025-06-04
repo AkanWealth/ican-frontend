@@ -72,7 +72,6 @@ function EventActivities() {
         }));
         setEventRegistrationTrendData(formattedData);
 
-        console.log(response);
       } catch (error) {
         toast({
           title: "Error",

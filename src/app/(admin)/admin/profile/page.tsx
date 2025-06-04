@@ -90,11 +90,7 @@ function Profile() {
     try {
       const result = await apiClient.request(config);
       console.log(result);
-      toast({
-        title: "Admin details saved successfully",
-        description: "Admin details saved successfully",
-        variant: "default",
-      });
+  
     } catch (error) {
       console.error("Error saving admin details:", error);
       toast({
@@ -110,7 +106,7 @@ function Profile() {
       <div className="flex flex-col mb-6 w-full items-start justify-between">
         <div className="flex flex-col gap-3"></div>
         <h2 className="font-semibold text-2xl text-black">Profile</h2>
-        <p>Update and Manage your Profile here</p>
+        <p> Manage your Profile here</p>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
         <h2 className="text-xl font-semibold text-left">Admin Profile</h2>

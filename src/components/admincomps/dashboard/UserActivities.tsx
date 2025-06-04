@@ -87,11 +87,7 @@ function UserActivities() {
           config
         );
         setData(response);
-        toast({
-          title: "User Activities",
-          description: "User activities data fetched successfully.",
-          variant: "default",
-        });
+
       } catch (error) {
         console.error(error);
 
@@ -130,11 +126,7 @@ function UserActivities() {
         }));
         setUserActivityTrendData(formattedData);
 
-        toast({
-          title: "User Activities",
-          description: "User activities data fetched successfully.",
-          variant: "default",
-        });
+
       } catch (error) {
         console.error(error);
 
@@ -165,11 +157,7 @@ function UserActivities() {
 
         const response = await apiClient.get("/dashboard/login-stats", config);
         setLoginStats(response.data);
-        toast({
-          title: "User Login Stats",
-          description: "User login stats fetched successfully.",
-          variant: "default",
-        });
+
       } catch (error) {
         console.error(error);
 
@@ -241,11 +229,7 @@ function UserActivities() {
         const response = await apiClient.get("/dashboard/chart-stats", config);
         setLoginChartData(response);
         processLoginChartData(response);
-        toast({
-          title: "Success",
-          description: "Chart data fetched successfully",
-          variant: "default",
-        });
+  
       } catch (error) {
         console.error(error);
         toast({

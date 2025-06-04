@@ -26,11 +26,7 @@ function Resources() {
       try {
         const response = await apiClient.get("/resources/contents", config);
         setData(response.data);
-        toast({
-          title: "Content fetched successfully",
-          description: "Content fetched successfully",
-          variant: "default",
-        });
+    
       } catch (error) {
         toast({
           title: "Error",

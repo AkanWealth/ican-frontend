@@ -37,11 +37,7 @@ function AdminManagementPage() {
           (user: User) => user.role.name !== "MEMBER"
         );
         setData(filteredData);
-        toast({
-          title: "Success",
-          description: "Admins fetched successfully.",
-          variant: "default",
-        });
+  
       } catch (error) {
         toast({
           title: "Error",

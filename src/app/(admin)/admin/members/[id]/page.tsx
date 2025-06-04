@@ -149,11 +149,7 @@ function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
         setData(result);
         // Initialize form data with fetched data
         setFormData(result);
-        toast({
-          title: "Member details fetched successfully!",
-          description: "Member details fetched successfully!",
-          variant: "default",
-        });
+  
       } catch (error) {
         console.error("Error fetching member details:", error);
         toast({

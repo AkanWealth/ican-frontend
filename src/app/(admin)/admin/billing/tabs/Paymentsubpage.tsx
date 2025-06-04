@@ -28,11 +28,7 @@ export default function Paymentsubpage() {
       try {
         const response = await apiClient.request(config);
         setData(response);
-        toast({
-          title: "Payments fetched successfully",
-          description: "Payments fetched successfully",
-          variant: "default",
-        });
+ 
       } catch (error) {
         console.error("Error fetching payments:", error);
         toast({

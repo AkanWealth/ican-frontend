@@ -28,11 +28,7 @@ export default function Donationsubpage() {
       try {
         const response = await apiClient.request(config);
         setData(response.filter((payment: { paymentType: string }) => payment.paymentType === "Donation"));
-        toast({
-          title: "Donations fetched successfully",
-          description: "Donation records have been updated",
-          variant: "default",
-        });
+
       } catch (error) {
         console.error("Error fetching payments:", error);
         toast({

@@ -71,7 +71,7 @@ function EventAttendancePage({ params }: { params: Promise<{ id: string }> }) {
     const config = {
       method: "patch",
       maxBodyLength: Infinity,
-      url: `${BASE_API_URL}/events/${eventId}/registrations`,
+      url: `${BASE_API_URL}/events/registrations/${eventId}/attendance/bulk`,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

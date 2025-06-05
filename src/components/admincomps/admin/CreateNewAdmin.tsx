@@ -53,6 +53,10 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
   const [roles, setRoles] = useState<RolesData[]>([]);
   // State to store users
   const [users, setUsers] = useState<User[]>([]);
+  // Add this state for search functionality
+  const [searchQuery, setSearchQuery] = useState("");
+  // Add this state for dropdown visibility
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Handle form input changes
   const handleChange = (
@@ -145,6 +149,14 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
     fetchUsers();
   }, [toast]); // Empty dependency array means this runs once on mount
 
+  // Add this function to filter users based on search
+  const filteredUsers = Array.isArray(users)
+    ? users.filter((user) => {
+        const fullName = `${user.firstname} ${user.surname}`.toLowerCase();
+        return fullName.includes(searchQuery.toLowerCase());
+      })
+    : [];
+
   const selectedUser = Array.isArray(users)
     ? users.find((user) => user.id === formData.userId)
     : null;
@@ -195,7 +207,7 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
         }
       }}
     >
-      <div className="bg-white p-8 rounded-lg w-[800px] max-w-[90%] max-h-[90vh] overflow-y-auto">
+      <div className="bg-white p-8 rounded-lg w-[800px] max-w-[90%] h-fit  ">
         <h2 className="text-2xl font-semibold mb-6">
           Create New Administrator
         </h2>
@@ -213,26 +225,56 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
             </p>
           )}
 
-          <InputEle
-            label="User"
-            type="select"
-            id="userId"
-            value={formData.userId}
-            options={
-              Array.isArray(users)
-                ? [
-                    { value: "", label: "Select User" },
-                    ...users.map((user) => ({
-                      value: user.id,
-                      label: `${user.firstname} ${user.surname}`,
-                    })),
-                  ]
-                : [{ value: "", label: "Select User" }]
-            }
-            onChange={(e) =>
-              setFormData({ ...formData, userId: e.target.value })
-            }
-          />
+          <div className="w-full h-fit flex flex-col gap-3">
+            <label
+              className="text-base font-sans font-semibold"
+              htmlFor="userId"
+            >
+              User <span className="text-red-600">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsDropdownOpen(true);
+                }}
+                onFocus={() => setIsDropdownOpen(true)}
+                className="p-3 rounded border border-gray-400 w-full"
+              />
+              {isDropdownOpen && searchQuery && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <div
+                        key={user.id}
+                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          setFormData({ ...formData, userId: user.id });
+                          setSearchQuery(`${user.firstname} ${user.surname}`);
+                          setIsDropdownOpen(false);
+                        }}
+                      >
+                        {user.firstname} {user.surname}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-2 text-gray-500">No users found</div>
+                  )}
+                </div>
+              )}
+            </div>
+            {formData.userId && (
+              <input
+                type="hidden"
+                name="userId"
+                value={formData.userId}
+                required={true}
+              />
+            )}
+          </div>
           <InputEle
             label="Role Type"
             type="select"

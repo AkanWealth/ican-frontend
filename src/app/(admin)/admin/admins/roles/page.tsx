@@ -8,7 +8,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-
 import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
 import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
@@ -132,7 +131,6 @@ function RolesPage() {
           </AccordionItem>
         ))}
       </Accordion>
-
 
       {showEditModal && (
         <EditRole

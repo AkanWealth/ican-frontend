@@ -43,6 +43,8 @@ export function PaymentTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const [globalFilter, setGlobalFilter] = React.useState("");
+
   const table = useReactTable({
     data,
     columns,
@@ -55,23 +57,18 @@ export function PaymentTable<TData, TValue>({
     state: {
       sorting,
       columnFilters,
+      globalFilter,
     },
+    onGlobalFilterChange: setGlobalFilter,
   });
 
   return (
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Search by Name..."
-          value={
-            (table.getColumn("user.firstname")?.getFilterValue() as string) ??
-            ""
-          }
-          onChange={(event) =>
-            table
-              .getColumn("user.firstname")
-              ?.setFilterValue(event.target.value)
-          }
+          placeholder="Search across all fields..."
+          value={globalFilter ?? ""}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
       </div>

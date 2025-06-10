@@ -1,19 +1,21 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Trash2 } from "lucide-react";
 import {
   OverdueBills,
   PaymentDetails,
-  PaymentBasic,
   BillingUsersDetails,
-  BillingDetails,
+  WaiverCode,
   BillingPaymentTable,
 } from "@/libs/types";
 
 import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
-import CellActions from "@/components/admincomps/payment/actions/CellActions";
+
+import { useState } from "react";
+
+import DeleteWaiver from "@/components/admincomps/payment/actions/DeleteWaiver";
 
 export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
   {
@@ -32,7 +34,7 @@ export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
     cell: ({ row }) => {
       return (
         <div>
-          {row.original.user.firstname} {row.original.user.middlename} 
+          {row.original.user.firstname} {row.original.user.middlename}
           {row.original.user.surname}
         </div>
       );
@@ -323,3 +325,119 @@ export const billingusersdetailscoloumns: ColumnDef<BillingUsersDetails>[] = [
     },
   },
 ];
+export const waivercoloumns: ColumnDef<WaiverCode>[] = [
+  {
+    accessorKey: "code",
+    header: "Waiver Code",
+  },
+  {
+    accessorKey: "billing.name",
+    header: "Bill Name",
+  },
+  {
+    accessorKey: "billing.amount",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Amount
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "usedBy.id",
+    header: "Used By",
+    cell: ({ row }) => {
+      return <div>{row.original.usedBy?.length || 0} uses</div>;
+    },
+  },
+
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Created At
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {new Date(row.original.createdAt).toLocaleString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "expiresAt",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Expires At
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div>
+          {new Date(row.original.expiresAt).toLocaleString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })}
+        </div>
+      );
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <WaiverActionsCell row={row} />,
+  },
+];
+
+const WaiverActionsCell = ({ row }: { row: any }) => {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  return (
+    <>
+      <Button variant="ghost" onClick={() => setShowDeleteDialog(true)}>
+        <Trash2 className="h-4 w-4" />
+      </Button>
+
+      {showDeleteDialog && (
+        <DeleteWaiver
+          id={row.original.id}
+          code={row.original.code}
+          billName={row.original.billing.name}
+          amount={row.original.billing.amount}
+          createdAt={row.original.createdAt}
+          onClose={() => setShowDeleteDialog(false)}
+        />
+      )}
+    </>
+  );
+};

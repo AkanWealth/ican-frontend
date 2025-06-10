@@ -36,6 +36,7 @@ const topMenuItems = [
     href: "/admin/content",
   },
   { icon: IoMdCalendar, label: "Event Management", href: "/admin/events" },
+  { icon: MdOutlineAnalytics, label: "Payment Management", href: "/admin/payment" },      
 
   { icon: MdOutlineAnalytics, label: "Billings", href: "/admin/billing" },
 ];

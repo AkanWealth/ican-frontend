@@ -343,10 +343,13 @@ export const waivercoloumns: ColumnDef<WaiverCode>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Amount
+          Amount Waived
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      return <div>₦{row.original.billing.amount.toLocaleString("en-NG")}</div>;
     },
   },
   {
@@ -411,6 +414,16 @@ export const waivercoloumns: ColumnDef<WaiverCode>[] = [
           })}
         </div>
       );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const currentTime = new Date();
+      const expirationTime = new Date(row.original.expiresAt);
+      const status = currentTime > expirationTime ? "expired" : "active";
+      return <Statbtn status={status} />;
     },
   },
   {

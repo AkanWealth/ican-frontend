@@ -150,104 +150,112 @@ function Biodata() {
   }, []);
 
   // Wrap validateCurrentStep in useCallback
-  const validateCurrentStep = useCallback(() => {
-    switch (activeStep) {
-      case 0: // Personal data
-        const personalData = formData.personalData;
-        const isPersonalValid =
-          !!personalData.surname?.trim() &&
-          !!personalData.firstName?.trim() &&
-          !!personalData.gender?.trim() &&
-          !!personalData.dob &&
-          !!personalData.maritalStatus?.trim() &&
-          !!personalData.state?.trim() &&
-          !!personalData.nationality?.trim();
 
-        setIsCurrentStepValid(isPersonalValid);
-        if (!isPersonalValid) {
+const validateCurrentStep = useCallback(() => {
+  switch (activeStep) {
+    case 0: // Personal data
+      const personalData = formData.personalData;
+      const isPersonalValid =
+        !!personalData.surname?.trim() &&
+        !!personalData.firstName?.trim() &&
+        !!personalData.gender?.trim() &&
+        !!personalData.dob &&
+        !!personalData.maritalStatus?.trim() &&
+        !!personalData.state?.trim() &&
+        !!personalData.nationality?.trim() &&
+        !!formData.profilePicture?.trim(); 
+
+      setIsCurrentStepValid(isPersonalValid);
+      if (!isPersonalValid) {
+        if (!formData.profilePicture?.trim()) {
+          setValidationMessage("Please upload your profile picture");
+        } else {
           setValidationMessage("Please fill all required personal details");
-        } else {
-          setValidationMessage("");
         }
-        break;
+      } else {
+        setValidationMessage("");
+      }
+      break;
 
-      case 1: // Contact details
-        const contactDetails = formData.contactDetails;
-        const isContactValid =
-          !!contactDetails.mobileNumber?.trim() &&
-          !!contactDetails.residentialAddress?.trim() &&
-          !!contactDetails.residentialCountry?.trim() &&
-          !!contactDetails.residentialCity?.trim();
+    case 1: // Contact details
+      const contactDetails = formData.contactDetails;
+      const isContactValid =
+        !!contactDetails.mobileNumber?.trim() &&
+        !!contactDetails.residentialAddress?.trim() &&
+        !!contactDetails.residentialCountry?.trim() &&
+        !!contactDetails.residentialCity?.trim() &&
+        !!contactDetails.residentialState?.trim() &&
+        !!contactDetails.residentialLga?.trim(); 
 
-        setIsCurrentStepValid(isContactValid);
-        if (!isContactValid) {
-          setValidationMessage("Please fill all required contact details");
-        } else {
-          setValidationMessage("");
-        }
-        break;
+      setIsCurrentStepValid(isContactValid);
+      if (!isContactValid) {
+        setValidationMessage("Please fill all required contact details including residential state and LGA");
+      } else {
+        setValidationMessage("");
+      }
+      break;
 
-      case 2: // Qualifications
-        const education = formData.education;
-        const isEducationValid =
-          !!education?.insitution?.trim() &&
-          !!education?.discipline?.trim() &&
-          !!education?.qualification?.trim() &&
-          !!education?.graduation?.trim() &&
-          !!education?.status?.trim();
+    case 2: // Qualifications
+      const education = formData.education;
+      const isEducationValid =
+        !!education?.insitution?.trim() &&
+        !!education?.discipline?.trim() &&
+        !!education?.qualification?.trim() &&
+        !!education?.graduation?.trim() &&
+        !!education?.status?.trim();
 
-        setIsCurrentStepValid(isEducationValid);
-        if (!isEducationValid) {
-          setValidationMessage("Please fill all required qualification details");
-        } else {
-          setValidationMessage("");
-        }
-        break;
+      setIsCurrentStepValid(isEducationValid);
+      if (!isEducationValid) {
+        setValidationMessage("Please fill all required qualification details");
+      } else {
+        setValidationMessage("");
+      }
+      break;
 
-      case 3: // Experience
-        // Check if the user has indicated no work experience
-        const hasNoWorkExperience = formData.experience?.hasNoExperience === true;
+    case 3: // Experience
+      // Check if the user has indicated no work experience
+      const hasNoWorkExperience = formData.experience?.hasNoExperience === true;
 
-        if (hasNoWorkExperience) {
-          // If user has no work experience, consider this step valid
-          setIsCurrentStepValid(true);
-          setValidationMessage("");
-        } else {
-          // Otherwise validate normal experience fields
-          const experience = formData.experience;
-          const isExperienceValid =
-            !!experience?.companyName?.trim() &&
-            !!experience?.currentPosition?.trim() &&
-            !!experience?.startDate?.trim();
-
-          // Check if end date is required (not current job) and provided
-          const isCurrentJob = experience?.isCurrentJob === true;
-          const isEndDateValid = isCurrentJob || !!experience?.endDate?.trim();
-
-          setIsCurrentStepValid(isExperienceValid && isEndDateValid);
-          if (!isExperienceValid || !isEndDateValid) {
-            setValidationMessage("Please fill all required experience details");
-          } else {
-            setValidationMessage("");
-          }
-        }
-        break;
-
-      case 4: // Payment
-        // For the payment step, validity is determined by isPaymentSuccessful
-        setIsCurrentStepValid(formData.isPaymentSuccessful || false);
-        if (!formData.isPaymentSuccessful) {
-          setValidationMessage("Payment is required to complete registration");
-        } else {
-          setValidationMessage("");
-        }
-        break;
-
-      default:
+      if (hasNoWorkExperience) {
+        // If user has no work experience, consider this step valid
         setIsCurrentStepValid(true);
         setValidationMessage("");
-    }
-  }, [activeStep, formData]); // Add isCurrentJob as a dependency
+      } else {
+        // Otherwise validate normal experience fields
+        const experience = formData.experience;
+        const isExperienceValid =
+          !!experience?.companyName?.trim() &&
+          !!experience?.currentPosition?.trim() &&
+          !!experience?.startDate?.trim();
+
+        // Check if end date is required (not current job) and provided
+        const isCurrentJob = experience?.isCurrentJob === true;
+        const isEndDateValid = isCurrentJob || !!experience?.endDate?.trim();
+
+        setIsCurrentStepValid(isExperienceValid && isEndDateValid);
+        if (!isExperienceValid || !isEndDateValid) {
+          setValidationMessage("Please fill all required experience details");
+        } else {
+          setValidationMessage("");
+        }
+      }
+      break;
+
+    case 4: // Payment
+      // For the payment step, validity is determined by isPaymentSuccessful
+      setIsCurrentStepValid(formData.isPaymentSuccessful || false);
+      if (!formData.isPaymentSuccessful) {
+        setValidationMessage("Payment is required to complete registration");
+      } else {
+        setValidationMessage("");
+      }
+      break;
+
+    default:
+      setIsCurrentStepValid(true);
+      setValidationMessage("");
+  }
+}, [activeStep, formData]);
 
   // Run validation when activeStep changes or when formData changes
   useEffect(() => {

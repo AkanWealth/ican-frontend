@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { waivercoloumns } from "@/components/admincomps/payment/datatable/columns";
+import CreateWaiver from "@/components/admincomps/billing/actions/CreateWaiver";
 
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +14,7 @@ import apiClient from "@/services-admin/apiClient";
 export default function Waiversubpage() {
   const [data, setData] = useState([]);
   const { toast } = useToast();
+  const [isWaiver, setisWaiver] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -44,11 +46,15 @@ export default function Waiversubpage() {
     <div className="rounded-3xl p-6">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
         <div className="flex flex-col gap-3">
-          <h2 className="font-semibol text-2xl text-black">
-            Waiver Code Management
-          </h2>
-          <p>View all waiver codes and their status here</p>
+          
         </div>
+        <button
+          onClick={() => setisWaiver(!isWaiver)}
+          className="flex flex-row items-center gap-2 text-white bg-primary px-4 py-2 rounded-md"
+        >
+          {" "}
+          Create Waiver Code
+        </button>{" "}
       </div>
 
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
@@ -57,6 +63,15 @@ export default function Waiversubpage() {
           <PaymentTable columns={waivercoloumns} data={data} />
         </div>
       </div>
+      {isWaiver && (
+        <CreateWaiver
+          isOpen={isWaiver}
+          onClose={() => setisWaiver(false)}
+          billingId={""}
+          createdById={""}
+          mode="table"
+        />
+      )}
     </div>
   );
 }

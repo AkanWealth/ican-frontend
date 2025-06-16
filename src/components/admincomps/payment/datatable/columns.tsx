@@ -1,10 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Trash2 } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import {
   OverdueBills,
-  PaymentDetails,
+  PaymentDetailsTable,
   BillingUsersDetails,
   WaiverCode,
   BillingPaymentTable,
@@ -12,12 +12,21 @@ import {
 
 import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { useState } from "react";
 
 import DeleteWaiver from "@/components/admincomps/payment/actions/DeleteWaiver";
+import ViewWaiver from "../actions/ViewWaiver";
+import ViewReceipt from "../actions/ViewReceipt";
 
-export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
+export const paymentcoloumns: ColumnDef<PaymentDetailsTable>[] = [
   {
     accessorKey: "userId",
     header: ({ column }) => {
@@ -87,6 +96,10 @@ export const paymentcoloumns: ColumnDef<PaymentDetails>[] = [
     cell: ({ row }) => {
       return <Statbtn status={row.original.status} />;
     },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <PaymentActionsCell row={row} />,
   },
   // {
   //   id: "actions",
@@ -179,7 +192,7 @@ export const dashPaymentcoloumns: ColumnDef<OverdueBills>[] = [
   },
 ];
 
-export const paymentdetailscoloumns: ColumnDef<PaymentDetails>[] = [
+export const paymentdetailscoloumns: ColumnDef<PaymentDetailsTable>[] = [
   {
     accessorKey: "user.firstname",
     header: ({ column }) => {
@@ -349,14 +362,25 @@ export const waivercoloumns: ColumnDef<WaiverCode>[] = [
       );
     },
     cell: ({ row }) => {
-      return <div>₦{row.original.billing.amount.toLocaleString("en-NG")}</div>;
+      return <div>₦{row.original?.billing?.amount.toLocaleString("en-NG")}</div>;
     },
   },
   {
-    accessorKey: "usedBy.id",
+    accessorKey: "currentUsages",
     header: "Used By",
     cell: ({ row }) => {
-      return <div>{row.original.usedBy?.length || 0} uses</div>;
+      return <div>{row.original.usedBy?.length || 0} users</div>;
+    },
+  },
+  {
+    accessorKey: "maxUsages",
+    header: "Max Usages",
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.original.maxUsages ? row.original.maxUsages : "Unlimited"}
+        </div>
+      );
     },
   },
 
@@ -434,12 +458,38 @@ export const waivercoloumns: ColumnDef<WaiverCode>[] = [
 
 const WaiverActionsCell = ({ row }: { row: any }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
 
   return (
     <>
-      <Button variant="ghost" onClick={() => setShowDeleteDialog(true)}>
-        <Trash2 className="h-4 w-4" />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setShowViewModal(true)}>
+            View Details
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="bg-red-600 text-white"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {showViewModal && (
+        <ViewWaiver
+          key={row.original.id}
+          waiver={row.original}
+          onClose={() => setShowViewModal(false)}
+        />
+      )}
 
       {showDeleteDialog && (
         <DeleteWaiver
@@ -449,6 +499,38 @@ const WaiverActionsCell = ({ row }: { row: any }) => {
           amount={row.original.billing.amount}
           createdAt={row.original.createdAt}
           onClose={() => setShowDeleteDialog(false)}
+        />
+      )}
+    </>
+  );
+};
+
+const PaymentActionsCell = ({ row }: { row: any }) => {
+  const [showViewModal, setShowViewModal] = useState(false);
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setShowViewModal(true)}>
+            View Receipt
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {showViewModal && (
+        <ViewReceipt
+        key={row.original.id}
+          open={showViewModal}
+          onPrint={() => {}}  
+          payment={row.original}
+          onClose={() => setShowViewModal(false)}
         />
       )}
     </>

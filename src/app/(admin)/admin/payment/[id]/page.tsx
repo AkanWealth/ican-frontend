@@ -7,14 +7,14 @@ import { MdArrowBack } from "react-icons/md";
 import apiClient from "@/services-admin/apiClient";
 
 import { BASE_API_URL } from "@/utils/setter";
-import { PaymentDetails } from "@/libs/types";
+import { PaymentDetailsTable } from "@/libs/types";
 
 import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
 import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
 function PaymentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const [data, setData] = useState<PaymentDetails>();
+  const [data, setData] = useState<PaymentDetailsTable>();
 
   useEffect(() => {
     async function fetchData() {

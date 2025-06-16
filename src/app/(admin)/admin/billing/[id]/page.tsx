@@ -441,6 +441,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           onClose={() => setisWaiver(false)}
           billingId={data?.id || ""}
           createdById={data?.createdById || ""}
+          mode="billing"
         />
       )}
     </div>

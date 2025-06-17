@@ -3,16 +3,21 @@
 import React, { useState, useEffect } from "react";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
+import ExportPayments from "@/components/admincomps/payment/export/ExportPayments";
 
 import { useToast } from "@/hooks/use-toast";
 
 import { BASE_API_URL } from "@/utils/setter";
 
 import apiClient from "@/services-admin/apiClient";
-import { FiCreditCard, FiUsers } from "react-icons/fi";
+import { FiCreditCard, FiDownload, FiUsers } from "react-icons/fi";
 import { FiBarChart2 } from "react-icons/fi";
 import { FiCalendar } from "react-icons/fi";
 import { PaymentDetailsTable } from "@/libs/types";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
 
 // --- Improved summary card component ---
 function SummaryCard({
@@ -43,13 +48,15 @@ function SummaryCard({
 }
 
 export default function Paymentsubpage() {
+  const router = useRouter();
   const [data, setData] = useState<PaymentDetailsTable[]>([]);
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState<"ALL" | "PAID" | "NOT_PAID">(
     "ALL"
   );
   const [filteredData, setFilteredData] = useState<PaymentDetailsTable[]>([]);
-
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     async function fetchData() {
       const config = {
@@ -93,6 +100,52 @@ export default function Paymentsubpage() {
     setFilteredData(filtered);
   }, [data, selectedTab]);
 
+  const handleSendNotification = async () => {
+    if (selectedRows.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one Member",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsLoading(true);
+    const config = {
+      method: "patch",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/billing/send-unpaid-bill-reminders`,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      data: {
+        userIds: selectedRows,
+      },
+    };
+
+    try {
+      const result = await apiClient.request(config);
+
+      router.refresh();
+      toast({
+        title: "Success",
+        description: "Notification sent successfully",
+        variant: "default",
+      });
+      setSelectedRows([]);
+      setIsLoading(false);
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send Notification",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
+  };
+
   // Sum all amounts where paymentStatus is "PAID"
   const totalAmountPaid = data
     .filter((d) => d.status === "SUCCESS")
@@ -112,7 +165,7 @@ export default function Paymentsubpage() {
   ).length;
 
   return (
-    <div className="rounded-3xl p-6">
+    <div className="rounded-3xl ">
       {/* Tab Switcher */}
 
       <div className="flex gap-4 mb-6">
@@ -152,30 +205,50 @@ export default function Paymentsubpage() {
         />
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <div className="flex w-fit space-x-4 border-b border-gray-200 mb-4">
-          {["ALL", "PAID", "NOT_PAID"].map((tab) => (
-            <button
-              key={tab}
-              className={`px-4 py-2 font-medium rounded-t-lg ${
-                selectedTab === tab
-                  ? "text-blue-700 border-b-2 border-blue-700 bg-blue-50"
-                  : "text-gray-500"
-              }`}
-              onClick={() => setSelectedTab(tab as "ALL" | "PAID" | "NOT_PAID")}
+        <div className="flex flex-row justify-between">
+          <div className="flex w-fit space-x-4 border-b border-gray-200 mb-4">
+            {["ALL", "PAID", "NOT_PAID"].map((tab) => (
+              <button
+                key={tab}
+                className={`px-4 py-2 font-medium rounded-t-lg ${
+                  selectedTab === tab
+                    ? "text-blue-700 border-b-2 border-blue-700 bg-blue-50"
+                    : "text-gray-500"
+                }`}
+                onClick={() =>
+                  setSelectedTab(tab as "ALL" | "PAID" | "NOT_PAID")
+                }
+              >
+                {tab === "ALL" ? "All" : tab === "PAID" ? "Paid" : "Unpaid"}
+              </button>
+            ))}
+          </div>{" "}
+          <div className="flex gap-2">
+            <Button
+              variant="default"
+              className="gap-2"
+              onClick={handleSendNotification}
+              disabled={isLoading}
             >
-              {tab === "ALL" ? "All" : tab === "PAID" ? "Paid" : "Unpaid"}
-            </button>
-          ))}
-        </div>{" "}
-        <h2 className="text-xl font-semibold text-left">
-          {selectedTab === "ALL"
-            ? "All Payments"
-            : selectedTab === "PAID"
-            ? "Paid Payments"
-            : "Unpaid Payments"}
-        </h2>
+              <span>Send Notification</span>
+              {isLoading && <Loader2 className="animate-spin" />}
+              {selectedRows.length > 0 && (
+                <Badge variant="secondary">
+                  {selectedRows.length} selected
+                </Badge>
+              )}
+            </Button>
+            <ExportPayments data={filteredData} />
+          </div>
+        </div>
+
+
         <div>
-          <PaymentTable columns={paymentcoloumns} data={filteredData} />
+          <PaymentTable
+            columns={paymentcoloumns}
+            data={filteredData}
+            setter={setSelectedRows}
+          />
         </div>
       </div>
     </div>

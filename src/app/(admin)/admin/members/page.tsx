@@ -5,6 +5,8 @@ import React, { useState, useEffect } from "react";
 import apiClient from "@/services-admin/apiClient";
 import { useToast } from "@/hooks/use-toast";
 
+import ExportMembers from "@/components/admincomps/user/export/ExportMembers";
+
 import { UserTable } from "@/components/admincomps/user/datatable/UserTable";
 import { memberscolumns } from "@/components/admincomps/user/datatable/columns";
 import { User } from "@/libs/types";
@@ -30,7 +32,6 @@ function MembersPage() {
         const result = await apiClient.request(config);
 
         setData(result.data);
-   
       } catch (error) {
         toast({
           title: "Error fetching members data!",
@@ -51,6 +52,7 @@ function MembersPage() {
           </h2>
           <p>Manage user details here</p>
         </div>
+        <ExportMembers members={data} />
       </div>
 
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">

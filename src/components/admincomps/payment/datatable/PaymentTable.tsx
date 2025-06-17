@@ -33,17 +33,20 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  setter?: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export function PaymentTable<TData, TValue>({
   columns,
   data,
+  setter,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -54,13 +57,20 @@ export function PaymentTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       globalFilter,
+      rowSelection,
     },
     onGlobalFilterChange: setGlobalFilter,
   });
+  function onAccept(selectedRows: TData[]) {
+    if (setter) {
+      setter(selectedRows.map((row) => String((row as any).id))); // Extract and convert the 'id' field to string
+    }
+  }
 
   return (
     <div>
@@ -131,6 +141,28 @@ export function PaymentTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+      </div>{" "}
+      <div className="flex-1 text-sm text-muted-foreground">
+        <p>
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} member(s) selected.
+        </p>
+        {setter && (
+          <div className="flex justify-end py-4">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => {
+                const selectedRows = table
+                  .getSelectedRowModel()
+                  .rows.map((row) => row.original);
+                onAccept(selectedRows);
+              }}
+            >
+              Accept
+            </Button>
+          </div>
+        )}
       </div>
       <div className="flex flex-row items-center justify-center">
         <div className="flex items-center justify-end space-x-2 py-4">

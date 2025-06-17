@@ -197,8 +197,6 @@ type NotificationTopic = "GENERAL" | "PAYMENT" | "EVENT";
 type ResourceType = "PODCAST" | "DOCUMENT" | "VIDEO";
 type ResourceAccess = "PUBLIC" | "RESTRICTED" | "MEMBERS_ONLY";
 
-
-
 type OverdueBills = {
   user: {
     firstname: string;
@@ -513,6 +511,18 @@ type WaiverCode = {
   createdBy: User;
 };
 
+type UserOwing = {
+  id: string;
+  billingId: string;
+  userId: string;
+  amountPaid: number;
+  paymentStatus: PaymentStatus;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
+  billing: Billing;
+};
+
 export type {
   Advert,
   Billing,
@@ -541,4 +551,5 @@ export type {
   UpdatedBillingStats,
   BillingPaymentTable,
   WaiverCode,
+  UserOwing,
 };

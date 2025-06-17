@@ -43,7 +43,7 @@ export default function Waiversubpage() {
   }, [toast]);
 
   return (
-    <div className="rounded-3xl p-6">
+    <div className="rounded-3xl ">
       <div className="flex flex-row mb-6 w-full items-center justify-between">
         <div className="flex flex-col gap-3">
           

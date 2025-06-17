@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
+import ExportPayments from "@/components/admincomps/payment/export/ExportPayments";
 
 import { useToast } from "@/hooks/use-toast";
 
@@ -63,7 +64,7 @@ export default function Donationsubpage() {
     .reduce((sum, d) => sum + (d.amount || 0), 0);
 
   return (
-    <div className="rounded-3xl p-6">
+    <div className="rounded-3xl ">
       {/* --- Donation Summary Cards --- */}
       <div className="flex gap-4 mb-6">
         <SummaryCard
@@ -104,9 +105,12 @@ export default function Donationsubpage() {
       {/* --- End Summary Cards --- */}
 
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl font-semibold text-left">
-          All Successful Donations
-        </h2>
+        <div className="flex flex-row justify-between">
+          <h2 className="text-xl font-semibold text-left">
+            All Successful Donations
+          </h2>{" "}
+          <ExportPayments data={data} />
+        </div>
         <div>
           <PaymentTable columns={paymentcoloumns} data={data} />
         </div>

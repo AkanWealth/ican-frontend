@@ -16,6 +16,7 @@ import { BASE_API_URL } from "@/utils/setter";
 import CreateNewAdmin from "@/components/admincomps/admin/CreateNewAdmin";
 
 import { useToast } from "@/hooks/use-toast";
+import ExportMembers from "@/components/admincomps/user/export/ExportMembers";
 
 function AdminManagementPage() {
   const router = useRouter();
@@ -37,7 +38,6 @@ function AdminManagementPage() {
           (user: User) => user.role.name !== "MEMBER"
         );
         setData(filteredData);
-  
       } catch (error) {
         toast({
           title: "Error",
@@ -47,7 +47,6 @@ function AdminManagementPage() {
       }
     }
     fetchData();
-    
   }, [router, toast]);
 
   return (
@@ -75,7 +74,10 @@ function AdminManagementPage() {
         </div>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl font-semibold text-left">Administrators</h2>
+        <div className="flex flex-row justify-between items-center">
+          <h2 className="text-xl font-semibold text-left">Administrators</h2>
+          <ExportMembers members={data} />
+        </div>
         <div>
           <UserTable columns={adminscolumns} data={data} />
         </div>

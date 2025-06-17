@@ -23,6 +23,8 @@ import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/Adm
 import { UserAttendanceTable } from "@/components/admincomps/event/attendance/UserAttendanceTable";
 import { registereduserscolumns } from "@/components/admincomps/event/attendance/columns";
 
+import ExportEventDetail from "@/components/admincomps/event/export/ExportEventDetail";
+
 function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { toast } = useToast();
   const cookies = new Cookies();
@@ -188,9 +190,10 @@ function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
             onClose={() => setShowFeedbackModal(false)}
             feedbacks={Array.isArray(feedbacks) ? feedbacks : []}
           />
-          <button className="w-fit whitespace-nowrap rounded px-3 text-black fill-black border-gray-400 border py-2 flex flex-row items-center gap-2 bg-white">
-            <MdDownload className="w-5 h-5" /> Export Event
-          </button>
+          <ExportEventDetail
+            events={[eventDetails]}
+            registeredUsers={registeredUsers}
+          />
         </div>
       </div>
       <div className="rounded-xl border bg-white w-full border-gray-200 p-4">

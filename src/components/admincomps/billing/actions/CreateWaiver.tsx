@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import apiClient from "@/services-admin/apiClient";
 import {
   Dialog,
@@ -9,12 +9,15 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { BASE_API_URL } from "@/utils/setter";
+import { Billing } from "@/libs/types";
 
 interface CreateWaiverProps {
   isOpen: boolean;
   onClose: () => void;
   billingId: string;
   createdById: string;
+  mode: "billing" | "table";
 }
 
 function CreateWaiver({
@@ -22,6 +25,7 @@ function CreateWaiver({
   onClose,
   billingId,
   createdById,
+  mode,
 }: CreateWaiverProps) {
   const [expiryDate, setExpiryDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +34,22 @@ function CreateWaiver({
   const [createdWaiver, setCreatedWaiver] = useState<any>(null);
   const { toast } = useToast();
 
-  const validateExpiryDate = (date: string) => {
+  const [billingData, setbillingData] = useState<Billing[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [selectedBilling, setSelectedBilling] = useState<any>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [usageType, setUsageType] = useState<"unlimited" | "limited">(
+    "unlimited"
+  );
+  const [maxUsages, setMaxUsages] = useState<number | "">("");
+
+  /**
+   * Validates that the expiry date is in the future.
+   * @param date - The expiry date string (YYYY-MM-DD).
+   * @returns An error message if invalid, otherwise null.
+   */
+  const validateExpiryDate = (date: string): string | null => {
     const selectedDate = new Date(date);
     const now = new Date();
 
@@ -40,12 +59,50 @@ function CreateWaiver({
     return null;
   };
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Fetch billing data
+        const response = await apiClient.get(`${BASE_API_URL}/billing`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        });
+        // Filter results by searchTerm (case-insensitive)
+        const filtered = response.filter((item: any) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setSearchResults(filtered);
+        setbillingData(response.data);
+      } catch (error) {
+        console.log(error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
+      }
+    }
+    fetchData();
+  }, [mode, searchTerm]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationError = validateExpiryDate(expiryDate);
 
+    if (mode === "table" && !selectedBilling) {
+      setError("Please select a billing record.");
+      return;
+    }
+
     if (validationError) {
       setError(validationError);
+      return;
+    }
+
+    if (usageType === "limited" && (!maxUsages || Number(maxUsages) < 1)) {
+      setError("Please enter a valid number for max usages.");
       return;
     }
 
@@ -53,19 +110,23 @@ function CreateWaiver({
     setError(null);
 
     try {
-      const response = await apiClient.post("/payments/waiver", {
-        billingId,
-        createdById,
+      const payload: any = {
+        billingId: mode === "billing" ? billingId : selectedBilling.id,
+        createdById:
+          mode === "billing" ? createdById : selectedBilling.createdById,
         expiresAt: expiryDate,
-      });
-
+      };
+      if (usageType === "limited") {
+        payload.maxUsages = Number(maxUsages);
+      }
+      const response = await apiClient.post("/payments/waiver", payload);
       setCreatedWaiver(response);
       setShowSuccessPopup(true);
-      setTimeout(() => {
-        setShowSuccessPopup(false);
-        onClose();
-        window.location.reload(); // Moved reload inside timeout
-      }, 3000);
+      // setTimeout(() => {
+      //   setShowSuccessPopup(false);
+      //   onClose();
+      //   window.location.reload();
+      // }, 3000);
     } catch (err) {
       setError("Failed to create waiver. Please try again.");
       console.error("Waiver creation error:", err);
@@ -74,7 +135,7 @@ function CreateWaiver({
         description: "There was an error while trying to create the waiver.",
         variant: "destructive",
       });
-      window.location.reload();
+      // window.location.reload();
     }
   };
 
@@ -87,6 +148,117 @@ function CreateWaiver({
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === "table" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Search Billing</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search for bill name"
+                    value={
+                      selectedBilling ? `${selectedBilling.name}` : searchTerm
+                    }
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setSelectedBilling(null);
+                      setError(null);
+                      setIsDropdownOpen(true);
+                    }}
+                    onFocus={() => setIsDropdownOpen(true)}
+                    onBlur={() =>
+                      setTimeout(() => setIsDropdownOpen(false), 150)
+                    }
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                  {isDropdownOpen && searchTerm && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                      {searchResults.length > 0 ? (
+                        searchResults.map((result) => (
+                          <div
+                            key={result.id}
+                            className={`p-2 hover:bg-gray-100 cursor-pointer ${
+                              selectedBilling?.id === result.id
+                                ? "bg-gray-200"
+                                : ""
+                            }`}
+                            onMouseDown={() => {
+                              setSelectedBilling(result);
+                              setSearchTerm(`${result.name} (${result.id})`);
+                              setIsDropdownOpen(false);
+                            }}
+                          >
+                            {result.name} ({result.id})
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-2 text-gray-500">
+                          No billing records found
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {selectedBilling && (
+                  <div className="text-xs text-green-700">
+                    Selected: {selectedBilling.name} ({selectedBilling.id})
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Waiver Usage Limit</label>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="usageType"
+                    value="unlimited"
+                    checked={usageType === "unlimited"}
+                    onChange={() => {
+                      setUsageType("unlimited");
+                      setMaxUsages("");
+                      setError(null);
+                    }}
+                  />
+                  Unlimited
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="usageType"
+                    value="limited"
+                    checked={usageType === "limited"}
+                    onChange={() => {
+                      setUsageType("limited");
+                      setError(null);
+                    }}
+                  />
+                  Limited
+                </label>
+              </div>
+              {usageType === "limited" && (
+                <div className="mt-2">
+                  <input
+                    type="number"
+                    min={1}
+                    value={maxUsages}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setMaxUsages(val === "" ? "" : Math.max(1, Number(val)));
+                      setError(null);
+                    }}
+                    placeholder="Enter max usages"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    required={usageType === "limited"}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Set the maximum number of times this waiver can be used
+                  </p>
+                </div>
+              )}
+            </div>
+
             <div className="space-y-2">
               <label
                 htmlFor="expiryDate"

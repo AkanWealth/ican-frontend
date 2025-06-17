@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 
+import ExportBilling from "@/components/admincomps/billing/export/ExportBilling";
+
 import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
 import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
 
@@ -216,13 +218,16 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           <h2 className="font-semibold text-2xl text-black">Billing Details</h2>
           <p>View billings and payments here</p>
         </div>
-        <button
-          onClick={() => setisWaiver(!isWaiver)}
-          className="flex flex-row items-center gap-2 text-white bg-primary px-4 py-2 rounded-md"
-        >
-          {" "}
-          Create Waiver Code
-        </button>
+        <div className="flex flex-row gap-2">
+          <button
+            onClick={() => setisWaiver(!isWaiver)}
+            className="flex flex-row items-center gap-2 text-white bg-primary px-4 py-2 rounded-md"
+          >
+            {" "}
+            Create Waiver Code
+          </button>
+          <ExportBilling data={data ? [data] : []} />
+        </div>
       </div>
       {/* Tab sections */}
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
@@ -441,6 +446,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           onClose={() => setisWaiver(false)}
           billingId={data?.id || ""}
           createdById={data?.createdById || ""}
+          mode="billing"
         />
       )}
     </div>

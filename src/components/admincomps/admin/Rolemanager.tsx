@@ -24,350 +24,106 @@ const initialFormData: FormData = {
   name: "",
   permissions: [],
 };
-/**
- * All Available Permissions (for reference)
- *
- * ADD_CONTEN
- * ADD_CONTENT
- * ADD_FAQ
- * Add_PAYMENT
- * ADD_PAYMENT
- * ADD_PERMISSION
- * ADD_TO_WAITLIST
- * ASSIGN_ROLE
- * CHANGE_PASSWORD
- * CREATE_ADVERT
- * CREATE_BILLING
- * CREATE_BLOG
- * CREATE_CONTENT
- * CREATE_EVENT
- * CREATE_GALLERY
- * CREATE_PAYMENT
- * CREATE_PAYMET
- * CREATE_ROLE
- * CREATE_STUDYPACK
- * CREATE_TECHNICAL_SESSION
- * CREATE_USER
- * DELETE_ADVERT
- * DELETE_BLOG
- * DELETE_CONTENT
- * DELETE_EVENT
- * DELETE_FAQ
- * DELETE_FEEDBACK
- * DELETE_GALLERY
- * DELETE_PERMISSION
- * DELETE_ROLE
- * DELETE_STUDYPACK
- * DELETE_TECHNICAL_SESSION
- * DELETE_USER
- * EDIT_ADVERT
- * EDIT_CONTENT
- * EDIT_EVENT
- * EDIT_FAQ
- * EDIT_FEEDBACK
- * EDIT_GALLERY
- * EDIT_STUDYPACK
- * EDIT_TECHNICAL_SESSION
- * EDIT-CONTACT-DETAILS
- * EDIT-PROFILE
- * EDIT-QUALIFICATION
- * EDIT-WORK-EXPERIENCE
- * MAKE_DONATION
- * REGISTER_EVENT
- * RESPOND_TO_MESSAGE
- * SUBMIT_FEEDBACK
- * SUSPEND_USER
- * UPDATE_ADVERT_STATUS
- * UPDATE_BILLING
- * UPDATE_BLOG
- * UPDATE_CONTACT
- * UPDATE_CONTENT
- * UPDATE_EVENT_REGISTRATION
- * UPDATE_EVENT_REGISTRATIONS
- * UPDATE_EVENT_STATUS
- * UPDATE_PROFILE
- * UPDATE_QUALIFICATION
- * UPDATE_ROLE
- * UPDATE_ROLE_PERMISSIONS
- * UPDATE_USER
- * UPDATE_WORK_EXPERIENCE
- * UPDATE-BIODATA
- * UPDATE-PROFILE
- * VIEW_ADMIN
- * VIEW_ADVERT
- * VIEW_ALL_ADVERT
- * VIEW_ALL_BILLINGS
- * VIEW_ALL_BLOGS
- * VIEW_ALL_CONTENT
- * VIEW_ALL_EVENT_REGISTRATIONS_BY_USER
- * VIEW_ALL_EVENTS
- * VIEW_ALL_FAQ
- * VIEW_ALL_GALLERY
- * VIEW_ALL_MEETINGS
- * VIEW_ALL_MESSAGES
- * VIEW_ALL_PAYMENTS
- * VIEW_ALL_STUDYPACKS
- * VIEW_ALL_TECHNICAL_SESSION
- * VIEW_ALL_USERS
- * VIEW_ATTENDANCE
- * VIEW_ATTENDANCE_METRICS
- * VIEW_BILLING
- * VIEW_BLOG
- * VIEW_CONTENT
- * VIEW_DONUT_SUMMARY
- * VIEW_EVENT
- * VIEW_EVENT_ATTENDANCE
- * VIEW_EVENT_REGISTRATION_TREND
- * VIEW_EVENT_REGISTRATIONS
- * VIEW_EVENT_REGISTRATIONS_BY_USER
- * VIEW_FAQ
- * VIEW_FEEDBACK
- * VIEW_GALLERY
- * VIEW_GRAPH_SUMMARY
- * VIEW_ICAN_MEMBER_REGISTRATIONS
- * VIEW_MESSAGE
- * VIEW_MONTHLY_CHART
- * VIEW_OUTSTANDING_BREAKDOWN
- * VIEW_OVERDUE_PAYMENTS
- * VIEW_PAYMENT
- * VIEW_PAYMENT_BY_BILLING
- * VIEW_PAYMENT_DATA
- * VIEW_PAYMENT_HISTORY
- * VIEW_PAYMENT_TREND
- * VIEW_PERMISSION
- * VIEW_ROLE
- * VIEW_ROLES
- * VIEW_STUDYPACK
- * VIEW_SUBSCRIPTION
- * VIEW_TECHNICAL_SESSION
- * VIEW_TOTAL_OUTSTANDING
- * VIEW_USER
- * VIEW_USER_ACTIVITY
- * VIEW_USER_LOGIN_TREND
- * VIEW_USER_REGISTRATION_TREND
- * VIEW_WAITLIST
- */
-
 // Permission matrix configuration
 const PERMISSION_MATRIX = [
   {
-    resource: "Event Management",
+    resource: "Dashboard",
     actions: [
-      { label: "Create", value: "CREATE_EVENT" },
-      { label: "View", value: "VIEW_EVENT" },
-      { label: "View All", value: "VIEW_ALL_EVENTS" },
-      { label: "Manage", value: "EDIT_EVENT" },
-      { label: "Delete", value: "DELETE_EVENT" },
-      { label: "Register", value: "REGISTER_EVENT" },
-      { label: "Update Status", value: "UPDATE_EVENT_STATUS" },
-      { label: "View Registrations", value: "VIEW_EVENT_REGISTRATIONS" },
+      { label: "Create", value: `` },
       {
-        label: "View All Registrations",
-        value: "VIEW_ALL_EVENT_REGISTRATIONS_BY_USER",
+        label: "View",
+        value: `"VIEW_ATTENDANCE_METRICS" , "VIEW_DONUT_SUMMARY", "VIEW_EVENT_REGISTRATION_TREND", "VIEW_GRAPH_SUMMARY", "VIEW_ICAN_MEMBER_REGISTRATIONS", "VIEW_MONTHLY_CHART", "VIEW_OUTSTANDING_BREAKDOWN", "VIEW_OVERDUE_PAYMENTS", "VIEW_PAYMENT_DATA", "VIEW_PAYMENT_HISTORY", "VIEW_PAYMENT_TREND", "VIEW_TOTAL_OUTSTANDING", "VIEW_USER_ACTIVITY", "VIEW_USER_LOGIN_TREND", "VIEW_USER_REGISTRATION_TREND"`,
       },
-      { label: "Update Registrations", value: "UPDATE_EVENT_REGISTRATIONS" },
-      { label: "View Attendance", value: "VIEW_EVENT_ATTENDANCE" },
       {
-        label: "View Registration Trend",
-        value: "VIEW_EVENT_REGISTRATION_TREND",
+        label: "Manage",
+        value: ``,
+      },
+      { label: "Delete", value: `` },
+    ],
+  },
+  {
+    resource: "Admin Management",
+    actions: [
+      { label: "Create", value: `"ADD_PERMISSION", "CREATE_ROLE" ` },
+      {
+        label: "View",
+        value: `"VIEW_ALL_USERS" , "VIEW_ADMIN", "VIEW_ICAN_MEMBER_REGISTRATIONS", "VIEW_PERMISSION", "VIEW_ROLE", "VIEW_ROLES", "VIEW_USER", "VIEW_USER_ACTIVITY", "VIEW_USER_LOGIN_TREND", "VIEW_USER_REGISTRATION_TREND"`,
+      },
+      {
+        label: "Manage",
+        value: `"RESPOND_TO_MESSAGE" , "SUSPEND_USER" , "UPDATE_CONTACT", "UPDATE_ROLE", "UPDATE_ROLE_PERMISSIONS", "UPDATE_USER" `,
+      },
+      {
+        label: "Delete",
+        value: `"DELETE_PERMISSION", "DELETE_ROLE"`,
       },
     ],
   },
   {
-    resource: "User Management",
+    resource: "Members Management",
     actions: [
-      { label: "Create", value: "CREATE_USER" },
-      { label: "View", value: "VIEW_USER" },
-      { label: "View All", value: "VIEW_ALL_USERS" },
-      { label: "Manage", value: "UPDATE_USER" },
-      { label: "Delete", value: "DELETE_USER" },
-      { label: "Suspend", value: "SUSPEND_USER" },
-      { label: "View Activity", value: "VIEW_USER_ACTIVITY" },
-      { label: "View Login Trend", value: "VIEW_USER_LOGIN_TREND" },
+      { label: "Create", value: `"CREATE_USER"` },
       {
-        label: "View Registration Trend",
-        value: "VIEW_USER_REGISTRATION_TREND",
+        label: "View",
+        value: `"VIEW_ALL_USERS" ,  "VIEW_ICAN_MEMBER_REGISTRATIONS", "VIEW_USER", "VIEW_USER_ACTIVITY", "VIEW_USER_LOGIN_TREND", "VIEW_USER_REGISTRATION_TREND" , "VIEW_ALL_MESSAGES" , "VIEW_MESSAGE"`,
       },
-      { label: "Change Password", value: "CHANGE_PASSWORD" },
+      {
+        label: "Manage",
+        value: `"CHANGE_PASSWORD" , "EDIT-PROFILE", "EDIT-QUALIFICATION", "EDIT-WORK-EXPERIENCE", "SUSPEND_USER", "UPDATE_PROFILE", "UPDATE_QUALIFICATION", "UPDATE_USER", "UPDATE_WORK_EXPERIENCE", "UPDATE-BIODATA", "UPDATE-PROFILE"`,
+      },
+      { label: "Delete", value: `"DELETE_USER"` },
     ],
   },
   {
     resource: "Content Management",
     actions: [
-      { label: "Create", value: "CREATE_CONTENT" },
-      { label: "View", value: "VIEW_CONTENT" },
-      { label: "View All", value: "VIEW_ALL_CONTENT" },
-      { label: "Manage", value: "EDIT_CONTENT" },
-      { label: "Delete", value: "DELETE_CONTENT" },
-      { label: "Update", value: "UPDATE_CONTENT" },
-    ],
-  },
-  {
-    resource: "Blog Management",
-    actions: [
-      { label: "Create", value: "CREATE_BLOG" },
-      { label: "View", value: "VIEW_BLOG" },
-      { label: "View All", value: "VIEW_ALL_BLOGS" },
-      { label: "Update", value: "UPDATE_BLOG" },
-      { label: "Delete", value: "DELETE_BLOG" },
-    ],
-  },
-  {
-    resource: "Payment & Billing",
-    actions: [
-      { label: "Create Payment", value: "CREATE_PAYMENT" },
-      { label: "View Payment", value: "VIEW_PAYMENT" },
-      { label: "View All Payments", value: "VIEW_ALL_PAYMENTS" },
-      { label: "View Payment History", value: "VIEW_PAYMENT_HISTORY" },
-      { label: "View Payment Trend", value: "VIEW_PAYMENT_TREND" },
-      { label: "View Payment Data", value: "VIEW_PAYMENT_DATA" },
-      { label: "View Payment by Billing", value: "VIEW_PAYMENT_BY_BILLING" },
-      { label: "Create Billing", value: "CREATE_BILLING" },
-      { label: "View Billing", value: "VIEW_BILLING" },
-      { label: "View All Billings", value: "VIEW_ALL_BILLINGS" },
-      { label: "Update Billing", value: "UPDATE_BILLING" },
-      { label: "View Outstanding", value: "VIEW_TOTAL_OUTSTANDING" },
-      { label: "View Overdue", value: "VIEW_OVERDUE_PAYMENTS" },
       {
-        label: "View Outstanding Breakdown",
-        value: "VIEW_OUTSTANDING_BREAKDOWN",
+        label: "Create",
+        value: `"ADD_CONTENT", "ADD_CONTEN", "ADD_FAQ", "CREATE_ADVERT", "CREATE_BLOG", "CREATE_CONTENT", "CREATE_GALLERY", "CREATE_STUDYPACK", "CREATE_TECHNICAL_SESSION",   `,
+      },
+      {
+        label: "View",
+        value: `"VIEW_ALL_BLOGS" , "VIEW_ALL_CONTENT", "VIEW_ALL_FAQ", "VIEW_ALL_GALLERY" , "VIEW_ALL_STUDYPACKS" , "VIEW_ALL_TECHNICAL_SESSION", "VIEW_BLOG" , "VIEW_CONTENT", "VIEW_FAQ", "VIEW_GALLERY", "VIEW_STUDYPACK", "VIEW_TECHNICAL_SESSION" , "VIEW_TECHNICAL_SESSION_ATTENDANCE"`,
+      },
+      {
+        label: "Manage",
+        value: `"EDIT_ADVERT", "EDIT_CONTENT", "EDIT_EVENT", "EDIT_FAQ" , "EDIT_GALLERY", "EDIT_STUDYPACK", "EDIT_TECHNICAL_SESSION", "UPDATE_ADVERT_STATUS", "UPDATE_BLOG", "UPDATE_CONTENT"`,
+      },
+      {
+        label: "Delete",
+        value: `"DELETE_ADVERT", "DELETE_BLOG", "DELETE_CONTENT",  "DELETE_FAQ", "DELETE_GALLERY", "DELETE_STUDYPACK", "DELETE_TECHNICAL_SESSION"`,
       },
     ],
   },
   {
-    resource: "Role & Permission",
+    resource: "Event Management",
     actions: [
-      { label: "Create Role", value: "CREATE_ROLE" },
-      { label: "View Role", value: "VIEW_ROLE" },
-      { label: "View All Roles", value: "VIEW_ROLES" },
-      { label: "Update Role", value: "UPDATE_ROLE" },
-      { label: "Delete Role", value: "DELETE_ROLE" },
-      { label: "Assign Role", value: "ASSIGN_ROLE" },
-      { label: "View Permission", value: "VIEW_PERMISSION" },
-      { label: "Add Permission", value: "ADD_PERMISSION" },
-      { label: "Delete Permission", value: "DELETE_PERMISSION" },
-      { label: "Update Role Permissions", value: "UPDATE_ROLE_PERMISSIONS" },
-    ],
-  },
-  {
-    resource: "Gallery Management",
-    actions: [
-      { label: "Create", value: "CREATE_GALLERY" },
-      { label: "View", value: "VIEW_GALLERY" },
-      { label: "View All", value: "VIEW_ALL_GALLERY" },
-      { label: "Manage", value: "EDIT_GALLERY" },
-      { label: "Delete", value: "DELETE_GALLERY" },
-    ],
-  },
-  {
-    resource: "FAQ Management",
-    actions: [
-      { label: "Add", value: "ADD_FAQ" },
-      { label: "View", value: "VIEW_FAQ" },
-      { label: "View All", value: "VIEW_ALL_FAQ" },
-      { label: "Manage", value: "EDIT_FAQ" },
-      { label: "Delete", value: "DELETE_FAQ" },
-    ],
-  },
-  {
-    resource: "Technical Sessions",
-    actions: [
-      { label: "Create", value: "CREATE_TECHNICAL_SESSION" },
-      { label: "View", value: "VIEW_TECHNICAL_SESSION" },
-      { label: "View All", value: "VIEW_ALL_TECHNICAL_SESSION" },
-      { label: "Manage", value: "EDIT_TECHNICAL_SESSION" },
-      { label: "Delete", value: "DELETE_TECHNICAL_SESSION" },
-    ],
-  },
-  {
-    resource: "Study Packs",
-    actions: [
-      { label: "Create", value: "CREATE_STUDYPACK" },
-      { label: "View", value: "VIEW_STUDYPACK" },
-      { label: "View All", value: "VIEW_ALL_STUDYPACKS" },
-      { label: "Manage", value: "EDIT_STUDYPACK" },
-      { label: "Delete", value: "DELETE_STUDYPACK" },
-    ],
-  },
-  {
-    resource: "Advert Management",
-    actions: [
-      { label: "Create", value: "CREATE_ADVERT" },
-      { label: "View", value: "VIEW_ADVERT" },
-      { label: "View All", value: "VIEW_ALL_ADVERT" },
-      { label: "Manage", value: "EDIT_ADVERT" },
-      { label: "Delete", value: "DELETE_ADVERT" },
-      { label: "Update Status", value: "UPDATE_ADVERT_STATUS" },
-    ],
-  },
-  {
-    resource: "Analytics & Reports",
-    actions: [
-      { label: "View Donut Summary", value: "VIEW_DONUT_SUMMARY" },
-      { label: "View Graph Summary", value: "VIEW_GRAPH_SUMMARY" },
-      { label: "View Monthly Chart", value: "VIEW_MONTHLY_CHART" },
+      { label: "Create", value: `"CREATE_EVENT"` },
       {
-        label: "View ICAN Member Registrations",
-        value: "VIEW_ICAN_MEMBER_REGISTRATIONS",
+        label: "View",
+        value: `"VIEW_EVENT" , "VIEW_ALL_EVENTS", "VIEW_ALL_EVENT_REGISTRATIONS_BY_USER" , "VIEW_ALL_MEETINGS", "VIEW_ATTENDANCE", "VIEW_EVENT", "VIEW_EVENT_ATTENDANCE", "VIEW_EVENT_REGISTRATION_TREND", "VIEW_EVENT_REGISTRATIONS", "VIEW_EVENT_REGISTRATIONS_BY_USER" , "VIEW_TECHNICAL_SESSION" , "VIEW_WAITLIST"`,
       },
+      {
+        label: "Manage",
+        value: `"ADD_TO_WAITLIST" , "UPDATE_EVENT_STATUS", "REGISTER_EVENT" , "UPDATE_EVENT_REGISTRATION" , "UPDATE_EVENT_REGISTRATIONS", "VIEW_FEEDBACK"`,
+      },
+      { label: "Delete", value: `"DELETE_EVENT", "DELETE_FEEDBACK" ` },
     ],
   },
   {
-    resource: "Profile Management",
+    resource: "Billing & Payments",
     actions: [
-      { label: "Edit Profile", value: "EDIT-PROFILE" },
-      { label: "Update Profile", value: "UPDATE-PROFILE" },
-      { label: "Update Biodata", value: "UPDATE-BIODATA" },
-      { label: "Edit Contact Details", value: "EDIT-CONTACT-DETAILS" },
-      { label: "Update Contact", value: "UPDATE_CONTACT" },
-      { label: "Edit Qualification", value: "EDIT-QUALIFICATION" },
-      { label: "Update Qualification", value: "UPDATE_QUALIFICATION" },
-      { label: "Edit Work Experience", value: "EDIT-WORK-EXPERIENCE" },
-      { label: "Update Work Experience", value: "UPDATE_WORK_EXPERIENCE" },
+      {
+        label: "Create",
+        value: `"ADD_PAYMENT", "Add_PAYMENT", "CREATE_BILLING", "CREATE_PAYMENT", "CREATE_PAYMET" `,
+      },
+      {
+        label: "View",
+        value: `"VIEW_ALL_BILLINGS" , "VIEW_ALL_PAYMENTS", "VIEW_BILLING", "VIEW_PAYMENT", "VIEW_PAYMENT_BY_BILLING", "VIEW_PAYMENT_DATA", "VIEW_PAYMENT_DATA", "VIEW_PAYMENT_HISTORY", "VIEW_PAYMENT_TREND", "VIEW_SUBSCRIPTION" , "VIEW_TOTAL_OUTSTANDING"`,
+      },
+      { label: "Manage", value: `"MAKE_DONATION" , "UPDATE_BILLING"` },
+      { label: "Delete", value: `"DELETE_EVENT"` },
     ],
-  },
-  {
-    resource: "Waitlist Management",
-    actions: [
-      { label: "Add to Waitlist", value: "ADD_TO_WAITLIST" },
-      { label: "View Waitlist", value: "VIEW_WAITLIST" },
-    ],
-  },
-  {
-    resource: "Feedback Management",
-    actions: [
-      { label: "Submit", value: "SUBMIT_FEEDBACK" },
-      { label: "View", value: "VIEW_FEEDBACK" },
-      { label: "Manage", value: "EDIT_FEEDBACK" },
-      { label: "Delete", value: "DELETE_FEEDBACK" },
-    ],
-  },
-  {
-    resource: "Message Management",
-    actions: [
-      { label: "View", value: "VIEW_MESSAGE" },
-      { label: "View All", value: "VIEW_ALL_MESSAGES" },
-      { label: "Respond", value: "RESPOND_TO_MESSAGE" },
-    ],
-  },
-  {
-    resource: "Meeting Management",
-    actions: [{ label: "View All", value: "VIEW_ALL_MEETINGS" }],
-  },
-  {
-    resource: "Attendance Management",
-    actions: [
-      { label: "View", value: "VIEW_ATTENDANCE" },
-      { label: "View Metrics", value: "VIEW_ATTENDANCE_METRICS" },
-    ],
-  },
-  {
-    resource: "Subscription Management",
-    actions: [{ label: "View", value: "VIEW_SUBSCRIPTION" }],
-  },
-  {
-    resource: "Donation Management",
-    actions: [{ label: "Make Donation", value: "MAKE_DONATION" }],
   },
 ];
 
@@ -380,36 +136,29 @@ function Rolemanager({ id }: RolemanagerProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Extract just the permission values from selected permissions
-    const selectedPermissionValues = permissions.map(
-      (permission) => permission.value
-    );
+
+    // Extract and clean up permission values
+    const selectedPermissionValues = permissions
+      .map((permission) => permission.value)
+      .join(",") // Join all values into a single string
+      .split(",") // Split into array
+      .map((p) => p.trim().replace(/"/g, "")) // Remove quotes and trim
+      .filter((p) => p !== "") // Remove empty strings
+      .filter((value, index, self) => self.indexOf(value) === index); // Remove duplicates
 
     // Update formData with selected permissions
-    const submitData = JSON.stringify({
-      name: formData.name.replace(/[^a-zA-Z]/g, "_"),
+    const submitData = {
+      name: formData.name.replace(/[^a-zA-Z]/g, "_").toUpperCase(),
       permissions: selectedPermissionValues,
-    });
+    };
 
     try {
-      // Submit new role to backend
-      const config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/roles/create`,
-
+      const response = await apiClient.post("/roles/create", submitData, {
         headers: {
           "Content-Type": "application/json",
-
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
-        data: submitData,
-      };
-      const response = await apiClient.post(
-        "/roles/create",
-        submitData,
-        config
-      );
+      });
 
       setFormData(initialFormData);
       setPermissions([]);

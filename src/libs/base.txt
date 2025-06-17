@@ -1,0 +1,410 @@
+model Payment {
+  id              String          @id @default(uuid())
+  userId          String
+  billingId       String?
+  invoiceId       String?  
+  paymentType     String?
+  amount          Float
+  datePaid        DateTime        @default(now())
+  status          PaymentStatus   @default(PENDING)
+  transactionId   String?         @unique
+  subscriptionId  String?
+  anonymous       Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  donationOption  String?
+  paymentCategory PaymentCategory
+  eventId         String?
+  billing         Billing?        @relation(fields: [billingId], references: [id])
+  event           Event?          @relation(fields: [eventId], references: [id])
+  invoice         Invoice?        @relation(fields: [invoiceId], references: [id])
+  subscription    Subscription?   @relation(fields: [subscriptionId], references: [id])
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Billing {
+  id            String                @id @default(uuid())
+  name          String
+  amount        Float
+  createdAt     DateTime              @default(now())
+  autoApply     Boolean               @default(false)
+  createdById   String?
+  nextDueDate   DateTime?
+  description   String?
+  frequency     BillingFrequency      @default(ONE_TIME)
+  nextBillingAt DateTime?
+  createdBy     User?                 @relation("UserBillingCreated", fields: [createdById], references: [id])
+  affectedUsers BillingAffectedUser[]
+  Payment       Payment[]
+  waiverCodes   WaiverCode[]
+  waiverUsages  WaiverUsage[]
+  invoices       Invoice[] 
+}
+
+model BillingAffectedUser {
+  id            String        @id @default(uuid())
+  billingId     String
+  userId        String
+  amountPaid    Float         @default(0)
+  paymentStatus PaymentStatus @default(NOT_PAID)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime?     @updatedAt
+  billing       Billing       @relation(fields: [billingId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, billingId])
+}
+
+model Invoice {
+  id          String         @id @default(uuid())
+  userId      String
+  billingId   String?       
+  amount      Float
+  description String
+  issuedAt    DateTime       @default(now())
+  dueDate     DateTime?
+  status      InvoiceStatus  @default(UNPAID)
+
+  // Relations
+  payments    Payment[]
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  billing     Billing?       @relation(fields: [billingId], references: [id]) 
+}
+
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+  PARTIALLY_PAID
+  OVERDUE
+}
+
+model Registration {
+  id             String           @id @default(uuid())
+  fullName       String
+  email          String?
+  membership     MembershipStatus
+  eventId        String
+  status         AttendanceStatus @default(REGISTERED)
+  proofOfPayment String?
+  createdAt      DateTime         @default(now())
+  userId         String?
+  event          Event            @relation(fields: [eventId], references: [id])
+  user           User?            @relation(fields: [userId], references: [id])
+}
+
+model Event {
+  id            String         @id @default(uuid())
+  name          String
+  venue         String
+  description   String
+  date          DateTime
+  time          String
+  fee           Float?
+  mcpd_credit   Int?
+  flyer         String?
+  meeting_link  String?
+  status        EventStatus    @default(DRAFT)
+  createdAt     DateTime       @default(now())
+  feedbacks     Feedback[]
+  payments      Payment[]
+  registrations Registration[]
+  waitlists     Waitlist[]
+}
+
+model User {
+  id                      String                       @id @default(uuid())
+  email                   String                       @unique
+  membershipId            String                       @unique
+  surname                 String?
+  firstname               String?
+  middlename              String?
+  gender                  String?
+  dateOfBirth             DateTime?
+  maritalStatus           String?
+  stateOfOrigin           String?
+  nationality             String?
+  residentialAddress      String?
+  residentialCountry      String?
+  residentialCity         String?
+  residentialState        String?
+  residentialLGA          String?
+  contactPhoneNumber      String?
+  institution             String?
+  discipline              String?
+  qualifications          String?
+  yearOfGraduation        Int?
+  status                  String?
+  companyName             String?
+  officeAddress           String?
+  position                String?
+  startDate               DateTime?
+  endDate                 DateTime?
+  password                String
+  isVerified              Boolean                      @default(false)
+  verificationToken       String?
+  resetPasswordToken      String?
+  resetPasswordExpires    DateTime?
+  createdAt               DateTime                     @default(now())
+  updatedAt               DateTime                     @updatedAt
+  roleId                  String?
+  isSuspended             Boolean                      @default(false)
+  profilePicture          String?
+  tokenExpiresAt          DateTime?
+  notificationPreference  NotificationChannel          @default(EMAIL)
+  refreshToken            String?
+  adverts                 Advert[]
+  billingsCreated         Billing[]                    @relation("UserBillingCreated")
+  billingsAffected        BillingAffectedUser[]
+  bookmarks               Bookmark[]
+  contents                Content[]
+  feedbacks               Feedback[]
+  galleries               Gallery?
+  payments                Payment[]
+  waiverUsages            WaiverUsage[]
+  registrations           Registration[]
+  studypacks              StudyPack[]
+  invoices                Invoice[]
+  subscription            Subscription?
+  technicalsessions       TechnicalSession[]
+  role                    Role?                        @relation(fields: [roleId], references: [id])
+  loginActivities         UserLoginActivity[]
+  notificationPreferences UserNotificationPreference[]
+  permissions             UserPermission[]
+  waiverCodesCreated      WaiverCode[]                 @relation("WaiverCreatedBy")
+  waiverCodesUsed         WaiverCode[]                 @relation("WaiverUsedBy")
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  status    String
+  timestamp DateTime @default(now())
+}
+
+model UserLoginActivity {
+  id        String   @id @default(uuid())
+  userId    String?
+  ipAddress String?
+  device    String?
+  location  String?
+  loginTime DateTime @default(now())
+  status    String   @default("success")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserNotificationPreference {
+  id      String              @id @default(uuid())
+  userId  String
+  topic   NotificationTopic
+  channel NotificationChannel
+  user    User                @relation(fields: [userId], references: [id])
+
+  @@unique([userId, topic, channel])
+}
+
+model Role {
+  id           String           @id @default(uuid())
+  name         String           @unique
+  description  String?
+  isSuperAdmin Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  permissions  RolePermission[]
+  users        User[]
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+  createdAt   DateTime         @default(now())
+  roles       RolePermission[]
+  users       UserPermission[]
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model UserPermission {
+  id           String     @id @default(uuid())
+  userId       String
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permissionId])
+}
+
+model Resource {
+  id          String         @id @default(uuid())
+  title       String
+  description String
+  type        ResourceType
+  access      ResourceAccess
+  fileUrl     String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  recommended Boolean?       @default(false)
+  bookmarks   Bookmark[]
+}
+
+model Blog {
+  id          String   @id @default(uuid())
+  contentType String
+  coverImage  String
+  title       String
+  authorName  String
+  contentBody String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  eventId   String
+  rating    Int
+  comment   String?
+  anonymous Boolean  @default(true)
+  createdAt DateTime @default(now())
+  userId    String?
+  event     Event    @relation(fields: [eventId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Waitlist {
+  id        String   @id @default(uuid())
+  eventId   String
+  fullName  String
+  email     String
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id])
+}
+
+model Gallery {
+  id        String   @id @default(uuid())
+  name      String
+  images    String[]
+  videos    String[]
+  createdBy String   @unique
+  createdAt DateTime @default(now())
+  status    String   @default("active")
+  user      User     @relation(fields: [createdBy], references: [id])
+}
+
+model Advert {
+  id         String   @id @default(uuid())
+  name       String
+  advertiser String
+  content    String
+  startDate  DateTime
+  endDate    DateTime
+  coverImg   String
+  status     String   @default("pending")
+  createdBy  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+}
+
+model Content {
+  id        String   @id @default(uuid())
+  name      String
+  type      String
+  createdBy String
+  createdAt DateTime @default(now())
+  status    String   @default("pending")
+  user      User     @relation(fields: [createdBy], references: [id])
+}
+
+model StudyPack {
+  id        String   @id @default(uuid())
+  name      String
+  document  String
+  createdBy String
+  createdAt DateTime @default(now())
+  status    String   @default("pending")
+  user      User     @relation(fields: [createdBy], references: [id])
+}
+
+model TechnicalSession {
+  id        String   @id @default(uuid())
+  name      String
+  document  String
+  coverImg  String
+  createdAt DateTime @default(now())
+  status    String   @default("pending")
+  createdBy String
+  user      User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+}
+
+model FAQ {
+  id        String   @id @default(uuid())
+  name      String
+  answer    String
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id        String             @id @default(uuid())
+  userId    String             @unique
+  planType  String
+  startDate DateTime           @default(now())
+  endDate   DateTime
+  status    SubscriptionStatus @default(ACTIVE)
+  payments  Payment[]
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+
+
+model WaiverCode {
+  id        String  @id @default(uuid())
+  code      String  @unique
+  billingId String
+  billing   Billing @relation(fields: [billingId], references: [id])
+
+  createdById String?
+  createdBy   User?   @relation("WaiverCreatedBy", fields: [createdById], references: [id])
+
+  usedById String?
+  usedBy   User?   @relation("WaiverUsedBy", fields: [usedById], references: [id])
+
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+
+  maxUsages     Int? // null means unlimited
+  currentUsages Int           @default(0)
+  usages        WaiverUsage[]
+}
+
+model WaiverUsage {
+  id           String     @id @default(uuid())
+  waiverCode   WaiverCode @relation(fields: [waiverCodeId], references: [id])
+  waiverCodeId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  billing   Billing @relation(fields: [billingId], references: [id])
+  billingId String
+
+  typeOfUse String // This will be filled from billing.name
+  createdAt DateTime @default(now())
+
+  @@unique([waiverCodeId, userId])
+}
+
+
+
+
+
+
+
+

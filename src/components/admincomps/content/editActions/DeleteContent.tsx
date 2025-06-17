@@ -40,7 +40,11 @@ function DeleteContent({
       method: "DELETE",
       maxBodyLength: Infinity,
       url: `${BASE_API_URL}/${
-        contentCategory === "resources" ? "resources/content" : contentCategory
+        contentCategory === "technical"
+          ? "technical-sessions"
+          : contentCategory === "resources"
+          ? "resources/content"
+          : contentCategory
       }/${id}`,
       headers: {
         "Content-Type": "application/json",
@@ -66,6 +70,9 @@ function DeleteContent({
         variant: "destructive",
       });
       setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+      window.location.reload();
     }
   };
 

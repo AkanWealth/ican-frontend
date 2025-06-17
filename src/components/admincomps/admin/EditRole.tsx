@@ -93,7 +93,6 @@ function EditRole({ id, showModal, setShowModal }: RolemanagerProps) {
       });
       setIsLoading(false);
       router.refresh();
-      router.refresh();
       window.location.reload();
     } catch (error) {
       console.error("Error creating role:", error);

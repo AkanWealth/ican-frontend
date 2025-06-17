@@ -223,12 +223,14 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
 
         {/* PDF Upload Section */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Upload PDF</label>
+          <label className="block text-sm font-medium">
+            Upload PDF ( 10Mb max)
+          </label>
 
           {/* Image Upload Controls */}
           <div className="flex flex-wrap gap-4">
             <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
-              Upload PDF
+              Upload PDF ( 10Mb max)
               <input
                 type="file"
                 accept="application/pdf"
@@ -250,7 +252,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
 
           {/* Upload Progress */}
           {isUploading && (
-            <div className="mt-2 space-y-2">
+            <div className="my-2 space-y-2">
               <p className="text-sm font-medium">
                 Uploading... {uploadProgress}%
               </p>
@@ -263,7 +265,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
             </div>
           )}
 
-          {/* Image Preview */}
+          {/* Resource Preview */}
           {resource.fileUrl && !isUploading && (
             <div className="mt-2">
               <p className="text-sm font-medium mb-2">PDF Preview</p>
@@ -277,7 +279,7 @@ function ResourceEdit({ mode, id }: CreateContentProps) {
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col mt-4 gap-2">
         <button
           disabled={isSubmitting}
           onClick={handleSubmit}

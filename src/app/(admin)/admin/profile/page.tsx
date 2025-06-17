@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import InputEle from "@/components/genui/InputEle";
 
@@ -23,30 +23,34 @@ function Profile() {
     role: "",
   });
   const [admin, setAdmin] = useState<User>({} as User);
-  // Function to fetch admin details from API
-  const fetchAdminDetails = async (userId: string) => {
-    try {
-      const response = await apiClient.get(`${BASE_API_URL}/users/${userId}`);
 
-      setAdmin((prevAdmin) => ({
-        ...prevAdmin,
-        ...response,
-      }));
+  // Function to fetch admin details from API - memoized with useCallback
+  const fetchAdminDetails = useCallback(
+    async (userId: string) => {
+      try {
+        const response = await apiClient.get(`${BASE_API_URL}/users/${userId}`);
 
-      toast({
-        title: "Success",
-        description: "Admin details fetched successfully",
-        variant: "default",
-      });
-    } catch (error) {
-      console.error("Error fetching admin details:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch admin details",
-        variant: "destructive",
-      });
-    }
-  };
+        setAdmin((prevAdmin) => ({
+          ...prevAdmin,
+          ...response,
+        }));
+
+        toast({
+          title: "Success",
+          description: "Admin details fetched successfully",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Error fetching admin details:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch admin details",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast]
+  );
 
   // Effect to get admin data from cookie and fetch details
   useEffect(() => {
@@ -86,11 +90,7 @@ function Profile() {
     try {
       const result = await apiClient.request(config);
       console.log(result);
-      toast({
-        title: "Admin details saved successfully",
-        description: "Admin details saved successfully",
-        variant: "default",
-      });
+  
     } catch (error) {
       console.error("Error saving admin details:", error);
       toast({
@@ -106,7 +106,7 @@ function Profile() {
       <div className="flex flex-col mb-6 w-full items-start justify-between">
         <div className="flex flex-col gap-3"></div>
         <h2 className="font-semibold text-2xl text-black">Profile</h2>
-        <p>Update and Manage your Profile here</p>
+        <p> Manage your Profile here</p>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
         <h2 className="text-xl font-semibold text-left">Admin Profile</h2>
@@ -125,6 +125,10 @@ function Profile() {
             <h5 className="text-base w-full border-b border-gray-600 text-neutral-900">
               Admin Details
             </h5>
+            <div className="w-full p-4 mb-4 bg-yellow-50/50 rounded-md text-center text-sm text-gray-600 border border-yellow-200">
+              <span className="mr-2">⚠️</span>
+              Please note: Profile changes cannot be made through the admin interface. To update your personal information, please visit your user profile section.
+            </div>
             <div className="grid grid-cols-2  gap-4 ">
               <InputEle
                 id="first_name"
@@ -165,18 +169,7 @@ function Profile() {
                   setAdmin({ ...admin, membershipId: e.target.value })
                 }
               />
-              <InputEle
-                id="role"
-                label="Role"
-                type="text"
-                placeholder="Role"
-                value={admin?.role?.name}
-                disabled
-                onChange={(e) => {
-                  const updatedRole = { ...admin.role, name: e.target.value };
-                  setAdmin({ ...admin, role: updatedRole });
-                }}
-              />
+            
             </div>
             <div className="flex w-full justify-center items-center flex-row gap-4">
               <button

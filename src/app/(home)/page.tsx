@@ -1,6 +1,5 @@
 "use client";
 
-
 import { motion } from "framer-motion";
 import Heroimg from "../../components/homecomps/Heroimg";
 import Cta from "../../components/homecomps/Cta";
@@ -22,7 +21,7 @@ export default function Home() {
             "Join Surulere & District Society (SDS) and unlock the benefits of a thriving professional community."
           }
         >
-          <div className="flex sm:gap-12 w-full flex-row justify-around items-center mt-4">
+          <div className="flex sm:gap-12 w-full flex-row justify-between items-center mt-4">
             <Link href={"/sign-up"}>
               <button className=" h-fit sm:text-white rounded-full bg-secondary p-2 sm:py-3 sm:px-8 w-fit whitespace-nowrap hover:bg-green-500 ">
                 Become a Member
@@ -36,9 +35,7 @@ export default function Home() {
           </div>
         </Heroimg>
         <Speech />
-        <div className="hidden sm:block">
-          <Gallery />
-        </div>
+        <Gallery />
         <Stories />
         <Adverts />
         <Cta />

@@ -46,6 +46,9 @@ export function BillUserTable<TData, TValue>({
     []
   );
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const [globalFilter, setGlobalFilter] = React.useState("");
+
   const table = useReactTable({
     data,
     columns,
@@ -55,12 +58,13 @@ export function BillUserTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
-      rowSelection,
+      globalFilter,
     },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: "includesString",
   });
 
   function onAccept(selectedRows: TData[]) {
@@ -71,11 +75,9 @@ export function BillUserTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Search by Name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
+          placeholder="Search by name or membership id..."
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
       </div>

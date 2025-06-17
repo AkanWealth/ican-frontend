@@ -71,58 +71,118 @@ function AttendanceRender() {
   );
 
   // Fetch meetings data from API for metrics only
-  useEffect(() => {
-    const fetchMeetingsMetrics = async () => {
-      setIsLoadingMetrics(true);
-      try {
-        const response = await apiClient.get("/meetings");
-        console.log("Meetings response", response);
+  // useEffect(() => {
+  //   const fetchMeetingsMetrics = async () => {
+  //     setIsLoadingMetrics(true);
+  //     try {
+  //       const response = await apiClient.get("/meetings");
+  //       console.log("Meetings response", response);
 
-        // Check if the response status is not 200 (OK)
-        // if (response.status !== 200) {
-        //   throw new Error(`API request failed with status ${response.status}`);
-        // }
+  //       // Check if the response status is not 200 (OK)
+  //       // if (response.status !== 200) {
+  //       //   throw new Error(`API request failed with status ${response.status}`);
+  //       // }
         
-        const data = response;
+  //       const data = response;
         
-        // Transform API data for metrics calculation
-        const formattedMeetingsData = data.map((meeting: any) => {
-          const meetingDate = new Date(meeting.date || new Date().toISOString());
-          const currentDate = new Date();
+  //       // Transform API data for metrics calculation
+  //       const formattedMeetingsData = data.map((meeting: any) => {
+  //         const meetingDate = new Date(meeting.date || new Date().toISOString());
+  //         const currentDate = new Date();
           
-          // Check if meeting date has passed
-          const hasHeld = currentDate > meetingDate;
+  //         // Check if meeting date has passed
+  //         const hasHeld = currentDate > meetingDate;
           
-          // Format date to match the component's expected format
-          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-          const formattedDate = `${monthNames[meetingDate.getMonth()]} ${meetingDate.getDate()}, ${meetingDate.getFullYear()}`;
+  //         // Format date to match the component's expected format
+  //         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  //         const formattedDate = `${monthNames[meetingDate.getMonth()]} ${meetingDate.getDate()}, ${meetingDate.getFullYear()}`;
           
-          return {
-            MeetingTitle: meeting.title || "Monthly ICAN Meeting",
-            date: formattedDate,
-            status: meeting.attended ? "present" : "absent",
-            hasHeld: hasHeld
-          };
-        });
+  //         return {
+  //           MeetingTitle: meeting.title || "Monthly ICAN Meeting",
+  //           date: formattedDate,
+  //           status: meeting.attended ? "present" : "absent",
+  //           hasHeld: hasHeld
+  //         };
+  //       });
         
-        // Filter to only include meetings that have been held
-        const heldMeetings = formattedMeetingsData.filter((meeting: any) => meeting.hasHeld);
+  //       // Filter to only include meetings that have been held
+  //       const heldMeetings = formattedMeetingsData.filter((meeting: any) => meeting.hasHeld);
         
-        setApiMeetingsData(heldMeetings);
-        // Update the metrics state with the total meetings count
-        setMetrics(prev => ({
-          ...prev,
-          totalMeetings: heldMeetings.length
-        }));
-        setIsLoadingMetrics(false);
-      } catch (err) {
-        console.error("Error fetching meetings metrics:", err);
-        setIsLoadingMetrics(false);
-      }
-    };
+  //       setApiMeetingsData(heldMeetings);
+  //       // Update the metrics state with the total meetings count
+  //       setMetrics(prev => ({
+  //         ...prev,
+  //         totalMeetings: heldMeetings.length
+  //       }));
+  //       setIsLoadingMetrics(false);
+  //     } catch (err) {
+  //       console.error("Error fetching meetings metrics:", err);
+  //       setIsLoadingMetrics(false);
+  //     }
+  //   };
 
-    fetchMeetingsMetrics();
-  }, []);
+  //   fetchMeetingsMetrics();
+  // }, []);
+
+
+
+
+
+// Fetch meetings data from API for metrics only
+useEffect(() => {
+  const fetchMeetingsMetrics = async () => {
+    setIsLoadingMetrics(true);
+    try {
+      const response = await apiClient.get("/meetings");
+      console.log("Meetings response", response);
+
+      // Check if the response status is not 200 (OK)
+      // if (response.status !== 200) {
+      //   throw new Error(`API request failed with status ${response.status}`);
+      // }
+      
+      const data = response;
+      
+      // Transform API data for metrics calculation
+      const formattedMeetingsData = data.map((meeting: any) => {
+        const meetingDate = new Date(meeting.date || new Date().toISOString());
+        const currentDate = new Date();
+        
+        // Check if meeting date has passed
+        const hasHeld = currentDate > meetingDate;
+        
+        // Format date to match the component's expected format
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const formattedDate = `${monthNames[meetingDate.getMonth()]} ${meetingDate.getDate()}, ${meetingDate.getFullYear()}`;
+        
+        return {
+          MeetingTitle: meeting.title || "Monthly ICAN Meeting",
+          date: formattedDate,
+          status: meeting.attended ? "present" : "absent",
+          hasHeld: hasHeld
+        };
+      });
+      
+      // Remove the filter - count ALL meetings, not just held ones
+      setApiMeetingsData(formattedMeetingsData);
+      
+      // Update the metrics state with the total meetings count (all meetings)
+      setMetrics(prev => ({
+        ...prev,
+        totalMeetings: formattedMeetingsData.length
+      }));
+      setIsLoadingMetrics(false);
+    } catch (err) {
+      console.error("Error fetching meetings metrics:", err);
+      setIsLoadingMetrics(false);
+    }
+  };
+
+  fetchMeetingsMetrics();
+}, []);
+
+
+
 
   // Fetch user registrations for metrics only
   useEffect(() => {
@@ -516,7 +576,7 @@ function AttendanceRender() {
                         <Video className="h-4 w-4 text-green-600" />
                       </div>
                       <p className="text-sm text-center p-2">
-                        Technical Session
+                        All Events
                       </p>
                     </div>
                     {isLoadingMetrics ? (

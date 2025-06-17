@@ -103,6 +103,8 @@ function AdminLogin() {
       // Use the login method from AuthContext
       await login(formData.email, formData.password);
 
+      
+
       toast({
         title: "Login Successful",
         description: "Welcome back!",

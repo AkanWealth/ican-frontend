@@ -72,6 +72,14 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
             >
               <MdRemoveRedEye className="w-4 h-4" /> View Member Details
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="hover:bg-red-600 hover:text-white text-red-600 flex flex-row items-center fill-red-600 "
+              onClick={() => setShowDeleteModal(true)}
+            >
+              <MdOutlineDelete className="w-4 h-4" />
+              Delete User
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         {showDisableModal && (
@@ -88,6 +96,17 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
             fullName={row.original.firstname + " " + row.original.surname}
             role={capitalizeWords(row.original.role.name ?? "")}
             onClose={() => setShowEnableModal(false)}
+          />
+        )}{" "}
+        {showDeleteModal && (
+          <DeleteAdmin
+            id={row.original.id}
+            fullName={
+              row.original.fullName ||
+              row.original.firstname + " " + row.original.surname
+            }
+            role={capitalizeWords(row.original.role.name ?? "")}
+            onClose={() => setShowDeleteModal(false)}
           />
         )}
       </>
@@ -132,7 +151,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
               onClick={() => setShowDeleteModal(true)}
             >
               <MdOutlineDelete className="w-4 h-4" />
-              Delete
+              Delete User
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -156,7 +175,7 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
           <DeleteAdmin
             id={row.original.id}
             fullName={row.original.fullName || row.original.firstname + " " + row.original.surname  }
-            role={capitalizeWords(row.original.role ?? "")}
+            role={capitalizeWords(row.original.role.name ?? "")}
             onClose={() => setShowDeleteModal(false)}
           />
         )}

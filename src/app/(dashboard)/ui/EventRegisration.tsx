@@ -378,7 +378,7 @@ if (!isValid) {
     const config = {
       public_key:
         process.env.FLW_PUBLIC_KEY ||
-        "FLWPUBK_TEST-534b5997be3928deed468163ca379112-X", // Replace with your actual public key
+        "FLWPUBK-cac4ae0f5ac66f6f072b049acd6cfc9e-X", // Replace with your actual public key
       tx_ref: Date.now().toString(),
       amount: Number(eventDetails.eventFee),
       currency: "NGN",

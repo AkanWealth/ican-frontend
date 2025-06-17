@@ -111,11 +111,7 @@ function PaymentActivities() {
           total: item.totalPaid || 0,
         }));
         setPaymentTrendData(formattedData);
-        toast({
-          title: "Payment Activities",
-          description: "Payment activities data fetched successfully.",
-          variant: "default",
-        });
+;
       } catch (error) {
         console.error(error);
 
@@ -148,11 +144,7 @@ function PaymentActivities() {
         );
 
         setPaymentData(response);
-        toast({
-          title: "Overdue Payments",
-          description: "Overdue payments fetched successfully",
-          variant: "default",
-        });
+
       } catch (error) {
         toast({
           title: "Error",
@@ -231,11 +223,7 @@ function PaymentActivities() {
       printWindow.document.close();
       printWindow.print();
 
-      toast({
-        title: "Export Successful",
-        description: "Payment data has been prepared for PDF export",
-        variant: "default",
-      });
+
     } catch (error) {
       console.error("Export failed:", error);
       toast({

@@ -195,7 +195,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
           <input
             type="file"
             multiple
-            accept="image/*"
+            accept="image/jpeg,image/png,image/jpg"
             onChange={(e) => handleImageUpload(e.target.files)}
             className="block w-full text-sm text-gray-500
               file:mr-4 file:py-2 file:px-4
@@ -208,7 +208,7 @@ function GalleryEdit({ mode, id }: CreateContentProps) {
 
           {/* Upload Progress */}
           {isUploading && (
-            <div className="mt-2 space-y-2">
+            <div className="my-2 space-y-2">
               <p className="text-sm font-medium">Uploading...</p>
               {uploadProgress.map((progress, index) => (
                 <div

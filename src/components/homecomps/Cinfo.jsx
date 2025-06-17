@@ -7,12 +7,12 @@ import {
 
 function Cinfo() {
   return (
-    <div className="flex flex-row flex-wrap gap-8 w-full justify-around items-start  p-4 md:p-20 lg:py-20 lg:px-40 bg-blue-100">
-      <div className="flex gap-8 w-fit flex-col">
-        <div className="flex flex-row  items-start gap-4">
-          <MdOutlineLocalPhone className=" fill-primary h-8 w-8" />
-          <div className="flex flex-col gap-4 text-left">
-            <h4 className=" whitespace-nowrap text-2xl font-bold font-mono text-black ">
+    <div className="flex flex-col md:flex-row flex-wrap gap-6 md:gap-8 w-full justify-center md:justify-around items-center md:items-start p-4 md:p-12 lg:py-20 lg:px-40 bg-blue-100">
+      <div className="flex gap-6 md:gap-8 w-full md:w-fit flex-col">
+        <div className="flex flex-row items-start gap-3 md:gap-4">
+          <MdOutlineLocalPhone className="fill-primary h-6 w-6 md:h-8 md:w-8 mt-1" />
+          <div className="flex flex-col gap-2 md:gap-4 text-left">
+            <h4 className="text-xl md:text-2xl font-bold font-mono text-black">
               Phone Number
             </h4>
             <p>+234 808 816 8895</p>
@@ -20,38 +20,37 @@ function Cinfo() {
           </div>
         </div>
 
-        <div className="flex flex-row  items-start gap-4">
-          <MdMailOutline className=" fill-primary h-8 w-8" />
-          <div className="flex flex-col gap-4 text-left">
-            <h4 className=" text-2xl font-bold font-mono text-black ">
+        <div className="flex flex-row items-start gap-3 md:gap-4">
+          <MdMailOutline className="fill-primary h-6 w-6 md:h-8 md:w-8 mt-1" />
+          <div className="flex flex-col gap-2 md:gap-4 text-left">
+            <h4 className="text-xl md:text-2xl font-bold font-mono text-black">
               Mail Us
             </h4>
-            <p>icansuruleredistrictsociety@gmail.com</p>
+            <p className="break-words">icansuruleredistrictsociety@gmail.com</p>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-row max-w-80 items-start gap-4">
-        <MdLocationOn className=" fill-primary h-8 w-8" />
-        <div className="flex flex-col w-3/5 gap-4 text-left">
+      <div className="flex flex-row w-full md:max-w-md items-start gap-3 md:gap-4">
+        <MdLocationOn className="fill-primary h-6 w-6 md:h-8 md:w-8 mt-1" />
+        <div className="flex flex-col gap-2 md:gap-4 text-left">
           <div>
-            <h4 className=" text-2xl font-bold font-mono text-black ">
+            <h4 className="text-xl md:text-2xl font-bold font-mono text-black">
               Secretariat Address
             </h4>
-            <p className=" whitespace-nowrap ">
-              30B, Oke-Onijo Street, Off Ogunlana Street, <br />
-              Ijeshatedo, Surulere, Lagos
+            <p>
+              30B, Oke-Onijo Street, Off Ogunlana Street, Ijeshatedo, Surulere,
+              Lagos
             </p>
           </div>
-          <div>
-            <h4 className=" text-2xl font-bold font-mono text-black ">
+          <div className="mt-2 md:mt-4">
+            <h4 className="text-xl md:text-2xl font-bold font-mono text-black">
               Physical Meeting Address
             </h4>
-            <p className="   whitespace-nowrap ">
-              Surulere Local Government Secretariat, <br /> Senator Oluremi
-              Tinubu Hall,<br />
-              24, Hakeem Olaogun Dickson Close <br /> Off Alhaji Masha,
-              Onilegogoro Bus Stop <br/> Lagos State
+            <p>
+              Surulere Local Government Secretariat, Senator Oluremi Tinubu
+              Hall, 24, Hakeem Olaogun Dickson Close Off Alhaji Masha,
+              Onilegogoro Bus Stop, Lagos State
             </p>
           </div>
         </div>

@@ -1,9 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { useRouter } from "next/navigation";
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
+import Paymentsubpage from "@/app/(admin)/admin/payment/tabs/Paymentsubpage";
+import Waiversubpage from "@/app/(admin)/admin/payment/tabs/Waiversubpage";
+import Donationsubpage from "@/app/(admin)/admin/payment/tabs/Donationsubpage";
 
 import { AuthProvider } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
 import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/AdminProtectedRoute";
@@ -32,11 +37,6 @@ function Payment() {
       try {
         const response = await apiClient.request(config);
         setData(response);
-        toast({
-          title: "Payments fetched successfully",
-          description: "Payments fetched successfully",
-          variant: "default",
-        });
       } catch (error) {
         console.error("Error fetching payments:", error);
         toast({
@@ -60,12 +60,22 @@ function Payment() {
         </div>
       </div>
 
-      <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl font-semibold text-left">All Payments</h2>
-        <div>
-          <PaymentTable columns={paymentcoloumns} data={data} />
-        </div>
-      </div>
+      <Tabs defaultValue="payments">
+        <TabsList>
+          <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="waivers">Waivers</TabsTrigger>
+          <TabsTrigger value="donations">Donations</TabsTrigger>
+        </TabsList>
+        <TabsContent value="payments">
+          <Paymentsubpage />
+        </TabsContent>
+        <TabsContent value="waivers">
+          <Waiversubpage />
+        </TabsContent>
+        <TabsContent value="donations">
+          <Donationsubpage />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

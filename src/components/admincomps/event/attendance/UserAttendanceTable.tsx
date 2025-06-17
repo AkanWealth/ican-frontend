@@ -31,12 +31,14 @@ import {
 } from "@/components/ui/table";
 
 interface DataTableProps<TData, TValue> {
+  type: "attendance" | "registered";
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   setter: React.Dispatch<React.SetStateAction<string[]>> | undefined;
 }
 
 export function UserAttendanceTable<TData, TValue>({
+  type,
   columns,
   data,
   setter,
@@ -83,11 +85,6 @@ export function UserAttendanceTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-        {setter && (
-          <button className="bg-primary text-white rounded-full py-2 px-3 border border-white whitespace-nowrap">
-            Mark as Present
-          </button>
-        )}
       </div>
       <div className="">
         <Table>
@@ -200,20 +197,22 @@ export function UserAttendanceTable<TData, TValue>({
           </Button>
         </div>
       </div>
-      <div className="flex justify-end py-4">
-        <Button
-          variant="default"
-          size="sm"
-          onClick={() => {
-            const selectedRows = table
-              .getSelectedRowModel()
-              .rows.map((row) => row.original);
-            onAccept(selectedRows); // Pass the selected rows to the parent component via the callback
-          }}
-        >
-          Accept
-        </Button>
-      </div>
+      {type === "attendance" && (
+        <div className="flex justify-end py-4">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => {
+              const selectedRows = table
+                .getSelectedRowModel()
+                .rows.map((row) => row.original);
+              onAccept(selectedRows);
+            }}
+          >
+            Accept
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { MdArrowBack } from "react-icons/md";
 import { BASE_API_URL } from "@/utils/setter";
 import { User } from "@/libs/types";
+import ExportMemberPDF from "@/components/admincomps/user/export/ExportMemberPDF";
 
 // Format date to dd-mm-yyyy
 const formatDate = (dateString: string | undefined): string => {
@@ -149,11 +150,6 @@ function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
         setData(result);
         // Initialize form data with fetched data
         setFormData(result);
-        toast({
-          title: "Member details fetched successfully!",
-          description: "Member details fetched successfully!",
-          variant: "default",
-        });
       } catch (error) {
         console.error("Error fetching member details:", error);
         toast({
@@ -237,12 +233,15 @@ function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
               </button>
             </>
           ) : (
-            <button
-              onClick={() => setEditMode(true)}
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition"
-            >
-              Edit Details
-            </button>
+            <div className="flex flex-row gap-2">
+              <button
+                onClick={() => setEditMode(true)}
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition"
+              >
+                Edit Details
+              </button>
+              {data && <ExportMemberPDF user={data} />}
+            </div>
           )}
         </div>
       </div>

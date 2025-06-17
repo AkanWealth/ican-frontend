@@ -62,8 +62,7 @@ type BillingPayment = {
   donationOption: string | null;
   paymentCategory: string;
   eventId: string | null;
-}
-
+};
 
 type User = {
   id: string;
@@ -157,6 +156,47 @@ type PaymentDets = {
   };
 };
 
+type PaymentDetailsTable = {
+  id: string;
+  userId: string;
+  billingId: string | null;
+  invoiceId: string | null;
+  paymentType: string;
+  amount: number;
+  datePaid: string;
+  status: PaymentStatus | string;
+  transactionId: string | null;
+  subscriptionId: string | null;
+  anonymous: boolean;
+  createdAt: string;
+  donationOption: string | null;
+  paymentCategory: PaymentCategory | string;
+  eventId: string | null;
+  user: User;
+  billing: Billing | null;
+};
+
+type PaymentStatus =
+  | "SUCCESS"
+  | "WAIVED"
+  | "FAILED"
+  | "PENDING"
+  | "REFUNDED"
+  | "NOT_PAID"
+  | "PARTIALLY_PAID"
+  | "FULLY_PAID";
+type SubscriptionStatus = "ACTIVE" | "CANCELED" | "EXPIRED";
+type BillingStatus = "PENDING" | "COMPLETED" | "CANCELED";
+type AttendanceStatus = "REGISTERED" | "ABSENT" | "PRESENT";
+type MembershipStatus = "MEMBER" | "NON_MEMBER";
+type EventStatus = "DRAFT" | "CANCELLED" | "COMPLETED" | "UPCOMING";
+type PaymentCategory = "DONATION" | "ONE_TIME" | "RECURRING";
+type BillingFrequency = "ONE_TIME" | "MONTHLY" | "YEARLY";
+type NotificationChannel = "EMAIL" | "PUSH" | "SMS";
+type NotificationTopic = "GENERAL" | "PAYMENT" | "EVENT";
+type ResourceType = "PODCAST" | "DOCUMENT" | "VIDEO";
+type ResourceAccess = "PUBLIC" | "RESTRICTED" | "MEMBERS_ONLY";
+
 type OverdueBills = {
   user: {
     firstname: string;
@@ -203,41 +243,6 @@ type BillingUsersDetails = {
     amountPaid: number;
     paymentStatus: "NOT_PAID" | "PARTIALLY_PAID" | "PAID";
   }[];
-};
-
-/**
- * Represents a payment transaction with details about the payment and associated user
- */
-type PaymentDetails = {
-  /** Unique identifier for the payment */
-  id: string;
-
-  /** Amount of the payment */
-  amount: number;
-
-  /** Type of payment made (e.g., Bank Transfer) */
-  paymentType: string;
-
-  /** Current status of the payment */
-  status: "PENDING" | "COMPLETED" | "FAILED";
-
-  /** Date when the payment was made */
-  datePaid: string;
-
-  /** Unique transaction identifier */
-  transactionId: string;
-
-  /** ID of the associated billing record */
-  billingId: string | null;
-
-  /** ID of the associated subscription */
-  subscriptionId: string | null;
-
-  /** ID of the user who made the payment */
-  userId: string;
-
-  /** User details associated with the payment */
-  user: User;
 };
 
 type EventDetails = {
@@ -325,8 +330,11 @@ type RegisteredUsers = {
   fullName: string;
   email: string;
   membership: string;
+  eventId: string;
   status: string;
   proofOfPayment: string;
+  createdAt: string;
+  userId: string;
 };
 
 type Resource = {
@@ -436,39 +444,7 @@ type Billing = {
   description: string | null;
   frequency: "ONE_TIME" | "MONTHLY" | "YEARLY" | string;
   nextBillingAt: string | null;
-  createdBy: {
-    id: string;
-    email: string;
-    membershipId: string;
-    surname: string;
-    firstname: string;
-    middlename: string | null;
-    gender: string | null;
-    dateOfBirth: string | null;
-    maritalStatus: string | null;
-    stateOfOrigin: string | null;
-    nationality: string | null;
-    residentialAddress: string | null;
-    residentialCountry: string | null;
-    residentialCity: string | null;
-    residentialState: string | null;
-    residentialLGA: string | null;
-    contactPhoneNumber: string | null;
-    institution: string | null;
-    discipline: string | null;
-    qualifications: string | null;
-    yearOfGraduation: number | null;
-    status: string | null;
-    companyName: string | null;
-    officeAddress: string | null;
-    position: string | null;
-    startDate: string | null;
-    endDate: string | null;
-    isVerified: boolean;
-    isSuspended: boolean;
-    profilePicture: string | null;
-    notificationPreference: string;
-  };
+  createdBy: User;
   Payment: {
     id: string;
     userId: string;
@@ -493,39 +469,7 @@ type Billing = {
     paymentStatus: "NOT_PAID" | "FULLY_PAID" | string;
     createdAt: string;
     updatedAt: string;
-    user: {
-      id: string;
-      email: string;
-      membershipId: string;
-      surname: string;
-      firstname: string;
-      middlename: string | null;
-      gender: string | null;
-      dateOfBirth: string | null;
-      maritalStatus: string | null;
-      stateOfOrigin: string | null;
-      nationality: string | null;
-      residentialAddress: string | null;
-      residentialCountry: string | null;
-      residentialCity: string | null;
-      residentialState: string | null;
-      residentialLGA: string | null;
-      contactPhoneNumber: string | null;
-      institution: string | null;
-      discipline: string | null;
-      qualifications: string | null;
-      yearOfGraduation: number | null;
-      status: string | null;
-      companyName: string | null;
-      officeAddress: string | null;
-      position: string | null;
-      startDate: string | null;
-      endDate: string | null;
-      isVerified: boolean;
-      isSuspended: boolean;
-      profilePicture: string | null;
-      notificationPreference: string;
-    };
+    user: User;
   }[];
 };
 type UpdatedBillingStats = {
@@ -547,6 +491,38 @@ type UpdatedBillingStats = {
   };
 };
 
+type WaiverCode = {
+  id: string;
+  code: string;
+  billingId: string;
+  createdById: string;
+  usedById: string | null;
+  expiresAt: string;
+  createdAt: string;
+  maxUsages: number | string | null;
+  currentUsages: number;
+  usedBy:
+    | {
+        id: string;
+        email: string;
+      }[]
+    | null;
+  billing: Billing | null;
+  createdBy: User;
+};
+
+type UserOwing = {
+  id: string;
+  billingId: string;
+  userId: string;
+  amountPaid: number;
+  paymentStatus: PaymentStatus;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
+  billing: Billing;
+};
+
 export type {
   Advert,
   Billing,
@@ -562,7 +538,7 @@ export type {
   BillingDetails,
   OverdueBills,
   PaymentDets,
-  PaymentDetails,
+  PaymentDetailsTable,
   BillingUsersDetails,
   EventDetails,
   DashEventReg,
@@ -574,4 +550,6 @@ export type {
   Publication,
   UpdatedBillingStats,
   BillingPaymentTable,
+  WaiverCode,
+  UserOwing,
 };

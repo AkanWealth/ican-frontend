@@ -115,11 +115,7 @@ function Settings() {
 
     try {
       const result = await apiClient.request(config);
-      toast({
-        title: "Success",
-        description: "Password updated successfully",
-        variant: "default",
-      });
+
       handleCancel();
     } catch (error) {
       console.error("Error saving admin details:", error);

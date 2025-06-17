@@ -258,7 +258,9 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         />
         {/* Image Upload Section */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Technical Session Image</label>
+          <label className="block text-sm font-medium">
+            Technical Session Image
+          </label>
 
           {/* Image Upload Controls */}
           <div className="flex flex-wrap gap-4">
@@ -315,12 +317,14 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
 
         {/* PDF Upload Section */}
         <div className="space-y-2 mb-4">
-          <label className="block text-sm font-medium">Upload PDF</label>
+          <label className="block text-sm font-medium">
+            Upload PDF ( 10Mb max)
+          </label>
 
           {/* Image Upload Controls */}
           <div className="flex flex-wrap gap-4">
             <label className="bg-[#27378C] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm whitespace-nowrap">
-              Upload PDF
+              Upload PDF ( 10Mb max)
               <input
                 type="file"
                 accept="application/pdf"
@@ -370,7 +374,7 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col mt-4 gap-2">
         <button
           disabled={isSubmitting}
           onClick={(e) => {
@@ -382,12 +386,14 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         >
           {isSubmitting ? (
             <span>Loading...</span>
+          ) : mode === "edit" ? (
+            "Publish Edit"
           ) : (
-            mode === "edit" ? "Publish Edit" : "Publish Technical Session"
+            "Publish Technical Session"
           )}
         </button>
         <button
-          disabled={isSubmitting} 
+          disabled={isSubmitting}
           onClick={(e) => {
             e.preventDefault();
             setIsSubmitting(true);
@@ -397,8 +403,10 @@ function TechnicalEdit({ mode, id }: CreateContentProps) {
         >
           {isSubmitting ? (
             <span>Loading...</span>
+          ) : mode === "edit" ? (
+            "Save Edit"
           ) : (
-            mode === "edit" ? "Save Edit" : "Save as Draft"
+            "Save as Draft"
           )}
         </button>
         <button

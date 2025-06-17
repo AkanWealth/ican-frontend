@@ -9,7 +9,7 @@ import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/user/actions/CellActions";
 
 const capitalizeWords = (str: string): string => {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  return str.replace(/[_-]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 export const allcolumns: ColumnDef<User>[] = [
@@ -96,6 +96,21 @@ export const adminscolumns: ColumnDef<User>[] = [
     },
   },
   {
+    accessorKey: "middlename",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Middlename
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
     accessorKey: "surname",
     header: ({ column }) => {
       return (
@@ -173,6 +188,21 @@ export const memberscolumns: ColumnDef<User>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           First Name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "middlename",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="pl-0 text-left"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Middlename
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

@@ -80,6 +80,28 @@ export const userattendancecolumns: ColumnDef<UserAttendance>[] = [
 ];
 export const registereduserscolumns: ColumnDef<RegisteredUsers>[] = [
   {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "fullName",
     header: ({ column }) => {
       return (
@@ -102,5 +124,31 @@ export const registereduserscolumns: ColumnDef<RegisteredUsers>[] = [
   {
     accessorKey: "email",
     header: "Email",
+  },
+  {
+    accessorKey: "proofOfPayment",
+    header: "Proof of Payment",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Registered At",
+    cell: ({ row }) => {
+      const day = new Date(row.original.createdAt);
+      return (
+        <span>
+          {day.toLocaleTimeString()}{" "}
+          {`${String(day.getDate()).padStart(2, "0")}-${String(
+            day.getMonth() + 1
+          ).padStart(2, "0")}-${day.getFullYear()}`}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      return <Statbtn status={row.original.status} />;
+    },
   },
 ];

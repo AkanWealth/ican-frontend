@@ -86,9 +86,21 @@ export default function Paymentsubpage() {
   useEffect(() => {
     let filtered = data;
     if (selectedTab === "PAID") {
-      filtered = data.filter((d) => d.status === "SUCCESS");
+      filtered = data.filter(
+        (d) =>
+          d.status === "SUCCESS" ||
+          d.status === "PARTIALLY_PAID" ||
+          d.status === "FULLY_PAID"
+      );
     } else if (selectedTab === "NOT_PAID") {
-      filtered = data.filter((d) => d.status === "PENDING");
+      filtered = data.filter(
+        (d) =>
+          d.status === "PENDING" ||
+          d.status === "FAILED" ||
+          d.status === "REFUNDED" ||
+          d.status === "NOT_PAID" ||
+          d.status === "PARTIALLY_PAID"
+      );
     }
     // Sort payments by createdAt descending (most recent first)
     filtered = [...filtered].sort((a, b) => {
@@ -241,7 +253,6 @@ export default function Paymentsubpage() {
             <ExportPayments data={filteredData} />
           </div>
         </div>
-
 
         <div>
           <PaymentTable

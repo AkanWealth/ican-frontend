@@ -184,24 +184,57 @@ function Rolemanager({ id }: RolemanagerProps) {
     setIsLoading(false);
   };
 
+  // Helper: Get all unique permission options from the matrix
+  const getAllPermissionOptions = (): Option[] => {
+    const options: Option[] = [];
+    PERMISSION_MATRIX.forEach((row) => {
+      row.actions.forEach((action) => {
+        if (action.value) {
+          // Avoid duplicates by value
+          if (!options.some((opt) => opt.value === action.value)) {
+            options.push({ label: action.label, value: action.value });
+          }
+        }
+      });
+    });
+    return options;
+  };
+
+  // Handler: Select all permissions
+  const handleSelectAll = () => {
+    setPermissions(getAllPermissionOptions());
+  };
+
+  // Handler: Deselect all permissions
+  const handleDeselectAll = () => {
+    setPermissions([]);
+  };
+
   return (
-    <div className="bg-white p-8 rounded-lg w-full">
+    <div className="bg-white p-8 rounded-lg flex flex-col gap-4 w-full">
       <div className="flex justify-start">
         <Button variant="outline" onClick={() => router.back()}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Roles
         </Button>
       </div>
-      <h2 className="text-2xl font-semibold mb-6">Create New Role</h2>
+      <h2 className="text-2xl font-semibold ">Create New Role</h2>
       <p className="text-sm text-gray-500">
         Create a new role to manage the platform. This will grant them access to
         all features and settings.
       </p>
 
+      {/* Select All / Deselect All Buttons */}
+      <div className="flex gap-2 mt-2 mb-2">
+        <Button type="button" variant="outline" onClick={handleSelectAll}>
+          Select All
+        </Button>
+        <Button type="button" variant="outline" onClick={handleDeselectAll}>
+          Deselect All
+        </Button>
+      </div>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <p className="text-sm text-gray-500">
-          Role name should be in alphabets only and should not contain any
-          special characters.
-        </p>
+      
         <InputEle
           label="Role Name"
           type="text"

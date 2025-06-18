@@ -225,10 +225,10 @@ function Rolemanager({ id }: RolemanagerProps) {
 
       {/* Select All / Deselect All Buttons */}
       <div className="flex gap-2 mt-2 mb-2">
-        <Button type="button" variant="outline" onClick={handleSelectAll}>
+        <Button type="button" variant="default" onClick={handleSelectAll}>
           Select All
         </Button>
-        <Button type="button" variant="outline" onClick={handleDeselectAll}>
+        <Button type="button" variant="default" onClick={handleDeselectAll}>
           Deselect All
         </Button>
       </div>

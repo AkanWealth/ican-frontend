@@ -20,7 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 
 // --- Improved summary card component ---
-function SummaryCard({
+export function SummaryCard({
   label,
   value,
   icon,

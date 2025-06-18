@@ -15,7 +15,6 @@ import { User } from "@/libs/types";
 import ExportMemberPDF from "@/components/admincomps/user/export/ExportMemberPDF";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-
 import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
 import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
 import ExportPayments from "@/components/admincomps/payment/export/ExportPayments";
@@ -23,9 +22,8 @@ import { PaymentDetailsTable } from "@/libs/types";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-
-
+import { FiBarChart2, FiCreditCard, FiUsers, FiCalendar } from "react-icons/fi";
+import { SummaryCard } from "@/app/(admin)/admin/payment/tabs/Paymentsubpage";
 
 // Format date to dd-mm-yyyy
 const formatDate = (dateString: string | undefined): string => {
@@ -49,7 +47,7 @@ const formatDate = (dateString: string | undefined): string => {
 
 function PaymentHistory({ userId }: { userId: string }) {
   const router = useRouter();
-  
+
   const [payments, setPayments] = useState<PaymentDetailsTable[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -59,7 +57,7 @@ function PaymentHistory({ userId }: { userId: string }) {
   const [filteredData, setFilteredData] = useState<PaymentDetailsTable[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   useEffect(() => {
     async function fetchPayments() {
       setLoading(true);
@@ -89,37 +87,44 @@ function PaymentHistory({ userId }: { userId: string }) {
     }
     fetchPayments();
   }, [userId, toast]);
-    useEffect(() => {
-      let filtered = payments;
-      if (selectedTab === "PAID") {
-        filtered = payments.filter(
-          (d) =>
-            d.status === "SUCCESS" ||
-            d.status === "PARTIALLY_PAID" ||
-            d.status === "FULLY_PAID"
-        );
-      } else if (selectedTab === "NOT_PAID") {
-        filtered = payments.filter(
-          (d) =>
-            d.status === "PENDING" ||
-            d.status === "FAILED" ||
-            d.status === "REFUNDED" ||
-            d.status === "NOT_PAID" ||
-            d.status === "PARTIALLY_PAID"
-        );
-      }
-      // Sort payments by createdAt descending (most recent first)
-      filtered = [...filtered].sort((a, b) => {
-        // Parse createdAt as Date, fallback to 0 if invalid
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return dateB - dateA;
-      });
-      setFilteredData(filtered);
-    }, [payments, selectedTab]);
+  useEffect(() => {
+    let filtered = payments;
+    if (selectedTab === "PAID") {
+      filtered = payments.filter(
+        (d) =>
+          d.status === "SUCCESS" ||
+          d.status === "PARTIALLY_PAID" ||
+          d.status === "FULLY_PAID"
+      );
+    } else if (selectedTab === "NOT_PAID") {
+      filtered = payments.filter(
+        (d) =>
+          d.status === "PENDING" ||
+          d.status === "FAILED" ||
+          d.status === "REFUNDED" ||
+          d.status === "NOT_PAID" ||
+          d.status === "PARTIALLY_PAID"
+      );
+    }
+    // Sort payments by createdAt descending (most recent first)
+    filtered = [...filtered].sort((a, b) => {
+      // Parse createdAt as Date, fallback to 0 if invalid
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+    setFilteredData(filtered);
+  }, [payments, selectedTab]);
 
-  
-  
+  const totalAmountPaid = payments.reduce((sum, d) => sum + (d.amount || 0), 0);
+  const totalUnpaid = payments.filter((d) => d.status === "PENDING").length;
+  const totalAmountWaived = payments
+    .filter((d) => d.status === "WAIVED")
+    .reduce((sum, d) => sum + (d.amount || 0), 0);
+  const totalOverduePayments = payments.filter(
+    (d) => d.status === "PENDING"
+  ).length;
+
   const handleSendNotification = async () => {
     if (selectedRows.length === 0) {
       toast({
@@ -194,6 +199,44 @@ function PaymentHistory({ userId }: { userId: string }) {
   if (!payments.length)
     return (
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
+        <div className="flex gap-4 mb-6">
+          <SummaryCard
+            label="Total Amount Paid"
+            value={
+              totalAmountPaid ? `₦${totalAmountPaid.toLocaleString()}` : "₦0"
+            }
+            icon={<FiCreditCard size={24} />}
+            iconBg="bg-green-100"
+          />
+          <SummaryCard
+            label="Total Unpaid"
+            value={totalUnpaid}
+            icon={<FiUsers size={24} />}
+            iconBg="bg-blue-100"
+          />
+          <SummaryCard
+            label="Amount Waived"
+            value={
+              totalAmountWaived
+                ? `₦${totalAmountWaived.toLocaleString()}`
+                : "₦0"
+            }
+            icon={<FiCalendar size={24} />}
+            iconBg="bg-purple-100"
+          />
+          <SummaryCard
+            label="Overdue Payments"
+            value={
+              totalOverduePayments
+                ? `₦${totalOverduePayments.toLocaleString(undefined, {
+                    maximumFractionDigits: 2,
+                  })}`
+                : "₦0"
+            }
+            icon={<FiBarChart2 size={24} />}
+            iconBg="bg-yellow-100"
+          />
+        </div>
         <div className="flex flex-row justify-between">
           <div className="flex w-fit space-x-4 border-b border-gray-200 mb-4">
             {["ALL", "PAID", "NOT_PAID"].map((tab) => (

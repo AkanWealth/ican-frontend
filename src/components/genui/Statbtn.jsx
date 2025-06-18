@@ -22,6 +22,13 @@ function Statbtn({ status }) {
       icon: <MdCheckCircleOutline className="w-4 h-4" />,
       label: "Success",
     },
+    waived: {
+      bg: "bg-green-100",
+      text: "text-green-600",
+      fill: "fill-green-600",
+      icon: <MdCheckCircleOutline className="w-4 h-4" />,
+      label: "Waived",
+    },
     active: {
       bg: "bg-green-100",
       text: "text-green-600",

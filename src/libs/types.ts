@@ -47,6 +47,17 @@ type BillingDetails = {
   }[];
 };
 
+type BillingAffectedUsers = {
+  id: string;
+  billingId: string;
+  userId: string;
+  amountPaid: number;
+  paymentStatus: string;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
+};
+
 type BillingPayment = {
   id: string;
   userId: string;
@@ -552,4 +563,5 @@ export type {
   BillingPaymentTable,
   WaiverCode,
   UserOwing,
+  BillingAffectedUsers,
 };

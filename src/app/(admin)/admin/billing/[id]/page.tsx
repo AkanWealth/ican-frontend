@@ -13,6 +13,7 @@ import { AdminProtectedRoute } from "@/app/(admin)/admin/LoginAuthentication/Adm
 import apiClient from "@/services-admin/apiClient";
 
 import { billingdetailscoloumns } from "@/components/admincomps/payment/datatable/columns";
+import { affecteduserscoloumns } from "@/components/admincomps/payment/datatable/columns";
 
 import { BASE_API_URL } from "@/utils/setter";
 import {
@@ -20,6 +21,7 @@ import {
   BillingPaymentTable,
   UpdatedBillingStats,
   WaiverCode,
+  BillingAffectedUsers,
 } from "@/libs/types";
 
 import CreateWaiver from "@/components/admincomps/billing/actions/CreateWaiver";
@@ -61,8 +63,17 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const [paymentData, setPaymentData] = useState<BillingPaymentTable[]>([]);
   const [billingStats, setBillingStats] = useState<UpdatedBillingStats>();
   const [waivers, setWaivers] = useState<WaiverCode[]>([]);
+  const [affectedUsersData, setAffectedUsersData] = useState<
+    BillingAffectedUsers[]
+  >([]);
+
+  const [waivedUsers, setWaivedUsers] = useState<BillingAffectedUsers[]>([]);
+  const [notPaidUsers, setNotPaidUsers] = useState<BillingAffectedUsers[]>([]);
 
   const [isWaiver, setisWaiver] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "payments" | "affected" | "waived" | "notpaid"
+  >("payments");
 
   const chartData = [
     {
@@ -93,6 +104,17 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
         setData(result);
         setPaymentData(result.Payment);
+        setAffectedUsersData(result.affectedUsers);
+        setWaivedUsers(
+          result.affectedUsers.filter(
+            (user: BillingAffectedUsers) => user.paymentStatus === "WAIVED"
+          )
+        );
+        setNotPaidUsers(
+          result.affectedUsers.filter(
+            (user: BillingAffectedUsers) => user.paymentStatus === "NOT_PAID"
+          )
+        );
         console.log(result);
       } catch (error) {
         toast({
@@ -434,11 +456,61 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         </div>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl font-semibold text-left">
-          Successful Payment Details
-        </h2>
+        <div className="flex flex-row gap-4 mb-2">
+          <button
+            className={`px-4 py-2 rounded-md font-semibold ${
+              activeTab === "payments"
+                ? "bg-primary text-white"
+                : "bg-gray-100 text-gray-700"
+            }`}
+            onClick={() => setActiveTab("payments")}
+          >
+            Successful Payments
+          </button>
+          <button
+            className={`px-4 py-2 rounded-md font-semibold ${
+              activeTab === "affected"
+                ? "bg-primary text-white"
+                : "bg-gray-100 text-gray-700"
+            }`}
+            onClick={() => setActiveTab("affected")}
+          >
+            Affected Users
+          </button>
+          <button
+            className={`px-4 py-2 rounded-md font-semibold ${
+              activeTab === "waived"
+                ? "bg-primary text-white"
+                : "bg-gray-100 text-gray-700"
+            }`}
+            onClick={() => setActiveTab("waived")}
+          >
+            Waived
+          </button>
+          <button
+            className={`px-4 py-2 rounded-md font-semibold ${
+              activeTab === "notpaid"
+                ? "bg-primary text-white"
+                : "bg-gray-100 text-gray-700"
+            }`}
+            onClick={() => setActiveTab("notpaid")}
+          >
+            Not Paid
+          </button>
+        </div>
         <hr />
-        <PaymentTable data={paymentData} columns={billingdetailscoloumns} />
+        {activeTab === "payments" ? (
+          <PaymentTable data={paymentData} columns={billingdetailscoloumns} />
+        ) : activeTab === "affected" ? (
+          <PaymentTable
+            data={affectedUsersData}
+            columns={affecteduserscoloumns}
+          />
+        ) : activeTab === "waived" ? (
+          <PaymentTable data={waivedUsers} columns={affecteduserscoloumns} />
+        ) : (
+          <PaymentTable data={notPaidUsers} columns={affecteduserscoloumns} />
+        )}
       </div>
       {isWaiver && (
         <CreateWaiver

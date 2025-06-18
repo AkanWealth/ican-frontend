@@ -13,6 +13,19 @@ import { MdArrowBack } from "react-icons/md";
 import { BASE_API_URL } from "@/utils/setter";
 import { User } from "@/libs/types";
 import ExportMemberPDF from "@/components/admincomps/user/export/ExportMemberPDF";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+
+import { PaymentTable } from "@/components/admincomps/payment/datatable/PaymentTable";
+import { paymentcoloumns } from "@/components/admincomps/payment/datatable/columns";
+import ExportPayments from "@/components/admincomps/payment/export/ExportPayments";
+import { PaymentDetailsTable } from "@/libs/types";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+
+
 
 // Format date to dd-mm-yyyy
 const formatDate = (dateString: string | undefined): string => {
@@ -33,6 +46,246 @@ const formatDate = (dateString: string | undefined): string => {
     return "N/A";
   }
 };
+
+function PaymentHistory({ userId }: { userId: string }) {
+  const router = useRouter();
+  
+  const [payments, setPayments] = useState<PaymentDetailsTable[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const [selectedTab, setSelectedTab] = useState<"ALL" | "PAID" | "NOT_PAID">(
+    "ALL"
+  );
+  const [filteredData, setFilteredData] = useState<PaymentDetailsTable[]>([]);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  useEffect(() => {
+    async function fetchPayments() {
+      setLoading(true);
+      try {
+        const config = {
+          method: "get",
+          url: `${BASE_API_URL}/payments`,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        };
+        const result = await apiClient.request(config);
+        // Only set payments where the userId matches the current userId prop
+        const filteredPayments = (result || []).filter(
+          (payment: PaymentDetailsTable) => payment.userId === userId
+        );
+        setPayments(filteredPayments);
+      } catch (error) {
+        toast({
+          title: "Error fetching payments",
+          description: "Could not load payment history.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPayments();
+  }, [userId, toast]);
+    useEffect(() => {
+      let filtered = payments;
+      if (selectedTab === "PAID") {
+        filtered = payments.filter(
+          (d) =>
+            d.status === "SUCCESS" ||
+            d.status === "PARTIALLY_PAID" ||
+            d.status === "FULLY_PAID"
+        );
+      } else if (selectedTab === "NOT_PAID") {
+        filtered = payments.filter(
+          (d) =>
+            d.status === "PENDING" ||
+            d.status === "FAILED" ||
+            d.status === "REFUNDED" ||
+            d.status === "NOT_PAID" ||
+            d.status === "PARTIALLY_PAID"
+        );
+      }
+      // Sort payments by createdAt descending (most recent first)
+      filtered = [...filtered].sort((a, b) => {
+        // Parse createdAt as Date, fallback to 0 if invalid
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      setFilteredData(filtered);
+    }, [payments, selectedTab]);
+
+  
+  
+  const handleSendNotification = async () => {
+    if (selectedRows.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one Member",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsLoading(true);
+    const config = {
+      method: "patch",
+      maxBodyLength: Infinity,
+      url: `${BASE_API_URL}/billing/send-unpaid-bill-reminders`,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      data: {
+        userIds: selectedRows,
+      },
+    };
+
+    try {
+      const result = await apiClient.request(config);
+
+      router.refresh();
+      toast({
+        title: "Success",
+        description: "Notification sent successfully",
+        variant: "default",
+      });
+      setSelectedRows([]);
+      setIsLoading(false);
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send Notification",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
+  };
+  if (loading)
+    return (
+      <div className="py-8 text-center">
+        <svg
+          className="animate-spin h-6 w-6 text-primary inline-block"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-label="Loading"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          />
+        </svg>
+      </div>
+    );
+  if (!payments.length)
+    return (
+      <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
+        <div className="flex flex-row justify-between">
+          <div className="flex w-fit space-x-4 border-b border-gray-200 mb-4">
+            {["ALL", "PAID", "NOT_PAID"].map((tab) => (
+              <button
+                key={tab}
+                className={`px-4 py-2 font-medium rounded-t-lg ${
+                  selectedTab === tab
+                    ? "text-blue-700 border-b-2 border-blue-700 bg-blue-50"
+                    : "text-gray-500"
+                }`}
+                onClick={() =>
+                  setSelectedTab(tab as "ALL" | "PAID" | "NOT_PAID")
+                }
+              >
+                {tab === "ALL" ? "All" : tab === "PAID" ? "Paid" : "Unpaid"}
+              </button>
+            ))}
+          </div>{" "}
+          <div className="flex gap-2">
+            <Button
+              variant="default"
+              className="gap-2"
+              onClick={handleSendNotification}
+              disabled={isLoading}
+            >
+              <span>Send Notification</span>
+              {isLoading && <Loader2 className="animate-spin" />}
+              {selectedRows.length > 0 && (
+                <Badge variant="secondary">
+                  {selectedRows.length} selected
+                </Badge>
+              )}
+            </Button>
+            <ExportPayments data={filteredData} />
+          </div>
+        </div>
+
+        <div>
+          <PaymentTable
+            columns={paymentcoloumns}
+            data={filteredData}
+            setter={setSelectedRows}
+          />
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
+      <div className="flex flex-row justify-between">
+        <div className="flex w-fit space-x-4 border-b border-gray-200 mb-4">
+          {["ALL", "PAID", "NOT_PAID"].map((tab) => (
+            <button
+              key={tab}
+              className={`px-4 py-2 font-medium rounded-t-lg ${
+                selectedTab === tab
+                  ? "text-blue-700 border-b-2 border-blue-700 bg-blue-50"
+                  : "text-gray-500"
+              }`}
+              onClick={() => setSelectedTab(tab as "ALL" | "PAID" | "NOT_PAID")}
+            >
+              {tab === "ALL" ? "All" : tab === "PAID" ? "Paid" : "Unpaid"}
+            </button>
+          ))}
+        </div>{" "}
+        <div className="flex gap-2">
+          <Button
+            variant="default"
+            className="gap-2"
+            onClick={handleSendNotification}
+            disabled={isLoading}
+          >
+            <span>Send Notification</span>
+            {isLoading && <Loader2 className="animate-spin" />}
+            {selectedRows.length > 0 && (
+              <Badge variant="secondary">{selectedRows.length} selected</Badge>
+            )}
+          </Button>
+          <ExportPayments data={filteredData} />
+        </div>
+      </div>
+
+      <div>
+        <PaymentTable
+          columns={paymentcoloumns}
+          data={filteredData}
+          setter={setSelectedRows}
+        />
+      </div>
+    </div>
+  );
+}
 
 function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -302,6 +555,35 @@ function MemberDetails({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
+function MemberDetailsWithTabs({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    params.then(({ id }) => setUserId(id));
+  }, [params]);
+
+  if (!userId) return <div>Loading...</div>;
+
+  return (
+    <Tabs defaultValue="details" className="w-full">
+      <TabsList>
+        <TabsTrigger value="details">Member Details</TabsTrigger>
+        <TabsTrigger value="payments">Payment History</TabsTrigger>
+      </TabsList>
+      <TabsContent value="details">
+        <MemberDetails params={Promise.resolve({ id: userId })} />
+      </TabsContent>
+      <TabsContent value="payments">
+        <PaymentHistory userId={userId} />
+      </TabsContent>
+    </Tabs>
+  );
+}
+
 export default function PackedMemberDetails({
   params,
 }: {
@@ -310,7 +592,7 @@ export default function PackedMemberDetails({
   return (
     <AuthProvider>
       <AdminProtectedRoute>
-        <MemberDetails params={params} />
+        <MemberDetailsWithTabs params={params} />
       </AdminProtectedRoute>
     </AuthProvider>
   );

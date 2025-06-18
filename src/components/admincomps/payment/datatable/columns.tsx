@@ -8,6 +8,7 @@ import {
   BillingUsersDetails,
   WaiverCode,
   BillingPaymentTable,
+  BillingAffectedUsers,
 } from "@/libs/types";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,6 +28,8 @@ import { useState } from "react";
 import DeleteWaiver from "@/components/admincomps/payment/actions/DeleteWaiver";
 import ViewWaiver from "../actions/ViewWaiver";
 import ViewReceipt from "../actions/ViewReceipt";
+import { MdOutlinePerson, MdRemoveRedEye } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
 export const paymentcoloumns: ColumnDef<PaymentDetailsTable>[] = [
   {
@@ -330,6 +333,37 @@ export const billingdetailscoloumns: ColumnDef<BillingPaymentTable>[] = [
     },
   },
 ];
+
+export const affecteduserscoloumns: ColumnDef<BillingAffectedUsers>[] = [
+  {
+    accessorKey: "user.firstname",
+    header: "Member Name",
+  },
+  {
+    accessorKey: "user.surname",
+    header: "Surname",
+  },
+  {
+    accessorKey: "user.membershipId",
+    header: "Member ID",
+  },
+  {
+    accessorKey: "amountPaid",
+    header: "Amount Paid",
+
+    cell: ({ row }) => {
+      return <div>₦{row.original.amountPaid.toLocaleString("en-NG")}</div>;
+    },
+  },
+  {
+    accessorKey: "paymentStatus",
+    header: "Status",
+    cell: ({ row }) => {
+      return <Statbtn status={row.original.paymentStatus} />;
+    },
+  },
+];
+
 export const billingusersdetailscoloumns: ColumnDef<BillingUsersDetails>[] = [
   {
     accessorKey: "paymentType",
@@ -386,7 +420,9 @@ export const waivercoloumns: ColumnDef<WaiverCode>[] = [
       );
     },
     cell: ({ row }) => {
-      return <div>₦{row.original?.billing?.amount.toLocaleString("en-NG")}</div>;
+      return (
+        <div>₦{row.original?.billing?.amount.toLocaleString("en-NG")}</div>
+      );
     },
   },
   {
@@ -531,7 +567,7 @@ const WaiverActionsCell = ({ row }: { row: any }) => {
 
 const PaymentActionsCell = ({ row }: { row: any }) => {
   const [showViewModal, setShowViewModal] = useState(false);
-
+  const router = useRouter(); 
   return (
     <>
       <DropdownMenu>
@@ -543,16 +579,23 @@ const PaymentActionsCell = ({ row }: { row: any }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => setShowViewModal(true)}>
-            View Receipt
+            <MdRemoveRedEye className="w-4 h-4" /> View Receipt
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => router.push(`members/${row.original.userId}`)}
+            className="flex flex-row items-center"
+          >
+            <MdOutlinePerson className="w-4 h-4" /> View Member Details
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       {showViewModal && (
         <ViewReceipt
-        key={row.original.id}
+          key={row.original.id}
           open={showViewModal}
-          onPrint={() => {}}  
+          onPrint={() => {}}
           payment={row.original}
           onClose={() => setShowViewModal(false)}
         />

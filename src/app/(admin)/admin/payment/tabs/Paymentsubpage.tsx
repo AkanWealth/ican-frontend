@@ -182,7 +182,7 @@ export default function Paymentsubpage() {
 
       <div className="flex gap-4 mb-6">
         <SummaryCard
-          label="Amount Paid Donations"
+          label="Total Amount Paid"
           value={
             totalAmountPaid ? `₦${totalAmountPaid.toLocaleString()}` : "₦0"
           }

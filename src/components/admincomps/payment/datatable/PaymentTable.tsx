@@ -82,7 +82,7 @@ export function PaymentTable<TData, TValue>({
     }
     // Only run when the selected rows change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [table.getSelectedRowModel().rows, setter]);
+  }, [rowSelection, setter]);
 
   return (
     <div>

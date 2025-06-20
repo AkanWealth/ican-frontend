@@ -25,6 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { format } from "date-fns";
 
 // --- Improved summary card component ---
 export function SummaryCard({
@@ -65,6 +66,11 @@ export default function Paymentsubpage() {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSendDialog, setShowSendDialog] = useState(false);
+  const [startDate, setStartDate] = useState<string>("2025-05-01");
+  const [endDate, setEndDate] = useState<string>(
+    format(new Date(), "yyyy-MM-dd")
+  );
+
   useEffect(() => {
     async function fetchData() {
       const config = {
@@ -119,6 +125,16 @@ export default function Paymentsubpage() {
     });
     setFilteredData(filtered);
   }, [data, selectedTab]);
+
+  // Filtered data with date range
+  const filteredByDate = filteredData.filter((d) => {
+    if (!d.createdAt) return false;
+    const created = new Date(d.createdAt);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    // Only include if createdAt is between startDate and endDate (inclusive)
+    return created >= start && created <= end;
+  });
 
   const handleSendNotification = async () => {
     if (selectedRows.length === 0) {
@@ -240,19 +256,68 @@ export default function Paymentsubpage() {
                 {tab === "ALL" ? "All" : tab === "PAID" ? "Paid" : "Unpaid"}
               </button>
             ))}
-          </div>{" "}
-          <div className="flex gap-2">
-            <>
+          </div>
+          <div className="flex flex-wrap gap-4 items-center">
+            {/* Date Range Filter with clearer grouping and quick reset */}
+            <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
+              <label className="text-sm text-gray-600 font-medium">From</label>
+              <input
+                type="date"
+                min="2025-05-01"
+                max={endDate}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-200"
+                aria-label="Start date"
+              />
+              <label className="text-sm text-gray-600 font-medium">To</label>
+              <input
+                type="date"
+                min="2025-05-01"
+                max={format(new Date(), "yyyy-MM-dd")}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-200"
+                aria-label="End date"
+              />
+              {(startDate !== "2025-05-01" || endDate !== format(new Date(), "yyyy-MM-dd")) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-2 text-xs"
+                  onClick={() => {
+                    setStartDate("2025-05-01");
+                    setEndDate(format(new Date(), "yyyy-MM-dd"));
+                  }}
+                  title="Reset date range"
+                >
+                  Reset
+                </Button>
+              )}
+            </div>
+
+            {/* Export Button with tooltip */}
+            <div>
+              <ExportPayments data={filteredByDate} />
+            </div>
+
+            {/* Send Notice Button with improved feedback and disabled state */}
+            <div className="flex items-center gap-2">
               <Button
                 variant="default"
                 className="gap-2"
                 onClick={() => setShowSendDialog(true)}
-                disabled={isLoading}
+                disabled={isLoading || selectedRows.length === 0}
+                title={
+                  selectedRows.length === 0
+                    ? "Select at least one member to send notice"
+                    : "Send notice to selected members"
+                }
               >
                 <span>Send Notice</span>
                 {isLoading && <Loader2 className="animate-spin" />}
                 {selectedRows.length > 0 && (
-                  <Badge className="text-white " variant="outline">
+                  <Badge className="text-white" variant="outline">
                     {selectedRows.length} selected
                   </Badge>
                 )}
@@ -263,9 +328,17 @@ export default function Paymentsubpage() {
                   <DialogHeader>
                     <DialogTitle>Send Notice</DialogTitle>
                     <DialogDescription>
-                      Are you sure you want to send notifications to{" "}
-                      {selectedRows.length} member
-                      {selectedRows.length !== 1 ? "s" : ""}?
+                      {selectedRows.length === 0 ? (
+                        <span className="text-red-500">
+                          Please select at least one member to send a notice.
+                        </span>
+                      ) : (
+                        <>
+                          Are you sure you want to send notifications to{" "}
+                          <span className="font-semibold">{selectedRows.length}</span> member
+                          {selectedRows.length !== 1 ? "s" : ""}?
+                        </>
+                      )}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex justify-end gap-2 mt-4">
@@ -282,7 +355,7 @@ export default function Paymentsubpage() {
                         setShowSendDialog(false);
                         await handleSendNotification();
                       }}
-                      disabled={isLoading}
+                      disabled={isLoading || selectedRows.length === 0}
                     >
                       {isLoading && <Loader2 className="animate-spin mr-2" />}
                       Confirm
@@ -290,15 +363,14 @@ export default function Paymentsubpage() {
                   </div>
                 </DialogContent>
               </Dialog>
-            </>
-            <ExportPayments data={filteredData} />
+            </div>
           </div>
         </div>
 
         <div>
           <PaymentTable
             columns={paymentcoloumns}
-            data={filteredData}
+            data={filteredByDate}
             setter={setSelectedRows}
           />
         </div>

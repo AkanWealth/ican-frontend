@@ -51,10 +51,11 @@ export const billingcolumns: ColumnDef<Billing>[] = [
     accessorKey: "amount",
     header: "Amount",
     cell: ({ row }) => {
+      const amount = row.original.amount.toLocaleString("en-NG");
       return (
         <div className="flex flex-row items-center gap-2">
           <span className="text-primary font-semibold">₦</span>
-          <span>{row.original.amount}</span>
+          <span>{amount}</span>
         </div>
       );
     },

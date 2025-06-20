@@ -64,6 +64,11 @@ export function PaymentTable<TData, TValue>({
       globalFilter,
       rowSelection,
     },
+    initialState: {
+      pagination: {
+        pageSize: 30,
+      },
+    },
     onGlobalFilterChange: setGlobalFilter,
   });
 

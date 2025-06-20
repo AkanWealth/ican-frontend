@@ -18,7 +18,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // --- Improved summary card component ---
 export function SummaryCard({
@@ -243,7 +249,7 @@ export default function Paymentsubpage() {
                 onClick={() => setShowSendDialog(true)}
                 disabled={isLoading}
               >
-                <span>Send Notification</span>
+                <span>Send Notice</span>
                 {isLoading && <Loader2 className="animate-spin" />}
                 {selectedRows.length > 0 && (
                   <Badge className="text-white " variant="outline">
@@ -255,7 +261,7 @@ export default function Paymentsubpage() {
               <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Send Notification</DialogTitle>
+                    <DialogTitle>Send Notice</DialogTitle>
                     <DialogDescription>
                       Are you sure you want to send notifications to{" "}
                       {selectedRows.length} member

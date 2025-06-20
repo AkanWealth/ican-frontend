@@ -229,7 +229,7 @@ function PaymentHistory({ userId }: { userId: string }) {
               onClick={handleSendNotification}
               disabled={isLoading}
             >
-              <span>Send Notification</span>
+              <span>Send Notice</span>
               {isLoading && <Loader2 className="animate-spin" />}
               {selectedRows.length > 0 && (
                 <Badge variant="secondary">
@@ -317,7 +317,7 @@ function PaymentHistory({ userId }: { userId: string }) {
               onClick={() => setShowSendDialog(true)}
               disabled={isLoading}
             >
-              <span>Send Notification</span>
+              <span>Send Notice</span>
               {isLoading && <Loader2 className="animate-spin" />}
               {selectedRows.length > 0 && (
                 <Badge className="text-white " variant="outline">
@@ -329,7 +329,7 @@ function PaymentHistory({ userId }: { userId: string }) {
             <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Send Notification</DialogTitle>
+                  <DialogTitle>Send Notice</DialogTitle>
                   <DialogDescription>
                     Are you sure you want to send notifications to{" "}
                     {selectedRows.length} member

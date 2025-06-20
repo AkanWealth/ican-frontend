@@ -223,7 +223,7 @@ function Rolemanager({ id }: RolemanagerProps) {
         all features and settings.
       </p>
 
-      {/* Select All / Deselect All Buttons */}
+      {/* Select All / Deselect All Buttons
       <div className="flex gap-2 mt-2 mb-2">
         <Button type="button" variant="default" onClick={handleSelectAll}>
           Select All
@@ -231,7 +231,7 @@ function Rolemanager({ id }: RolemanagerProps) {
         <Button type="button" variant="default" onClick={handleDeselectAll}>
           Deselect All
         </Button>
-      </div>
+      </div> */}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <InputEle

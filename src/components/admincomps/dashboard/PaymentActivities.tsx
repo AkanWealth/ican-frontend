@@ -111,7 +111,6 @@ function PaymentActivities() {
           total: item.totalPaid || 0,
         }));
         setPaymentTrendData(formattedData);
-;
       } catch (error) {
         console.error(error);
 
@@ -144,7 +143,6 @@ function PaymentActivities() {
         );
 
         setPaymentData(response);
-
       } catch (error) {
         toast({
           title: "Error",
@@ -222,8 +220,6 @@ function PaymentActivities() {
 
       printWindow.document.close();
       printWindow.print();
-
-
     } catch (error) {
       console.error("Export failed:", error);
       toast({

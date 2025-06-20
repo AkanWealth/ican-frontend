@@ -66,11 +66,18 @@ export function PaymentTable<TData, TValue>({
     },
     onGlobalFilterChange: setGlobalFilter,
   });
-  function onAccept(selectedRows: TData[]) {
+
+  // Automatically update setter when selection changes
+  React.useEffect(() => {
     if (setter) {
-      setter(selectedRows.map((row) => String((row as any).id))); // Extract and convert the 'id' field to string
+      const selectedRows = table
+        .getSelectedRowModel()
+        .rows.map((row) => row.original);
+      setter(selectedRows.map((row) => String((row as any).id)));
     }
-  }
+    // Only run when the selected rows change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table.getSelectedRowModel().rows, setter]);
 
   return (
     <div>
@@ -141,29 +148,15 @@ export function PaymentTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </div>{" "}
-      <div className="flex-1 text-sm text-muted-foreground">
-        <p>
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} member(s) selected.
-        </p>
-        {setter && (
-          <div className="flex justify-end py-4">
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => {
-                const selectedRows = table
-                  .getSelectedRowModel()
-                  .rows.map((row) => row.original);
-                onAccept(selectedRows);
-              }}
-            >
-              Accept
-            </Button>
-          </div>
-        )}
       </div>
+      {setter && (
+        <div className="flex-1 text-sm text-muted-foreground">
+          <p>
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} member(s) selected.
+          </p>
+        </div>
+      )}
       <div className="flex flex-row items-center justify-center">
         <div className="flex items-center justify-end space-x-2 py-4">
           <Button

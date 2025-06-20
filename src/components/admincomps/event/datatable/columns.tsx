@@ -54,6 +54,9 @@ export const allcolumns: ColumnDef<Event>[] = [
   {
     accessorKey: "fee",
     header: "Fee",
+    cell: ({ row }) => {
+      return <div>₦{row.original.fee.toLocaleString("en-NG")}</div>;
+    },
   },
 
   {

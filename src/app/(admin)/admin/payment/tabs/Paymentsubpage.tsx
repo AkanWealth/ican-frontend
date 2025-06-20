@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // --- Improved summary card component ---
 export function SummaryCard({
@@ -57,6 +58,7 @@ export default function Paymentsubpage() {
   const [filteredData, setFilteredData] = useState<PaymentDetailsTable[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSendDialog, setShowSendDialog] = useState(false);
   useEffect(() => {
     async function fetchData() {
       const config = {
@@ -123,7 +125,7 @@ export default function Paymentsubpage() {
     }
     setIsLoading(true);
     const config = {
-      method: "patch",
+      method: "post",
       maxBodyLength: Infinity,
       url: `${BASE_API_URL}/billing/send-unpaid-bill-reminders`,
       headers: {
@@ -131,9 +133,7 @@ export default function Paymentsubpage() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
-      data: {
-        userIds: selectedRows,
-      },
+      data: { userIds: selectedRows },
     };
 
     try {
@@ -191,7 +191,7 @@ export default function Paymentsubpage() {
         />
         <SummaryCard
           label="Total Unpaid"
-          value={totalUnpaid}
+          value={totalUnpaid ? `₦${totalUnpaid.toLocaleString()}` : "₦0"}
           icon={<FiUsers size={24} />}
           iconBg="bg-blue-100"
         />
@@ -236,20 +236,55 @@ export default function Paymentsubpage() {
             ))}
           </div>{" "}
           <div className="flex gap-2">
-            <Button
-              variant="default"
-              className="gap-2"
-              onClick={handleSendNotification}
-              disabled={isLoading}
-            >
-              <span>Send Notification</span>
-              {isLoading && <Loader2 className="animate-spin" />}
-              {selectedRows.length > 0 && (
-                <Badge variant="secondary">
-                  {selectedRows.length} selected
-                </Badge>
-              )}
-            </Button>
+            <>
+              <Button
+                variant="default"
+                className="gap-2"
+                onClick={() => setShowSendDialog(true)}
+                disabled={isLoading}
+              >
+                <span>Send Notification</span>
+                {isLoading && <Loader2 className="animate-spin" />}
+                {selectedRows.length > 0 && (
+                  <Badge className="text-white " variant="outline">
+                    {selectedRows.length} selected
+                  </Badge>
+                )}
+              </Button>
+              {/* Confirmation Dialog */}
+              <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Send Notification</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to send notifications to{" "}
+                      {selectedRows.length} member
+                      {selectedRows.length !== 1 ? "s" : ""}?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowSendDialog(false)}
+                      disabled={isLoading}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="default"
+                      onClick={async () => {
+                        setShowSendDialog(false);
+                        await handleSendNotification();
+                      }}
+                      disabled={isLoading}
+                    >
+                      {isLoading && <Loader2 className="animate-spin mr-2" />}
+                      Confirm
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </>
             <ExportPayments data={filteredData} />
           </div>
         </div>

@@ -234,7 +234,6 @@ function Rolemanager({ id }: RolemanagerProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      
         <InputEle
           label="Role Name"
           type="text"
@@ -257,43 +256,92 @@ function Rolemanager({ id }: RolemanagerProps) {
                     {action.label}
                   </th>
                 ))}
+                <th className="px-4 py-2 font-medium text-gray-700">
+                  Select All
+                </th>
               </tr>
             </thead>
             <tbody>
-              {PERMISSION_MATRIX.map((row) => (
-                <tr key={row.resource} className="border-t">
-                  <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
-                    {row.resource}
-                  </td>
-                  {row.actions.map((action) => (
-                    <td key={action.label} className="px-4 py-2 text-center">
-                      {action.value ? (
-                        <input
-                          type="checkbox"
-                          checked={permissions.some(
-                            (p) => p.value === action.value
-                          )}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setPermissions((prev) => [
-                                ...prev,
-                                { label: action.label, value: action.value },
-                              ]);
-                            } else {
-                              setPermissions((prev) =>
-                                prev.filter((p) => p.value !== action.value)
-                              );
-                            }
-                          }}
-                          className="accent-blue-700 w-4 h-4"
-                        />
-                      ) : (
-                        <span className="inline-block w-4 h-4" />
-                      )}
+              {PERMISSION_MATRIX.map((row) => {
+                // Get all non-empty permissions for this row
+                const rowPermissionOptions = row.actions
+                  .filter((action) => action.value)
+                  .map((action) => ({
+                    label: action.label,
+                    value: action.value,
+                  }));
+                // Check if all permissions in this row are selected
+                const allRowSelected =
+                  rowPermissionOptions.length > 0 &&
+                  rowPermissionOptions.every((perm) =>
+                    permissions.some((p) => p.value === perm.value)
+                  );
+                return (
+                  <tr key={row.resource} className="border-t">
+                    <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
+                      {row.resource}
                     </td>
-                  ))}
-                </tr>
-              ))}
+                    {row.actions.map((action) => (
+                      <td key={action.label} className="px-4 py-2 text-center">
+                        {action.value ? (
+                          <input
+                            type="checkbox"
+                            checked={permissions.some(
+                              (p) => p.value === action.value
+                            )}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setPermissions((prev) => [
+                                  ...prev,
+                                  { label: action.label, value: action.value },
+                                ]);
+                              } else {
+                                setPermissions((prev) =>
+                                  prev.filter((p) => p.value !== action.value)
+                                );
+                              }
+                            }}
+                            className="accent-blue-700 w-4 h-4"
+                          />
+                        ) : (
+                          <span className="inline-block w-4 h-4" />
+                        )}
+                      </td>
+                    ))}
+                    <td className="px-4 py-2 text-center">
+                      <Button
+                        type="button"
+                        variant={allRowSelected ? "secondary" : "default"}
+                        size="sm"
+                        onClick={() => {
+                          if (allRowSelected) {
+                            // Deselect all permissions in this row
+                            setPermissions((prev) =>
+                              prev.filter(
+                                (p) =>
+                                  !rowPermissionOptions.some(
+                                    (perm) => perm.value === p.value
+                                  )
+                              )
+                            );
+                          } else {
+                            // Add all permissions in this row (avoid duplicates)
+                            setPermissions((prev) => {
+                              const newPerms = rowPermissionOptions.filter(
+                                (perm) =>
+                                  !prev.some((p) => p.value === perm.value)
+                              );
+                              return [...prev, ...newPerms];
+                            });
+                          }
+                        }}
+                      >
+                        {allRowSelected ? "Deselect All" : "Select All"}
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

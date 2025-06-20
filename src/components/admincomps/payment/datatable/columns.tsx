@@ -84,6 +84,9 @@ export const paymentcoloumns: ColumnDef<PaymentDetailsTable>[] = [
   {
     accessorKey: "amount",
     header: "Amount",
+    cell: ({ row }) => {
+      return <div>₦{row.original.amount.toLocaleString("en-NG")}</div>;
+    },
   },
   {
     accessorKey: "datePaid",
@@ -166,6 +169,9 @@ export const dashPaymentcoloumns: ColumnDef<OverdueBills>[] = [
   {
     accessorKey: "billing.amount",
     header: "Amount",
+    cell: ({ row }) => {
+      return <div>₦{row.original.billing.amount.toLocaleString("en-NG")}</div>;
+    },
   },
   {
     accessorKey: "billing.frequency",
@@ -248,6 +254,9 @@ export const paymentdetailscoloumns: ColumnDef<PaymentDetailsTable>[] = [
   {
     accessorKey: "amount",
     header: "Amount",
+    cell: ({ row }) => {
+      return <div>₦{row.original.amount.toLocaleString("en-NG")}</div>;
+    },
   },
   {
     accessorKey: "datePaid",
@@ -304,6 +313,9 @@ export const billingdetailscoloumns: ColumnDef<BillingPaymentTable>[] = [
   {
     accessorKey: "amount",
     header: "Amount Paid",
+    cell: ({ row }) => {
+      return <div>₦{row.original.amount.toLocaleString("en-NG")}</div>;
+    },
   },
   {
     accessorKey: "datePaid",
@@ -372,6 +384,9 @@ export const billingusersdetailscoloumns: ColumnDef<BillingUsersDetails>[] = [
   {
     accessorKey: "amount",
     header: "Amount",
+    cell: ({ row }) => {
+      return <div>₦{row.original.amount.toLocaleString("en-NG")}</div>;
+    },
   },
   {
     accessorKey: "affectedUsers.amountPaid",
@@ -382,11 +397,12 @@ export const billingusersdetailscoloumns: ColumnDef<BillingUsersDetails>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Amount Paid
+          Amount Paid (₦)
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
+    
   },
   {
     accessorKey: "affectedUsers.paymentStatus",

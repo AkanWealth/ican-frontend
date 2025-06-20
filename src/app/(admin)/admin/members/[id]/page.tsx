@@ -24,6 +24,13 @@ import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { FiBarChart2, FiCreditCard, FiUsers, FiCalendar } from "react-icons/fi";
 import { SummaryCard } from "@/app/(admin)/admin/payment/tabs/Paymentsubpage";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Format date to dd-mm-yyyy
 const formatDate = (dateString: string | undefined): string => {
@@ -57,7 +64,7 @@ function PaymentHistory({ userId }: { userId: string }) {
   const [filteredData, setFilteredData] = useState<PaymentDetailsTable[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [showSendDialog, setShowSendDialog] = useState(false);
   useEffect(() => {
     async function fetchPayments() {
       setLoading(true);
@@ -144,9 +151,7 @@ function PaymentHistory({ userId }: { userId: string }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
-      data: {
-        userIds: selectedRows,
-      },
+      data: { selectedRows },
     };
 
     try {
@@ -199,44 +204,6 @@ function PaymentHistory({ userId }: { userId: string }) {
   if (!payments.length)
     return (
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <div className="flex gap-4 mb-6">
-          <SummaryCard
-            label="Total Amount Paid"
-            value={
-              totalAmountPaid ? `₦${totalAmountPaid.toLocaleString()}` : "₦0"
-            }
-            icon={<FiCreditCard size={24} />}
-            iconBg="bg-green-100"
-          />
-          <SummaryCard
-            label="Total Unpaid"
-            value={totalUnpaid}
-            icon={<FiUsers size={24} />}
-            iconBg="bg-blue-100"
-          />
-          <SummaryCard
-            label="Amount Waived"
-            value={
-              totalAmountWaived
-                ? `₦${totalAmountWaived.toLocaleString()}`
-                : "₦0"
-            }
-            icon={<FiCalendar size={24} />}
-            iconBg="bg-purple-100"
-          />
-          <SummaryCard
-            label="Overdue Payments"
-            value={
-              totalOverduePayments
-                ? `₦${totalOverduePayments.toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}`
-                : "₦0"
-            }
-            icon={<FiBarChart2 size={24} />}
-            iconBg="bg-yellow-100"
-          />
-        </div>
         <div className="flex flex-row justify-between">
           <div className="flex w-fit space-x-4 border-b border-gray-200 mb-4">
             {["ALL", "PAID", "NOT_PAID"].map((tab) => (
@@ -286,6 +253,42 @@ function PaymentHistory({ userId }: { userId: string }) {
 
   return (
     <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
+      <div className="flex gap-4 mb-6">
+        <SummaryCard
+          label="Total Amount Paid"
+          value={
+            totalAmountPaid ? `₦${totalAmountPaid.toLocaleString()}` : "₦0"
+          }
+          icon={<FiCreditCard size={24} />}
+          iconBg="bg-green-100"
+        />
+        <SummaryCard
+          label="Total Unpaid"
+          value={totalUnpaid ? `₦${totalUnpaid.toLocaleString()}` : "₦0"}
+          icon={<FiUsers size={24} />}
+          iconBg="bg-blue-100"
+        />
+        <SummaryCard
+          label="Amount Waived"
+          value={
+            totalAmountWaived ? `₦${totalAmountWaived.toLocaleString()}` : "₦0"
+          }
+          icon={<FiCalendar size={24} />}
+          iconBg="bg-purple-100"
+        />
+        <SummaryCard
+          label="Overdue Payments"
+          value={
+            totalOverduePayments
+              ? `₦${totalOverduePayments.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}`
+              : "₦0"
+          }
+          icon={<FiBarChart2 size={24} />}
+          iconBg="bg-yellow-100"
+        />
+      </div>
       <div className="flex flex-row justify-between">
         <div className="flex w-fit space-x-4 border-b border-gray-200 mb-4">
           {["ALL", "PAID", "NOT_PAID"].map((tab) => (
@@ -303,18 +306,59 @@ function PaymentHistory({ userId }: { userId: string }) {
           ))}
         </div>{" "}
         <div className="flex gap-2">
-          <Button
-            variant="default"
-            className="gap-2"
-            onClick={handleSendNotification}
-            disabled={isLoading}
-          >
-            <span>Send Notification</span>
-            {isLoading && <Loader2 className="animate-spin" />}
-            {selectedRows.length > 0 && (
-              <Badge variant="secondary">{selectedRows.length} selected</Badge>
-            )}
-          </Button>
+          {/* 
+            Add a confirmation dialog before sending notifications.
+            This prevents accidental mass notifications and improves UX.
+          */}
+          {/* 
+            <Button
+              variant="default"
+              className="gap-2"
+              onClick={() => setShowSendDialog(true)}
+              disabled={isLoading}
+            >
+              <span>Send Notification</span>
+              {isLoading && <Loader2 className="animate-spin" />}
+              {selectedRows.length > 0 && (
+                <Badge className="text-white " variant="outline">
+                  {selectedRows.length} selected
+                </Badge>
+              )}
+            </Button>
+           
+            <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Send Notification</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to send notifications to{" "}
+                    {selectedRows.length} member
+                    {selectedRows.length !== 1 ? "s" : ""}?
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSendDialog(false)}
+                    disabled={isLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="default"
+                    onClick={async () => {
+                      setShowSendDialog(false);
+                      await handleSendNotification();
+                    }}
+                    disabled={isLoading}
+                  >
+                    {isLoading && <Loader2 className="animate-spin mr-2" />}
+                    Confirm
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+           */}
           <ExportPayments data={filteredData} />
         </div>
       </div>
@@ -323,7 +367,7 @@ function PaymentHistory({ userId }: { userId: string }) {
         <PaymentTable
           columns={paymentcoloumns}
           data={filteredData}
-          setter={setSelectedRows}
+          // setter={setSelectedRows}
         />
       </div>
     </div>

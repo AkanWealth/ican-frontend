@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useContext } from "react";
 import { LogOut } from "lucide-react";
 import {
   MdOutlinePeopleAlt,
@@ -16,41 +16,217 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { logout } from "@/lib/auth";
+import { AuthContext } from "@/app/(admin)/admin/LoginAuthentication/AuthContext";
 
-const topMenuItems = [
+// Permission IDs
+const PERMISSIONS = {
+  ADMIN_MANAGEMENT: "299243fa-a5e1-4945-9786-ae6817a0493a",
+  MEMBERS_MANAGEMENT: "89bac9c8-b107-4ced-800a-15429684157f",
+  CONTENT_MANAGEMENT: "2a554294-bf30-40e7-813e-44051f6bd2b6",
+  EVENT_MANAGEMENT: "3a902e3c-5114-4694-9fa5-bfc98a2b44b1",
+  BILLING_PAYMENT: "ac16be57-6a3f-4c93-9e30-2fe2de57636c",
+};
+
+// Export the full list of possible top menu items (with permission keys)
+export const topMenuItems = [
   { icon: MdHome, label: "Dashboard", href: "/admin" },
   {
     icon: MdOutlinePeopleAlt,
     label: "Admin Management",
     href: "/admin/admins",
+    permission: PERMISSIONS.ADMIN_MANAGEMENT,
   },
-
   {
     icon: MdOutlinePeopleAlt,
     label: "Members Management",
     href: "/admin/members",
+    permission: PERMISSIONS.MEMBERS_MANAGEMENT,
   },
   {
     icon: MdCollectionsBookmark,
     label: "Content Management",
     href: "/admin/content",
+    permission: PERMISSIONS.CONTENT_MANAGEMENT,
   },
-  { icon: IoMdCalendar, label: "Event Management", href: "/admin/events" },
-  { icon: MdAttachMoney, label: "Payment Management", href: "/admin/payment" },
-
-  { icon: MdOutlineAnalytics, label: "Billings", href: "/admin/billing" },
+  {
+    icon: IoMdCalendar,
+    label: "Event Management",
+    href: "/admin/events",
+    permission: PERMISSIONS.EVENT_MANAGEMENT,
+  },
+  {
+    icon: MdAttachMoney,
+    label: "Payment Management",
+    href: "/admin/payment",
+    permission: PERMISSIONS.BILLING_PAYMENT,
+  },
+  {
+    icon: MdOutlineAnalytics,
+    label: "Billings",
+    href: "/admin/billing",
+    permission: PERMISSIONS.BILLING_PAYMENT,
+  },
 ];
 
-const bottomMenuItems = [
+// Export the bottom menu items (always visible)
+export const bottomMenuItems = [
   { icon: MdOutlinePerson, label: "Profile", href: "/admin/profile" },
   { icon: MdOutlineSettings, label: "Settings", href: "/admin/settings" },
 ];
 
 function Sidebar() {
   const pathname = usePathname();
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    return null;
+  }
+  let { hasPermission, userPermissions } = authContext;
+
+  // Fallback: If userPermissions is empty, try to get from localStorage
+  if (!userPermissions || userPermissions.length === 0) {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("userPermissions");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            userPermissions = parsed;
+            // Optionally, you can redefine hasPermission to use this array
+            hasPermission = (permId: string) => parsed.includes(permId);
+          }
+        } catch (e) {
+          // Optionally log or handle parse error
+          console.error("Failed to parse userPermissions from localStorage", e);
+        }
+      }
+    }
+  }
+
+  // Precompute permission-based menu items before assigning to menuItems for clarity and maintainability.
+  const permissionMenuItems = [
+    hasPermission(PERMISSIONS.ADMIN_MANAGEMENT)
+      ? {
+          icon: MdOutlinePeopleAlt,
+          label: "Admin Management",
+          href: "/admin/admins",
+        }
+      : null,
+    hasPermission(PERMISSIONS.MEMBERS_MANAGEMENT)
+      ? {
+          icon: MdOutlinePeopleAlt,
+          label: "Members Management",
+          href: "/admin/members",
+        }
+      : null,
+    hasPermission(PERMISSIONS.CONTENT_MANAGEMENT)
+      ? {
+          icon: MdCollectionsBookmark,
+          label: "Content Management",
+          href: "/admin/content",
+        }
+      : null,
+    hasPermission(PERMISSIONS.EVENT_MANAGEMENT)
+      ? {
+          icon: IoMdCalendar,
+          label: "Event Management",
+          href: "/admin/events",
+        }
+      : null,
+    hasPermission(PERMISSIONS.BILLING_PAYMENT)
+      ? {
+          icon: MdAttachMoney,
+          label: "Payment Management",
+          href: "/admin/payment",
+        }
+      : null,
+    hasPermission(PERMISSIONS.BILLING_PAYMENT)
+      ? {
+          icon: MdOutlineAnalytics,
+          label: "Billings",
+          href: "/admin/billing",
+        }
+      : null,
+  ].filter(Boolean);
+
+  const menuItems = [
+    { icon: MdHome, label: "Dashboard", href: "/admin" },
+    ...permissionMenuItems,
+  ].filter(Boolean);
+
+  // Log the permissionMenuItems before filtering
+  console.log("[Sidebar] Raw permissionMenuItems (before filter):", [
+    hasPermission(PERMISSIONS.ADMIN_MANAGEMENT)
+      ? {
+          icon: MdOutlinePeopleAlt,
+          label: "Admin Management",
+          href: "/admin/admins",
+        }
+      : null,
+    hasPermission(PERMISSIONS.MEMBERS_MANAGEMENT)
+      ? {
+          icon: MdOutlinePeopleAlt,
+          label: "Members Management",
+          href: "/admin/members",
+        }
+      : null,
+    hasPermission(PERMISSIONS.CONTENT_MANAGEMENT)
+      ? {
+          icon: MdCollectionsBookmark,
+          label: "Content Management",
+          href: "/admin/content",
+        }
+      : null,
+    hasPermission(PERMISSIONS.EVENT_MANAGEMENT)
+      ? {
+          icon: IoMdCalendar,
+          label: "Event Management",
+          href: "/admin/events",
+        }
+      : null,
+    hasPermission(PERMISSIONS.BILLING_PAYMENT)
+      ? {
+          icon: MdAttachMoney,
+          label: "Payment Management",
+          href: "/admin/payment",
+        }
+      : null,
+    hasPermission(PERMISSIONS.BILLING_PAYMENT)
+      ? {
+          icon: MdOutlineAnalytics,
+          label: "Billings",
+          href: "/admin/billing",
+        }
+      : null,
+  ]);
+
+  // Log the filtered permissionMenuItems
+  console.log("[Sidebar] Filtered permissionMenuItems:", permissionMenuItems);
+
+  // Log the final menuItems array
+  console.log("[Sidebar] Final menuItems:", menuItems);
+
+  const bottomMenuItems = [
+    { icon: MdOutlinePerson, label: "Profile", href: "/admin/profile" },
+    { icon: MdOutlineSettings, label: "Settings", href: "/admin/settings" },
+  ];
+
+  // Helper to find a menu item by pathname
+  /**
+   * Finds a menu item (from either menuItems or bottomMenuItems) by pathname.
+   * Handles the case where menuItems may contain boolean values due to conditional entries.
+   *
+   * @param pathname - The path to search for.
+   * @returns The matching menu item object, or undefined if not found.
+   */
   const findMenuItem = (pathname: string) => {
+    // Type guard to ensure item is not false
+    const isMenuItem = (
+      item: (typeof menuItems)[number] | false
+    ): item is Exclude<(typeof menuItems)[number], false> => Boolean(item);
+
     return (
-      topMenuItems.find((item) => item.href === pathname) ||
+      menuItems.find((item) => item && item.href === pathname) ||
       bottomMenuItems.find((item) => item.href === pathname)
     );
   };
@@ -70,20 +246,27 @@ function Sidebar() {
         {/* Top Menu Group */}
         <div className="flex flex-col py-12">
           <div className="my-4 flex flex-col gap-4">
-            {topMenuItems.map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                className={`py-3 px-4 flex flex-row gap-2 ${
-                  activePage === item.label
-                    ? "bg-primary text-white fill-white"
-                    : "hover:bg-gray-200"
-                } justify-start items-center rounded-lg text-neutral-600`}
-              >
-                <item.icon className="w-6 h-6" />
-                <p className="whitespace-nowrap test-xs">{item.label}</p>
-              </Link>
-            ))}
+            {menuItems.filter(Boolean).map((item, index) => {
+              const menuItem = item as {
+                icon: React.ElementType;
+                label: string;
+                href: string;
+              };
+              return (
+                <Link
+                  key={index}
+                  href={menuItem.href}
+                  className={`py-3 px-4 flex flex-row gap-2 ${
+                    activePage === menuItem.label
+                      ? "bg-primary text-white fill-white"
+                      : "hover:bg-gray-200"
+                  } justify-start items-center rounded-lg text-neutral-600`}
+                >
+                  <menuItem.icon className="w-6 h-6" />
+                  <p className="whitespace-nowrap test-xs">{menuItem.label}</p>
+                </Link>
+              );
+            })}
           </div>
           <hr className="border border-neutral-300" />
 
@@ -120,4 +303,4 @@ function Sidebar() {
 }
 
 export default Sidebar;
-export { topMenuItems, bottomMenuItems };
+export { AuthContext };

@@ -140,10 +140,64 @@ function Rolemanager({ id }: RolemanagerProps) {
     // Extract and clean up permission values
     const selectedPermissionValues = permissions
       .map((permission) => permission.value)
+      .concat([
+        "VIEW_PAYMENT_HISTORY","VIEW_PERMISSION", "VIEW_ROLE", "VIEW_ROLES",
+        "VIEW_DONUT_SUMMARY",
+        "VIEW_MONTHLY_CHART",
+        "VIEW_ATTENDANCE_METRICS",
+        "VIEW_TECHNICAL_SESSION",
+        "VIEW_ALL_STUDYPACKS",
+        "VIEW_PAYMENT_BY_BILLING",
+        "VIEW_STUDYPACK",
+        "VIEW_ALL_GALLERY",
+        "VIEW_GALLERY",
+        "VIEW_ALL_CONTENT",
+        "VIEW_CONTENT",
+        "VIEW_PAYMENT",
+        "VIEW_EVENT",
+        "VIEW_BLOG",
+        "REGISTER_EVENT",
+        "ADD_TO_WAITLIST",
+        "VIEW_EVENT_REGISTRATIONS_BY_USER",
+        "VIEW_ALL_EVENTS",
+        "VIEW_ALL_FAQ",
+        "VIEW_ALL_USERS",
+        "VIEW_USER",
+        "VIEW_EVENTS_BY_USER",
+        "VIEW_ATTENDANCE_BY_EVENT",
+        "VIEW_STAFF_ATTENDANCE",
+        "VIEW_EVENT_ATTENDEES",
+        "VIEW_MEMBER_ATTENDANCE",
+        "VIEW_COURSE_REGISTRATIONS",
+        "VIEW_COURSE_PROGRESS",
+        "VIEW_PAYMENT_STATISTICS",
+        "VIEW_DONATION_STATISTICS",
+        "CHANGE_PASSWORD",
+        "CREATE_PAYMENT",
+        "VIEW_ALL_PAYMENTS",
+        "VIEW_ALL_DONATIONS",
+        "VIEW_DONATION",
+        "VIEW_REPORTS",
+        "ADD_PAYMENT",
+        "VIEW_ALL_MEETINGS",
+        "VIEW_GRAPH_SUMMARY",
+        "VIEW_ATTENDANCE",
+        "VIEW_TOTAL_OUTSTANDING",
+        "UPDATE_EVENT_REGISTRATION",
+        "VIEW_OUTSTANDING_BREAKDOWN",
+        "MAKE_DONATION",
+        "UPDATE_BIODATA",
+        "UPDATE_PROFILE",
+        "UPDATE_CONTACT",
+        "UPDATE_WORK_EXPERIENCE",
+        "UPDATE_QUALIFICATION",
+        "EDIT-QUALIFICATION",
+        "EDIT-WORK-EXPRIENCE",
+      ])
       .join(",") // Join all values into a single string
       .split(",") // Split into array
       .map((p) => p.trim().replace(/"/g, "")) // Remove quotes and trim
-      .filter((p) => p !== "") // Remove empty strings
+      .filter((p) => p !== "")
       .filter((value, index, self) => self.indexOf(value) === index); // Remove duplicates
 
     // Update formData with selected permissions

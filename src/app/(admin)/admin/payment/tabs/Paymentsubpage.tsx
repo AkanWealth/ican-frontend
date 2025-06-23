@@ -25,7 +25,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { format } from "date-fns";
 
 // --- Improved summary card component ---
 export function SummaryCard({
@@ -55,7 +54,21 @@ export function SummaryCard({
   );
 }
 
-export default function Paymentsubpage() {
+interface PaymentsubpageProps {
+  startDate: string;
+  endDate: string;
+}
+
+/**
+ * Paymentsubpage component for displaying and managing payment data.
+ * @param startDate - The start date for filtering payments.
+ * @param endDate - The end date for filtering payments.
+ * @returns React component
+ */
+export default function Paymentsubpage({
+  startDate,
+  endDate,
+}: PaymentsubpageProps) {
   const router = useRouter();
   const [data, setData] = useState<PaymentDetailsTable[]>([]);
   const { toast } = useToast();
@@ -66,10 +79,6 @@ export default function Paymentsubpage() {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSendDialog, setShowSendDialog] = useState(false);
-  const [startDate, setStartDate] = useState<string>("2025-05-01");
-  const [endDate, setEndDate] = useState<string>(
-    format(new Date(), "yyyy-MM-dd")
-  );
 
   useEffect(() => {
     async function fetchData() {
@@ -180,23 +189,44 @@ export default function Paymentsubpage() {
     }
   };
 
-  // Sum all amounts where paymentStatus is "PAID"
-  const totalAmountPaid = data
-    .filter((d) => d.status === "SUCCESS")
-    .reduce((sum, d) => sum + (d.amount || 0), 0);
+  // Use state to store summary statistics and recalculate when startDate or endDate changes
+  const [summaryStats, setSummaryStats] = React.useState({
+    totalAmountPaid: 0,
+    totalUnpaid: 0,
+    totalAmountWaived: 0,
+    totalOverduePayments: 0,
+  });
 
-  // Calculate the total amount for payments with paymentStatus "NOT_PAID"
-  const totalUnpaid = data
-    .filter((d) => d.status === "PENDING")
-    .reduce((sum, d) => sum + (d.amount || 0), 0);
-  // Calculate the total amount for payments with paymentStatus "WAIVED"
-  const totalAmountWaived = data
-    .filter((d) => d.status === "WAIVED")
-    .reduce((sum, d) => sum + (d.amount || 0), 0);
-  // Count the number of payments with paymentStatus "NOT_PAID"
-  const totalOverduePayments = data.filter(
-    (d) => d.status === "PENDING"
-  ).length;
+  React.useEffect(() => {
+    // Defensive: ensure filteredData is up-to-date with date range
+    const paid = filteredByDate
+      .filter((d) => d.status === "SUCCESS")
+      .reduce((sum, d) => sum + (d.amount || 0), 0);
+
+    const unpaid = filteredByDate
+      .filter((d) => d.status === "PENDING")
+      .reduce((sum, d) => sum + (d.amount || 0), 0);
+
+    const waived = filteredByDate
+      .filter((d) => d.status === "WAIVED")
+      .reduce((sum, d) => sum + (d.amount || 0), 0);
+
+    const overdue = filteredByDate.filter((d) => d.status === "PENDING").length;
+
+    setSummaryStats({
+      totalAmountPaid: paid,
+      totalUnpaid: unpaid,
+      totalAmountWaived: waived,
+      totalOverduePayments: overdue,
+    });
+  }, [filteredData, startDate, endDate]);
+
+  const {
+    totalAmountPaid,
+    totalUnpaid,
+    totalAmountWaived,
+    totalOverduePayments,
+  } = summaryStats;
 
   return (
     <div className="rounded-3xl ">
@@ -258,44 +288,6 @@ export default function Paymentsubpage() {
             ))}
           </div>
           <div className="flex flex-wrap gap-4 items-center">
-            {/* Date Range Filter with clearer grouping and quick reset */}
-            <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
-              <label className="text-sm text-gray-600 font-medium">From</label>
-              <input
-                type="date"
-                min="2025-05-01"
-                max={endDate}
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-200"
-                aria-label="Start date"
-              />
-              <label className="text-sm text-gray-600 font-medium">To</label>
-              <input
-                type="date"
-                min="2025-05-01"
-                max={format(new Date(), "yyyy-MM-dd")}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-200"
-                aria-label="End date"
-              />
-              {(startDate !== "2025-05-01" || endDate !== format(new Date(), "yyyy-MM-dd")) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="ml-2 text-xs"
-                  onClick={() => {
-                    setStartDate("2025-05-01");
-                    setEndDate(format(new Date(), "yyyy-MM-dd"));
-                  }}
-                  title="Reset date range"
-                >
-                  Reset
-                </Button>
-              )}
-            </div>
-
             {/* Export Button with tooltip */}
             <div>
               <ExportPayments data={filteredByDate} />
@@ -335,7 +327,10 @@ export default function Paymentsubpage() {
                       ) : (
                         <>
                           Are you sure you want to send notifications to{" "}
-                          <span className="font-semibold">{selectedRows.length}</span> member
+                          <span className="font-semibold">
+                            {selectedRows.length}
+                          </span>{" "}
+                          member
                           {selectedRows.length !== 1 ? "s" : ""}?
                         </>
                       )}

@@ -8,8 +8,11 @@ import { Button } from "@/components/ui/button";
 import Statbtn from "@/components/genui/Statbtn";
 import CellActions from "@/components/admincomps/user/actions/CellActions";
 
-const capitalizeWords = (str: string): string => {
-  return str.replace(/[_-]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+
+const capitalizeFirstLetter = (str: string): string => {
+  if (!str) return "";
+  const cleaned = str.replace(/[_-]/g, " ").toLowerCase();
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
 };
 
 export const allcolumns: ColumnDef<User>[] = [
@@ -46,7 +49,9 @@ export const allcolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return capitalizeWords(row.original.role.name.replace(/[_-]/g, " "));
+      return capitalizeFirstLetter(
+        row.original.role.name.replace(/[_-]/g, " ")
+      );
     },
   },
   {
@@ -143,7 +148,9 @@ export const adminscolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return capitalizeWords(row.original.role.name.replace(/[_-]/g, " "));
+      return capitalizeFirstLetter(
+        row.original.role.name.replace(/[_-]/g, " ")
+      );
     },
   },
   {
@@ -256,7 +263,7 @@ export const memberscolumns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      return capitalizeWords(row.original.role.name);
+      return capitalizeFirstLetter(row.original.role.name);
     },
   },
   {

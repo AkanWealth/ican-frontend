@@ -164,8 +164,12 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
       try {
         const result = await apiClient.get("/payments/waivers", config);
+        // Only display waiver codes that haven't expired (expiration date is in the future)
+        const now = new Date();
         const filteredWaivers = result.filter(
-          (waiver: WaiverCode) => waiver.billingId === billingId
+          (waiver: WaiverCode) =>
+            waiver.billingId === billingId &&
+            new Date(waiver.expiresAt) > now
         );
         setWaivers(filteredWaivers);
       } catch (error) {
@@ -338,57 +342,17 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               </div>
             </div>
           </div>
-
-          <div className="flex flex-col gap-2">
-            <p className="text-lg  mx-auto  text-neutral-600">
-              Bill payment statistics
-            </p>
-
-            <ChartContainer
-              config={chartConfig}
-              className="mx-auto aspect-square   min-h-[250px] px-0"
-            >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Pie
-                  data={chartData}
-                  dataKey="trans_no"
-                  labelLine={false}
-                  label={({ payload, ...props }) => {
-                    return (
-                      <text
-                        cx={props.cx}
-                        cy={props.cy}
-                        x={props.x}
-                        y={props.y}
-                        textAnchor={props.textAnchor}
-                        dominantBaseline={props.dominantBaseline}
-                        fill="hsla(var(--foreground))"
-                        className="font-medium"
-                      >
-                        {payload.trans_no}
-                      </text>
-                    );
-                  }}
-                  nameKey="status"
-                />
-              </PieChart>
-            </ChartContainer>
-          </div>
         </div>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <h2 className="text-xl font-semibold text-left">Waiver Codes</h2>
+        <h2 className="text-xl font-semibold text-left">Active Waiver Codes</h2>
         <hr />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {waivers.length === 0 ? (
             <Card className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <CardTitle className="text-lg text-gray-500 text-center">
-                  No waiver codes created yet
+                  No Active waiver codes
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
@@ -456,61 +420,11 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         </div>
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
-        <div className="flex flex-row gap-4 mb-2">
-          <button
-            className={`px-4 py-2 rounded-md font-semibold ${
-              activeTab === "payments"
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
-            onClick={() => setActiveTab("payments")}
-          >
-            Successful Payments
-          </button>
-          <button
-            className={`px-4 py-2 rounded-md font-semibold ${
-              activeTab === "affected"
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
-            onClick={() => setActiveTab("affected")}
-          >
-            Affected Users
-          </button>
-          <button
-            className={`px-4 py-2 rounded-md font-semibold ${
-              activeTab === "waived"
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
-            onClick={() => setActiveTab("waived")}
-          >
-            Waived
-          </button>
-          <button
-            className={`px-4 py-2 rounded-md font-semibold ${
-              activeTab === "notpaid"
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
-            onClick={() => setActiveTab("notpaid")}
-          >
-            Not Paid
-          </button>
-        </div>
-        <hr />
-        {activeTab === "payments" ? (
-          <PaymentTable data={paymentData} columns={billingdetailscoloumns} />
-        ) : activeTab === "affected" ? (
-          <PaymentTable
-            data={affectedUsersData}
-            columns={affecteduserscoloumns}
-          />
-        ) : activeTab === "waived" ? (
-          <PaymentTable data={waivedUsers} columns={affecteduserscoloumns} />
-        ) : (
-          <PaymentTable data={notPaidUsers} columns={affecteduserscoloumns} />
-        )}
+        <PaymentTable
+          data={affectedUsersData}
+          type="billingDetails"
+          columns={affecteduserscoloumns}
+        />
       </div>
       {isWaiver && (
         <CreateWaiver

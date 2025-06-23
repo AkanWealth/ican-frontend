@@ -30,16 +30,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   setter?: React.Dispatch<React.SetStateAction<string[]>>;
+  type?: string;
 }
 
 export function PaymentTable<TData, TValue>({
   columns,
   data,
   setter,
+  type,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -47,6 +57,7 @@ export function PaymentTable<TData, TValue>({
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [rowSelection, setRowSelection] = React.useState({});
+  const [selectedStatuses, setSelectedStatuses] = React.useState<string[]>([]);
 
   const table = useReactTable({
     data,
@@ -84,16 +95,90 @@ export function PaymentTable<TData, TValue>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowSelection, setter]);
 
+  // Allowed statuses for billingDetails
+  const allowedStatuses = [
+    "SUCCESS",
+    "WAIVED",
+    "FAILED",
+    "PENDING",
+    "REFUNDED",
+    "NOT_PAID",
+    "PARTIALLY_PAID",
+    "FULLY_PAID",
+  ];
+
+  // Filter data based on selected statuses (if billingDetails)
+  const filteredData =
+    type === "billingDetails" &&
+    Array.isArray(data) &&
+    selectedStatuses.length > 0
+      ? data.filter((user: any) =>
+          selectedStatuses.includes(user.paymentStatus)
+        )
+      : data;
+
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4 gap-4">
         <Input
           placeholder="Search across all fields..."
           value={globalFilter ?? ""}
           onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
+        {type === "billingDetails" && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="min-w-[180px] justify-between"
+              >
+                {selectedStatuses.length > 0
+                  ? `Status: ${selectedStatuses.join(", ")}`
+                  : "Filter by Status"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56">
+              <div className="flex flex-col gap-2">
+                {allowedStatuses.map((status) => (
+                  <label
+                    key={status}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Checkbox
+                      checked={selectedStatuses.includes(status)}
+                      onCheckedChange={(checked) => {
+                        setSelectedStatuses((prev) =>
+                          checked
+                            ? [...prev, status]
+                            : prev.filter((s) => s !== status)
+                        );
+                      }}
+                      id={`status-${status}`}
+                    />
+                    <Label htmlFor={`status-${status}`}>
+                      {status
+                        .toLowerCase()
+                        .replace(/[_-]/g, " ")
+                        .replace(/\b\w/g, (c) => c.toUpperCase())
+                        .replace(/^./, (c) => c.toUpperCase())}
+                    </Label>
+                  </label>
+                ))}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => setSelectedStatuses([])}
+                >
+                  Clear
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
       </div>
+
       <div className="">
         <Table>
           <TableHeader>
@@ -119,22 +204,30 @@ export function PaymentTable<TData, TValue>({
           </TableHeader>
 
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+            {filteredData.length ? (
+              table
+                .getRowModel()
+                .rows.filter((row) =>
+                  // Only show rows that are in filteredData
+                  filteredData.some(
+                    (item: any) => item.id === (row.original as any).id
+                  )
+                )
+                .map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
             ) : (
               <TableRow>
                 <TableCell

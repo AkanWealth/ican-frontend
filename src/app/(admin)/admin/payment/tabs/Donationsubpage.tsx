@@ -13,7 +13,12 @@ import apiClient from "@/services-admin/apiClient";
 import { PaymentDetailsTable } from "@/libs/types";
 import { FiCreditCard, FiUsers, FiBarChart2, FiCalendar } from "react-icons/fi";
 
-export default function Donationsubpage() {
+interface DonationsubpageProps {
+  startDate: string;
+  endDate: string;
+}
+
+export default function Donationsubpage({ startDate, endDate }: DonationsubpageProps) {
   const [data, setData] = useState<PaymentDetailsTable[]>([]);
   const { toast } = useToast();
 
@@ -47,12 +52,22 @@ export default function Donationsubpage() {
     }
     fetchData();
   }, [toast]);
+  // --- Filter data by date range for summary/statistics and table display ---
+  // This ensures all summary cards and tables reflect only donations within the selected date range.
+  const filteredByDate = data.filter((d) => {
+    if (!d.createdAt) return false;
+    const created = new Date(d.createdAt);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    // Only include if createdAt is between startDate and endDate (inclusive)
+    return created >= start && created <= end;
+  });
 
-  // --- Calculate summary statistics ---
-  const totalDonations = data.reduce((sum, d) => sum + (d.amount || 0), 0);
-  const donors = new Set(data.map((d) => d.userId)).size;
-  const averageDonation = data.length ? totalDonations / data.length : 0;
-  const thisMonthDonations = data
+  // --- Calculate summary statistics based on filtered data ---
+  const totalDonations = filteredByDate.reduce((sum, d) => sum + (d.amount || 0), 0);
+  const donors = new Set(filteredByDate.map((d) => d.userId)).size;
+  const averageDonation = filteredByDate.length ? totalDonations / filteredByDate.length : 0;
+  const thisMonthDonations = filteredByDate
     .filter((d) => {
       const date = new Date(d.createdAt);
       const now = new Date();
@@ -62,6 +77,7 @@ export default function Donationsubpage() {
       );
     })
     .reduce((sum, d) => sum + (d.amount || 0), 0);
+
 
   return (
     <div className="rounded-3xl ">
@@ -92,7 +108,7 @@ export default function Donationsubpage() {
           iconBg="bg-yellow-100"
         />
         <SummaryCard
-          label="This Month"
+          label="This Time Frame"
           value={
             thisMonthDonations
               ? `₦${thisMonthDonations.toLocaleString()}`
@@ -109,10 +125,10 @@ export default function Donationsubpage() {
           <h2 className="text-xl font-semibold text-left">
             All Successful Donations
           </h2>{" "}
-          <ExportPayments data={data} />
+          <ExportPayments data={filteredByDate} />
         </div>
         <div>
-          <PaymentTable columns={paymentcoloumns} data={data} />
+          <PaymentTable columns={paymentcoloumns} data={filteredByDate} />
         </div>
       </div>
     </div>
@@ -120,7 +136,7 @@ export default function Donationsubpage() {
 }
 
 // --- Improved summary card component ---
-function SummaryCard({
+export function SummaryCard({
   label,
   value,
   icon,

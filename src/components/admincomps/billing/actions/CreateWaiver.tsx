@@ -187,7 +187,7 @@ function CreateWaiver({
                               setIsDropdownOpen(false);
                             }}
                           >
-                            {result.name} ({result.id})
+                            {result.name} 
                           </div>
                         ))
                       ) : (
@@ -200,7 +200,7 @@ function CreateWaiver({
                 </div>
                 {selectedBilling && (
                   <div className="text-xs text-green-700">
-                    Selected: {selectedBilling.name} ({selectedBilling.id})
+                    Selected: {selectedBilling.name} 
                   </div>
                 )}
               </div>

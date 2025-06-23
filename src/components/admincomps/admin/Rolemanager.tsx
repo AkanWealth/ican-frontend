@@ -311,7 +311,7 @@ function Rolemanager({ id }: RolemanagerProps) {
                     <td className="px-4 py-2 text-center">
                       <Button
                         type="button"
-                        variant={allRowSelected ? "secondary" : "default"}
+                        variant={allRowSelected ? "outline" : "default"}
                         size="sm"
                         onClick={() => {
                           if (allRowSelected) {

@@ -270,23 +270,7 @@ export default function Paymentsubpage({
       </div>
       <div className="rounded-3xl px-8 py-6 flex flex-col gap-4 border border-neutral-200 bg-white">
         <div className="flex flex-row justify-between">
-          <div className="flex w-fit space-x-4 border-b border-gray-200 mb-4">
-            {["ALL", "PAID", "NOT_PAID"].map((tab) => (
-              <button
-                key={tab}
-                className={`px-4 py-2 font-medium rounded-t-lg ${
-                  selectedTab === tab
-                    ? "text-blue-700 border-b-2 border-blue-700 bg-blue-50"
-                    : "text-gray-500"
-                }`}
-                onClick={() =>
-                  setSelectedTab(tab as "ALL" | "PAID" | "NOT_PAID")
-                }
-              >
-                {tab === "ALL" ? "All" : tab === "PAID" ? "Paid" : "Unpaid"}
-              </button>
-            ))}
-          </div>
+       
           <div className="flex flex-wrap gap-4 items-center">
             {/* Export Button with tooltip */}
             <div>
@@ -366,6 +350,7 @@ export default function Paymentsubpage({
           <PaymentTable
             columns={paymentcoloumns}
             data={filteredByDate}
+            type="paymentDetails"
             setter={setSelectedRows}
           />
         </div>

@@ -44,6 +44,15 @@ interface DataTableProps<TData, TValue> {
   setter?: React.Dispatch<React.SetStateAction<string[]>>;
   type?: string;
 }
+type PaymentStatus =
+  | "SUCCESS"
+  | "WAIVED"
+  | "FAILED"
+  | "PENDING"
+  | "REFUNDED"
+  | "NOT_PAID"
+  | "PARTIALLY_PAID"
+  | "FULLY_PAID";
 
 export function PaymentTable<TData, TValue>({
   columns,
@@ -58,6 +67,9 @@ export function PaymentTable<TData, TValue>({
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [rowSelection, setRowSelection] = React.useState({});
   const [selectedStatuses, setSelectedStatuses] = React.useState<string[]>([]);
+  const [selectedPaymentTypes, setSelectedPaymentTypes] = React.useState<
+    string[]
+  >([]);
 
   const table = useReactTable({
     data,
@@ -107,15 +119,31 @@ export function PaymentTable<TData, TValue>({
     "FULLY_PAID",
   ];
 
-  // Filter data based on selected statuses (if billingDetails)
-  const filteredData =
-    type === "billingDetails" &&
-    Array.isArray(data) &&
-    selectedStatuses.length > 0
-      ? data.filter((user: any) =>
-          selectedStatuses.includes(user.paymentStatus)
-        )
-      : data;
+  // Unified filtering logic for both billingDetails and paymentDetails
+  const filteredData = React.useMemo(() => {
+    let result = data;
+
+    if (type === "billingDetails" && selectedStatuses.length > 0) {
+      result = result.filter((user: any) =>
+        selectedStatuses.includes(user.paymentStatus)
+      );
+    }
+
+    if (type === "paymentDetails") {
+      if (selectedStatuses.length > 0) {
+        result = result.filter((item: any) =>
+          selectedStatuses.includes(item.status)
+        );
+      }
+      if (selectedPaymentTypes.length > 0) {
+        result = result.filter((item: any) =>
+          selectedPaymentTypes.includes(item.paymentType)
+        );
+      }
+    }
+
+    return result;
+  }, [data, type, selectedStatuses, selectedPaymentTypes]);
 
   return (
     <div>
@@ -126,57 +154,190 @@ export function PaymentTable<TData, TValue>({
           onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
-        {type === "billingDetails" && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="min-w-[180px] justify-between"
-              >
-                {selectedStatuses.length > 0
-                  ? `Status: ${selectedStatuses.join(", ")}`
-                  : "Filter by Status"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56">
-              <div className="flex flex-col gap-2">
-                {allowedStatuses.map((status) => (
-                  <label
-                    key={status}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <Checkbox
-                      checked={selectedStatuses.includes(status)}
-                      onCheckedChange={(checked) => {
-                        setSelectedStatuses((prev) =>
-                          checked
-                            ? [...prev, status]
-                            : prev.filter((s) => s !== status)
-                        );
-                      }}
-                      id={`status-${status}`}
-                    />
-                    <Label htmlFor={`status-${status}`}>
-                      {status
-                        .toLowerCase()
-                        .replace(/[_-]/g, " ")
-                        .replace(/\b\w/g, (c) => c.toUpperCase())
-                        .replace(/^./, (c) => c.toUpperCase())}
-                    </Label>
-                  </label>
-                ))}
+        <div className="flex flex-row gap-4 items-center w-fit justify-end">
+          {type === "billingDetails" && (
+            <Popover>
+              <PopoverTrigger asChild>
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => setSelectedStatuses([])}
+                  variant="outline"
+                  className="min-w-[180px] justify-between"
                 >
-                  Clear
+                  {selectedStatuses.length > 0
+                    ? `Status: ${selectedStatuses.join(", ")}`
+                    : "Filter by Status"}
                 </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-        )}
+              </PopoverTrigger>
+              <PopoverContent className="w-56">
+                <div className="flex flex-col gap-2">
+                  {allowedStatuses.map((status) => (
+                    <label
+                      key={status}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Checkbox
+                        checked={selectedStatuses.includes(status)}
+                        onCheckedChange={(checked) => {
+                          setSelectedStatuses((prev) =>
+                            checked
+                              ? [...prev, status]
+                              : prev.filter((s) => s !== status)
+                          );
+                        }}
+                        id={`status-${status}`}
+                      />
+                      <Label htmlFor={`status-${status}`}>
+                        {status
+                          .toLowerCase()
+                          .replace(/[_-]/g, " ")
+                          .replace(/\b\w/g, (c) => c.toUpperCase())
+                          .replace(/^./, (c) => c.toUpperCase())}
+                      </Label>
+                    </label>
+                  ))}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => setSelectedStatuses([])}
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {type === "paymentDetails" && (
+            <>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="min-w-[180px] justify-between"
+                  >
+                    {selectedStatuses.length > 0
+                      ? `Status: ${selectedStatuses.join(", ")}`
+                      : "Filter by Status"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56">
+                  <div className="flex flex-col gap-2">
+                    {allowedStatuses.map((status) => (
+                      <label
+                        key={status}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <Checkbox
+                          checked={selectedStatuses.includes(status)}
+                          onCheckedChange={(checked) => {
+                            setSelectedStatuses(
+                              (prev: (string | PaymentStatus)[]) =>
+                                checked
+                                  ? [...prev, status]
+                                  : prev.filter((s) => s !== status)
+                            );
+                          }}
+                          id={`status-${status}`}
+                        />
+                        <Label htmlFor={`status-${status}`}>
+                          {/* Format status for display: e.g. "NOT_PAID" -> "Not Paid" */}
+                          {String(status)
+                            .toLowerCase()
+                            .replace(/[_-]/g, " ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())}
+                        </Label>
+                      </label>
+                    ))}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => setSelectedStatuses([])}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="min-w-[180px] justify-between"
+                  >
+                    {selectedPaymentTypes && selectedPaymentTypes.length > 0
+                      ? `Payment Type: ${selectedPaymentTypes.join(", ")}`
+                      : "Filter by Payment Type"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56">
+                  <div className="flex flex-col gap-2">
+                    {[
+                      "Registration",
+                      "Billing",
+                       // include the current type as a default option
+                      ...Array.from(
+                        new Set(
+                          (data || [])
+                            .map((item: any) => item.paymentType)
+                            .filter(
+                              (pt:string) =>
+                                pt &&
+                                pt !== "Registration" &&
+                                pt !== "Billing" &&
+                                pt !== type
+                            )
+                        )
+                      ),
+                    ]
+                      // Remove duplicates in case type is already in data
+                      .filter(
+                        (v, i, arr) =>
+                          v && arr.indexOf(v) === i && typeof v === "string"
+                      )
+                      .map((paymentType) => (
+                        <label
+                          key={paymentType}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={
+                              selectedPaymentTypes
+                                ? selectedPaymentTypes.includes(paymentType)
+                                : false
+                            }
+                            onCheckedChange={(checked) => {
+                              setSelectedPaymentTypes((prev: string[] = []) =>
+                                checked
+                                  ? [...prev, paymentType]
+                                  : prev.filter((s) => s !== paymentType)
+                              );
+                            }}
+                            id={`paymentType-${paymentType}`}
+                          />
+                          <Label htmlFor={`paymentType-${paymentType}`}>
+                            {paymentType
+                              .toLowerCase()
+                              .replace(/[_-]/g, " ")
+                              .replace(/\b\w/g, (c: string) => c.toUpperCase())
+                              .replace(/^./, (c: string) => c.toUpperCase())}
+                          </Label>
+                        </label>
+                      ))}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => setSelectedPaymentTypes([])}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="">

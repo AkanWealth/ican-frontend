@@ -10,6 +10,7 @@ import {
   MdHome,
   MdOutlineSettings,
 } from "react-icons/md";
+import { TbCurrencyNaira } from "react-icons/tb";
 import { IoMdCalendar } from "react-icons/io";
 import Image from "next/image";
 import Link from "next/link";
@@ -55,7 +56,7 @@ export const topMenuItems = [
     permission: PERMISSIONS.EVENT_MANAGEMENT,
   },
   {
-    icon: MdAttachMoney,
+    icon: TbCurrencyNaira,
     label: "Payment Management",
     href: "/admin/payment",
     permission: PERMISSIONS.BILLING_PAYMENT,
@@ -135,7 +136,7 @@ function Sidebar() {
       : null,
     hasPermission(PERMISSIONS.BILLING_PAYMENT)
       ? {
-          icon: MdAttachMoney,
+          icon: TbCurrencyNaira,
           label: "Payment Management",
           href: "/admin/payment",
         }
@@ -186,7 +187,7 @@ function Sidebar() {
       : null,
     hasPermission(PERMISSIONS.BILLING_PAYMENT)
       ? {
-          icon: MdAttachMoney,
+          icon: TbCurrencyNaira,
           label: "Payment Management",
           href: "/admin/payment",
         }

@@ -67,26 +67,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     BillingAffectedUsers[]
   >([]);
 
-  const [waivedUsers, setWaivedUsers] = useState<BillingAffectedUsers[]>([]);
-  const [notPaidUsers, setNotPaidUsers] = useState<BillingAffectedUsers[]>([]);
-
   const [isWaiver, setisWaiver] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    "payments" | "affected" | "waived" | "notpaid"
-  >("payments");
-
-  const chartData = [
-    {
-      status: "paid",
-      trans_no: billingStats?.totalUsersPaid,
-      fill: "var(--color-paid)",
-    },
-    {
-      status: "unpaid",
-      trans_no: billingStats?.totalUsersNotPaid,
-      fill: "var(--color-unpaid)",
-    },
-  ];
 
   useEffect(() => {
     async function fetchData() {
@@ -105,17 +86,6 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         setData(result);
         setPaymentData(result.Payment);
         setAffectedUsersData(result.affectedUsers);
-        setWaivedUsers(
-          result.affectedUsers.filter(
-            (user: BillingAffectedUsers) => user.paymentStatus === "WAIVED"
-          )
-        );
-        setNotPaidUsers(
-          result.affectedUsers.filter(
-            (user: BillingAffectedUsers) => user.paymentStatus === "NOT_PAID"
-          )
-        );
-        console.log(result);
       } catch (error) {
         toast({
           title: "Error",
@@ -168,8 +138,7 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         const now = new Date();
         const filteredWaivers = result.filter(
           (waiver: WaiverCode) =>
-            waiver.billingId === billingId &&
-            new Date(waiver.expiresAt) > now
+            waiver.billingId === billingId && new Date(waiver.expiresAt) > now
         );
         setWaivers(filteredWaivers);
       } catch (error) {
@@ -305,13 +274,36 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                     Total Members Affected
                   </span>
                   <span className="text-base font-medium text-black">
-                    {billingStats?.totalUsersAffected || 0}
+                    {/* Count affected users from affectedUsersData for accuracy */}
+                    {affectedUsersData ? affectedUsersData.length : 0}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">
+                    Total Members Waived
+                  </span>
+                  <span className="text-base font-medium text-green-600">
+                    {
+                      // Count users with paymentStatus === "WAIVED" for accuracy
+                      affectedUsersData
+                        ? affectedUsersData.filter(
+                            (user) => user.paymentStatus === "WAIVED"
+                          ).length
+                        : 0
+                    }
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-sm text-gray-600">Unpaid Members</span>
                   <span className="text-base font-medium text-red-600">
-                    {billingStats?.totalUsersNotPaid || 0}
+                    {
+                      // Count users with paymentStatus === "NOT_PAID" for accuracy
+                      affectedUsersData
+                        ? affectedUsersData.filter(
+                            (user) => user.paymentStatus === "NOT_PAID"
+                          ).length
+                        : 0
+                    }
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -335,7 +327,29 @@ function BillingDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                       currency: "NGN",
                     }).format(
                       (billingStats?.totalBillingAmount || 0) *
-                        (billingStats?.totalUsersNotPaid || 0)
+                        (affectedUsersData
+                          ? affectedUsersData.filter(
+                              (user) => user.paymentStatus === "NOT_PAID"
+                            ).length
+                          : 0)
+                    )}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-gray-600">
+                    Total Amount Waived
+                  </span>
+                  <span className="text-base font-medium text-green-600">
+                    {new Intl.NumberFormat("en-NG", {
+                      style: "currency",
+                      currency: "NGN",
+                    }).format(
+                      (billingStats?.totalBillingAmount || 0) *
+                        (affectedUsersData
+                          ? affectedUsersData.filter(
+                              (user) => user.paymentStatus === "WAIVED"
+                            ).length
+                          : 0)
                     )}
                   </span>
                 </div>

@@ -51,8 +51,7 @@ type PaymentStatus =
   | "PENDING"
   | "REFUNDED"
   | "NOT_PAID"
-  | "PARTIALLY_PAID"
-  | "FULLY_PAID";
+  | "PARTIALLY_PAID" ;
 
 export function PaymentTable<TData, TValue>({
   columns,
@@ -116,7 +115,7 @@ export function PaymentTable<TData, TValue>({
     "REFUNDED",
     "NOT_PAID",
     "PARTIALLY_PAID",
-    "FULLY_PAID",
+    
   ];
 
   // Unified filtering logic for both billingDetails and paymentDetails
@@ -163,7 +162,15 @@ export function PaymentTable<TData, TValue>({
                   className="min-w-[180px] justify-between"
                 >
                   {selectedStatuses.length > 0
-                    ? `Status: ${selectedStatuses.join(", ")}`
+                    ? `Status: ${selectedStatuses
+                        .map((status) =>
+                          status
+                            .toLowerCase()
+                            .replace(/[_-]/g, " ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())
+                            .replace(/^./, (c) => c.toUpperCase())
+                        )
+                        .join(", ")}`
                     : "Filter by Status"}
                 </Button>
               </PopoverTrigger>
@@ -216,7 +223,15 @@ export function PaymentTable<TData, TValue>({
                     className="min-w-[180px] justify-between"
                   >
                     {selectedStatuses.length > 0
-                      ? `Status: ${selectedStatuses.join(", ")}`
+                      ? `Status: ${selectedStatuses
+                          .map((status) =>
+                            status
+                              .toLowerCase()
+                              .replace(/[_-]/g, " ")
+                              .replace(/\b\w/g, (c) => c.toUpperCase())
+                              .replace(/^./, (c) => c.toUpperCase())
+                          )
+                          .join(", ")}`
                       : "Filter by Status"}
                   </Button>
                 </PopoverTrigger>
@@ -274,18 +289,14 @@ export function PaymentTable<TData, TValue>({
                   <div className="flex flex-col gap-2">
                     {[
                       "Registration",
-                      "Billing",
-                       // include the current type as a default option
+                      // include the current type as a default option
                       ...Array.from(
                         new Set(
                           (data || [])
                             .map((item: any) => item.paymentType)
                             .filter(
-                              (pt:string) =>
-                                pt &&
-                                pt !== "Registration" &&
-                                pt !== "Billing" &&
-                                pt !== type
+                              (pt: string) =>
+                                pt && pt !== "Registration" && pt !== type
                             )
                         )
                       ),

@@ -243,6 +243,7 @@ function PaymentHistory({ userId }: { userId: string }) {
 
         <div>
           <PaymentTable
+            type="paymentDetails"
             columns={paymentcoloumns}
             data={filteredData}
             setter={setSelectedRows}
@@ -257,21 +258,30 @@ function PaymentHistory({ userId }: { userId: string }) {
         <SummaryCard
           label="Total Amount Paid"
           value={
-            totalAmountPaid ? `₦${totalAmountPaid.toLocaleString()}` : "₦0"
+            totalAmountPaid ? `₦${totalAmountPaid.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}` : "₦0"
           }
           icon={<FiCreditCard size={24} />}
           iconBg="bg-green-100"
         />
         <SummaryCard
           label="Total Unpaid"
-          value={totalUnpaid ? `₦${totalUnpaid.toLocaleString()}` : "₦0"}
+          value={totalUnpaid ? `₦${totalUnpaid.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}` : "₦0"}
           icon={<FiUsers size={24} />}
           iconBg="bg-blue-100"
         />
         <SummaryCard
           label="Amount Waived"
           value={
-            totalAmountWaived ? `₦${totalAmountWaived.toLocaleString()}` : "₦0"
+              totalAmountWaived ? `₦${totalAmountWaived.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}` : "₦0"
           }
           icon={<FiCalendar size={24} />}
           iconBg="bg-purple-100"
@@ -281,6 +291,7 @@ function PaymentHistory({ userId }: { userId: string }) {
           value={
             totalOverduePayments
               ? `₦${totalOverduePayments.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}`
               : "₦0"

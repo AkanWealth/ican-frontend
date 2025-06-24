@@ -85,7 +85,14 @@ export default function Donationsubpage({ startDate, endDate }: DonationsubpageP
       <div className="flex gap-4 mb-6">
         <SummaryCard
           label="Total Donations"
-          value={totalDonations ? `₦${totalDonations.toLocaleString()}` : "₦0"}
+          value={
+            totalDonations
+              ? `₦${totalDonations.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`
+              : "₦0.00"
+          }
           icon={<FiCreditCard size={24} />}
           iconBg="bg-green-100"
         />
@@ -111,7 +118,10 @@ export default function Donationsubpage({ startDate, endDate }: DonationsubpageP
           label="This Time Frame"
           value={
             thisMonthDonations
-              ? `₦${thisMonthDonations.toLocaleString()}`
+              ? `₦${thisMonthDonations.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`
               : "₦0"
           }
           icon={<FiCalendar size={24} />}

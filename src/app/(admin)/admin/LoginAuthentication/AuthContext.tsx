@@ -167,6 +167,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = useCallback(async () => {
     debugAuth("Logging out");
 
+    localStorage.removeItem("userPermissions");
+    localStorage.removeItem("userRole");
+
     try {
       await authService.logout();
 

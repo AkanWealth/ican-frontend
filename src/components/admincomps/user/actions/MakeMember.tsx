@@ -1,32 +1,32 @@
 import React from "react";
-import { MdOutlinePublishedWithChanges, MdSubtitles } from "react-icons/md";
+import { MdOutlinePerson, MdSubtitles } from "react-icons/md";
 import { HiOutlineTag } from "react-icons/hi";
 import { BASE_API_URL } from "@/utils/setter";
 
 import { useToast } from "@/hooks/use-toast";
 import apiClient from "@/services-admin/apiClient";
 
-interface EnableAdminProps {
+interface MakeMemberProps {
   id: string;
   fullName: string;
   role: string;
   onClose: () => void;
 }
 
-function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
+function MakeMember({ id, fullName, role, onClose }: MakeMemberProps) {
   const { toast } = useToast();
   const handleConfirm = () => {
     console.log({ id, fullName, role });
     async function enableUser() {
       const data = JSON.stringify({
         userId: id,
-        suspend: false,
+        roleId: "ef86d40f-fe37-45cf-b08a-32738bf34664",
       });
       console.log(data);
       const config = {
         method: "patch",
         maxBodyLength: Infinity,
-        url: `${BASE_API_URL}/users/${id}/suspend`,
+        url: `${BASE_API_URL}/roles/assign`,
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json", // Fixed ContentType -> Content-Type
@@ -39,8 +39,8 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
         const results = await apiClient.request(config);
         console.log(results);
         toast({
-          title: "User Reactivated",
-          description: "User Reactivated successfully",
+          title: "Admin demoted to member",
+          description: "Admin demoted to member successfully",
           variant: "default",
           duration: 2000,
         });
@@ -62,14 +62,17 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
       <div className="flex flex-col p-4 rounded-xl gap-4 bg-white">
         <div className="flex flex-row justify-start gap-4">
-          <div className="rounded-full  h-fit w-fit p-4 bg-green-200">
-            <MdOutlinePublishedWithChanges className="w-6 h-6 fill-green-400" />
+          <div className="rounded-full  h-fit w-fit p-4 bg-yellow-200">
+            <MdOutlinePerson className="w-6 h-6 fill-yellow-600" />
           </div>
           <div>
             <div className="flex flex-col gap-2">
-              <h5 className="font-semibold text-xl text-black">Enable User</h5>
+              <h5 className="font-semibold text-xl text-black">
+                Convert to Member
+              </h5>
               <p className="text-sm text-neutral-600">
-                Are you sure you want to enable this user?
+                Are you sure you want to remove this user as an admin and assign
+                them the role of a member?
               </p>
             </div>
             <div className="flex flex-col gap-2 mt-4">
@@ -84,7 +87,12 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
                 <p className="flex text-neutral-700 font-medium text-base   items-centerflex-row gap-2">
                   <HiOutlineTag className="w-4 h-4" /> Role:
                 </p>
-                <p className="text-black font-medium text-base ">{role.replace(/[_-]/g, ' ').replace(/\b\w/g, l => l.toLowerCase()).replace(/\b\w/g, l => l.toUpperCase())}</p>
+                <p className="text-black font-medium text-base ">
+                  {role
+                    .replace(/[_-]/g, " ")
+                    .replace(/\b\w/g, (l) => l.toLowerCase())
+                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+                </p>
               </div>
             </div>
           </div>
@@ -108,4 +116,4 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
   );
 }
 
-export default EnableAdmin;
+export default MakeMember;

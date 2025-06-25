@@ -284,7 +284,12 @@ function CreateNewAdmin({ showModal, setShowModal }: CreateNewAdminProps) {
               { value: "", label: "Select Role" },
               ...roles.map((role) => ({
                 value: role.id,
-                label: role.name.replace(/[_-]/g, " "),
+                label: (() => {
+                  const name = role.name.replace(/[_-]/g, " ");
+                  return (
+                    name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+                  );
+                })(),
               })),
             ]}
             onChange={(e) =>

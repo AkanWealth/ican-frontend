@@ -11,6 +11,8 @@ import {
 
 import {
   MdEdit,
+  MdPersonOutline,
+  MdPublishedWithChanges,
   MdRemoveRedEye,
   MdOutlineToggleOn,
   MdOutlineDelete,
@@ -22,6 +24,8 @@ import { MoreHorizontal } from "lucide-react";
 import DisableAdmin from "./DisableAdmin";
 import DeleteAdmin from "./DeleteAdmin";
 import EnableAdmin from "./EnableAdmin";
+import MakeMember from "./MakeMember";
+import ChangeRole from "./ChangeRole";
 import { useRouter } from "next/navigation";
 
 interface CellProps {
@@ -32,6 +36,8 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
   const router = useRouter();
   const [showDisableModal, setShowDisableModal] = useState(false);
   const [showEnableModal, setShowEnableModal] = useState(false);
+  const [showMakeModal, setShowMakeModal] = useState(false);
+  const [showChangeModal, setShowChangeModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const capitalizeWords = (str: string): string => {
@@ -129,6 +135,21 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
               <MdRemoveRedEye className="w-4 h-4" /> View Admin Details
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              onClick={() => setShowMakeModal(true)}
+              className="flex flex-row items-center"
+            >
+              <MdPersonOutline className="w-4 h-4" /> Convert to Member
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => setShowChangeModal(true)}
+              className="flex flex-row items-center"
+            >
+              <MdPublishedWithChanges className="w-4 h-4" /> Change Roles
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             {row.original.isSuspended === false ? (
               <DropdownMenuItem
                 className="flex flex-row items-center"
@@ -174,9 +195,28 @@ const ActionsCell: React.FC<CellProps> = ({ row }) => {
         {showDeleteModal && (
           <DeleteAdmin
             id={row.original.id}
-            fullName={row.original.fullName || row.original.firstname + " " + row.original.surname  }
+            fullName={
+              row.original.fullName ||
+              row.original.firstname + " " + row.original.surname
+            }
             role={capitalizeWords(row.original.role.name ?? "")}
             onClose={() => setShowDeleteModal(false)}
+          />
+        )}
+        {showMakeModal && (
+          <MakeMember
+            id={row.original.id}
+            fullName={row.original.firstname + " " + row.original.surname}
+            role={capitalizeWords(row.original.role.name ?? "")}
+            onClose={() => setShowMakeModal(false)}
+          />
+        )}
+        {showChangeModal && (
+          <ChangeRole
+            id={row.original.id}
+            fullName={row.original.firstname + " " + row.original.surname}
+            role={capitalizeWords(row.original.role.name ?? "")}
+            onClose={() => setShowChangeModal(false)}
           />
         )}
       </>

@@ -90,8 +90,7 @@ function MakeMember({ id, fullName, role, onClose }: MakeMemberProps) {
                 <p className="text-black font-medium text-base ">
                   {role
                     .replace(/[_-]/g, " ")
-                    .replace(/\b\w/g, (l) => l.toLowerCase())
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+                    .replace(/^([a-zA-Z])/, (l) => l.toUpperCase())}
                 </p>
               </div>
             </div>

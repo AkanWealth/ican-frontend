@@ -69,7 +69,11 @@ function DeleteRole({ id, role, onClose }: DeleteRoleProps) {
                 <p className="flex text-neutral-700 font-medium text-base flex-row  items-center gap-2">
                   <MdSubtitles className="w-4 h-4" /> Name:
                 </p>
-                <p className="text-black font-medium text-base ">{role?.replace(/[_-]/g, ' ').replace(/\b\w/g, l => l.toLowerCase())}</p>
+                <p className="text-black font-medium text-base ">
+                  {role
+                    ?.replace(/[_-]/g, " ")
+                    .replace(/^([a-zA-Z])/, (l) => l.toUpperCase())}
+                </p>
               </div>
             </div>
           </div>

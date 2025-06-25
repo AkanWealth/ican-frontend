@@ -96,7 +96,7 @@ function ChangeRole({ id, fullName, role, onClose }: ChangeRoleProps) {
       });
       console.log(data);
       const config = {
-        method: "patch",
+        method: "post",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/roles/assign`,
         headers: {

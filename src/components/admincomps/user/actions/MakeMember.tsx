@@ -24,7 +24,7 @@ function MakeMember({ id, fullName, role, onClose }: MakeMemberProps) {
       });
       console.log(data);
       const config = {
-        method: "patch",
+        method: "post",
         maxBodyLength: Infinity,
         url: `${BASE_API_URL}/roles/assign`,
         headers: {

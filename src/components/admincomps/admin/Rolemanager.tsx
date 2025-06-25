@@ -140,6 +140,7 @@ function Rolemanager({ id }: RolemanagerProps) {
     // Extract and clean up permission values
     const selectedPermissionValues = permissions
       .map((permission) => permission.value)
+      .concat(['"VIEW_ROLE"', '"VIEW_ROLES"']) // Add default role viewing permissions
       .join(",") // Join all values into a single string
       .split(",") // Split into array
       .map((p) => p.trim().replace(/"/g, "")) // Remove quotes and trim

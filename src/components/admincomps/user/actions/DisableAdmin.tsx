@@ -63,6 +63,9 @@ function DisableAdmin({ id, fullName, role, onClose }: DisableAdminProps) {
         });
         onClose(); // Close the modal after successful update
         router.refresh();
+      } finally {
+        onClose();
+        window.location.reload();
       }
     }
     disableUser();

@@ -54,6 +54,10 @@ function MakeMember({ id, fullName, role, onClose }: MakeMemberProps) {
           duration: 2000,
         });
       }
+      finally{
+        onClose();
+        window.location.reload();
+      }
     }
     enableUser();
   };

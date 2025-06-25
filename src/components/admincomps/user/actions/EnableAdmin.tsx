@@ -54,6 +54,10 @@ function EnableAdmin({ id, fullName, role, onClose }: EnableAdminProps) {
           duration: 2000,
         });
       }
+      finally{
+        onClose();
+        window.location.reload();
+      }
     }
     enableUser();
   };

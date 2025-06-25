@@ -126,6 +126,11 @@ function ChangeRole({ id, fullName, role, onClose }: ChangeRoleProps) {
           duration: 2000,
         });
       }
+      finally{
+        setIsLoading(false);
+        onClose();
+        window.location.reload();
+      }
     }
     enableUser();
   };

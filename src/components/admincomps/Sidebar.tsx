@@ -23,9 +23,9 @@ import { AuthContext } from "@/app/(admin)/admin/LoginAuthentication/AuthContext
 const PERMISSIONS = {
   ADMIN_MANAGEMENT: "299243fa-a5e1-4945-9786-ae6817a0493a",
   MEMBERS_MANAGEMENT: "89bac9c8-b107-4ced-800a-15429684157f",
-  CONTENT_MANAGEMENT: "2a554294-bf30-40e7-813e-44051f6bd2b6",
-  EVENT_MANAGEMENT: "3a902e3c-5114-4694-9fa5-bfc98a2b44b1",
-  BILLING_PAYMENT: "ac16be57-6a3f-4c93-9e30-2fe2de57636c",
+  CONTENT_MANAGEMENT: "b3b82851-91f7-4f30-8b35-ea391f43d868",
+  EVENT_MANAGEMENT: "abfc07a9-9c65-49c6-8767-f46a0a621806",
+  BILLING_PAYMENT: "80bf8302-3c25-407f-9e68-e15b23d833c9",
 };
 
 // Export the full list of possible top menu items (with permission keys)

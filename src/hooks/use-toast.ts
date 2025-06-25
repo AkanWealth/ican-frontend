@@ -9,10 +9,10 @@ import * as React from "react";
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
 
 // Maximum number of toasts that can be displayed simultaneously
-const TOAST_LIMIT = 1;
+const TOAST_LIMIT = 3;
 // Delay in milliseconds before removing a toast from the DOM after it is dismissed
 // This allows time for exit animations to complete before the toast is fully removed
-const TOAST_REMOVE_DELAY = 100;
+const TOAST_REMOVE_DELAY = 1000;
 
 // Type definition for a toast with all required properties
 type ToasterToast = ToastProps & {

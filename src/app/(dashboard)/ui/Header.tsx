@@ -16,16 +16,12 @@ import { parseCookies, destroyCookie } from "nookies";
 import apiClient from "@/services/apiClient";
 import Cookies from "universal-cookie";
 
-
-
-
 interface UserData {
   id: string;
   firstname: string;
   surname: string;
   email: string;
   profilePicture?: string;
-
 }
 
 export const Header = () => {
@@ -36,7 +32,15 @@ export const Header = () => {
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const notificationRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
-  const s3Loader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
+  const s3Loader = ({
+    src,
+    width,
+    quality,
+  }: {
+    src: string;
+    width: number;
+    quality?: number;
+  }) => {
     return `${src}?w=${width}&q=${quality || 75}`;
   };
 
@@ -79,12 +83,12 @@ export const Header = () => {
     const fetchProfilePicture = async () => {
       try {
         if (typeof window === "undefined") return; // Ensure code runs only on the client side
-        
-          const cookies = parseCookies();
-           const userDataCookie = cookies['user_data'];
-           const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
-           const userId = userData?.id;
-        
+
+        const cookies = parseCookies();
+        const userDataCookie = cookies["user_data"];
+        const userData = userDataCookie ? JSON.parse(userDataCookie) : null;
+        const userId = userData?.id;
+
         if (!userId) {
           console.error("User ID not found in cookies");
           return;
@@ -92,14 +96,15 @@ export const Header = () => {
 
         // Use apiClient instead of direct axios call
         const userDetails = await apiClient.get<UserData>(`/users/${userId}`);
-        
+
         const profilePictureUrl = userDetails.profilePicture;
         console.log("Profile Picture URL:", profilePictureUrl); // Log the URL for debugging
-        
+
         if (profilePictureUrl) {
           setProfilePicture(profilePictureUrl); // Update the profile picture state
         } else {
           console.warn("Profile picture not found in user data");
+          setProfilePicture("/Ellipse 1732.png");
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -111,10 +116,10 @@ export const Header = () => {
 
   const handleLogout = () => {
     // Remove cookies instead of localStorage
-    destroyCookie(null, 'access_token');
-    destroyCookie(null, 'refresh_token');
-    destroyCookie(null, 'user_data');
-    
+    destroyCookie(null, "access_token");
+    destroyCookie(null, "refresh_token");
+    destroyCookie(null, "user_data");
+
     router.push("/login");
   };
 

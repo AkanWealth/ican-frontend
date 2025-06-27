@@ -590,7 +590,11 @@ function ResourcePage() {
                             <ChevronDown className="h-4 w-4" />
                         </button>
                         {filterBy && (
-                            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 w-36">
+                            <div 
+                                className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 w-36"
+                                onBlur={() => setShowFilterBy(false)}
+                                tabIndex={-1}
+                            >
                                 <div className="p-2">
                                     {filterTypes.map((filter, index) => (
                                         <div 
@@ -608,13 +612,18 @@ function ResourcePage() {
                     <div className="relative flex-1 sm:flex-none">
                         <button
                             onClick={() => setShowSortBy(!sortBy)}
+
                             className="flex w-full sm:w-auto items-center justify-center sm:justify-start gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                         >
                             <span className="text-sm">Sort by</span>
                             <ChevronDown className="h-4 w-4" />
                         </button>
                         {sortBy && (
-                            <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 w-36">
+                            <div 
+                                className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 w-36"
+                                onBlur={() => setShowSortBy(false)}
+                                tabIndex={-1}
+                            >
                                 <div className="p-2">
                                     {sortOptions.map((option, index) => (
                                         <div 
